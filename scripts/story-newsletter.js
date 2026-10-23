@@ -13,6 +13,10 @@
 /** The fragment path for a locale. */
 export const newsletterCardPath = (locale) => `/${locale}/fragments/newsletter-card`;
 
+// the locales whose source stories open their sidebar with the card, and whose fragment is built:
+// the German, Slovak and Serbian stories have none (live, 2026-10-23; SKODA-1001 review)
+export const CARD_LOCALES = new Set(['en', 'cs']);
+
 /**
  * The locale of a page path: its first segment when that is a two-letter code, else `en`.
  * @param {string} pathname e.g. `/cs/e-mobilita-cs/x`
@@ -33,10 +37,15 @@ export function addNewsletterCard(main, pathname = window.location.pathname) {
   const sidebar = main.querySelector(':scope > .section.sidebar');
   // a card is there already: authored, or a Fragment block for it (authored or added before)
   if (!sidebar || sidebar.querySelector('.newsletter-stub, a[href$="/fragments/newsletter-card"]')) return null;
+  const locale = pageLocale(pathname);
+  if (!CARD_LOCALES.has(locale)) return null;
   const doc = main.ownerDocument;
   const link = doc.createElement('a');
-  link.href = newsletterCardPath(pageLocale(pathname));
-  // no link text: if the fragment can't load, the empty block shows nothing
+  link.href = newsletterCardPath(locale);
+  // no link text: if the fragment can't load, the empty block shows nothing, and the empty link
+  // stays out of the tab order and the accessibility tree (the loaded card replaces it)
+  link.setAttribute('aria-hidden', 'true');
+  link.tabIndex = -1;
   const block = doc.createElement('div');
   block.className = 'fragment';
   const row = doc.createElement('div');

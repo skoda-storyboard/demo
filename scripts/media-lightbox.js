@@ -6,10 +6,11 @@
  */
 
 import { buildLightbox } from './lightbox.js';
-import { cleanTitle, currentLocale } from './query-index.js';
+import { cleanTitle } from './query-index.js';
 import { fileKey, findRowsByFile } from './media-feed.js';
 import { formatCardDate } from './card-teaser.js';
 import { downloadHref } from './media-card.js';
+import { builtLocale } from './locale-paths.js';
 
 /*
  * One shared-lightbox item from a media feed row (contract media-item shape 5): the stage
@@ -87,7 +88,10 @@ export function feedLightboxItem(row) {
 }
 
 /** The media feed of the current locale. */
-export const mediaFeedUrl = () => `/${currentLocale()}/media-feed.json`;
+// the page's locale when its feed is built, else the English feed (SKODA-1001)
+export const mediaFeedUrl = (pathname = window.location.pathname) => (
+  `/${builtLocale('mediaFeed', pathname)}/media-feed.json`
+);
 
 /**
  * Links in page copy that point at a full-size image (`<a href="…jpg"><picture>`) open the

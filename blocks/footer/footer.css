@@ -332,6 +332,16 @@ footer .footer-social .social-icons a.social-instagram:hover {
     display: block;
   }
 
+  /* a label that repeats its column's first link (the source parent is not a page, `#`: the
+     German Modelle / Lifestyle; footer-sections.js): the source shows that link at the top */
+  footer .footer-nav .footer-nav-label {
+    display: none;
+  }
+
+  footer .footer-nav .footer-nav-sublist {
+    margin-block-start: 0;
+  }
+
   /* source below 1024: one row of content-width columns, the free space shared evenly around
      them (a flex row whose clearfix pseudo-elements act as end items), so no label wraps */
   footer .footer-nav nav > ul {

@@ -35,6 +35,8 @@ function section({ label = true, white = false } = {}) {
 test('one of the two variants is picked at random', () => {
   assert.deepEqual(VARIANTS, ['youve-reached-a-dead-end', 'welcome-to-our-remote-car-park']);
   assert.equal(variantPath(() => 0), '/en/fragments/404/youve-reached-a-dead-end');
+  // a page in a locale without its own fragments reads the English ones (SKODA-1001)
+  assert.equal(variantPath(() => 0, '/cs/nic-tady-neni'), '/en/fragments/404/youve-reached-a-dead-end');
   assert.equal(variantPath(() => 0.49), '/en/fragments/404/youve-reached-a-dead-end');
   assert.equal(variantPath(() => 0.5), '/en/fragments/404/welcome-to-our-remote-car-park');
   assert.equal(variantPath(() => 0.9999), '/en/fragments/404/welcome-to-our-remote-car-park');

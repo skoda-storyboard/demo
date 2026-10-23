@@ -27,6 +27,7 @@
  * Never keyed on section order or the page URL. Rails it cannot classify (e.g. the
  * live-Instagram `type-social` strip) unwrap and bail — they are not index-driven.
  */
+import { sourceLocale, mediaFeedUrl } from '../locale.js';
 
 // href → { key, value } (category or template). Returns null if unrecognised.
 function queryFromHref(href) {
@@ -68,7 +69,9 @@ function modelOrder(element) {
   }).filter((path) => path.startsWith('/'));
 }
 
-export default function parse(element, { document, orderModels = false }) {
+export default function parse(element, {
+  document, url, params, orderModels = false,
+}) {
   // The live-Instagram social strip (`type-social`, in a `.socials-static` band)
   // is NOT an index-driven rail — bail before anything else so it isn't mistaken
   // for a `type-post` story rail.
@@ -119,7 +122,10 @@ export default function parse(element, { document, orderModels = false }) {
   // Image/video rows live in the generated media feed, not the page index (SKODA-608), as
   // in the model-page rails (story-rail.js).
   const [, railTemplate] = cells.find(([key]) => key === 'template') || [];
-  if (railTemplate === 'image' || railTemplate === 'video') cells.push(['index', '/en/media-feed.json']);
+  // the feed the page's locale reads (SKODA-1001)
+  if (railTemplate === 'image' || railTemplate === 'video') {
+    cells.push(['index', mediaFeedUrl(sourceLocale((params && params.originalURL) || url))]);
+  }
 
   const table = WebImporter.DOMUtils.createTable(cells, document);
   element.replaceWith(table);

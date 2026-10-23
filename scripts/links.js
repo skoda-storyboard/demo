@@ -6,9 +6,11 @@
  *   demo set by construction (the importer only rewrites allow-listed targets site-relative):
  *   they open in a new tab. Exception: DEMO_LISTINGS (demo entry/listing pages the DA Media
  *   Room nav still links to on the live host) become site-relative and stay in the tab.
- * - Site-relative links to sections the demo does not carry (LIVE_ONLY: other locales,
- *   Škodapedia, feeds, Media Room service pages, source-only downloads) point at the live site
- *   and open in a new tab, instead of 404ing on EDS. Mostly the DA nav/footer fragments.
+ * - Site-relative links to sections the demo does not carry (LIVE_ONLY: Škodapedia, feeds,
+ *   Media Room service pages, source-only downloads) point at the live site and open in a new
+ *   tab, instead of 404ing on EDS. Mostly the DA nav/footer fragments. Other locales are no
+ *   longer caught here (SKODA-1001): the importers decide per link, keeping a translated page
+ *   site-relative once it is migrated and writing the rest as live-site links.
  *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription") stay in the tab, as
  *   on the source (SKODA-308).
  * - A trailing slash on any other site-relative path is dropped: EDS 404s `/en/`, serves `/en`.
@@ -16,8 +18,7 @@
  *   the target and the tab (the language switcher's translations, SKODA-303a).
  * - Fragment block references skip the live redirect (LIVE_ONLY): the link names content this
  *   site serves (the shared `/{locale}/fragments/newsletter-card`, SKODA-840), not a page to
- *   navigate to, and the locale rule would send `/cs/fragments/…` to the live site, so the card
- *   would never load (#243). They keep the trailing-slash rule: `loadFragment()` appends
+ *   navigate to (#243). They keep the trailing-slash rule: `loadFragment()` appends
  *   `.plain.html`, and `/x/.plain.html` 404s (#348 review).
  */
 
@@ -27,7 +28,6 @@ const LIVE_HOST = /^(?:www\.)?skoda-storyboard\.com$/i;
 // Site-relative paths the demo does not serve → same path on the live site.
 export const LIVE_ONLY = [
   /^\/direct-download\//i,
-  /^\/(?!en(?:\/|$))[a-z]{2}(?:\/|$)/i,
   /^\/en\/skodapedia(?:\/|$)/i,
   /^\/en\/category\/podcast(?:-en)?(?:\/|$)/i,
   /^\/en\/(?:press-releases\/)?feed(?:\/|$)/i,

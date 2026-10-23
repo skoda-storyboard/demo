@@ -10,7 +10,8 @@ import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { logicalId } from './media-lib.mjs';
 import {
-  binaryErrors, binaryKind, publicBinaryUrl, rewriteBinaryLinks, verifyPublicBinary,
+  binaryAnchors, binaryErrors, binaryKind, publicBinaryUrl, rewriteBinaryLinks, verifyPublicBinary,
+  isExternalDocument,
 } from './binary-media.mjs';
 
 const exec = promisify(execFile);
@@ -267,4 +268,21 @@ test('standalone validator exits nonzero and reports page-specific failures', as
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('an approved external document host is linked as it is: not gated, not ingested (SKODA-1001)', () => {
+  const cookie = 'https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-de.pdf';
+  assert.equal(isExternalDocument(cookie), true);
+  assert.deepEqual(binaryAnchors(`<a href="${cookie}">Cookie-Richtlinie</a>`), []);
+  assert.deepEqual(binaryErrors(`<a href="${cookie}">Cookie-Richtlinie</a>`, { rows: {} }), []);
+  // only that host, over https: a look-alike, plain http or another Škoda host is still gated
+  ['https://assets.cookies.skoda-auto.com.example.org/x.pdf', 'http://assets.cookies.skoda-auto.com/x.pdf',
+    'https://cdn.skoda-storyboard.com/2026/x.pdf', 'not a url'].forEach((href) => assert.equal(isExternalDocument(href), false, href));
+  assert.match(binaryErrors('<a href="https://cdn.skoda-storyboard.com/2026/x.pdf">PDF</a>', { rows: {} }).join(' '), /unverified document link/);
+});
+
+test('rewriteBinaryLinks leaves an approved external document link alone (SKODA-1001)', () => {
+  const cookie = 'https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-sk.pdf';
+  const html = `<a href="${cookie}">Zásady cookies</a>`;
+  assert.deepEqual(rewriteBinaryLinks(html, { rows: {} }), { html, errors: [], rewrites: 0 });
 });

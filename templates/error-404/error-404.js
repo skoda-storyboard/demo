@@ -12,6 +12,7 @@
  * @param {Element} main The main element
  */
 
+import { builtLocale } from '../../scripts/locale-paths.js';
 // the fragments under /en/fragments/404/, one per source variant page
 export const VARIANTS = ['youve-reached-a-dead-end', 'welcome-to-our-remote-car-park'];
 
@@ -27,9 +28,10 @@ const LABEL = /^\S{1,8}$/;
  * The fragment path of one variant, picked at random.
  * @param {() => number} [random]
  */
-export function variantPath(random = Math.random) {
+export function variantPath(random = Math.random, pathname = window.location.pathname) {
   const index = Math.min(VARIANTS.length - 1, Math.floor(random() * VARIANTS.length));
-  return `/en/fragments/404/${VARIANTS[index]}`;
+  // the page's locale when its fragments are built, else English (SKODA-1001)
+  return `/${builtLocale('fragments404', pathname)}/fragments/404/${VARIANTS[index]}`;
 }
 
 /** An image's media-bus base (no query) and its format, as createOptimizedPicture does. */

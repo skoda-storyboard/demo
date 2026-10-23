@@ -26,6 +26,8 @@
  * parent page `/en/skoda-model/<parent>/` (its derivatives only); on a derivative page
  * `/en/skoda-model/<parent>` (parent + all derivatives, as the source shows).
  */
+import { sourceLocale, mediaFeedUrl } from '../locale.js';
+import { contentPrefix } from '../../../scripts/locale-paths.js';
 const RAILS = {
   derivatives: { template: 'skoda_model', heading: 'Bodywork / Derivatives' },
   news: { template: 'press_release', heading: 'News' },
@@ -34,10 +36,10 @@ const RAILS = {
   // Image/video rows live in the generated media feed, not the page index (SKODA-608,
   // docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md: AEM Assets is the source of truth).
   images: {
-    template: 'image', heading: 'Images', limit: '20', index: '/en/media-feed.json',
+    template: 'image', heading: 'Images', limit: '20', feed: true,
   },
   videos: {
-    template: 'video', heading: 'Videos', limit: '20', index: '/en/media-feed.json',
+    template: 'video', heading: 'Videos', limit: '20', feed: true,
   },
 };
 const FACET_KEYS = ['model', 'bodywork', 'derivative'];
@@ -74,6 +76,7 @@ function modelSegments(document, url) {
 }
 
 export default function parse(element, { document, url, params }) {
+  const locale = sourceLocale((params && params.originalURL) || url);
   let node = element;
   let railId = null;
   while (node && node !== document.documentElement) {
@@ -107,7 +110,9 @@ export default function parse(element, { document, url, params }) {
       element.remove();
       return;
     }
-    rows.push(['path', segs.length > 1 ? `/en/skoda-model/${segs[0]}` : `/en/skoda-model/${segs[0]}/`]);
+    // the model family in the page's locale (`/cs/skoda-model/…`), SKODA-1001
+    const models = contentPrefix('skoda_model', locale);
+    rows.push(['path', segs.length > 1 ? `${models}/${segs[0]}` : `${models}/${segs[0]}/`]);
   } else {
     const own = allLink(element);
     const link = own || allLink(document);
@@ -118,7 +123,7 @@ export default function parse(element, { document, url, params }) {
       element.remove();
       return;
     }
-    if (rail.index) rows.splice(1, 0, ['index', rail.index]);
+    if (rail.feed) rows.splice(1, 0, ['index', mediaFeedUrl(locale)]);
     if (rail.limit) rows.push(['limit', rail.limit]);
     if (own) {
       const target = new URL(own.getAttribute('href'), 'https://www.skoda-storyboard.com');

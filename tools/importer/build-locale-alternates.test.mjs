@@ -182,3 +182,32 @@ test('chromeRows with --chrome-footer: locales without a translated footer keep 
     ['/de/**', '/de/nav', ''],
   ]);
 });
+
+// --- SKODA-1001: the Media Room chrome rows per locale -----------------------------------
+
+test('mediaRoomRows: each Media Room section and content prefix of a locale, with its /**', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const rows = mediaRoomRows(['cs']);
+  const urls = rows.map((r) => r.URL);
+  ['/cs/media-room', '/cs/tiskove-zpravy', '/cs/tiskove-zpravy-archiv/**', '/cs/foto', '/cs/kontakty/kosik', '/cs/skoda-model/**']
+    .forEach((u) => assert.ok(urls.includes(u), u));
+  assert.ok(rows.every((r) => r.nav === '/cs/media-room/nav' && r.footer === '/cs/media-room/footer' && r.section === 'media-room'));
+  // a section the locale lacks (Slovenian has no press kits) gets no row, never an English path
+  assert.ok(mediaRoomRows(['sl']).every((r) => r.URL.startsWith('/sl/')));
+  assert.deepEqual(mediaRoomRows(['en', 'xx']), []);
+});
+
+test('mergeSheet: the Media Room rows follow /{locale}/**, and a re-run replaces both in place', async () => {
+  const { mergeSheet, chromeRows, mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const extra = [...chromeRows(['cs']), ...mediaRoomRows(['cs'])];
+  const curated = { URL: '/en/press-releases/**', nav: '/media-room/nav', footer: '/media-room/footer', section: 'media-room' };
+  const first = mergeSheet({ data: [curated] }, [], extra);
+  const at = (sheet, url) => sheet.data.findIndex((r) => r.URL === url);
+  assert.ok(at(first, '/cs/**') < at(first, '/cs/tiskove-zpravy-archiv/**'), 'the specific rows come later, so they win');
+  assert.equal(at(first, '/en/press-releases/**'), 0, 'the curated English rows stay first, unchanged');
+  // a second run: the tool's own rows are replaced, not kept as curated before the new /cs/**
+  const second = mergeSheet(first, [], extra);
+  assert.equal(second.data.length, first.data.length);
+  assert.ok(at(second, '/cs/**') < at(second, '/cs/tiskove-zpravy-archiv/**'));
+  assert.equal(second.data.filter((r) => r.URL === '/cs/foto').length, 1, 'no duplicate rows');
+});

@@ -9,6 +9,7 @@
  */
 
 import { localeOfUrl, buildNewsletter } from './locale-chrome.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 // the panel's thank-you text is the demo's own (the source shows its ESP response): kept in
 // English until a translation is supplied (SKODA-303a known gap)
@@ -18,6 +19,8 @@ export default {
   transform: ({ document, params }) => {
     const locale = localeOfUrl(params.originalURL);
     const element = buildNewsletter(document, locale, { message: MESSAGE });
+    // links to demo pages become site-relative, the rest stay on the live site (SKODA-1001)
+    linksTransformer('afterTransform', element, { document });
     return [{ element, path: `/${locale}/nav-newsletter`, report: { locale, fragment: 'nav-newsletter' } }];
   },
 };
