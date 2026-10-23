@@ -24,7 +24,7 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
 - [x] Gallery modals (gallery / story lightbox, Media Box lightbox) trap focus, close on Escape, and return focus to the
       trigger. The glossary modal is out of M1 (SKODA-206).
 - [x] Contrast passes WCAG 2.1 AA on the M1 pages, apart from the PO-accepted source greys (audit §3).
-- [x] All interactive controls are fully keyboard-operable (skip link and size-menu keys added; the story slider keeps the source's autoplay with no pause button, PO #361, audit §3).
+- [x] All interactive controls are fully keyboard-operable (skip link and size-menu keys added; the story slider has no pause button, so it no longer autoplays: SKODA-819, PR #456, audit §2).
 - [x] Empty alts flagged / backfilled; `[RUNTIME-UNCONFIRMED]` a11y items confirmed in-browser. The human NVDA /
       VoiceOver pass (audit §6) is still open.
 

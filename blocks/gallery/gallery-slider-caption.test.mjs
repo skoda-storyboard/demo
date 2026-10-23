@@ -74,12 +74,41 @@ test('the wrap-around clones carry the same caption as their slide', { skip }, (
   assert.deepEqual(clones.map((c) => c.querySelector('.gallery-slide-caption')?.textContent.trim()), ['Last', 'First']);
 });
 
-// --- controls: as the source, arrows and dots only (#361 QA, PO 2026-10-22) -----------------
+// --- controls: the source's arrows and dots only, and no autoplay (#361 QA, PR #456 review) --
 test('a looping slider has the source\'s arrows and dots and no pause / play button', { skip }, () => {
   const block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
-  assert.equal(block.querySelector('.gallery-slider-pause'), null, 'no pause control (PO: as the live slider)');
+  assert.equal(block.querySelector('.gallery-slider-pause'), null, 'no pause control (#361 QA)');
   const controls = [...block.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'));
   assert.deepEqual(controls, ['Previous image', 'Next image', 'Go to image 1', 'Go to image 2', 'Go to image 3']);
+});
+
+// SKODA-819 / WCAG 2.2.2: with no visible pause / resume control the slider must not move by itself
+test('a looping slider never autoplays: no rotation timer, the first slide stays current', { skip }, () => {
+  const { setTimeout: realTimeout, setInterval: realInterval, IntersectionObserver: RealIO } = window;
+  const delays = [];
+  const observed = [];
+  // the slider in view: every IntersectionObserver it creates reports it visible at once
+  const InView = class { constructor(cb) { this.cb = cb; } observe(el) { observed.push([this.cb, el]); } disconnect() {} };
+  window.setTimeout = (fn, ms, ...rest) => { delays.push(ms); return realTimeout(fn, ms, ...rest); };
+  window.setInterval = (fn, ms, ...rest) => { delays.push(ms); return realInterval(fn, ms, ...rest); };
+  window.IntersectionObserver = InView;
+  globalThis.IntersectionObserver = InView;
+  // a visible tab (jsdom documents report hidden)
+  Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+  let block;
+  try {
+    block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
+    observed.forEach(([cb, el]) => cb([{ isIntersecting: true, target: el }]));
+  } finally {
+    window.setTimeout = realTimeout;
+    window.setInterval = realInterval;
+    window.IntersectionObserver = RealIO;
+    globalThis.IntersectionObserver = RealIO;
+    delete document.hidden;
+  }
+  assert.deepEqual(delays, [], 'no rotation timer, even with the slider in view');
+  const current = () => [...block.querySelectorAll('.gallery-slider-dot')].findIndex((d) => d.hasAttribute('aria-current'));
+  assert.equal(current(), 0);
 });
 
 test('a single-image slider has no autoplay and no pause control', { skip }, () => {

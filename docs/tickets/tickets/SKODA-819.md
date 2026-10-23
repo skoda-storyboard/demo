@@ -44,7 +44,7 @@ at a time with arrows and dots.
 - **Block:** a `slider` variant of the existing `blocks/gallery` (authored `Gallery (slider)`),
   not a new block. It reuses the gallery's image optimisation. Native scroll-snap track, prev/next
   buttons, dots, wrap-around, and autoplay that pauses on hover/focus and is disabled under
-  `prefers-reduced-motion`. No thumbnail strip, no "Images" heading, no caption h3.
+  `prefers-reduced-motion`. *(2026-10-23: autoplay removed, see the amended criterion below.)* No thumbnail strip, no "Images" heading, no caption h3.
 - **Importer:** `story-flatten.js` emits `Gallery (slider)` for link-free `skoda-carousel-widget`.
   Link-bearing carousels keep routing to Cards. Leave `sow-slider` and `.sb-gallery` (SKODA-216)
   as they are unless measured otherwise.
@@ -61,8 +61,11 @@ at a time with arrows and dots.
 ## Acceptance Criteria
 - [ ] 1440/768/500: slider box matches the table above (±2px), 16:9, one image per view.
 - [ ] Arrows + dots positioned and coloured as measured; the selected dot tracks the current slide.
-- [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus, is off under reduced motion, and has a
-      visible pause/resume control.
+- [ ] ~~Autoplay advances every 3s and wraps; it pauses on hover/focus, is off under reduced motion, and has a
+      visible pause/resume control.~~ **Amended 2026-10-23 (#361 QA, PR #456 review):** QA asked for no extra
+      control, so by the rule above (no visible pause/resume control → no autoplay) the slider does not autoplay.
+      It wraps, and moves only on the arrows, dots, arrow keys and swipe/drag. Deviation from the source's 3s
+      rotation, recorded in the SKODA-703 audit §2.
 - [ ] Descriptions add height below the frame only when present (Octavia), with no empty caption gap (Epiq); no
       alt-as-caption.
 - [ ] Arrows and dots are labelled `<button>`s; the track is keyboard-scrollable.
