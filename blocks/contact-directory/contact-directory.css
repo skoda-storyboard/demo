@@ -1,0 +1,54 @@
+/* Contact Directory (SKODA-810a): measured on the live /en/contacts (375–1440). Two cards to a
+   row from 781px, 40px apart (the source's two-cell row and its gutter), one below, 10px
+   apart (the source's stacked cells). A card is
+   its paragraphs at the page-body rhythm (20px apart): the bold name (24px, its line 36) and
+   title (16/24, 600), the portrait at the card's width and its own ratio, the e-mail line,
+   the LinkedIn line with its 25px icon floated 10px before the link. */
+.contact-directory {
+  --contact-directory-gutter: var(--page-body-half-gutter);
+  --contact-directory-name-size: 24px;
+  --contact-directory-icon-size: 25px;
+  --contact-directory-icon-gap: var(--page-gutter);
+}
+
+.contact-directory .contact-directory-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--page-gutter) var(--contact-directory-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-directory .contact-directory-card {
+  margin: 0;
+}
+
+.contact-directory .contact-directory-name {
+  font-size: var(--contact-directory-name-size);
+}
+
+.contact-directory .contact-directory-portrait img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.contact-directory .contact-directory-icon {
+  float: inline-start;
+  margin-inline-end: var(--contact-directory-icon-gap);
+}
+
+.contact-directory .contact-directory-icon img {
+  display: block;
+  inline-size: var(--contact-directory-icon-size);
+  block-size: var(--contact-directory-icon-size);
+}
+
+/* the source's row stacks its cells below 781px: a viewport switch, not a container one (the
+   block is wider at 780 than at 781, where the page inset grows from 20 to 30px) */
+@media (width >= 781px) {
+  .contact-directory .contact-directory-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

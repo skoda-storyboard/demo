@@ -1,0 +1,21 @@
+{
+  "variantName": "contact-directory",
+  "baseBlock": "contact-directory",
+  "version": "1.0.0",
+  "created": "2026-10-23T09:00:00.000Z",
+  "name": "Contact Directory",
+  "description": "One row per person, one cell, as on the source: the name and title in bold (one paragraph, the name its first line, shown larger), the portrait, the e-mail line (a phone after it as text: \"t: +420 …\") and an optional LinkedIn line with its small icon picture before the link. Two cards to a row from 781px, one below. Put each source row in its own section (Style \"page-body\") and the group headings (h2) between them.",
+  "visualCharacteristics": {
+    "purpose": "company contacts: person cards with e-mail, phone and LinkedIn"
+  },
+  "contentPattern": {
+    "structure": "single cell card repeating"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/contacts"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-23T09:00:00.000Z"
+  }
+}

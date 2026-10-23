@@ -1,0 +1,113 @@
+/* App Promo (SKODA-810b): measured on the live /en/skoda-media-services-application (390–1440).
+   The source's SiteOrigin rows in the page-body column: from 781px each cell is 10px in from its
+   row and its editor widget 10px more (a cell's text 20px in, 40px apart across cells), below
+   the cells stack and only the widget's 10px stays. A widget starts 10px down; its paragraphs
+   are the page-body ones (20px under). The intro and the download panel are builders nested in
+   their row: another 10px around them. Images keep their size up to the cell's, centred. */
+.app-promo {
+  --app-promo-gap: var(--page-gutter);
+  --app-promo-inset: var(--page-gutter);
+  --app-promo-inset-wide: var(--paragraph-gap);
+  --app-promo-icon-share: 17.5%;
+  --app-promo-qr-share: 20%;
+  --app-promo-badge-share: 29.0824%;
+  --app-promo-panel-bg: var(--skoda-green-emerald);
+
+  /* the source's authored widget margins in the two columns: a screenshot after text sits
+     under a spacer widget (44px from 720, 20 below), its own 45px margin and its widget's 10px
+     (119px from the text, 95 below 720); text after a screenshot is pulled up flush (-30px) */
+  --app-promo-shot-gap: 95px;
+  --app-promo-shot-gap-wide: 119px;
+
+  margin: calc(-1 * var(--app-promo-gap)) calc(-1 * var(--app-promo-gap)) 0;
+}
+
+.app-promo .app-promo-cell {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  padding: var(--app-promo-gap) var(--app-promo-inset) 0;
+}
+
+.app-promo .app-promo-cell img {
+  display: block;
+  inline-size: auto;
+  max-inline-size: 100%;
+  block-size: auto;
+  margin-inline: auto;
+}
+
+/* the nested builders: the intro row and the download panel */
+.app-promo .app-promo-intro {
+  padding: var(--app-promo-gap) var(--app-promo-gap) 0;
+}
+
+.app-promo .app-promo-panel {
+  margin-block-end: calc(-1 * var(--app-promo-gap));
+  padding: var(--app-promo-gap);
+  background-color: var(--app-promo-panel-bg);
+}
+
+.app-promo .app-promo-heading .app-promo-cell {
+  text-align: center;
+}
+
+.app-promo .app-promo-split p:not(.app-promo-picture) + .app-promo-picture {
+  /* it collapses with the text's 20px margin */
+  margin-block-start: var(--app-promo-shot-gap);
+}
+
+.app-promo .app-promo-split .app-promo-picture + p:not(.app-promo-picture) {
+  margin-block-start: calc(-1 * var(--paragraph-gap));
+}
+
+@media (width >= 720px) {
+  .app-promo {
+    --app-promo-shot-gap: var(--app-promo-shot-gap-wide);
+  }
+}
+
+/* the source's rows stack their cells below 781px (SiteOrigin's switch, a viewport one) */
+@media (width >= 781px) {
+  .app-promo {
+    margin-inline: calc(-1 * var(--app-promo-inset-wide));
+  }
+
+  .app-promo .app-promo-row {
+    display: flex;
+  }
+
+  .app-promo .app-promo-cell {
+    flex: 1 1 0;
+    padding-inline: var(--app-promo-inset-wide);
+  }
+
+  .app-promo .app-promo-panel {
+    margin-inline: var(--app-promo-gap);
+  }
+
+  .app-promo .app-promo-store {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-promo .app-promo-store .app-promo-cell {
+    flex: 0 0 var(--app-promo-badge-share);
+  }
+
+  .app-promo .app-promo-store .app-promo-cell:first-child {
+    flex-basis: var(--app-promo-qr-share);
+  }
+
+  .app-promo .app-promo-intro {
+    align-items: center;
+    padding-inline: var(--app-promo-inset-wide);
+  }
+
+  .app-promo .app-promo-intro .app-promo-cell:first-child {
+    flex: 0 0 var(--app-promo-icon-share);
+  }
+
+  .app-promo .app-promo-intro .app-promo-cell + .app-promo-cell {
+    flex: 1 1 0;
+  }
+}

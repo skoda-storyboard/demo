@@ -1,0 +1,21 @@
+{
+  "variantName": "exec-bio",
+  "baseBlock": "exec-bio",
+  "version": "1.0.0",
+  "created": "2026-10-23T09:00:00.000Z",
+  "name": "Exec Bio",
+  "description": "One row per board member, two cells. Cell 1, the card: the name and roles in bold (one paragraph, the name its first line, shown larger), then the portrait. Cell 2, the \"show more\" panel: its label as the first paragraph, one paragraph per photo (each opens the lightbox over the set), then the links (CV, photo set, press release, LinkedIn). Two members to a row from 781px, one below. A row without cell 2 is a plain card; a panel without a label reads \"show more\".",
+  "visualCharacteristics": {
+    "purpose": "board members: person card with a show-more photo set and links"
+  },
+  "contentPattern": {
+    "structure": "card-panel repeating"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/board-of-management"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-23T09:00:00.000Z"
+  }
+}

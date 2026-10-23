@@ -1,0 +1,21 @@
+{
+  "variantName": "app-promo",
+  "baseBlock": "app-promo",
+  "version": "1.0.0",
+  "created": "2026-10-23T12:00:00.000Z",
+  "name": "App Promo",
+  "description": "The media-services app page: one row per source row, each read from its shape. [icon picture | intro text] the intro; [picture] the full-width mockup; [cell | cell] two columns of text and screenshots; [text] the download heading; [QR picture | App Store badge link | Google Play badge link] the store strip. The heading and the store strip share the emerald download panel. Images keep their size up to the cell width, centred. Put it in a section with Style \"page-body\".",
+  "visualCharacteristics": {
+    "purpose": "app promotion page: intro, mockup, screenshots, QR code and store badges"
+  },
+  "contentPattern": {
+    "structure": "rows by shape"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/skoda-media-services-application"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-23T12:00:00.000Z"
+  }
+}
