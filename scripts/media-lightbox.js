@@ -6,7 +6,8 @@
  */
 
 import { buildLightbox } from './lightbox.js';
-import { loadQueryIndex, cleanTitle, currentLocale } from './query-index.js';
+import { cleanTitle, currentLocale } from './query-index.js';
+import { fileKey, findRowsByFile } from './media-feed.js';
 import { formatCardDate } from './card-teaser.js';
 import { downloadHref } from './media-card.js';
 
@@ -88,10 +89,6 @@ export function feedLightboxItem(row) {
 /** The media feed of the current locale. */
 export const mediaFeedUrl = () => `/${currentLocale()}/media-feed.json`;
 
-const fileKey = (url) => {
-  try { return new URL(url, window.location.href).pathname.split('/').pop().toLowerCase(); } catch (e) { return ''; }
-};
-
 /**
  * Links in page copy that point at a full-size image (`<a href="…jpg"><picture>`) open the
  * lightbox on their own image (single view: no counter, no arrows), with the file details
@@ -103,9 +100,11 @@ export function wireImageLinks(links) {
   if (!links.length) return;
   let lightbox = null;
   const build = async () => {
-    let rows = [];
-    try { rows = await loadQueryIndex(mediaFeedUrl()); } catch (e) { /* titled by the alt */ }
-    const byFile = new Map(rows.map((r) => [fileKey(r.original), r]));
+    // only the keyed shards of these files when the feed has them (SKODA-517)
+    let byFile = new Map();
+    try {
+      byFile = await findRowsByFile(mediaFeedUrl(), links.map((a) => a.href));
+    } catch (e) { /* titled by the alt */ }
     const items = links.map((a) => {
       const img = a.querySelector('img');
       const row = byFile.get(fileKey(a.href));

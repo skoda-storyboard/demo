@@ -14,7 +14,8 @@
 /* eslint-disable no-use-before-define */
 
 import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
-import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
+import { defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
+import { openListingFeed } from '../../scripts/media-feed.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 // dependency-free: the limit banner renders in the first paint without the cart (SKODA-505b)
 import { buildLimitBanner, LIMIT_BANNER_TEXT } from '../../scripts/media-cart-limits.js';
@@ -342,15 +343,27 @@ export function wireMediaLightbox(grid, getRows, {
   });
 }
 
-export default async function decorate(block) {
+async function buildListing(block, onFirstPaint) {
   const cfg = parseListConfig(block);
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
   const media = isMediaTemplate(cfg.template);
   // The index doesn't need the placeholders: request it now, alongside them. The listing's
-  // first paint and LCP wait for it (SKODA-702). Its failure is handled where it's awaited.
-  const indexRows = loadQueryIndex(cfg.index);
-  indexRows.catch(() => {});
+  // first paint and LCP wait for it (SKODA-702). A media feed with a head shard paints its
+  // first page from that and loads the rest after (SKODA-517). Failures are handled where
+  // they are awaited.
+  // State (restored from the deep-link URL). The head shard is the newest rows of the template:
+  // it can only be the first page of the default view (no filter, no path scope, newest first),
+  // so a deep link to another view doesn't request it.
+  const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
+  const headView = !cfg.path && initial.sort === 'newest'
+    && !Object.values(initial.active).some((v) => v.length);
+  const feedReady = openListingFeed(cfg.index, { template: cfg.template, path: cfg.path });
+  // (and one that reveals more rows than the head holds skips it too)
+  const useHead = (f) => !!f.head && headView && (f.headRows ?? Infinity) >= initial.revealed;
+  const headReady = feedReady.then((f) => (useHead(f) ? f.head() : null)).catch(() => null);
+  const rowsReady = feedReady.then((f) => (useHead(f) ? null : f.rows()));
+  rowsReady.catch(() => {});
   // the source's option names (#273), alongside: only the facet bar needs them
   const facetLabels = cfg.facets.length ? loadFacetLabels() : Promise.resolve(facetLabelMap({}));
   // media listings show the cart's package-limit notice (SKODA-505b) in the skeleton, styled
@@ -360,8 +373,6 @@ export default async function decorate(block) {
   const STRINGS = buildStrings(placeholders);
   const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
-  // State (restored from the deep-link URL).
-  const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
   const state = { active: initial.active, sort: initial.sort, revealed: initial.revealed };
 
   // Skeleton.
@@ -417,13 +428,75 @@ export default async function decorate(block) {
     sortRow.after(buildLimitBanner(placeholders.mediaCartLimitBanner || LIMIT_BANNER_TEXT));
   }
 
+  let currentRows = []; // the rows the grid shows, in order (the media lightbox's items)
+  let paintedTotal = -1; // the total the grid's count shows
+  if (media) wireMediaLightbox(grid, () => currentRows);
+  // Load more pressed before the rows are in (the first page came from the head shard) runs
+  // once they are
+  let rowsLoaded = false;
+  let moreQueued = false;
+  const onLoadMore = () => {
+    if (rowsLoaded) loadMore();
+    else moreQueued = true;
+  };
+
+  function paintGrid(shownRows, total) {
+    currentRows = shownRows;
+    grid.textContent = '';
+    let cell = OVERLAY_TEMPLATES.has(cfg.template) ? overlayCell : cardCell;
+    if (media) cell = (row, eager) => mediaCell(row, eager, mediaText);
+    shownRows.forEach((row, i) => grid.append(cell(row, i === 0)));
+
+    status.hidden = total > 0;
+    if (!total) status.textContent = STRINGS.noResults;
+
+    renderCount(shownRows.length, total);
+
+    // Load-more.
+    loadMoreWrap.textContent = '';
+    if (shownRows.length < total) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'listing-loadmore-btn';
+      const label = document.createElement('span');
+      label.className = 'listing-loadmore-label';
+      label.textContent = STRINGS.loadMore;
+      // the source ajax-loader-button's 4-dot loader, shown while the next items load
+      const loader = document.createElement('span');
+      loader.className = 'listing-loader';
+      loader.setAttribute('aria-hidden', 'true');
+      loader.append(...Array.from({ length: 4 }, () => {
+        const dot = document.createElement('span');
+        dot.className = 'listing-loader-dot';
+        return dot;
+      }));
+      btn.append(label, loader);
+      btn.addEventListener('click', onLoadMore);
+      loadMoreWrap.append(btn);
+    }
+  }
+
   // Load the index (self-contained; degrades to empty/error state).
+  let feed;
   let scoped = [];
   try {
-    const rows = await indexRows;
+    feed = await feedReady;
+    const head = await headReady;
+    // the head is the first page when it holds that page (a deep link may reveal more)
+    const headRows = head ? scopeRows(head.rows, { template: cfg.template }) : [];
+    if (head && (headRows.length >= state.revealed || headRows.length >= head.total)) {
+      paintGrid(paginate(headRows, state.revealed), head.total);
+      paintedTotal = head.total;
+      onFirstPaint(); // the section can show now: the facet index and the bar follow
+    }
+    // with a head shard (loaded or failed) the rows were left for now: request them here
+    const rows = await (useHead(feed) ? feed.rows() : rowsReady);
     scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
   } catch (e) {
     status.textContent = STRINGS.loadError;
+    // a first page painted from the head shard stays, without a Load more that can't load
+    status.hidden = false;
+    loadMoreWrap.textContent = '';
     // eslint-disable-next-line no-console
     console.error('listing: index load failed', e);
     return;
@@ -455,8 +528,6 @@ export default async function decorate(block) {
 
   // --- rendering ---------------------------------------------------------
   const filteredSorted = () => sortRows(filterRows(scoped, state.active), state.sort);
-  let currentRows = []; // the rows the grid shows, in order (the media lightbox's items)
-  if (media) wireMediaLightbox(grid, () => currentRows);
 
   // Filter/sort changes replace the current history entry (keeps the URL
   // deep-linkable without a back-stack entry per toggle); only load-more pushes
@@ -509,42 +580,64 @@ export default async function decorate(block) {
     });
   }
 
-  function renderGrid() {
+  // Rows from the facet index are filled in from their detail shards before they show; the
+  // page shows at once when those are in (always, for a whole-feed read). Only the latest
+  // render paints, and a failed shard keeps the grid as it is. `onPainted` runs after the
+  // paint (synchronously when nothing had to load).
+  // A page that shows the same rows in the same order, out of the same total, is left as it is:
+  // the full rows landing after a first paint from the head shard don't rebuild the grid (and
+  // don't take the focus of a keyboard user who tabbed into it meanwhile).
+  let renderSeq = 0;
+  const rowKey = (row) => String(row?.id || row?.path || '');
+  const unchanged = (rows, total) => total === paintedTotal && rows.length === currentRows.length
+    && rows.every((row, i) => rowKey(row) && rowKey(row) === rowKey(currentRows[i]));
+  const settleLoadMore = () => {
+    const btn = loadMoreWrap.querySelector('.listing-loadmore-btn');
+    btn?.classList.remove('is-loading');
+    btn?.removeAttribute('aria-busy');
+  };
+  const paint = (rows, total) => {
+    if (unchanged(rows, total)) {
+      status.hidden = total > 0; // e.g. a load error shown meanwhile
+      settleLoadMore(); // a Load more that brought nothing new doesn't keep spinning
+    } else paintGrid(rows, total);
+    paintedTotal = total;
+  };
+  function renderGrid(onPainted = () => {}) {
     const all = filteredSorted();
-    const shownRows = paginate(all, state.revealed);
-    currentRows = shownRows;
-    grid.textContent = '';
-    let cell = OVERLAY_TEMPLATES.has(cfg.template) ? overlayCell : cardCell;
-    if (media) cell = (row, eager) => mediaCell(row, eager, mediaText);
-    shownRows.forEach((row, i) => grid.append(cell(row, i === 0)));
-
-    status.hidden = all.length > 0;
-    if (!all.length) status.textContent = STRINGS.noResults;
-
-    renderCount(shownRows.length, all.length);
-
-    // Load-more.
-    loadMoreWrap.textContent = '';
-    if (shownRows.length < all.length) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'listing-loadmore-btn';
-      const label = document.createElement('span');
-      label.className = 'listing-loadmore-label';
-      label.textContent = STRINGS.loadMore;
-      // the source ajax-loader-button's 4-dot loader, shown while the next items load
-      const loader = document.createElement('span');
-      loader.className = 'listing-loader';
-      loader.setAttribute('aria-hidden', 'true');
-      loader.append(...Array.from({ length: 4 }, () => {
-        const dot = document.createElement('span');
-        dot.className = 'listing-loader-dot';
-        return dot;
-      }));
-      btn.append(label, loader);
-      btn.addEventListener('click', loadMore);
-      loadMoreWrap.append(btn);
+    const page = paginate(all, state.revealed);
+    renderSeq += 1;
+    const ready = feed.hydrated(page);
+    if (ready) {
+      paint(ready, all.length);
+      onPainted();
+      return;
     }
+    const seq = renderSeq;
+    feed.hydrate(page).then((full) => {
+      if (seq !== renderSeq) return;
+      // a facet row that neither its detail shard nor the whole feed has can't show: it leaves
+      // the listing (count, pages, Load more), and the page is drawn again without it
+      if (full.length < page.length) {
+        const found = new Set(full.map(rowKey));
+        const gone = new Set(page.map(rowKey).filter((key) => !found.has(key)));
+        scoped = scoped.filter((row) => !gone.has(rowKey(row)));
+        renderGrid(onPainted);
+        return;
+      }
+      paint(full, all.length);
+      onPainted();
+    }, (e) => {
+      if (seq !== renderSeq) return;
+      // the shown cards stay; the listing says it couldn't load more, and nothing keeps spinning
+      status.textContent = STRINGS.loadError;
+      status.hidden = false;
+      settleLoadMore();
+      block.classList.remove('is-loading');
+      block.removeAttribute('aria-busy');
+      // eslint-disable-next-line no-console
+      console.error('listing: rows load failed', e);
+    });
   }
 
   // Load more: the button shows its loader, then the next page appends and focus moves to its
@@ -569,8 +662,7 @@ export default async function decorate(block) {
       const prev = grid.children.length;
       state.revealed += cfg.perpage;
       updateUrl(true); // load-more pushes a history entry (source offset paging)
-      renderGrid();
-      grid.children[prev]?.querySelector('a')?.focus();
+      renderGrid(() => grid.children[prev]?.querySelector('a')?.focus());
     }, reducedMotion() ? 0 : LOAD_MORE_MS);
   }
 
@@ -610,13 +702,13 @@ export default async function decorate(block) {
     });
   }
 
-  function rerender() {
+  function rerender(onPainted) {
     updateUrl();
     syncSortButtons();
     refreshPillStates();
     refreshFacetOptions();
     renderChips();
-    renderGrid();
+    renderGrid(onPainted);
   }
 
   // A filter change, as on the source (measured 2026-10-14 on /en/news + /en/images, #333): the
@@ -655,11 +747,14 @@ export default async function decorate(block) {
         veilTimer = 0;
         // before the render: it removes a clicked chip, which would drop focus to <body>
         const hadFocus = facetBar.contains(document.activeElement);
-        rerender();
+        // the veil lifts once the new results show (a page from the facet index may still need
+        // its detail shard)
+        rerender(() => {
+          block.classList.remove('is-loading');
+          block.removeAttribute('aria-busy');
+        });
         collapseFacetsNow();
         if (hadFocus) filterToggle.focus();
-        block.classList.remove('is-loading');
-        block.removeAttribute('aria-busy');
       }, reducedMotion() ? 0 : VEIL_MS);
     }, settleMs);
   }
@@ -859,6 +954,8 @@ export default async function decorate(block) {
   refreshPillStates();
   renderChips();
   renderGrid();
+  rowsLoaded = true;
+  if (moreQueued) loadMore();
 
   // names that came after the first paint: rename and reorder the options in place (their
   // inputs, state and listeners stay), then the chips. Moving a focused option drops focus to
@@ -904,4 +1001,23 @@ export default async function decorate(block) {
       renderChips();
     });
   }
+}
+
+/**
+ * EDS keeps a section hidden until its blocks are decorated (loadSection awaits this), so a
+ * listing whose first page came from the media feed's head shard ends its decoration there:
+ * the cards show while the facet index loads, and the facet bar, the count and Load more follow
+ * (SKODA-517 review). Without a head the decoration waits for the rows, as before.
+ * @param {Element} block the listing block
+ */
+export default async function decorate(block) {
+  let shown = false;
+  let showNow;
+  const firstPaint = new Promise((resolve) => { showNow = resolve; });
+  const built = buildListing(block, () => { shown = true; showNow(); });
+  built.catch((e) => {
+    // eslint-disable-next-line no-console
+    if (shown) console.error('listing: setup failed after the first paint', e);
+  });
+  await Promise.race([firstPaint, built]);
 }
