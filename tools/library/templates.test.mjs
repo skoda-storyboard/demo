@@ -4,9 +4,10 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { JSDOM } from 'jsdom';
 import { TEMPLATES } from './templates-spec.mjs';
 import { SPEC } from './library-spec.mjs';
-import { instances, rows } from './build-library.mjs';
+import { buildDocuments, instances, rows } from './build-library.mjs';
 import { parseMetadata, validateMetadata } from '../importer/validate-metadata.mjs';
 import { layoutTileRows } from '../../scripts/cards-tiles.js';
 
@@ -53,4 +54,30 @@ test('press-kit hub: the tile rows fill the press grid', () => {
   const [tiles] = instances(html(TEMPLATES['press-kit']), 'cards');
   const tokens = rows(tiles.html).map((r) => r.match(/^<div><div>([a-z-]+)<\/div>/)[1]);
   assert.doesNotThrow(() => layoutTileRows(tokens, { pressPage: true }));
+});
+
+test('timeline: every variant has an insertable library example without a published source', () => {
+  const { html: sample, report } = buildDocuments([]).timeline;
+  const document = new JSDOM(sample).window.document;
+  const blocks = [...document.querySelectorAll('.timeline')];
+  assert.deepEqual(
+    blocks.map((block) => [...block.classList].slice(1).join(' ')),
+    ['', ...SPEC.timeline.variants.map((variant) => variant.class)],
+  );
+  assert.equal(document.querySelectorAll('.library-metadata').length, blocks.length);
+  assert.equal(report.some((line) => line.includes('skipped')), false);
+  blocks.forEach((block) => {
+    const entries = [...block.children];
+    assert.equal(entries.length, 2);
+    entries.forEach((entry, index) => {
+      assert.equal(entry.children.length, 5, 'year | title | image | description | optional space');
+      const [year, title, image, description, space] = entry.children;
+      assert.match(year.textContent, /^\d{4}$/);
+      assert.equal(title.querySelectorAll(':scope > p').length, 3, 'maker, model and display note');
+      assert.ok(title.querySelector('strong'));
+      assert.ok(image.querySelector('picture > img[alt]'));
+      assert.ok(description.querySelector('p').textContent.trim());
+      assert.equal(space.textContent, index === 0 ? '15' : '');
+    });
+  });
 });
