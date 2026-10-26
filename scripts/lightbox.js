@@ -35,6 +35,7 @@
 
 import { loadCSS } from './aem.js';
 import { fetchPlaceholders, localize, fillText } from './placeholders.js';
+import { META_CLASS, RELATED_CLASS } from './media-panel.js';
 
 // UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
 // `lightbox…` ({n}, {total} filled in), a clip's as `lightboxVideo…`.
@@ -114,7 +115,7 @@ let overlayCount = 0;
 export function decorateTags(caption) {
   const p = [...caption.querySelectorAll('p')].find((el) => (
     el.textContent.includes('·')
-    && !el.matches('.lightbox-meta, .lightbox-related')
+    && !el.matches(`.${META_CLASS}, .${RELATED_CLASS}`)
     && !/file type|file size|dimensions|published/i.test(el.textContent)
     && !/related article/i.test(el.textContent)
     && !el.querySelector('a')
@@ -325,6 +326,11 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     nextBtn.setAttribute('aria-label', text.next);
     setDetails(overlay.classList.contains('is-details-open'));
     if (named) nameActions(named);
+    // an open lightbox: its counter's name and the player's fallback name too
+    if (!overlay.hidden && items.length) {
+      counter.setAttribute('aria-label', text.counterLabel(current + 1, items.length));
+      if (player && !player.hidden && !items[current]?.alt) player.title = text.video;
+    }
   }).catch(() => { /* the English text stays */ });
 
   const render = (index) => {
@@ -390,7 +396,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       // insert before the file-metadata paragraph if present (marked by media-panel.js in any
       // language; an authored caption's English "File type…"), otherwise at the end of the panel
       const paras = [...stageCaption.querySelectorAll('p')];
-      const meta = paras.find((p) => p.classList.contains('lightbox-meta') || /file type/i.test(p.textContent));
+      const meta = paras.find((p) => p.classList.contains(META_CLASS) || /file type/i.test(p.textContent));
       if (meta) stageCaption.insertBefore(actions, meta);
       else stageCaption.append(actions);
       // render the tags paragraph ("2026 · Peaq") as individual chips

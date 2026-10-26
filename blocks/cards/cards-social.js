@@ -18,8 +18,11 @@
  * grids don't pay for the icon data.
  */
 
-// i18n: the single translation point for this variant's control text
-const LABELS = {
+import { applyLocalized } from '../../scripts/placeholders.js';
+
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `cardsSocial…`; the networks' names below are brand names
+export const SOCIAL_CARD_LABELS = {
   newTab: 'opens in a new tab',
 };
 
@@ -80,11 +83,12 @@ export function profileUrl(href) {
  * name, WCAG 2.5.3), the network, and that the link opens a new tab.
  * @param {string|null} network a NETWORKS key
  * @param {string} handle the visible handle, e.g. "@skodaglobal"
+ * @param {typeof SOCIAL_CARD_LABELS} [labels] the page locale's (English by default)
  * @returns {string}
  */
-export function socialLabel(network, handle) {
+export function socialLabel(network, handle, labels = SOCIAL_CARD_LABELS) {
   const name = network ? NETWORKS[network].name : '';
-  return `${[name, handle].filter(Boolean).join(' ')} (${LABELS.newTab})`;
+  return `${[name, handle].filter(Boolean).join(' ')} (${labels.newTab})`;
 }
 
 function socialIcon(network) {
@@ -107,6 +111,7 @@ function socialIcon(network) {
  */
 export default function decorateSocialCards(block) {
   const ul = document.createElement('ul');
+  const named = [];
   [...block.children].forEach((row) => {
     const authored = row.querySelector('a[href]');
     const url = authored && profileUrl(authored.getAttribute('href'));
@@ -122,7 +127,7 @@ export default function decorateSocialCards(block) {
     link.href = url.href;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.setAttribute('aria-label', socialLabel(network, handle));
+    named.push([link, network, handle]);
     if (network) link.append(socialIcon(network));
     const text = document.createElement('span');
     text.className = 'card-teaser-social-handle';
@@ -132,4 +137,8 @@ export default function decorateSocialCards(block) {
     ul.append(li);
   });
   block.replaceChildren(ul);
+  // the names in English now, in the page locale once the sheet resolves
+  applyLocalized(SOCIAL_CARD_LABELS, 'cardsSocial', (labels) => {
+    named.forEach(([link, network, handle]) => link.setAttribute('aria-label', socialLabel(network, handle, labels)));
+  });
 }

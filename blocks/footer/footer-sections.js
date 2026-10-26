@@ -6,7 +6,7 @@
 import { opensInSameTab } from '../../scripts/links.js';
 
 // social network → accessible label + hover-tint class, keyed by icon token name
-const SOCIAL_LABELS = {
+const SOCIAL_NAMES = {
   facebook: 'Facebook',
   instagram: 'Instagram',
   youtube: 'YouTube',
@@ -48,9 +48,9 @@ function decorateSocial(section, labels = FOOTER_LABELS) {
 
   anchors.forEach((a) => {
     const name = iconNameOf(a);
-    if (name && SOCIAL_LABELS[name]) {
+    if (name && SOCIAL_NAMES[name]) {
       a.classList.add('social-link', `social-${name}`);
-      a.setAttribute('aria-label', SOCIAL_LABELS[name]);
+      a.setAttribute('aria-label', SOCIAL_NAMES[name]);
       socialIcons.push(a);
     } else if (name && APP_BADGE_KEYS[name]) {
       a.classList.add('app-badge');
@@ -132,8 +132,9 @@ function decorateColumns(section) {
 
 /**
  * The © notice's year as the current one (the authored footers say "2026"; G-KT-10,
- * SKODA-1003): the last 4-digit year after the ©, in the notice's own text, never an earlier or
- * later one the author set on purpose for a range ("2019–2026" keeps its start).
+ * SKODA-1003): the first 4-digit year after the ©, or the end of a range that directly follows
+ * it ("2019–2025" keeps its start). An open range ("2019 – present"), a later year the author
+ * set on purpose and any year further on ("Founded 1991") stay as they are.
  * @param {Element} notice the copyright notice paragraph
  * @param {number} year the current year
  */
@@ -147,17 +148,33 @@ export function updateCopyrightYear(notice, year) {
   collect(notice);
   const seen = texts.findIndex((t) => t.textContent.includes('©'));
   if (seen < 0) return;
-  // the last year in the text after the ©
-  for (let i = texts.length - 1; i >= seen; i -= 1) {
-    const value = texts[i].textContent;
-    const from = i === seen ? value.indexOf('©') : 0;
-    const match = [...value.slice(from).matchAll(/\b(19|20)\d{2}\b/g)].pop();
-    if (match) {
-      const at = from + match.index;
-      if (Number(match[0]) < year) texts[i].textContent = `${value.slice(0, at)}${year}${value.slice(at + 4)}`;
-      return;
-    }
+  // the text after the ©, across the notice's text nodes (a year may sit in a link or <strong>)
+  const parts = texts.slice(seen).map((node, i) => ({
+    node, from: i === 0 ? node.textContent.indexOf('©') + 1 : 0,
+  }));
+  let offset = 0;
+  parts.forEach((part) => {
+    part.start = offset;
+    offset += part.node.textContent.length - part.from;
+  });
+  const after = parts.map((part) => part.node.textContent.slice(part.from)).join('');
+  const match = after.match(/((?:19|20)\d{2})(?:(\s*[–—-]\s*)((?:19|20)\d{2}|\p{L}+))?/u);
+  if (!match) return;
+  const [, first, separator, end] = match;
+  let at = match.index;
+  let value = first;
+  if (end) {
+    if (!/^\d/.test(end)) return; // an open range
+    at += first.length + separator.length;
+    value = end;
   }
+  if (Number(value) >= year) return;
+  const part = parts.findLast((p) => p.start <= at);
+  const local = part.from + at - part.start;
+  const text = part.node.textContent;
+  // a year split across two nodes is not one the author wrote: leave it
+  if (text.slice(local, local + 4) !== value) return;
+  part.node.textContent = `${text.slice(0, local)}${year}${text.slice(local + 4)}`;
 }
 
 /**

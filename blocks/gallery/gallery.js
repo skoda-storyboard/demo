@@ -29,7 +29,6 @@ import {
 // `gallery…` ({n}, {total}, {alt} filled in). A counted text has its English singular as
 // `…One`; a sheet may add the locale's other forms (`…Few`, `…Many`, pluralText).
 export const GALLERY_LABELS = {
-  open: 'Open image',
   openNumbered: 'Open image {n}',
   openNamed: 'Open image {n}: {alt}',
   prev: 'Previous image',

@@ -50,8 +50,9 @@ export const DOWNLOADS_LABELS = {
   file: 'file',
   // the size-menu toggle
   sizes: 'Download sizes for {title}',
-  open: 'View image',
-  videoPoster: 'View video poster',
+  // a tile image's link, which opens the lightbox ({title} may be empty)
+  open: 'View image {title}',
+  videoPoster: 'View video poster {title}',
   // a file tile's own link (#275): it opens the file, as the source's tile does
   openFile: 'Open {name}',
   openFileTyped: 'Open {name} ({type})',
@@ -91,8 +92,8 @@ export function downloadsText(ph = {}) {
       ? fillText(t.downloadSized, { title, size })
       : fillText(t.download, { name: title || size || t.file })),
     sizes: (title) => fillText(t.sizes, { title }),
-    open: t.open,
-    videoPoster: t.videoPoster,
+    open: (title) => fillText(t.open, { title }).trim(),
+    videoPoster: (title) => fillText(t.videoPoster, { title }).trim(),
     openFile: (title, type) => fillText(
       type ? t.openFileTyped : t.openFile,
       { name: title || t.file, type },
@@ -668,7 +669,7 @@ function buildTile(asset, { mediaBox = false, text = ENGLISH } = {}) {
     thumb.className = 'downloads-thumb';
     [thumb.href] = asset.src.split('?');
     const isVideo = asset.sizes.length === 1 && /\.mp4(?:[?#]|$)/i.test(asset.sizes[0].href);
-    thumb.setAttribute('aria-label', `${isVideo ? text.videoPoster : text.open} ${asset.title}`.trim());
+    thumb.setAttribute('aria-label', (isVideo ? text.videoPoster : text.open)(asset.title || ''));
     thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
       { media: '(min-width: 768px)', width: '750' },
       { width: '500' },

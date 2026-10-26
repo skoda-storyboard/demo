@@ -1,4 +1,8 @@
 {
+ "cardsSocialNewTab": {
+  "text": "otevře se v nové kartě",
+  "source": "draft"
+ },
  "carouselCarousel": {
   "text": "karusel",
   "source": "draft"
@@ -104,11 +108,11 @@
   "source": "draft"
  },
  "downloadsAddSize": {
-  "text": "Přidat/odebrat verzi {size}",
+  "text": "Přidat/odebrat {size} verzi",
   "source": "draft"
  },
  "downloadsAddSizeNamed": {
-  "text": "Přidat/odebrat verzi {size}: {title}",
+  "text": "Přidat/odebrat {size} verzi: {title}",
   "source": "draft"
  },
  "downloadsDownload": {
@@ -136,7 +140,7 @@
   "source": "draft"
  },
  "downloadsOpen": {
-  "text": "Zobrazit obrázek",
+  "text": "Zobrazit obrázek {title}",
   "source": "draft"
  },
  "downloadsOpenFile": {
@@ -168,19 +172,19 @@
   "source": "live"
  },
  "downloadsTipAddSize": {
-  "text": "Přidat/odebrat verzi {size}",
-  "source": "draft"
+  "text": "Přidat/odebrat {size} verzi",
+  "source": "live"
  },
  "downloadsTipDownload": {
   "text": "Stáhnout soubor",
   "source": "live"
  },
  "downloadsTipDownloadSize": {
-  "text": "Stáhnout verzi {size}",
-  "source": "draft"
+  "text": "Stáhnout {size} verzi",
+  "source": "live"
  },
  "downloadsVideoPoster": {
-  "text": "Zobrazit náhled videa",
+  "text": "Zobrazit náhled videa {title}",
   "source": "draft"
  },
  "embedBuzzsprout": {
@@ -287,10 +291,6 @@
   "text": "Další obrázek",
   "source": "draft"
  },
- "galleryOpen": {
-  "text": "Otevřít obrázek",
-  "source": "draft"
- },
  "galleryOpenGallery": {
   "text": "Otevřít galerii, {n} obrázků",
   "source": "draft"
@@ -347,6 +347,10 @@
   "text": "Zavřít vyhledávání",
   "source": "draft"
  },
+ "headerHome": {
+  "text": "Škoda Storyboard, domovská stránka",
+  "source": "draft"
+ },
  "headerLanguages": {
   "text": "Jazyk",
   "source": "draft"
@@ -396,8 +400,8 @@
   "source": "live"
  },
  "lightboxAddTip": {
-  "text": "Přidat/odebrat originální verzi",
-  "source": "draft"
+  "text": "Přidat/odebrat Original verzi",
+  "source": "live"
  },
  "lightboxAddToBox": {
   "text": "Přidat do mediálního košíku",
@@ -424,8 +428,8 @@
   "source": "draft"
  },
  "lightboxDownloadTip": {
-  "text": "Stáhnout originální verzi",
-  "source": "draft"
+  "text": "Stáhnout Original verzi",
+  "source": "live"
  },
  "lightboxHideDetails": {
   "text": "Skrýt podrobnosti obrázku",
@@ -433,7 +437,7 @@
  },
  "lightboxLinkTip": {
   "text": "Odkaz na stránku",
-  "source": "draft"
+  "source": "live"
  },
  "lightboxNext": {
   "text": "Další obrázek",
@@ -465,7 +469,7 @@
  },
  "lightboxVideoCopyLink": {
   "text": "Odkaz na stránku",
-  "source": "draft"
+  "source": "live"
  },
  "lightboxVideoDownload": {
   "text": "Stáhnout soubor",
@@ -477,7 +481,7 @@
  },
  "lightboxVideoLinkTip": {
   "text": "Odkaz na stránku",
-  "source": "draft"
+  "source": "live"
  },
  "listingAdvancedFilter": {
   "text": "Pokročilé vyhledávání",
@@ -576,8 +580,8 @@
   "source": "draft"
  },
  "mediaAddSize": {
-  "text": "Přidat/odebrat verzi {size}",
-  "source": "draft"
+  "text": "Přidat/odebrat {size} verzi",
+  "source": "live"
  },
  "mediaAddToCart": {
   "text": "Přidat do mediálního košíku",
@@ -744,8 +748,8 @@
   "source": "draft"
  },
  "mediaDownloadSize": {
-  "text": "Stáhnout verzi {size}",
-  "source": "draft"
+  "text": "Stáhnout {size} verzi",
+  "source": "live"
  },
  "mediaDownloadVideo": {
   "text": "Stáhnout soubor",
@@ -861,7 +865,7 @@
  },
  "pressKitTipLink": {
   "text": "Odkaz na stránku",
-  "source": "draft"
+  "source": "live"
  },
  "pressReleaseAddAllMediaBox": {
   "text": "Přidat všechny soubory z Media Boxu do mediálního košíku",
@@ -944,7 +948,31 @@
   "source": "draft"
  },
  "storiesResultsShown": {
-  "text": "zobrazených článků",
+  "text": "Zobrazeno {n} článků",
+  "source": "draft"
+ },
+ "storiesResultsShownFew": {
+  "text": "Zobrazeny {n} články",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "Zobrazen {n} článek",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Přidat do mediálního košíku",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Stáhnout originál",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Stáhnout video",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Zobrazit vše",
   "source": "draft"
  },
  "suggestDateFormat": {

@@ -25,7 +25,7 @@
 import { readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
-import { foldText } from '../../scripts/search-suggest.js';
+import { matchRows } from '../../scripts/search-suggest.js';
 
 // UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
 // `search…`. The aria-live result summaries substitute %d (count) and %q (query).
@@ -42,12 +42,12 @@ export const buildStrings = (ph = {}) => localize(SEARCH_LABELS, ph, 'search');
 
 let instanceSeq = 0; // per-page counter → unique element ids when >1 search on a page
 
-// the indexed fields this pilot matches against (title/summary/tags only)
-const MATCH_FIELDS = ['title', 'description', 'tags'];
-
-/** Fill a template string's %q (query) / %d (count) tokens. */
-function format(tpl, { q = '', d = 0 } = {}) {
-  return tpl.replace('%q', q).replace('%d', String(d));
+/**
+ * Fill a template string's %q (query) / %d (count) tokens in one pass: a translation may put the
+ * query first, and the query is the user's text (a `%d` or `$&` in it stays as typed).
+ */
+export function format(tpl, { q = '', d = 0 } = {}) {
+  return tpl.replace(/%[qd]/g, (token) => (token === '%q' ? q : String(d)));
 }
 
 /**
@@ -61,23 +61,9 @@ function readConfig(block) {
   return { source: (cfg.source || '').trim() };
 }
 
-/**
- * Pure matcher: rows whose title/description/tags contain every whitespace-
- * separated term (case-insensitive, AND). Empty query → no results (the page
- * shows the prompt instead). Index-only: never looks at page body text.
- * @param {Array<object>} rows the query-index rows
- * @param {string} query raw user input
- * @returns {Array<object>} matching rows (index order preserved)
- */
-export function matchRows(rows, query) {
-  // case- and accent-insensitive, as the header's suggestions (SKODA-1003)
-  const terms = foldText(query.trim()).split(/\s+/).filter(Boolean);
-  if (!terms.length) return [];
-  return rows.filter((row) => {
-    const hay = foldText(MATCH_FIELDS.map((f) => String(row[f] || '')).join(' '));
-    return terms.every((t) => hay.includes(t));
-  });
-}
+// the pure matcher (title / description / tags, every term, case- and accent-insensitive) is the
+// header suggestions' own (SKODA-1003); re-exported for this block's tests
+export { matchRows };
 
 /**
  * Build one result <li>: a title link + optional summary. Link-only per the

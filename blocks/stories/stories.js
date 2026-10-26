@@ -27,7 +27,7 @@
 
 import { readBlockConfig, createOptimizedPicture } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
-import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize, pluralText } from '../../scripts/placeholders.js';
 import { buildCardTeaser } from '../../scripts/card-teaser.js';
 import {
   scopeRows, filterRows, sortRows, paginate, decodeState, encodeState,
@@ -43,8 +43,10 @@ export const SHARED_LABELS = { loadMore: 'Load more', loading: 'Loading…' };
 export const STORIES_LABELS = {
   loadError: 'Could not load results.',
   noResults: 'Nothing to show yet.',
-  // "N shown": announced on Load more for screen readers
-  resultsShown: 'stories shown',
+  // "N shown": announced on Load more for screen readers (a counted text: `…One`, and the
+  // locale's `…Few` / `…Many` rows, pluralText)
+  resultsShown: '{n} stories shown',
+  resultsShownOne: '{n} story shown',
   newTab: 'opens in a new tab',
 };
 
@@ -430,7 +432,7 @@ export default async function decorate(block) {
         if (!countEl) {
           const nowShown = Math.min(state.revealed, all.length);
           status.hidden = false;
-          status.textContent = `${nowShown} ${STRINGS.resultsShown}`;
+          status.textContent = pluralText(STRINGS, 'resultsShown', nowShown);
         }
         grid.children[prev]?.querySelector('a')?.focus();
       });

@@ -23,8 +23,9 @@ const MIN_CHARS = 1; // live triggers from the first character
 
 /**
  * Text for matching: lower case, accents and other combining marks removed, so "pogacar" finds
- * "Pogačar" and "skoda" finds "Škoda" (L-SK-10, L-SL-13, SKODA-1003). `đ` has no decomposition
- * (it is its own letter), so it folds to `d` explicitly, as Serbian Latin readers type it.
+ * "Pogačar" and "skoda" finds "Škoda" (L-SK-10, L-SL-13, SKODA-1003). Letters with no
+ * decomposition fold explicitly, as readers type them: `đ` → `d` (Serbian Latin), `ł` → `l`,
+ * `ß` → `ss` (German).
  * @param {string} text
  * @returns {string}
  */
@@ -33,15 +34,24 @@ export function foldText(text) {
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
     .replace(/[đĐ]/g, 'd')
+    .replace(/[łŁ]/g, 'l')
+    .replace(/ß/g, 'ss')
     .toLowerCase();
 }
+
+// a row's folded text, once per row (the index rows live for the page)
+const folded = new WeakMap();
+const haystack = (row) => {
+  if (!folded.has(row)) folded.set(row, foldText(MATCH_FIELDS.map((f) => String(row[f] || '')).join(' ')));
+  return folded.get(row);
+};
 
 /** Rows whose title/description/tags contain every term (AND, case- and accent-insensitive). */
 export function matchRows(rows, query) {
   const terms = foldText(query.trim()).split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
   return rows.filter((row) => {
-    const hay = foldText(MATCH_FIELDS.map((f) => String(row[f] || '')).join(' '));
+    const hay = haystack(row);
     return terms.every((t) => hay.includes(t));
   });
 }
@@ -166,6 +176,8 @@ export default function attachSuggest(input, opts = {}) {
     active = -1;
     input.removeAttribute('aria-activedescendant');
     if (!matches.length) { close(); return; }
+    // the type names and the date format, once per render (the sheet has loaded by the first key)
+    const labels = localize(SUGGEST_LABELS, placeholdersNow(), 'suggest');
     matches.forEach((row, i) => {
       const li = document.createElement('li');
       li.className = 'search-suggest-item';
@@ -189,7 +201,7 @@ export default function attachSuggest(input, opts = {}) {
       title.className = 'search-suggest-title';
       title.textContent = displayTitle(row);
       text.append(title);
-      const meta = metaLine(row, localize(SUGGEST_LABELS, placeholdersNow(), 'suggest'));
+      const meta = metaLine(row, labels);
       if (meta) {
         const m = document.createElement('span');
         m.className = 'search-suggest-meta';

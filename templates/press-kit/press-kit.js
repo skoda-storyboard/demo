@@ -230,9 +230,13 @@ function sidebarMediaBox(main, relabel = []) {
   label.append(...link.childNodes);
   const add = roundAction('button', 'add', PRESS_KIT_LABELS.addAll);
   add.setAttribute('aria-disabled', 'true');
-  // its name mirrors the Media Box toggle's (localized there); only the tooltip follows here
-  relabel.push((labels) => retip(add, 'add', labels));
   const groupToggle = () => box.querySelector('.downloads-add-all');
+  // its name mirrors the Media Box toggle's (localized there) once that toggle is built; until
+  // then it is this template's own
+  relabel.push((labels) => {
+    if (!groupToggle()) add.setAttribute('aria-label', labels.addAll);
+    retip(add, 'add', labels);
+  });
   const sync = () => {
     const toggle = groupToggle();
     if (!toggle) return;
@@ -269,8 +273,8 @@ function videoActions(main, relabel = []) {
     download.setAttribute('download', '');
     const open = roundAction('a', 'link', named(PRESS_KIT_LABELS, 'openVideo', title));
     open.href = file.href;
-    // the cart sets the add's name from its state once bound: only its tooltip follows here
     relabel.push((labels) => {
+      add.setAttribute('aria-label', named(labels, 'addVideo', title));
       retip(add, 'add', labels);
       download.setAttribute('aria-label', named(labels, 'downloadVideo', title));
       retip(download, 'download', labels);

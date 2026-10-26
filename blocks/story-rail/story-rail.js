@@ -34,9 +34,23 @@ import { formatCardDate } from '../../scripts/card-teaser.js';
 import { buildLightbox } from '../../scripts/lightbox.js';
 import { feedLightboxItem } from '../../scripts/media-lightbox.js';
 import { decorateLinks } from '../../scripts/links.js';
+import { fetchPlaceholders, localize, placeholdersNow } from '../../scripts/placeholders.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
+
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `storyRail…`: the "view all" link when the author gives no text, and the media cards' cart and
+// download buttons (icon-only: the name and the tooltip).
+export const STORY_RAIL_LABELS = {
+  viewAll: 'View all',
+  addToCart: 'Add to media cart',
+  downloadOriginal: 'Download original',
+  downloadVideo: 'Download video',
+};
+
+/** The rail's text in the page locale (English per missing key). */
+const railText = (ph) => localize(STORY_RAIL_LABELS, ph, 'storyRail');
 
 // Split a comma-separated config value into trimmed tokens.
 const tokens = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -255,7 +269,7 @@ export function curatedRows(block) {
  * it to the media cart (SKODA-505a). Download links the same original. Icon-only buttons,
  * so each gets its label from the source titles. Returns null for non-media rows.
  */
-export function mediaToolbar(row) {
+export function mediaToolbar(row, labels = STORY_RAIL_LABELS) {
   if (row.template !== 'image' && row.template !== 'video') return null;
   const button = (action, label, href) => {
     const p = document.createElement('p');
@@ -271,7 +285,7 @@ export function mediaToolbar(row) {
   const elems = [];
   const file = row.template === 'image' ? row.original : row.mp4;
   if (row.id) {
-    const { p, a } = button('add', 'Add to media cart', '#');
+    const { p, a } = button('add', labels.addToCart, '#');
     a.dataset.id = row.id;
     if (file) a.dataset.href = file;
     const title = cleanTitle(row.title || '');
@@ -284,7 +298,7 @@ export function mediaToolbar(row) {
     elems.push(p);
   }
   if (file) {
-    const { p, a } = button('download', row.template === 'image' ? 'Download original' : 'Download video', file);
+    const { p, a } = button('download', row.template === 'image' ? labels.downloadOriginal : labels.downloadVideo, file);
     a.setAttribute('download', '');
     a.target = '_blank';
     elems.push(p);
@@ -310,7 +324,7 @@ export const MEDIA_TEMPLATES = new Set(['image', 'video']);
  * These rails are deferred (built near-viewport, below the fold), so images stay
  * lazy — no eager/fetchpriority (that belongs to the page's real LCP element).
  */
-export function rowToCells(row) {
+export function rowToCells(row, labels = STORY_RAIL_LABELS) {
   // body cell: date paragraph (→ overlay) + title heading (link), as flat elems
   const elems = [];
   const title = cleanTitle(row.title);
@@ -331,7 +345,7 @@ export function rowToCells(row) {
   h.append(link);
   elems.push(h);
   const body = { elems };
-  const toolbar = mediaToolbar(row);
+  const toolbar = mediaToolbar(row, labels);
 
   // OMIT the image cell entirely when the row has no image (SKODA-212 review
   // P2): an empty placeholder <div> would be sniffed as a second .card-teaser-
@@ -360,14 +374,14 @@ export function rowToCells(row) {
  * The authored text of the "view all" link, when the cell holds a link (the model page's
  * rails say "All"). readBlockConfig keeps only the href, so read the anchor directly.
  */
-export function viewAllLabel(block) {
+export function viewAllLabel(block, fallback = STORY_RAIL_LABELS.viewAll) {
   const row = [...block.children].find((r) => {
     const key = toClassName(r.children[0]?.textContent.trim() || '');
     return key === 'viewall' || key === 'view-all' || key === 'all';
   });
   const text = row?.children[1]?.querySelector('a')?.textContent.trim() || '';
   // a bare URL as link text (the common DA paste) is not a label
-  return text && !/^(https?:\/\/|\/)/i.test(text) ? text : 'View all';
+  return text && !/^(https?:\/\/|\/)/i.test(text) ? text : fallback;
 }
 
 /*
@@ -553,7 +567,10 @@ export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
   const press = block.classList.contains('press');
-  const allLabel = viewAllLabel(block);
+  // an authored "view all" text is content; the fallback is the page locale's, from the sheet if
+  // it has loaded, else English until buildRail has it
+  const authoredAll = viewAllLabel(block, '');
+  let allLabel = authoredAll || railText(placeholdersNow()).viewAll;
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
   const { classes, carousel: carouselVariants, endCard } = railLayout({
     press,
@@ -598,6 +615,17 @@ export default async function decorate(block) {
   // Build + decorate + load the inner carousel. Deferred so multiple home rails
   // don't all build on load.
   async function buildRail() {
+    // the cards' names and the lightbox's details come from the sheet: wait for it (memoized,
+    // started with the page, never longer than SHEET_WAIT_MS)
+    const labels = railText(await fetchPlaceholders());
+    if (!authoredAll && labels.viewAll !== allLabel) {
+      allLabel = labels.viewAll;
+      const pill = header.querySelector('.story-rail-viewall');
+      if (pill) {
+        pill.textContent = allLabel;
+        if (heading) pill.setAttribute('aria-label', `${allLabel}: ${heading}`);
+      }
+    }
     let rows = authoredRows;
     let more = false;
     let indexRows = [];
@@ -616,7 +644,7 @@ export default async function decorate(block) {
         });
         more = matches.length > cfg.limit;
         indexRows = matches.slice(0, cfg.limit);
-        rows = indexRows.map((r) => rowToCells(r));
+        rows = indexRows.map((r) => rowToCells(r, labels));
       } catch (e) {
         // index load failed: remove the empty story band or generic rail
         // eslint-disable-next-line no-console

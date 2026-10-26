@@ -26,36 +26,58 @@ function toKey(s) {
     .replace(/^([A-Z])/, (m) => m.toLowerCase());
 }
 
+// How long a caller waits for the sheet (SKODA-1003): a stalled request must not hold a block,
+// and with it every section after it, so past this the caller builds in English. The sheet
+// still fills the memo when it arrives, for every later reader.
+export const SHEET_WAIT_MS = 3000;
+
+async function loadSheet(prefix) {
+  try {
+    const resp = await fetch(`${prefix}/placeholders.json`);
+    if (!resp.ok) return {};
+    const json = await resp.json();
+    const rows = Array.isArray(json) ? json : (json.data || []);
+    const map = {};
+    rows.forEach((row) => {
+      if (row && row.Key) map[toKey(row.Key)] = row.Text ?? row.Value ?? '';
+    });
+    return map;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn(`placeholders: load failed for ${prefix}`, e);
+    return {};
+  }
+}
+
 /**
  * Fetch and memoize a placeholders map for a locale prefix.
  * @param {string} [prefix] e.g. `/en` (default: current locale)
- * @returns {Promise<Record<string,string>>} camelCase key → text (empty on failure)
+ * @returns {Promise<Record<string,string>>} camelCase key → text (empty on failure, or after
+ *   SHEET_WAIT_MS while the request is still open)
  */
 export async function fetchPlaceholders(prefix = `/${currentLocale()}`) {
-  if (cache.has(prefix)) return cache.get(prefix);
-
-  const promise = (async () => {
-    try {
-      const resp = await fetch(`${prefix}/placeholders.json`);
-      if (!resp.ok) return {};
-      const json = await resp.json();
-      const rows = Array.isArray(json) ? json : (json.data || []);
-      const map = {};
-      rows.forEach((row) => {
-        if (row && row.Key) map[toKey(row.Key)] = row.Text ?? row.Value ?? '';
-      });
-      return map;
-    } catch (e) {
+  const known = cache.get(prefix);
+  if (known && typeof known.then !== 'function') return known;
+  let request = known;
+  if (!request) {
+    request = loadSheet(prefix);
+    cache.set(prefix, request);
+    // replace the in-flight promise with the resolved map
+    request.then((map) => cache.set(prefix, map));
+  }
+  let timer;
+  const late = new Promise((resolve) => {
+    timer = setTimeout(() => {
       // eslint-disable-next-line no-console
-      console.warn(`placeholders: load failed for ${prefix}`, e);
-      return {};
-    }
-  })();
-
-  cache.set(prefix, promise);
-  const map = await promise;
-  cache.set(prefix, map); // replace the in-flight promise with the resolved map
-  return map;
+      console.warn(`placeholders: ${prefix} took over ${SHEET_WAIT_MS}ms, English for now`);
+      resolve({});
+    }, SHEET_WAIT_MS);
+  });
+  try {
+    return await Promise.race([request, late]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -63,7 +85,7 @@ export async function fetchPlaceholders(prefix = `/${currentLocale()}`) {
  * `format`, which must import nothing (its eager-path test), so it keeps its own copy.
  */
 export const fillText = (text, values = {}) => String(text)
-  .replace(/\{(\w+)\}/g, (m, name) => (Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : m));
+  .replace(/\{(\w+)\}/g, (m, name) => (Object.hasOwn(values, name) ? String(values[name]) : m));
 
 /**
  * The sheet key of a module label: the prefix and the key in camelCase (`gallery` + `previous` →
@@ -89,17 +111,23 @@ export function localize(defaults, ph = {}, prefix = '') {
     const value = ph ? ph[sheetKey(prefix, key)] : undefined;
     return typeof value === 'string' && value.trim() ? value : '';
   };
+  const plural = /(Zero|One|Two|Few|Many)$/;
   const out = Object.fromEntries(Object.entries(defaults).map(([key, text]) => {
+    const base = key.replace(plural, '');
+    const counted = base !== key && Object.hasOwn(defaults, base);
+    // a plural form follows its general text: an English general text keeps the English forms,
+    // so a sheet with `…One` / `…Few` rows but no general row never mixes languages
+    if (counted && !own(base)) return [key, text];
     if (own(key)) return [key, own(key)];
-    // a plural form (`moreLabelOne`) the sheet lacks while it translates the general text:
-    // empty, so pluralText uses the translation, never the English form
-    const base = key.replace(/(Zero|One|Two|Few|Many)$/, '');
-    if (base !== key && Object.prototype.hasOwnProperty.call(defaults, base) && own(base)) return [key, ''];
-    return [key, text];
+    // a plural form the sheet lacks while it translates the general text: empty, so
+    // pluralText uses the translation, never the English form
+    return [key, counted ? '' : text];
   }));
-  // the locale's other plural forms of a counted text (English has `…One`; Czech adds `…Few`)
+  // the locale's other plural forms of a translated counted text (English has `…One`; Czech
+  // adds `…Few`)
   Object.keys(defaults).filter((key) => key.endsWith('One')).forEach((one) => {
     const base = one.slice(0, -3);
+    if (!Object.hasOwn(defaults, base) || !own(base)) return;
     ['Zero', 'Two', 'Few', 'Many'].forEach((form) => {
       if (own(`${base}${form}`)) out[`${base}${form}`] = own(`${base}${form}`);
     });
@@ -120,7 +148,11 @@ export function applyLocalized(defaults, prefix, apply) {
   apply(localize(defaults, {}, prefix));
   return fetchPlaceholders()
     .then((ph) => apply(localize(defaults, ph, prefix)))
-    .catch(() => { /* the English labels stay */ });
+    .catch((e) => {
+      // the English labels stay
+      // eslint-disable-next-line no-console
+      console.warn(`placeholders: ${prefix || 'shared'} labels not applied`, e);
+    });
 }
 
 /**
@@ -131,7 +163,8 @@ export function applyLocalized(defaults, prefix, apply) {
  * @param {string} pattern e.g. `{d}. {m}. {yyyy}`
  */
 export function formatDate(value, pattern) {
-  const t = value instanceof Date ? value.getTime() : Date.parse(value);
+  let t = Date.parse(value);
+  if (value instanceof Date || typeof value === 'number') t = new Date(value).getTime();
   if (!Number.isFinite(t)) return '';
   const d = new Date(t);
   const pad = (n) => String(n).padStart(2, '0');

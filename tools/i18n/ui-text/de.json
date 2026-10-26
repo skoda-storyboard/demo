@@ -1,4 +1,8 @@
 {
+ "cardsSocialNewTab": {
+  "text": "öffnet in einem neuen Tab",
+  "source": "draft"
+ },
  "carouselCarousel": {
   "text": "Karussell",
   "source": "draft"
@@ -104,11 +108,11 @@
   "source": "draft"
  },
  "downloadsAddSize": {
-  "text": "Version {size} hinzufügen/entfernen",
+  "text": "Hinzufügen/Löschen {size} Version",
   "source": "draft"
  },
  "downloadsAddSizeNamed": {
-  "text": "Version {size} hinzufügen/entfernen: {title}",
+  "text": "Hinzufügen/Löschen {size} Version: {title}",
   "source": "draft"
  },
  "downloadsDownload": {
@@ -136,7 +140,7 @@
   "source": "draft"
  },
  "downloadsOpen": {
-  "text": "Bild ansehen",
+  "text": "Bild {title} ansehen",
   "source": "draft"
  },
  "downloadsOpenFile": {
@@ -168,19 +172,19 @@
   "source": "live"
  },
  "downloadsTipAddSize": {
-  "text": "Version {size} hinzufügen/entfernen",
-  "source": "draft"
+  "text": "Hinzufügen/Löschen {size} Version",
+  "source": "live"
  },
  "downloadsTipDownload": {
   "text": "Download dies",
   "source": "live"
  },
  "downloadsTipDownloadSize": {
-  "text": "Version {size} herunterladen",
-  "source": "draft"
+  "text": "Download {size} Version",
+  "source": "live"
  },
  "downloadsVideoPoster": {
-  "text": "Videovorschau ansehen",
+  "text": "Videovorschau {title} ansehen",
   "source": "draft"
  },
  "embedBuzzsprout": {
@@ -283,10 +287,6 @@
   "text": "Nächstes Bild",
   "source": "draft"
  },
- "galleryOpen": {
-  "text": "Bild öffnen",
-  "source": "draft"
- },
  "galleryOpenGallery": {
   "text": "Galerie öffnen, {n} Bilder",
   "source": "draft"
@@ -324,7 +324,7 @@
   "source": "draft"
  },
  "gallerySlider": {
-  "text": "Bildergalerie",
+  "text": "Bilder-Slider",
   "source": "draft"
  },
  "headerCloseNav": {
@@ -337,6 +337,10 @@
  },
  "headerCloseSearch": {
   "text": "Suche schließen",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, Startseite",
   "source": "draft"
  },
  "headerLanguages": {
@@ -388,8 +392,8 @@
   "source": "draft"
  },
  "lightboxAddTip": {
-  "text": "Originalversion hinzufügen/entfernen",
-  "source": "draft"
+  "text": "Hinzufügen/Löschen Original Version",
+  "source": "live"
  },
  "lightboxAddToBox": {
   "text": "Zum Medienkorb hinzufügen",
@@ -416,8 +420,8 @@
   "source": "draft"
  },
  "lightboxDownloadTip": {
-  "text": "Originalversion herunterladen",
-  "source": "draft"
+  "text": "Download Original Version",
+  "source": "live"
  },
  "lightboxHideDetails": {
   "text": "Bilddetails ausblenden",
@@ -425,7 +429,7 @@
  },
  "lightboxLinkTip": {
   "text": "Link zur Seite",
-  "source": "draft"
+  "source": "live"
  },
  "lightboxNext": {
   "text": "Nächstes Bild",
@@ -457,7 +461,7 @@
  },
  "lightboxVideoCopyLink": {
   "text": "Link zur Seite",
-  "source": "draft"
+  "source": "live"
  },
  "lightboxVideoDownload": {
   "text": "Download dies",
@@ -469,7 +473,7 @@
  },
  "lightboxVideoLinkTip": {
   "text": "Link zur Seite",
-  "source": "draft"
+  "source": "live"
  },
  "listingAdvancedFilter": {
   "text": "Erweiterte Suche",
@@ -568,8 +572,8 @@
   "source": "draft"
  },
  "mediaAddSize": {
-  "text": "Version {size} hinzufügen/entfernen",
-  "source": "draft"
+  "text": "Hinzufügen/Löschen {size} Version",
+  "source": "live"
  },
  "mediaAddToCart": {
   "text": "Zum Medienkorb hinzufügen",
@@ -736,8 +740,8 @@
   "source": "draft"
  },
  "mediaDownloadSize": {
-  "text": "Version {size} herunterladen",
-  "source": "draft"
+  "text": "Download {size} Version",
+  "source": "live"
  },
  "mediaDownloadVideo": {
   "text": "Download dies",
@@ -853,7 +857,7 @@
  },
  "pressKitTipLink": {
   "text": "Link zur Seite",
-  "source": "draft"
+  "source": "live"
  },
  "pressReleaseAddAllMediaBox": {
   "text": "Alle Media-Box-Dateien zum Medienkorb hinzufügen",
@@ -936,7 +940,27 @@
   "source": "draft"
  },
  "storiesResultsShown": {
-  "text": "Stories angezeigt",
+  "text": "{n} Artikel angezeigt",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "{n} Artikel angezeigt",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Original herunterladen",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Video herunterladen",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Alle anzeigen",
   "source": "draft"
  },
  "suggestDateFormat": {

@@ -44,6 +44,8 @@ export const REGISTRY = [
   ['blocks/downloads/downloads.js', 'TOGGLE_LABELS', ''],
   ['blocks/gallery/gallery.js', 'GALLERY_LABELS', 'gallery'],
   ['blocks/carousel/carousel.js', 'CAROUSEL_LABELS', 'carousel'],
+  ['blocks/cards/cards-social.js', 'SOCIAL_CARD_LABELS', 'cardsSocial'],
+  ['blocks/story-rail/story-rail.js', 'STORY_RAIL_LABELS', 'storyRail'],
   ['blocks/header/header.js', 'HEADER_LABELS', 'header'],
   ['blocks/footer/footer-sections.js', 'FOOTER_LABELS', 'footer'],
   ['blocks/embed/embed.js', 'EMBED_LABELS', 'embed'],
@@ -103,10 +105,23 @@ async function installBrowserGlobals() {
  */
 export async function masterList(root = ROOT) {
   await installBrowserGlobals();
-  // the page boot that scripts.js starts on import is not this tool's concern
+  // the page boot that scripts.js starts on import is not this tool's concern: its rejections
+  // are ignored while the modules load, and only then
   const ignore = () => {};
   process.on('unhandledRejection', ignore);
   const rows = new Map();
+  try {
+    await collect(root, rows);
+    // the boot's promise chains settle within a few turns of the event loop
+    await new Promise((resolve) => { setTimeout(resolve, 50); });
+  } finally {
+    process.off('unhandledRejection', ignore);
+  }
+  return [...rows.values()].sort((a, b) => a.key.localeCompare(b.key));
+}
+
+/** Each REGISTRY object's keys into `rows` (sheet key → English text and module). */
+async function collect(root, rows) {
   for (const [file, name, prefix, keysName] of REGISTRY) {
     // eslint-disable-next-line no-await-in-loop
     const mod = await import(pathToFileURL(path.join(root, file)).href);
@@ -123,8 +138,6 @@ export async function masterList(root = ROOT) {
       if (!seen) rows.set(sheet, { key: sheet, text, module: file });
     });
   }
-  setTimeout(() => process.off('unhandledRejection', ignore), 2000).unref?.();
-  return [...rows.values()].sort((a, b) => a.key.localeCompare(b.key));
 }
 
 /** A locale's translations file ({} for English or a missing file). */
@@ -163,11 +176,19 @@ export function buildSheet(master, locale, translations = {}) {
     const own = translations[key];
     return own?.text ? { Key: key, Text: own.text, Source: own.source || 'draft' } : { Key: key, Text: text, Source: 'english' };
   });
-  // the locale's extra plural forms (`…Few`, `…Many`), after the keys they belong to
+  // the locale's extra plural forms (`…Few`, `…Many`), each right after its `…One` row
   const keys = new Set(master.map((r) => r.key));
   Object.entries(translations)
     .filter(([key]) => !keys.has(key) && /(Zero|Two|Few|Many)$/.test(key))
-    .forEach(([key, own]) => data.push({ Key: key, Text: own.text, Source: own.source || 'draft' }));
+    .forEach(([key, own]) => {
+      const one = `${key.replace(/(Zero|Two|Few|Many)$/, '')}One`;
+      let at = data.findIndex((r) => r.Key === one);
+      while (at >= 0 && at + 1 < data.length && data[at + 1].Key.startsWith(one.slice(0, -3))
+        && /(Zero|Two|Few|Many)$/.test(data[at + 1].Key)) at += 1;
+      const row = { Key: key, Text: own.text, Source: own.source || 'draft' };
+      if (at < 0) data.push(row);
+      else data.splice(at + 1, 0, row);
+    });
   return {
     total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
   };
@@ -218,7 +239,10 @@ async function main() {
     console.log(`${dir}: ${LOCALES.length} sheets of ${master.length} keys`);
   }
   if (process.argv.includes('--push')) {
-    const only = (arg('locales') || LOCALES.join(',')).split(',').map((s) => s.trim()).filter(Boolean);
+    const only = (arg('locales') || LOCALES.join(',')).split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+    // nothing is uploaded unless every requested locale is one of ours
+    const unknown = only.filter((l) => !sheets[l]);
+    if (unknown.length) throw new Error(`--locales: unknown ${unknown.join(', ')} (use ${LOCALES.join(', ')})`);
     for (const locale of only) {
       const file = `${locale}/placeholders.json`;
       const form = new FormData();

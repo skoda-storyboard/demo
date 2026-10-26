@@ -260,7 +260,6 @@ export default function decorate(block) {
     });
   }
 
-  const message = text(cfg.message, labels().message);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!validate()) {
@@ -272,7 +271,8 @@ export default function decorate(block) {
     // read once as the focused text, so it leaves the live region first (not announced twice).
     status.removeAttribute('role');
     status.removeAttribute('aria-live');
-    status.textContent = message;
+    // read on submit, as the error messages: the sheet has loaded by now
+    status.textContent = text(cfg.message, labels().message);
     form.classList.add('is-sent');
     status.tabIndex = -1;
     status.focus?.({ preventScroll: true });

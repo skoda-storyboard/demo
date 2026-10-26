@@ -1,4 +1,8 @@
 {
+ "cardsSocialNewTab": {
+  "text": "otvorí sa na novej karte",
+  "source": "draft"
+ },
  "carouselCarousel": {
   "text": "Karusel",
   "source": "draft"
@@ -120,7 +124,7 @@
   "source": "draft"
  },
  "downloadsFile": {
-  "text": "Súbor",
+  "text": "súbor",
   "source": "draft"
  },
  "downloadsFileType": {
@@ -136,7 +140,7 @@
   "source": "draft"
  },
  "downloadsOpen": {
-  "text": "Zobraziť obrázok",
+  "text": "Zobraziť obrázok {title}",
   "source": "draft"
  },
  "downloadsOpenFile": {
@@ -152,7 +156,7 @@
   "source": "live"
  },
  "downloadsSizeOriginal": {
-  "text": "Originál",
+  "text": "Original",
   "source": "draft"
  },
  "downloadsSizeUnavailable": {
@@ -180,7 +184,7 @@
   "source": "draft"
  },
  "downloadsVideoPoster": {
-  "text": "Zobraziť náhľad videa",
+  "text": "Zobraziť náhľad videa {title}",
   "source": "draft"
  },
  "embedBuzzsprout": {
@@ -287,10 +291,6 @@
   "text": "Ďalší obrázok",
   "source": "draft"
  },
- "galleryOpen": {
-  "text": "Otvoriť obrázok",
-  "source": "draft"
- },
  "galleryOpenGallery": {
   "text": "Otvoriť galériu, {n} obrázkov",
   "source": "draft"
@@ -332,7 +332,7 @@
   "source": "draft"
  },
  "gallerySlider": {
-  "text": "Galéria obrázkov",
+  "text": "Posúvač obrázkov",
   "source": "draft"
  },
  "headerCloseNav": {
@@ -345,6 +345,10 @@
  },
  "headerCloseSearch": {
   "text": "Zavrieť vyhľadávanie",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, domovská stránka",
   "source": "draft"
  },
  "headerLanguages": {
@@ -704,7 +708,7 @@
   "source": "draft"
  },
  "mediaCartSizeOriginal": {
-  "text": "Originál",
+  "text": "Original",
   "source": "draft"
  },
  "mediaCartSkippedLimitBytes": {
@@ -788,7 +792,7 @@
   "source": "live"
  },
  "mediaSizeOriginal": {
-  "text": "Originál",
+  "text": "Original",
   "source": "draft"
  },
  "modelNav": {
@@ -944,7 +948,31 @@
   "source": "draft"
  },
  "storiesResultsShown": {
-  "text": "zobrazené príbehy",
+  "text": "Zobrazených {n} príbehov",
+  "source": "draft"
+ },
+ "storiesResultsShownFew": {
+  "text": "Zobrazené {n} príbehy",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "Zobrazený {n} príbeh",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Stiahnuť originál",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Stiahnuť video",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Zobraziť všetko",
   "source": "draft"
  },
  "suggestDateFormat": {

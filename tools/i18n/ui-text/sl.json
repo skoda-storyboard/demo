@@ -1,4 +1,8 @@
 {
+ "cardsSocialNewTab": {
+  "text": "odpre se v novem zavihku",
+  "source": "draft"
+ },
  "carouselCarousel": {
   "text": "Vrtiljak",
   "source": "draft"
@@ -120,7 +124,7 @@
   "source": "draft"
  },
  "downloadsFile": {
-  "text": "Datoteka",
+  "text": "datoteko",
   "source": "draft"
  },
  "downloadsFileType": {
@@ -136,7 +140,7 @@
   "source": "draft"
  },
  "downloadsOpen": {
-  "text": "Ogled slike",
+  "text": "Ogled slike {title}",
   "source": "draft"
  },
  "downloadsOpenFile": {
@@ -152,7 +156,7 @@
   "source": "live"
  },
  "downloadsSizeOriginal": {
-  "text": "Izvirnik",
+  "text": "Original",
   "source": "draft"
  },
  "downloadsSizeUnavailable": {
@@ -180,7 +184,7 @@
   "source": "draft"
  },
  "downloadsVideoPoster": {
-  "text": "Ogled predogleda videoposnetka",
+  "text": "Ogled predogleda videoposnetka {title}",
   "source": "draft"
  },
  "embedBuzzsprout": {
@@ -291,10 +295,6 @@
   "text": "Naslednja slika",
   "source": "draft"
  },
- "galleryOpen": {
-  "text": "Odpri sliko",
-  "source": "draft"
- },
  "galleryOpenGallery": {
   "text": "Odpri galerijo, {n} slik",
   "source": "draft"
@@ -340,7 +340,7 @@
   "source": "draft"
  },
  "gallerySlider": {
-  "text": "Galerija slik",
+  "text": "Drsnik slik",
   "source": "draft"
  },
  "headerCloseNav": {
@@ -353,6 +353,10 @@
  },
  "headerCloseSearch": {
   "text": "Zapri iskanje",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, domača stran",
   "source": "draft"
  },
  "headerLanguages": {
@@ -712,7 +716,7 @@
   "source": "draft"
  },
  "mediaCartSizeOriginal": {
-  "text": "Izvirnik",
+  "text": "Original",
   "source": "draft"
  },
  "mediaCartSkippedLimitBytes": {
@@ -796,7 +800,7 @@
   "source": "live"
  },
  "mediaSizeOriginal": {
-  "text": "Izvirnik",
+  "text": "Original",
   "source": "draft"
  },
  "modelNav": {
@@ -952,7 +956,35 @@
   "source": "draft"
  },
  "storiesResultsShown": {
-  "text": "prikazane zgodbe",
+  "text": "Prikazanih {n} zgodb",
+  "source": "draft"
+ },
+ "storiesResultsShownFew": {
+  "text": "Prikazane {n} zgodbe",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "Prikazana {n} zgodba",
+  "source": "draft"
+ },
+ "storiesResultsShownTwo": {
+  "text": "Prikazani {n} zgodbi",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Prenesi izvirnik",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Prenesi videoposnetek",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Prikaži vse",
   "source": "draft"
  },
  "suggestDateFormat": {

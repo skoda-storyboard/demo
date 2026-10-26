@@ -7,10 +7,10 @@ import assert from 'node:assert/strict';
 
 const { foldText, matchRows, SUGGEST_LABELS } = await import('./search-suggest.js');
 
-test('foldText: lower case, combining marks removed, đ as d', () => {
+test('foldText: lower case, combining marks removed, đ / ł / ß as typed (d, l, ss)', () => {
   assert.equal(foldText('Škoda Pogačar'), 'skoda pogacar');
   assert.equal(foldText('Đoković ŽIVOT'), 'dokovic zivot');
-  assert.equal(foldText('Straße'), 'straße', 'ß is a letter, not a mark');
+  assert.equal(foldText('Straße Łódź'), 'strasse lodz');
   assert.equal(foldText(null), '');
 });
 
@@ -30,4 +30,10 @@ test('SUGGEST_LABELS: the source\'s three type names and its padded date', () =>
   assert.deepEqual(SUGGEST_LABELS, {
     story: 'Stories', pressRelease: 'News', pressKit: 'Press Kits', dateFormat: '{dd}. {mm}. {yyyy}',
   });
+});
+
+test('matchRows: ß and ss find each other', () => {
+  const rows = [{ title: 'Die Straße' }, { title: 'Other' }];
+  assert.equal(matchRows(rows, 'strasse').length, 1);
+  assert.equal(matchRows(rows, 'straße').length, 1);
 });

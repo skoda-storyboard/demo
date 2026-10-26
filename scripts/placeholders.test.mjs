@@ -120,3 +120,39 @@ test('localize: a sheet\'s extra plural forms of a counted text come through for
   assert.equal(Object.keys(cs).includes('other'), false, 'no unrelated keys');
   assert.equal(pluralText(cs, 'moreLabel', 3, {}, 'cs'), 'Zobrazit další 3 obrázky');
 });
+
+test('localize: plural rows without their general text keep the English forms (no mixed languages)', async () => {
+  const { pluralText } = await import('./placeholders.js');
+  const EN = { moreLabel: 'Show {n} more images', moreLabelOne: 'Show {n} more image' };
+  const cs = localize(EN, { galleryMoreLabelOne: 'Zobrazit další {n} obrázek', galleryMoreLabelFew: 'Zobrazit další {n} obrázky' }, 'gallery');
+  assert.deepEqual(cs, EN);
+  assert.equal(pluralText(cs, 'moreLabel', 3, {}, 'cs'), 'Show 3 more images');
+  assert.equal(pluralText(cs, 'moreLabel', 1, {}, 'cs'), 'Show 1 more image');
+});
+
+test('fetchPlaceholders: a stalled sheet gives {} after SHEET_WAIT_MS; the late sheet fills the memo', async (t) => {
+  const { SHEET_WAIT_MS, placeholdersNow } = await import('./placeholders.js');
+  const realFetch = globalThis.fetch;
+  const warn = console.warn;
+  t.after(() => { globalThis.fetch = realFetch; console.warn = warn; clearPlaceholdersCache(); t.mock.timers.reset(); });
+  console.warn = () => {};
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let arrive;
+  globalThis.fetch = () => new Promise((resolve) => { arrive = resolve; });
+  const first = fetchPlaceholders('/sk');
+  await Promise.resolve();
+  t.mock.timers.tick(SHEET_WAIT_MS);
+  assert.deepEqual(await first, {}, 'the caller builds in English');
+  assert.deepEqual(placeholdersNow('/sk'), {}, 'nothing loaded yet');
+  arrive({ ok: true, json: async () => ({ data: [{ Key: 'loadMore', Text: 'Načítať viac' }] }) });
+  await new Promise((resolve) => { setImmediate(resolve); });
+  assert.deepEqual(placeholdersNow('/sk'), { loadMore: 'Načítať viac' });
+  assert.deepEqual(await fetchPlaceholders('/sk'), { loadMore: 'Načítať viac' }, 'a later reader gets the sheet');
+});
+
+test('formatDate: a timestamp or a Date as well as an ISO string', async () => {
+  const { formatDate } = await import('./placeholders.js');
+  assert.equal(formatDate(Date.UTC(2025, 8, 10), '{d}. {m}. {yyyy}'), '10. 9. 2025');
+  assert.equal(formatDate(new Date(Date.UTC(2025, 8, 10)), '{d}. {m}. {yyyy}'), '10. 9. 2025');
+  assert.equal(formatDate(Number.NaN, '{d}'), '');
+});

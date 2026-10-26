@@ -134,8 +134,9 @@ test('Epiq story: only the declared translations, same tab, named by their langu
   const en = ul.querySelector('span');
   assert.deepEqual([en.getAttribute('aria-current'), en.getAttribute('lang')], ['true', 'en']);
   const langs = [...ul.querySelectorAll('a')].map((a) => [a.getAttribute('hreflang'), a.getAttribute('lang')]);
-  // Serbian's `lang` names its Latin script (`sr` alone reads as Cyrillic, SKODA-1003); hreflang stays
-  assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr-Latn']]);
+  // each link's `lang` is its two-letter code, as hreflang (the regional tags are the document
+  // language only: PO decision on #485)
+  assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr']]);
 });
 
 test('no declared translations: only the current language, never a locale-home fallback', () => {

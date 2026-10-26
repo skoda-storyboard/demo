@@ -239,14 +239,15 @@ function syncSearchTabbable(nav) {
   if (scope) scope.tabIndex = (open && !drawerOpen) ? 0 : -1;
 }
 
-// search scopes of the source header form (value = its `search_type`)
+// search scopes of the source header form: its `search_type` value and the HEADER_LABELS key
+// of the option's text
 export const SEARCH_SCOPES = [
-  ['', 'All'],
-  ['post', 'Stories'],
-  ['press_release', 'News'],
-  ['press_kit', 'Press Kits'],
-  ['image', 'Images'],
-  ['video', 'Videos'],
+  ['', 'scopeAll'],
+  ['post', 'scopePost'],
+  ['press_release', 'scopePressRelease'],
+  ['press_kit', 'scopePressKit'],
+  ['image', 'scopeImage'],
+  ['video', 'scopeVideo'],
 ];
 
 // UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
@@ -259,6 +260,8 @@ export const HEADER_LABELS = {
   closeNav: 'Close navigation',
   closeNewsletter: 'Close newsletter subscription',
   subscribe: 'Subscribe to our stories',
+  // the logo link's name when the nav gives it no text
+  home: 'Škoda Storyboard, home',
   scopeAll: 'All',
   scopePost: 'Stories',
   scopePressRelease: 'News',
@@ -268,10 +271,6 @@ export const HEADER_LABELS = {
   // the language list (header-locales.js)
   languages: LOCALE_LIST_LABELS.languages,
   newTab: LOCALE_LIST_LABELS.newTab,
-};
-// a scope value → its HEADER_LABELS key
-const SCOPE_KEYS = {
-  '': 'scopeAll', post: 'scopePost', press_release: 'scopePressRelease', press_kit: 'scopePressKit', image: 'scopeImage', video: 'scopeVideo',
 };
 
 // the source icons as inline SVG, [viewBox, path]: the icon-font glyphs (skoda-bnr-icons search
@@ -319,10 +318,10 @@ export function buildSearchScope(selected, labels = HEADER_LABELS) {
   select.className = 'nav-search-type';
   select.setAttribute('aria-label', labels.searchIn);
   select.tabIndex = -1;
-  SEARCH_SCOPES.forEach(([value, text]) => {
+  SEARCH_SCOPES.forEach(([value, key]) => {
     const option = document.createElement('option');
     option.value = value;
-    option.textContent = labels[SCOPE_KEYS[value]] || text;
+    option.textContent = labels[key] || HEADER_LABELS[key];
     if (value === selected) option.selected = true;
     select.append(option);
   });
@@ -671,7 +670,7 @@ export default async function decorate(block) {
       // render the wordmark as the logo icon. Authoring the SVG via an icon
       // token in the DA fragment is unreliable (DA sanitizes empty-anchor icon
       // spans), so inject it here from the brand link's text.
-      brandLink.setAttribute('aria-label', brandLink.textContent.trim() || 'Škoda Storyboard, home');
+      brandLink.setAttribute('aria-label', brandLink.textContent.trim() || text.home);
       brandLink.textContent = '';
       brandLink.classList.add('nav-brand-logo');
       const logo = document.createElement('span');

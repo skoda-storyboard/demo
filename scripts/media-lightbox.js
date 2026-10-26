@@ -41,7 +41,9 @@ export function feedLightboxItem(row) {
       // player (an MP4 still on the source CDN only plays in a tab, #273); a new tab, as live
       download: downloadHref(row.mp4 || ''),
       downloadTarget: '_blank',
-      // the action names are the lightbox's clip names (the source player's titles), per locale
+      // the action names are the lightbox's clip names (the source player's titles), per locale,
+      // also for a row with neither a Vimeo id nor an MP4
+      clip: true,
       link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
       cartId: row.id || '',
       cartHref: row.mp4 || '',

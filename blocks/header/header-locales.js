@@ -25,7 +25,6 @@
  */
 
 import { LIVE_ORIGIN } from '../../scripts/links.js';
-import htmlLang from '../../scripts/locale-tags.js';
 
 const LIVE_HOST = new URL(LIVE_ORIGIN).host;
 
@@ -233,7 +232,7 @@ export function buildLocaleList(
         item.setAttribute('aria-label', named);
       }
     }
-    item.setAttribute('lang', htmlLang(code));
+    item.setAttribute('lang', code);
     item.textContent = label;
     const li = doc.createElement('li');
     li.append(item);

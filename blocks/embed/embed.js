@@ -240,7 +240,7 @@ function loadNow(iframe, provider) {
  * showed, the click shows the consent placeholder instead of loading YouTube.
  * @param {Element} wrapper The .embed-video wrapper (empty)
  * @param {HTMLIFrameElement} iframe The iframe, its URL in data-src
- * @param {string} label The button's accessible name
+ * @param {() => string} label The button's accessible name, read when the poster is built
  * @param {() => HTMLElement} gate Shows the consent placeholder, returns its button
  * @returns {HTMLButtonElement} the play button
  */
@@ -250,7 +250,7 @@ function renderYoutubePoster(wrapper, iframe, label, gate) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'embed-play';
-  button.setAttribute('aria-label', label);
+  button.setAttribute('aria-label', label());
 
   const img = document.createElement('img');
   img.className = 'embed-poster';
@@ -318,7 +318,7 @@ function observeLazyEmbed(wrapper) {
  * @param {Element} wrapper The .embed-video / .embed-audio wrapper (empty)
  * @param {HTMLIFrameElement} iframe The iframe, its URL in data-src
  * @param {string} provider Provider key
- * @param {string} playLabel The YouTube play button's accessible name
+ * @param {() => string} playLabel The YouTube play button's accessible name (read when shown)
  * @param {() => HTMLElement} gate Shows the consent placeholder (YouTube, consent withdrawn)
  * @returns {HTMLElement} the element to focus, the play button or the iframe
  */
@@ -371,7 +371,7 @@ let gateCount = 0;
 async function localiseConsentGate(text, label, host) {
   try {
     const labels = await embedText();
-    text.textContent = labels.consentText.replaceAll('{host}', host);
+    text.textContent = labels.consentText.replaceAll('{host}', () => host);
     label.textContent = labels.consentButton;
   } catch {
     // keep the English defaults
@@ -388,7 +388,7 @@ async function localiseConsentGate(text, label, host) {
  * @param {Element} wrapper The .embed-video / .embed-audio wrapper (empty)
  * @param {HTMLIFrameElement} iframe The iframe, its URL still in data-src
  * @param {string} provider Provider key
- * @param {string} playLabel The YouTube play button's accessible name
+ * @param {() => string} playLabel The YouTube play button's accessible name (read when shown)
  * @returns {HTMLButtonElement} the placeholder's button
  */
 function renderConsentGate(wrapper, iframe, provider, playLabel) {
@@ -403,7 +403,7 @@ function renderConsentGate(wrapper, iframe, provider, playLabel) {
   const text = document.createElement('p');
   text.className = 'embed-consent-text';
   text.id = `embed-consent-text-${gateCount}`;
-  text.textContent = EMBED_LABELS.consentText.replaceAll('{host}', host);
+  text.textContent = EMBED_LABELS.consentText.replaceAll('{host}', () => host);
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'embed-consent-button';
@@ -494,9 +494,9 @@ function providerLabel(provider, url, labels = EMBED_LABELS) {
     // the URL type segment (open.spotify.com/{type}/{id}) → its name
     const type = url.pathname.replace(/^\/embed/, '').split('/')[1] || '';
     const key = `spotify${type.charAt(0).toUpperCase()}${type.slice(1)}`;
-    return Object.prototype.hasOwnProperty.call(labels, key) ? labels[key] : labels.spotify;
+    return Object.hasOwn(labels, key) ? labels[key] : labels.spotify;
   }
-  return labels.other.replace('{host}', url.hostname.replace(/^www\./, ''));
+  return labels.other.replace('{host}', () => url.hostname.replace(/^www\./, ''));
 }
 
 // A candidate title is descriptive only if it is non-empty and not itself a URL.
@@ -629,9 +629,21 @@ export default function decorate(block) {
     wrapper.style.setProperty('--embed-ratio', ratio);
   }
 
+  // a fallback name (no authored title) in the page locale once the lazily loaded sheet
+  // resolves (SKODA-1003); an authored title is content and stays
+  const fallbackTitle = title === providerLabel(provider, url);
+  const localName = fallbackTitle
+    ? embedText().then((labels) => providerLabel(provider, url, labels)).catch(() => title)
+    : Promise.resolve(title);
+  // the file player's name (a `<video>` in the wrapper) once it is known
+  const nameVideo = () => localName.then((name) => {
+    wrapper.querySelector('video')?.setAttribute('aria-label', name);
+  });
+
   if (provider === 'file') {
     mountFile(block, wrapper, url, title, poster);
     block.append(wrapper);
+    nameVideo();
     return;
   }
 
@@ -646,15 +658,19 @@ export default function decorate(block) {
     block.append(wrapper);
     if (!hasEmbedConsent()) {
       mountFile(block, wrapper, file, title, poster);
+      nameVideo();
       return;
     }
     playsHere(vimeoId(url)).then((plays) => {
       if (!plays) {
         mountFile(block, wrapper, file, title, poster);
+        nameVideo();
         return;
       }
       block.classList.add('embed-vimeo');
-      mountEmbed(wrapper, buildIframe(src, title, false, provider), provider, '', () => {});
+      const player = buildIframe(src, title, false, provider);
+      mountEmbed(wrapper, player, provider, () => '', () => {});
+      localName.then((name) => { player.title = name; });
     });
     return;
   }
@@ -672,22 +688,21 @@ export default function decorate(block) {
   const mode = provider === 'youtube' && isYoutubePlayer(url) ? 'youtube-player' : provider;
   // YouTube's play button name; a bare-URL embed only has the generic "YouTube video"
   // label, so don't read it out twice
-  let playLabel = '';
+  const playName = (labels) => (fallbackTitle ? labels.playYoutube
+    : labels.playVideo.replace('{title}', () => title));
+  let playLabel = mode === 'youtube' ? playName(EMBED_LABELS) : '';
+  // the page locale's names once the sheet resolves: the frame's fallback name and the play
+  // button's. The poster and the consent gate read playLabel when they show it, so one shown
+  // later (consent granted after the sheet) has the translated name too.
+  const currentPlayLabel = () => playLabel;
+  localName.then((name) => { iframe.title = name; });
   if (mode === 'youtube') {
-    playLabel = title === providerLabel(provider, url)
-      ? EMBED_LABELS.playYoutube : EMBED_LABELS.playVideo.replace('{title}', title);
+    embedText().then((labels) => {
+      playLabel = playName(labels);
+      wrapper.querySelector('.embed-play')?.setAttribute('aria-label', playLabel);
+    }).catch(() => { /* the English name stays */ });
   }
-  // the page locale's names once the lazily loaded sheet resolves (SKODA-1003): a fallback frame
-  // name and the play button's; an authored title is content and stays. `gate` reads playLabel
-  // when it runs, so a poster rendered later takes the translated name too.
-  const fallbackTitle = title === providerLabel(provider, url);
-  embedText().then((labels) => {
-    if (fallbackTitle) iframe.title = providerLabel(provider, url, labels);
-    if (mode !== 'youtube') return;
-    playLabel = fallbackTitle ? labels.playYoutube : labels.playVideo.replace('{title}', title);
-    wrapper.querySelector('.embed-play')?.setAttribute('aria-label', playLabel);
-  }).catch(() => { /* the English names stay */ });
-  const gate = () => renderConsentGate(wrapper, iframe, mode, playLabel);
+  const gate = () => renderConsentGate(wrapper, iframe, mode, currentPlayLabel);
   block.append(wrapper);
 
   if (!hasEmbedConsent()) {
@@ -698,5 +713,5 @@ export default function decorate(block) {
 
   // A YouTube watch URL: the click-to-load poster; others (a YouTube player URL too): the
   // player boots when the embed nears the viewport (source parity + perf).
-  mountEmbed(wrapper, iframe, mode, playLabel, gate);
+  mountEmbed(wrapper, iframe, mode, currentPlayLabel, gate);
 }

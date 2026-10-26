@@ -225,4 +225,17 @@ test('the © notice shows the current year; a range keeps its start, a later yea
   updateCopyrightYear(none, 2027);
   assert.equal(none.textContent, 'No year © here');
   updateCopyrightYear(notice('© 2026'), Number.NaN); // an invalid year changes nothing (no throw)
+  const founded = notice('© Škoda Auto a.s. 2024. Founded 1991.');
+  updateCopyrightYear(founded, 2027);
+  assert.equal(founded.textContent, '© Škoda Auto a.s. 2027. Founded 1991.', 'the © year, not a later one');
+  const open = notice('© 2019 – present');
+  updateCopyrightYear(open, 2027);
+  assert.equal(open.textContent, '© 2019 – present', 'an open range stays');
+  const nested = notice('© <strong>Škoda Auto a.s. 2025</strong>, <em>all rights reserved</em>');
+  updateCopyrightYear(nested, 2027);
+  assert.equal(nested.querySelector('strong').textContent, 'Škoda Auto a.s. 2027');
+  assert.ok(nested.querySelector('em'), 'markup kept');
+  const before = notice('2010 ©Škoda 2025');
+  updateCopyrightYear(before, 2027);
+  assert.equal(before.textContent, '2010 ©Škoda 2027', 'a year before the © is not the notice\'s');
 });

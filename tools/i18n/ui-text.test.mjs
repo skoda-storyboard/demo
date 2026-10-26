@@ -20,9 +20,9 @@ const sources = (dir) => readdirSync(path.join(ROOT, dir), { recursive: true })
 const master = await masterList(ROOT);
 const english = new Map(master.map((r) => [r.key, r.text]));
 
-test('the registry names every exported label object', async () => {
+test('the registry names every label object (exported or not: a private one would stay English)', async () => {
   const exported = ['blocks', 'scripts', 'templates'].flatMap(sources).flatMap((file) => [
-    ...readFileSync(path.join(ROOT, file), 'utf8').matchAll(/^export const (\w*LABELS) =/gm),
+    ...readFileSync(path.join(ROOT, file), 'utf8').matchAll(/^(?:export )?const (\w*LABELS) =/gm),
   ].map((m) => `${file} ${m[1]}`));
   const registered = new Set(REGISTRY.map(([file, name]) => `${file} ${name}`));
   const missing = exported.filter((id) => !registered.has(id) && !FOLDED[id]);
@@ -73,10 +73,17 @@ LOCALES.filter((l) => l !== 'en').forEach((locale) => {
       });
   });
 
-  test(`${locale}: the sheet keeps every master key, then the plural forms`, () => {
+  test(`${locale}: the sheet keeps every master key in order, each plural form after its …One row`, () => {
     const { data } = buildSheet(master, locale, readTranslations(locale, ROOT));
-    assert.deepEqual(data.slice(0, master.length).map((r) => r.Key), master.map((r) => r.key));
+    const extra = (r) => !english.has(r.Key);
+    assert.deepEqual(data.filter((r) => !extra(r)).map((r) => r.Key), master.map((r) => r.key));
     data.forEach((r) => assert.notEqual(r.Source, 'english', `${locale}: ${r.Key} falls back to English`));
-    data.slice(master.length).forEach((r) => assert.ok(!english.has(r.Key) && /(Two|Few|Many|Zero)$/.test(r.Key)));
+    data.forEach((r, i) => {
+      if (!extra(r)) return;
+      assert.match(r.Key, /(Two|Few|Many|Zero)$/, r.Key);
+      const base = r.Key.replace(/(Two|Few|Many|Zero)$/, '');
+      // the row above is its `…One` or another form of the same text
+      assert.ok(data[i - 1].Key === `${base}One` || (extra(data[i - 1]) && data[i - 1].Key.startsWith(base)), `${r.Key} after ${data[i - 1].Key}`);
+    });
   });
 });
