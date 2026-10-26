@@ -13,6 +13,9 @@ function header(main) {
   h1?.closest('.section').classList.add('press-kit-header');
 }
 
+// the Chapters bar's link back to the kit's hub, as the source labels it
+const INTRODUCTION = 'Introduction';
+
 function chapters(main) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
@@ -28,6 +31,25 @@ function chapters(main) {
       link.setAttribute('aria-current', 'page');
     }
   });
+  // The source's bar shows "← Introduction" on the left: the way back to the kit's hub, which DA
+  // keeps as the menu's first entry (the parent page). The menu itself lists the chapters only
+  // (SKODA-805, measured 2026-10-26).
+  const parent = here.slice(0, here.lastIndexOf('/'));
+  const hub = [...list.querySelectorAll('a[href]')]
+    .find((link) => link.origin === origin && link.pathname.replace(/\/$/, '') === parent);
+  let intro = null;
+  if (hub) {
+    intro = document.createElement('a');
+    intro.className = 'press-kit-chapters-intro';
+    intro.href = hub.getAttribute('href');
+    ['target', 'rel'].forEach((attr) => { if (hub.hasAttribute(attr)) intro.setAttribute(attr, hub.getAttribute(attr)); });
+    intro.textContent = INTRODUCTION;
+    // the menu's first chapter is also "Introduction": the accessible name adds the kit (its
+    // DA label), still starting with the visible text (WCAG 2.5.3)
+    const kit = hub.textContent.trim();
+    if (kit && kit !== INTRODUCTION) intro.setAttribute('aria-label', `${INTRODUCTION}: ${kit}`);
+    hub.closest('li')?.remove();
+  }
   const nav = document.createElement('nav');
   nav.className = 'press-kit-chapters-nav';
   nav.setAttribute('aria-label', 'Chapters');
@@ -54,6 +76,7 @@ function chapters(main) {
     button.focus();
   });
   list.replaceWith(nav);
+  if (intro) nav.append(intro);
   nav.append(button, list);
 }
 

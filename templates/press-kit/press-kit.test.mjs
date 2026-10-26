@@ -60,6 +60,35 @@ test('the Chapters menu marks the current chapter, not the hub or other chapters
   );
 });
 
+test('the hub becomes the bar\'s "Introduction" link before the toggle; the menu lists the chapters only (SKODA-805)', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2">Škoda Peaq – Press Kit</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/introduction">Introduction</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/exterior">Exterior</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/skoda-peaq-press-kit-2/exterior');
+  decorate(main);
+  const nav = main.querySelector('nav[aria-label="Chapters"]');
+  assert.deepEqual([...nav.children].map((el) => el.tagName), ['A', 'BUTTON', 'UL'], 'Introduction, then the toggle, then the menu');
+  const intro = nav.querySelector(':scope > a.press-kit-chapters-intro');
+  assert.equal(intro.textContent, 'Introduction');
+  assert.equal(intro.getAttribute('aria-label'), 'Introduction: Škoda Peaq – Press Kit', 'told apart from the Introduction chapter, visible text first');
+  assert.equal(new URL(intro.href).pathname, '/en/press-kits/skoda-peaq-press-kit-2', 'back to the hub');
+  assert.deepEqual([...nav.querySelectorAll('ul a')].map((a) => a.textContent), ['Introduction', 'Exterior'], 'the hub is not in the menu');
+  assert.deepEqual([...nav.querySelectorAll('ul a[aria-current="page"]')].map((a) => a.textContent), ['Exterior']);
+});
+
+test('without a hub link in the menu there is no Introduction link (defensive)', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/kit/exterior">Exterior</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/kit/exterior');
+  decorate(main);
+  const nav = main.querySelector('nav[aria-label="Chapters"]');
+  assert.equal(nav.querySelector('.press-kit-chapters-intro'), null);
+  assert.deepEqual([...nav.children].map((el) => el.tagName), ['BUTTON', 'UL']);
+});
+
 test('a variant chapter (SKODA-808) is marked current in the Chapters menu, in source order', () => {
   const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
       <li><a href="#chapters-links">Chapters</a></li>
@@ -70,7 +99,8 @@ test('a variant chapter (SKODA-808) is marked current in the Chapters menu, in s
     </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out');
   decorate(main);
   const links = [...main.querySelectorAll('nav a')];
-  assert.deepEqual(links.map((a) => a.textContent), ['Škoda Peaq – Press Kit', 'Connectivity', 'Sportline', 'Frequently Asked Questions']);
+  // the hub is the bar's "Introduction" link (SKODA-805), then the chapters in source order
+  assert.deepEqual(links.map((a) => a.textContent), ['Introduction', 'Connectivity', 'Sportline', 'Frequently Asked Questions']);
   assert.deepEqual(links.filter((a) => a.getAttribute('aria-current') === 'page').map((a) => a.textContent), ['Sportline']);
 });
 

@@ -3,6 +3,22 @@ body.press-kit {
   --pk-gutter: var(--spacing-l);
   --pk-chapters-height: 44px;
   --pk-chapters-layer: 5;
+
+  /* the Chapters bar and menu (SKODA-805, the source's .chapter-nav measured 2026-10-26) */
+  --pk-icon-font: skoda-bnr-icons;
+  --pk-chapters-text-top: 20px;
+  --pk-chapters-line: 22.5px;
+  --pk-chapters-caret-gap: 4px;
+
+  /* the source labels' surrounding whitespace renders as one space after ← and before ⌄
+     (5px at 20px: the SKODA Next space advance) */
+  --pk-chapters-word-gap: 0.25em;
+  --pk-chapters-underline-width: 66px;
+  --pk-chapters-underline-gap: 4.375px;
+  --pk-chapters-menu-gap: 24px;
+  --pk-chapters-menu-overhang: 15px;
+  --pk-chapters-item-line: 18px;
+  --pk-chapters-item-pad: 13px 24px 10px; /* a 41px row */
   --pk-sidebar-inset: var(--spacing-xxl);
   --pk-article-top: 32px;
   --pk-date-size: 11px;
@@ -206,19 +222,97 @@ body.press-kit .section.press-kit-chapters {
   background: var(--background-color);
 }
 
-body.press-kit .press-kit-chapters-nav button {
+/* The bar as the source draws it (SKODA-805, measured 2026-10-26 at 375 – 1440): "← Introduction"
+   (the hub) on the left, "Chapters ⌄" on the right, both 20 / 22.5 / 500, their text on the bar's
+   bottom (20px top inset). The row spans the 1248 content cap with the 10px page gutter below it
+   and none once the cap leaves room: clamp() keeps the text 10px in until the cap, then on its edge. */
+body.press-kit .press-kit-chapters-nav {
+  --pk-chapters-inset: clamp(0px, calc(var(--page-gutter) - (100vw - var(--content-max-width)) / 2), var(--page-gutter));
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   min-height: var(--pk-chapters-height);
+  margin-inline: calc(-1 * var(--page-gutter)); /* out of the section's gutter, to its edge… */
+  padding-inline: var(--pk-chapters-inset); /* …then in by the fluid inset */
+}
+
+body.press-kit .press-kit-chapters-nav > .press-kit-chapters-intro,
+body.press-kit .press-kit-chapters-nav > button {
+  margin: 0;
   border: 0;
+  padding: var(--pk-chapters-text-top) 0 0;
   background: none;
   color: var(--text-color);
+  font-family: inherit;
+  font-size: var(--body-font-size-lead);
+  font-weight: var(--weight-medium);
+  line-height: var(--pk-chapters-line);
+  text-decoration: none;
   cursor: pointer;
 }
 
+/* the source's icon-font glyphs: ← before Introduction, ⌄ after Chapters */
+body.press-kit .press-kit-chapters-intro::before,
+body.press-kit .press-kit-chapters-nav > button::after {
+  font-family: var(--pk-icon-font);
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+body.press-kit .press-kit-chapters-intro::before {
+  content: "\e003"; /* browsers without CSS alt text (Firefox < 128) keep the glyph */
+  content: "\e003" / "";
+  margin-inline-end: var(--pk-chapters-word-gap);
+}
+
+body.press-kit .press-kit-chapters-nav > button {
+  position: relative;
+  margin-inline-start: auto; /* stays right when there's no Introduction link */
+}
+
+body.press-kit .press-kit-chapters-nav > button::after {
+  content: "\e007";
+  content: "\e007" / "";
+  margin-inline-start: calc(var(--pk-chapters-word-gap) + var(--pk-chapters-caret-gap));
+  font-size: var(--body-font-size-m);
+}
+
+/* the open menu's 66 × 2 ink line under the word, just below the bar */
+body.press-kit .press-kit-chapters-nav > button::before {
+  content: "";
+  position: absolute;
+
+  /* under the text line, wherever the button's box ends; centred on the word and its space */
+  inset-block-start: calc(var(--pk-chapters-text-top) + var(--pk-chapters-line) + var(--pk-chapters-underline-gap));
+  inset-inline-start: calc((100% - var(--body-font-size-m) - var(--pk-chapters-caret-gap)) / 2);
+  width: var(--pk-chapters-underline-width);
+  height: 2px;
+  background: var(--text-color);
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+body.press-kit .press-kit-chapters-nav > button[aria-expanded="true"]::before {
+  opacity: 1;
+}
+
+/* the menu: a white panel 24px under the bar, as wide as its longest title (273px on Peaq, 706 on
+   Motorsport, whose titles carry line breaks) but never past the viewport's gutter; right-aligned
+   with the toggle (15px past it once the content cap leaves room, as the source's); 41px rows of
+   16 / 18 / 500 inset 24px */
 body.press-kit .press-kit-chapters-nav ul {
+  position: absolute;
+  inset-block-start: calc(100% + var(--pk-chapters-menu-gap));
+  inset-inline-end: calc(var(--pk-chapters-inset) - clamp(0px, calc((100vw - var(--content-max-width)) / 2 - 1px), var(--pk-chapters-menu-overhang)));
+  width: max-content;
+  max-width: calc(100vw - var(--page-gutter));
   list-style: none;
   margin: 0;
-  padding: var(--spacing-m);
+  padding: 0;
   background: var(--background-color);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 15%);
 }
 
 body.press-kit .press-kit-chapters-nav ul[hidden],
@@ -226,13 +320,19 @@ body.press-kit .downloads-items > li[hidden] {
   display: none;
 }
 
-body.press-kit .press-kit-chapters-nav li a {
-  display: block;
-  padding-block: var(--spacing-xs);
+/* the current chapter carries aria-current only: the source marks it no differently */
+body.press-kit .press-kit-chapters-nav li {
+  margin: 0;
 }
 
-body.press-kit .press-kit-chapters-nav a[aria-current="page"] {
-  font-weight: var(--weight-semibold);
+body.press-kit .press-kit-chapters-nav li a {
+  display: block;
+  padding: var(--pk-chapters-item-pad);
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: var(--pk-chapters-item-line);
+  text-decoration: none;
 }
 
 body.press-kit .press-kit-chapters-nav button:focus-visible,
