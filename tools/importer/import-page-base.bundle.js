@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // tools/importer/import-page-base.js
+  // import-page-base.js
   var import_page_base_exports = {};
   __export(import_page_base_exports, {
     default: () => import_page_base_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // parsers/hero-banner.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .image-wrapper img, img");
     const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
@@ -51,10 +51,14 @@ var CustomImportScript = (() => {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero Image (overlay)"]];
+    const cells = [["Hero Image (page)"]];
     cells.push([img || ""]);
     const contentCell = [];
-    if (heading) contentCell.push(heading);
+    if (heading && heading.tagName !== "H1") {
+      const h1 = document2.createElement("h1");
+      h1.textContent = (heading.textContent || "").trim();
+      contentCell.push(h1);
+    } else if (heading) contentCell.push(heading);
     if (perex && (perex.textContent || "").trim()) {
       const p = document2.createElement("p");
       p.textContent = (perex.textContent || "").trim();
@@ -71,9 +75,91 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // tools/importer/transformers/skoda-page-cleanup.js
-  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  // transformers/skoda-page-rows.js
+  var MARK = "data-skoda-page-body";
+  var HALF_ROW = "data-skoda-half-row";
+  var BODY = "page-body";
+  var HALF = "page-body, half";
+  var EMPTY_WIDGET = "empty-cell";
+  var isFilled = (cell) => !!cell && (!!cell.querySelector("img, picture, iframe, video, table") || !!cell.textContent.replace(/[\s\u00a0]/g, ""));
+  function withoutMedia(css) {
+    let out = "";
+    let i = 0;
+    while (i < css.length) {
+      const at = css.indexOf("@media", i);
+      if (at < 0) return out + css.slice(i);
+      out += css.slice(i, at);
+      let depth = 0;
+      let j = css.indexOf("{", at);
+      if (j < 0) return out;
+      for (; j < css.length; j += 1) {
+        if (css[j] === "{") depth += 1;
+        else if (css[j] === "}") {
+          depth -= 1;
+          if (!depth) break;
+        }
+      }
+      i = j + 1;
+    }
+    return out;
+  }
+  function cellWidths(doc) {
+    const css = withoutMedia([...doc.querySelectorAll("style")].map((s) => s.textContent).join("\n"));
+    const widths = /* @__PURE__ */ new Map();
+    [...css.matchAll(/((?:#pgc-[\w-]+\s*,?\s*)+)\{\s*width:\s*([\d.]+)%/g)].forEach(([, ids, w]) => {
+      ids.split(",").map((id) => id.trim().replace(/^#/, "")).filter(Boolean).forEach((id) => widths.set(id, Number(w)));
+    });
+    return widths;
+  }
+  var cellsOf = (row) => [...row.children].flatMap((child) => child.matches(".panel-row-style") ? [...child.children] : [child]).filter((c) => c.matches(".panel-grid-cell"));
+  function isHalfRow(row, widths) {
+    const cells = cellsOf(row);
+    if (cells.length !== 2) return false;
+    const [left, right] = cells;
+    return isFilled(left) && !isFilled(right) && widths.get(left.id) === 50;
+  }
+  function rowsOf(article) {
+    const layout = article.querySelector(".panel-layout");
+    return layout ? [...layout.children].filter((r) => r.matches(".panel-grid")) : [];
+  }
   function transform(hookName, element, payload) {
+    const doc = element.ownerDocument || (payload == null ? void 0 : payload.document);
+    const article = element.querySelector("article.page, article.post");
+    if (hookName === "preprocess") {
+      if (!article) return;
+      const widths = cellWidths(doc);
+      rowsOf(article).filter((row) => isHalfRow(row, widths)).forEach((row) => {
+        row.setAttribute(HALF_ROW, cellsOf(row)[1].querySelector(".so-panel") ? EMPTY_WIDGET : "");
+      });
+    }
+    if (hookName === "beforeTransform") {
+      if (!article) return;
+      const rows = rowsOf(article);
+      if (!rows.length) {
+        (article.querySelector(".entry-content") || article).setAttribute(MARK, BODY);
+        return;
+      }
+      rows.forEach((row, i) => {
+        const half = row.getAttribute(HALF_ROW);
+        let style = BODY;
+        if (half !== null) style = half ? `${HALF}, ${half}` : HALF;
+        row.removeAttribute(HALF_ROW);
+        if (i > 0) row.before(doc.createElement("hr"));
+        row.setAttribute(MARK, style);
+      });
+    }
+    if (hookName === "afterTransform") {
+      element.querySelectorAll(`[${MARK}]`).forEach((anchor) => {
+        const style = anchor.getAttribute(MARK);
+        anchor.removeAttribute(MARK);
+        anchor.before(WebImporter.Blocks.createBlock(doc, { name: "Section Metadata", cells: { style } }));
+      });
+    }
+  }
+
+  // transformers/skoda-page-cleanup.js
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function transform2(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
       WebImporter.DOMUtils.remove(element, [
         // Site header / nav / language switcher / search overlay chrome
@@ -155,7 +241,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-model-sections.js
+  // transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -166,7 +252,7 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function transform2(hookName, element, payload) {
+  function transform3(hookName, element, payload) {
     const sections = payload && payload.template && payload.template.sections || [];
     if (sections.length < 2) return;
     if (hookName === "beforeTransform") {
@@ -200,7 +286,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-metadata.js
+  // transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -447,7 +533,7 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function transform3(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     if (hasMetadataBlock(element)) return;
     const { document: document2, url, params } = payload;
@@ -487,7 +573,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // tools/importer/transformers/skoda-links.js
+  // transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -915,7 +1001,7 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform4(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
@@ -927,10 +1013,10 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/transformers/skoda-nbsp.js
+  // transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform5(hookName, element, payload) {
+  function transform6(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -945,7 +1031,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/import-page-base.js
+  // import-page-base.js
   var parsers = {
     "hero-banner": parse
   };
@@ -986,9 +1072,10 @@ var CustomImportScript = (() => {
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
-    transform3,
-    transform4
+    transform2,
+    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform3] : [],
+    transform4,
+    transform5
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
@@ -1017,8 +1104,10 @@ var CustomImportScript = (() => {
     return pageBlocks;
   }
   var import_page_base_default = {
-    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-    preprocess: ({ document: document2 }) => transform5("preprocess", document2.body, { document: document2 }),
+    preprocess: ({ document: document2 }) => {
+      transform6("preprocess", document2.body, { document: document2 });
+      transform("preprocess", document2.body, { document: document2 });
+    },
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;

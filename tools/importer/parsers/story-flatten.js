@@ -51,8 +51,9 @@
  *   skoda-image-box            0.2%  → infobox/definition callout: text (+ image) as
  *                                       default content — NOT a plain image (D2)
  *   sow-image                  0.1%  → image (lifted to direct child)
- *   ys-milestones              0.1%  → timeline flattened to content: per entry an
- *                                       <h3> "YEAR — Title" + its image (SKODA-815/D1)
+ *   ys-milestones              0.1%  → Timeline block: one row per entry, year | title |
+ *                                       image | description (SKODA-815/D1; was an
+ *                                       <h3> + image, which lost every description)
  *   ys-embed-share             0.1%  → dropped (social share chrome, not body)
  *   iframe-embed              0.01%  → embed block (preserve dnt=1)
  *   highlights                0.02%  → dropped + logged
@@ -357,36 +358,142 @@ function imageNodes(panel, document) {
   return img ? [img] : [];
 }
 
-// ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
-// `section.milestones > ul > li` where each <li> holds `.year`, `.title` (rich text)
-// and an `<img>`. Reduced-fidelity flatten (M1): each milestone → an <h3> "YEAR — Title"
-// heading + its image lifted to a direct child (EDS wraps it in <picture>), in order.
-// No content is dropped; the source's timeline visual is not reproduced (see SKODA-815
-// for the optional dedicated timeline block). Falls back gracefully if the DOM differs.
-function milestonesNodes(panel, document) {
-  const items = [...panel.querySelectorAll('li')].filter((li) => li.querySelector('.year, .title, img'));
-  const out = [];
-  items.forEach((li) => {
-    const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
-    const title = (li.querySelector('.title')?.textContent || '').replace(/\s+/g, ' ').trim();
-    if (year || title) {
-      const h = document.createElement('h3');
-      h.textContent = [year, title].filter(Boolean).join(' — ');
-      out.push(h);
+// The rich text of a milestone part as clean nodes: the source's styling spans (inline
+// font sizes, the Škodapedia `term-explain` tooltip, SKODA-206) give way to their text;
+// paragraphs, line breaks, bold/italic and links stay (links keep only their href).
+const MILESTONE_KEEP = new Set(['P', 'BR', 'STRONG', 'B', 'EM', 'I', 'A', 'UL', 'OL', 'LI']);
+function milestoneRich(source, document) {
+  const clean = (node) => {
+    if (node.nodeType === 3) return [document.createTextNode(node.textContent)];
+    if (node.nodeType !== 1) return [];
+    const kids = [...node.childNodes].flatMap(clean);
+    if (!MILESTONE_KEEP.has(node.tagName)) return kids;
+    const el = document.createElement(node.tagName.toLowerCase());
+    // links keep only their href: DA drops target/rel, so the Timeline block opens every
+    // milestone link in a new tab at runtime, as the source widget's target="_blank"
+    if (node.tagName === 'A' && node.getAttribute('href')) el.setAttribute('href', node.getAttribute('href'));
+    // a line break closing a bold/italic run (the title's `<strong>VOITURETTE A<br></strong>`)
+    // moves after it: the conversion drops a trailing <br> inside inline formatting
+    const trailing = [];
+    while (/^(STRONG|B|EM|I)$/.test(node.tagName) && kids.length) {
+      const last = kids[kids.length - 1];
+      if (last.nodeType === 1 && last.tagName === 'BR') trailing.unshift(kids.pop());
+      else if (last.nodeType === 3 && !last.textContent.trim()) kids.pop();
+      else break;
     }
-    const img = li.querySelector('img');
-    if (img) out.push(img);
+    el.append(...kids);
+    return [el, ...trailing];
+  };
+  const nodes = [...(source?.childNodes || [])].flatMap(clean)
+    .filter((n) => !(n.nodeType === 3 && !n.textContent.trim()));
+  // a paragraph left empty by the unwrap (a spacer <p>&nbsp;</p>) is not content
+  return nodes.filter((n) => !(n.tagName === 'P' && !n.textContent.trim() && !n.querySelector('br, a')));
+}
+
+// The year pill's colour is authored per widget (`.year` inline background): green
+// (#99cc00, the default) on most, black on "125 years of Škoda: iconic cars".
+const MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
+
+// The widget's title size, authored as inline font-size spans: 14pt (18.67px) on most,
+// 18pt (24px) on four stories → `large`, and a 24pt (32px) model line under an 18pt maker on
+// two (wheels, gear stick) → `xl`, whose title lines the block sizes by role.
+function milestoneTitleSize(items) {
+  const px = (value) => {
+    const m = String(value).match(/^([\d.]+)(pt|px)$/);
+    if (!m) return 0;
+    return m[2] === 'pt' ? (Number(m[1]) * 4) / 3 : Number(m[1]);
+  };
+  const sizes = items.flatMap((li) => [...li.querySelectorAll('.title [style*="font-size"]')]
+    .map((span) => px(span.style.fontSize.trim())).filter(Boolean));
+  if (!sizes.length) return '';
+  const counts = new Map();
+  sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
+  const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+  if (dominant >= 32) return 'xl';
+  return dominant >= 24 ? 'large' : '';
+}
+
+// The space the source adds above a title (PR #373 review): a spacer paragraph (an empty
+// <p>&nbsp;</p>: its 24px line + 20px margin, 44px; iconic cars, 1970) or an inline margin-top
+// on the first title paragraph (15px on four steering-wheel entries). Only these two patterns
+// are read, as whole pixels for the row's optional fifth cell; 0 = none.
+const MILESTONE_SPACER = 44;
+function milestoneSpace(title) {
+  let space = 0;
+  const paragraphs = title ? [...title.querySelectorAll(':scope > p')] : [];
+  const first = paragraphs.find((p) => {
+    if ((p.textContent || '').trim() || p.querySelector('img, a')) return true;
+    space += MILESTONE_SPACER;
+    return false;
   });
-  // Defensive: unexpected DOM (no <li> entries) → salvage any images + text so nothing
-  // is silently lost, rather than emitting an empty block.
-  if (!out.length) {
-    panel.querySelectorAll('img').forEach((img) => out.push(img));
-    const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
-    if (text && !panel.querySelector('img')) {
-      const p = document.createElement('p');
-      p.textContent = text;
-      out.push(p);
-    }
+  if (!first) return 0;
+  const margin = (first.getAttribute('style') || '').match(/margin-top\s*:\s*(\d+(?:\.\d+)?)px/i);
+  return Math.round(space + (margin ? Number(margin[1]) : 0));
+}
+
+const SPACE_ATTR = 'data-title-space';
+
+/**
+ * Records each milestone's title space before helix-importer's preProcess, which drops the
+ * empty spacer paragraphs it is measured from (import-story-detail.js preprocess).
+ * @param {Element} root
+ */
+export function markMilestoneSpaces(root) {
+  root.querySelectorAll('.so-widget-ys-milestones li').forEach((li) => {
+    const space = milestoneSpace(li.querySelector('.title'));
+    if (space) li.setAttribute(SPACE_ATTR, String(space));
+  });
+}
+
+/** A milestone's title space: as marked in preprocess, else read from its title now. */
+function titleSpaceOf(li) {
+  if (li.hasAttribute(SPACE_ATTR)) return Number(li.getAttribute(SPACE_ATTR)) || 0;
+  return milestoneSpace(li.querySelector('.title'));
+}
+
+// ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
+// `section.milestones > ul > li`, each <li> holding `.line > .year`, `.title` (rich: the
+// maker, the bold model, "(vehicle on display: …)"), `.thumbnail > img` (square) and
+// `.description` (rich text with links, after a decorative `.dot`). Each entry becomes
+// one Timeline row: year | title | image | description [| space above the title, px], in
+// source order; the block renders the source's vertical timeline (blocks/timeline,
+// docs/ui-specs/timeline.md).
+// Unexpected DOM (no entries) → its images + text as default content, never dropped.
+function milestonesCells(panel, document) {
+  const items = [...panel.querySelectorAll('li')]
+    .filter((li) => li.querySelector('.year, .title, .description, img'));
+  if (!items.length) return null;
+  const variants = [
+    MILESTONE_BLACK.test(items[0].querySelector('.year')?.getAttribute('style') || '') ? 'black' : '',
+    milestoneTitleSize(items),
+  ].filter(Boolean);
+  const cells = [[variants.length ? `Timeline (${variants.join(', ')})` : 'Timeline']];
+  // the fifth column only when an entry has extra space above its title, then on every row
+  const spaces = items.map(titleSpaceOf);
+  const spaced = spaces.some(Boolean);
+  items.forEach((li, i) => {
+    const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
+    const title = milestoneRich(li.querySelector('.title'), document);
+    // a thumbnail may stack more than one image (iconic cars, 1970: the 110 R and the 130 RS)
+    const thumbs = [...li.querySelectorAll('.thumbnail img')];
+    const imgs = thumbs.length ? thumbs : [...li.querySelectorAll('img')].slice(0, 1);
+    const description = li.querySelector('.description');
+    description?.querySelectorAll('.dot').forEach((dot) => dot.remove());
+    const row = [year, title, imgs.length ? imgs : '', milestoneRich(description, document)];
+    if (spaced) row.push(spaces[i] ? String(spaces[i]) : '');
+    cells.push(row);
+  });
+  return cells;
+}
+
+// the images, then the text, so a widget with both keeps both
+function milestonesFallback(panel, document) {
+  const out = [...panel.querySelectorAll('img')];
+  const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
+  if (text) {
+    const p = document.createElement('p');
+    p.textContent = text;
+    out.push(p);
   }
   return out;
 }
@@ -578,11 +685,55 @@ function highlightGeometry(css) {
     const m = find(mobile, test, 'margin') || d;
     return [d || fallback, m || fallback];
   };
+  // a multi-column row's own cell geometry (SKODA-227: the charging story's "Five questions"
+  // panel): each filled cell's widget margin and `.panel-cell-style` padding, desktop / mobile,
+  // as `highlight-cell-margin[-mobile]` / `highlight-cell-padding[-mobile]` rows, one box per cell
+  // joined by " | ". A cell without its own rule keeps the theme's (margin 0 15 / 15, no padding),
+  // a mobile value the desktop one. Only a layout that sets one of them gets the rows; the others
+  // keep the default panel inset.
+  const cellGeometry = (cells) => {
+    const per = cells.map((cell) => {
+      const widget = cell.querySelector(':scope > .so-panel, :scope > .panel-cell-style > .so-panel');
+      const isWidget = (s) => !!widget?.id && s.endsWith(`#${widget.id}`);
+      const isCell = (s) => s.replace(/\s+/g, '') === `#${cell.id}>.panel-cell-style`;
+      const marginD = find(desktop, isWidget, 'margin');
+      const marginM = find(mobile, isWidget, 'margin') || marginD;
+      const padD = find(desktop, isCell, 'padding');
+      const padM = find(mobile, isCell, 'padding') || padD;
+      return {
+        own: !!(marginD || marginM || padD || padM),
+        marginD: marginD || DEFAULT_TEXT_MARGIN[0],
+        marginM: marginM || DEFAULT_TEXT_MARGIN[1],
+        padD: padD || '0px 0px 0px 0px',
+        padM: padM || '0px 0px 0px 0px',
+      };
+    });
+    if (!per.some((c) => c.own)) return {};
+    const join = (key) => per.map((c) => c[key]).join(' | ');
+    return {
+      'highlight-cell-margin': join('marginD'),
+      'highlight-cell-margin-mobile': join('marginM'),
+      'highlight-cell-padding': join('padD'),
+      'highlight-cell-padding-mobile': join('padM'),
+    };
+  };
   return (grid) => {
     const out = {};
-    // a multi-column row has a margin per cell; its Columns block keeps the default inset
-    const cells = grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell');
-    if ([...cells].filter((c) => c.querySelector('.so-panel')).length > 1) return out;
+    // a multi-column row has a margin per cell: its Columns block keeps the default inset, unless
+    // the layout sets the cells' own (cellGeometry)
+    const cells = [...grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell')]
+      .filter((c) => c.querySelector('.so-panel'));
+    if (cells.length > 1) {
+      // only a row that becomes a Columns block (two cells with content) has cells to style
+      const filled = cells.filter((c) => (c.textContent || '').trim() || c.querySelector('img, picture, iframe, video'));
+      if (filled.length > 1) Object.assign(out, cellGeometry(cells));
+      if (Object.keys(out).length) {
+        const { padD, padM } = rowPadding(grid);
+        if (padD) out['highlight-padding'] = padD;
+        if (padM) out['highlight-padding-mobile'] = padM;
+      }
+      return out;
+    }
     const { padD, padM } = rowPadding(grid);
     if (padD) out['highlight-padding'] = padD;
     if (padM) out['highlight-padding-mobile'] = padM;
@@ -608,6 +759,46 @@ function highlightGeometry(css) {
 const THEME_ROW_TOP = '32px 0px 0px 0px';
 const ROW_PAD_ATTR = 'data-row-padding';
 const ROW_PAD_MOBILE_ATTR = 'data-row-padding-mobile';
+
+// a body image file this wide is full enough for the story column (819px at 2x)
+const FULL_ENOUGH_PX = 1600;
+
+/**
+ * Point each body image at its largest file: WordPress gives a 2026 editor image a thumbnail
+ * `src` (`…-384x216.jpg`, the charging story's photos), and the full file only in its `srcset`
+ * (`…jpg 1136w`), so the import kept the thumbnail and showed it at 384px. The media gate caps an
+ * oversize file at push. A slider gallery's slides too (one full-width photo each); the Media Box
+ * and photo-grid cards keep theirs (their parsers pick the files).
+ * Returns the number of images changed.
+ */
+export function useLargestSources(document) {
+  let count = 0;
+  document.querySelectorAll('.panel-layout img[srcset]').forEach((img) => {
+    if (img.closest('.search-results.media-box, .search-results-gallery, .sb-gallery')) return;
+    const candidates = (img.getAttribute('srcset') || '').split(',')
+      .map((c) => c.trim().split(/\s+/))
+      .map(([url, d]) => ({ url, w: parseInt((d || '').replace(/w$/, ''), 10) }))
+      .filter(({ url, w }) => url && w > 0);
+    if (!candidates.length) return;
+    const largest = candidates.reduce((a, b) => (b.w > a.w ? b : a));
+    const src = img.getAttribute('src') || '';
+    const current = candidates.find((c) => c.url === src)?.w
+      || parseInt((src.match(/-(\d+)x\d+\.\w+(?:$|\?)/) || [])[1], 10) || 0;
+    // only where the page shows the image wider than its `src` file (the charging photos: 1976
+    // authored, a 384px file); an image the author set at its thumbnail size keeps it. A slider
+    // slide's `width` is its file's (768), not its shown size (the slide's width): it ignores it
+    const slide = !!img.closest('.search-results.carousel-widget');
+    const authored = (!slide && parseInt(img.getAttribute('width'), 10)) || Infinity;
+    // a 1600px file already covers the 819px column at 2x: a 2560 rendition stays (its original
+    // would only be scaled back to it at push)
+    if (current >= FULL_ENOUGH_PX) return;
+    if (largest.url !== src && largest.w > current && authored > current) {
+      img.setAttribute('src', largest.url);
+      count += 1;
+    }
+  });
+  return count;
+}
 
 /** Mark each plain builder row's own padding (desktop / mobile). Returns the count. */
 export function markRowPadding(document) {
@@ -659,7 +850,8 @@ export function rowPaddingVariants(grid) {
 
 const GEOMETRY_KEYS = ['highlight-padding', 'highlight-padding-mobile', 'highlight-margin',
   'highlight-margin-mobile', 'highlight-gallery-margin', 'highlight-gallery-margin-mobile',
-  'highlight-background', 'highlight-color', 'highlight-link'];
+  'highlight-background', 'highlight-color', 'highlight-link',
+  'highlight-cell-margin', 'highlight-cell-margin-mobile', 'highlight-cell-padding', 'highlight-cell-padding-mobile'];
 
 // ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
 // SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
@@ -1159,7 +1351,13 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
     case 'image-box': nodes = infoboxNodes(panel, document); break;
     case 'image': nodes = imageNodes(panel, document); break;
     case 'button': nodes = buttonNodes(panel, document); break;
-    case 'milestones': nodes = milestonesNodes(panel, document); break;
+    case 'milestones':
+      cells = milestonesCells(panel, document);
+      if (!cells) {
+        nodes = milestonesFallback(panel, document);
+        stats.fallback.push(kind);
+      }
+      break;
     default:
       // unknown: try to salvage rich text, else skip + log.
       nodes = editorNodes(panel, document);
@@ -1285,7 +1483,8 @@ export default function parse(element, { document }) {
 
   const out = [];
   const stats = {
-    grids: grids.length, byKind: {}, deferred: [], unknown: [], multiColumn: 0, highlights: 0,
+    grids: grids.length, byKind: {}, deferred: [], unknown: [], fallback: [], multiColumn: 0,
+    highlights: 0,
   };
 
   // Highlight rows split the body: <hr> + row content + its Section Metadata, then the
@@ -1351,8 +1550,9 @@ export default function parse(element, { document }) {
     highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
+    fallback: stats.fallback,
   };
-  if (stats.deferred.length || stats.unknown.length) {
+  if (stats.deferred.length || stats.unknown.length || stats.fallback.length) {
     console.warn(`[story-flatten] deferred/unknown widgets: ${JSON.stringify(summary)}`);
   } else {
     console.log(`[story-flatten] flattened: ${JSON.stringify(summary)}`);
@@ -1362,4 +1562,5 @@ export default function parse(element, { document }) {
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
   classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant, centredVariants,
+  milestonesCells, markMilestoneSpaces,
 };

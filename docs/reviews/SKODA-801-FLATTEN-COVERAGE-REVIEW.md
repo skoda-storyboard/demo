@@ -40,6 +40,12 @@ editor-hygiene issue** (D4 over-encoded inline hrefs). D3 (interactive defer) wo
 > (order preserved, scaffolding stripped). Verified on the steering-wheel story: **0 → 11 dated
 > entries, +11 images**, 11 unique milestone headings. Unit test added. Option-2 dedicated
 > timeline block remains optional M2 (SKODA-815).
+>
+> **Update 2026-10-16 (SKODA-815):** that flatten kept the year and title but dropped every
+> milestone **description** (the text and its links). `ys-milestones` now becomes a `Timeline`
+> block, one row per entry (year | title | image | description), with nothing dropped:
+> steering wheel 11 entries and 11 descriptions, iconic cars 16 and 16. Spec:
+> [`timeline.md`](../ui-specs/timeline.md).
 
 - **Where:** steering-wheel-decades-of-changes (`ys-milestones`).
 - **Source:** 11 dated milestone entries + **11 images** (1905, 1925, 1932, 1940, 1952…).
@@ -125,7 +131,7 @@ The census's **208-widget outlier** URL
 
 ## Recommended follow-ups (tickets)
 1. ~~**D1 timeline**~~ — **FIXED in SKODA-801** (SKODA-815, 2026-09-24): `ys-milestones` flattens to
-   content (per entry `<h3>` "YEAR — Title" + image); 0 → 11 entries recovered. Optional M2: dedicated timeline block.
+   content (per entry `<h3>` "YEAR — Title" + image); 0 → 11 entries recovered. **2026-10-16:** replaced by the `Timeline` block (SKODA-815), which also keeps the descriptions the flatten dropped.
 2. ~~**D2 figure/infobox**~~ — **FIXED in SKODA-801** (2026-09-24): `figureNodes` lifts the native
    figure/figcaption; `skoda-image-box` → new `infoboxNodes` (text + optional image). 3 unit tests.
 3. ~~**D4 editor hygiene**~~ — **FIXED** (2026-09-24): over-encoded hrefs normalised to single

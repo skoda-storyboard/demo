@@ -109,6 +109,7 @@ export const SPEC = {
     variants: [
       { class: 'overlay', label: 'overlay', description: 'Model, series and press-kit hubs: title (and an optional label line) over the image.' },
       { class: 'archive', label: 'archive', description: 'Category and tag archive pages: a banner image row (may stay empty) and the h1 with one line per label.' },
+      { class: 'page', label: 'page', description: 'Generic pages (copyright, legal, contacts): a 240px title band with an optional image row and the page title (h1).' },
     ],
   },
   listing: {
@@ -175,11 +176,24 @@ export const SPEC = {
       { class: 'chips outline', label: 'chips, outline', description: 'Outlined filter chips that fill green on hover or when selected.' },
     ],
   },
+  timeline: {
+    structure: 'year-title-image-description repeating',
+    purpose: 'dated story timeline (milestones)',
+    description: 'One row per milestone: year | title | image | description, and an optional fifth cell: the space above the title in px (e.g. 15). Title lines are separate lines or paragraphs in the cell, the model in bold. A blank cell is a blank value: no image, no image box; no year, no year pill; an empty row is skipped. Links open in a new tab. A left line on phones and tablets, two-sided from 1080px wide.',
+    variants: [
+      { class: 'black', label: 'black', description: 'Black year pills and dots instead of the green default (125 years of Škoda: iconic cars).' },
+      { class: 'large', label: 'large', description: 'Larger titles (24px), for timelines whose source titles are 18pt.' },
+      { class: 'xl', label: 'xl', description: 'Title paragraphs sized by role: the maker line 24px, the all-bold model line 32px, the "(vehicle on display: …)" line 16px (wheels, gear stick).' },
+    ],
+  },
 };
 
 // Section Metadata Style tokens used on the site (section styles, not blocks)
 export const SECTION_STYLES = [
   ['body-column', 'Story / release article column (two-column layout with the sidebar).'],
+  ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
+  ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
+  ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],
@@ -189,6 +203,7 @@ export const SECTION_STYLES = [
   ['body-column, text-small', 'A run of story text in 10pt; text-medium is 14pt, text-large 16pt, text-xlarge 18pt. Combine with text-center.'],
   ['body-column, text-box', 'Story text in a padded, coloured box; optional rows box-background (colour), box-padding (1–4 px values), box-color (text colour), box-shadow (e.g. 0px 2px 6px #999999).'],
   ['body-column, highlight-dark / highlight-grey: colours', 'Optional rows on a highlight box: highlight-background, highlight-color, highlight-link (a hex colour each, e.g. #f1f1f1).'],
+  ['body-column, highlight-dark / highlight-grey: two-column cells', 'Optional rows on a highlight box holding a Columns row whose cells have their own inset: highlight-cell-margin, highlight-cell-padding (and -mobile), one px box per cell joined by " | " (e.g. 0px 0px 0px 15px | 0px 10px 0px 0px).'],
   ['dark, full-width, media-box', 'The Media Box band (holds the Media Box Downloads block).'],
   ['dark, full-width, related', 'The dark related band at the end of a press release.'],
   ['dark', 'Dark band (e.g. the Related Stories rail).'],

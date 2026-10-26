@@ -34,13 +34,19 @@ export default function parse(element, { document }) {
   // Project contract `hero` (SKODA-202, tools/importer/push/block-contracts.json): this
   // repo's hero is the Hero Image block (blocks/hero is an empty boilerplate stub the block
   // gate rejects). Same 1-column shape as the library Hero: image row, then title/CTA row.
-  const cells = [['Hero Image (overlay)']];
+  // `page`: the generic page's 240px title band, with or without an image (SKODA-813).
+  const cells = [['Hero Image (page)']];
   // Row 2: background image (optional).
   cells.push([img || '']);
 
-  // Row 3: title + optional standfirst + optional CTA link(s).
+  // Row 3: title + optional standfirst + optional CTA link(s). The band's title is the page's
+  // h1 (the block styles it), whatever element the source used for it.
   const contentCell = [];
-  if (heading) contentCell.push(heading);
+  if (heading && heading.tagName !== 'H1') {
+    const h1 = document.createElement('h1');
+    h1.textContent = (heading.textContent || '').trim();
+    contentCell.push(h1);
+  } else if (heading) contentCell.push(heading);
   if (perex && (perex.textContent || '').trim()) {
     const p = document.createElement('p');
     p.textContent = (perex.textContent || '').trim();

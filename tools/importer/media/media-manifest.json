@@ -35291,7 +35291,8 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d-1440x720.jpg"
+        "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d-1440x720.jpg",
+        "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 8494700,
@@ -240767,6 +240768,436 @@
       },
       "status": "done",
       "note": ""
+    },
+    "6b386aae__116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg": {
+      "logical_id": "6b386aae__116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/116_skoda_epiq_dcd70ac5-1920x1281_d9d30c91.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 498727,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg": {
+      "logical_id": "6b386aae__003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/003_skoda_epiq_1a6519ea-1920x994_a10b9aeb.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 436443,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg": {
+      "logical_id": "6b386aae__030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/030_skoda_epiq_6b648a84-1920x1263_873ea735.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 375138,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__Navrh-bez-nazvu-67_20850e67.png": {
+      "logical_id": "6b386aae__Navrh-bez-nazvu-67_20850e67.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-67_20850e67.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-67_20850e67.png",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-67_20850e67.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-67_20850e67.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2334102,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__Epiq_069_Tech_drawings_low_b0f8ff15.jpg": {
+      "logical_id": "6b386aae__Epiq_069_Tech_drawings_low_b0f8ff15.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/Epiq_069_Tech_drawings_low_b0f8ff15.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/Epiq_069_Tech_drawings_low_b0f8ff15.jpg",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/Epiq_069_Tech_drawings_low_b0f8ff15.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/Epiq_069_Tech_drawings_low_b0f8ff15.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 210875,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg": {
+      "logical_id": "8b558dfa__020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/020_skoda_peaq_9768c168-1920x1281_c32e2682.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 377012,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg": {
+      "logical_id": "6b386aae__014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/014_skoda_epiq_f9e2a70c-1920x1920_80b17d78.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 313814,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__Navrh-bez-nazvu-68_384d266b.png": {
+      "logical_id": "8b558dfa__Navrh-bez-nazvu-68_384d266b.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-68_384d266b.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-68_384d266b.png",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-68_384d266b.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-68_384d266b.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2466980,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg": {
+      "logical_id": "8b558dfa__018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/018_skoda_peaq_c64781b9-1920x1281_09c754df.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 357260,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg": {
+      "logical_id": "8b558dfa__189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/189_skoda_peaq_accessories_c8a96fcb-1920x1427_a1f42f91.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 364734,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg": {
+      "logical_id": "8b558dfa__022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/022_skoda_peaq_91187e87-1920x1281_d9e8c588.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 352120,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__Peaq_088_Tech-drawings_5_seater_f4de48be.jpg": {
+      "logical_id": "8b558dfa__Peaq_088_Tech-drawings_5_seater_f4de48be.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Peaq_088_Tech-drawings_5_seater_f4de48be-1920x1550.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Peaq_088_Tech-drawings_5_seater_f4de48be.jpg",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Peaq_088_Tech-drawings_5_seater_f4de48be.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Peaq_088_Tech-drawings_5_seater_f4de48be-1920x1550.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1918738,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__TD-Epiq-en_9ab9372d.pdf": {
+      "kind": "document",
+      "logical_id": "6b386aae__TD-Epiq-en_9ab9372d.pdf",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf",
+      "dam_page_path": "en/skoda-model/epiq",
+      "page_refs": [
+        "en/skoda-model/epiq"
+      ],
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+        "mime": "application/pdf",
+        "bytes": 205410
+      },
+      "da_path": "",
+      "title": "Download PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf"
+      ],
+      "bytes": 205410,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "done",
+        "publish": "done",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-26T10:36:24.745Z"
+    },
+    "8b558dfa__TD-Peaq-en_8fa4f649.pdf": {
+      "kind": "document",
+      "logical_id": "8b558dfa__TD-Peaq-en_8fa4f649.pdf",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf",
+      "dam_page_path": "en/skoda-model/peaq",
+      "page_refs": [
+        "en/skoda-model/peaq"
+      ],
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+        "mime": "application/pdf",
+        "bytes": 255940
+      },
+      "da_path": "",
+      "title": "Download PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf"
+      ],
+      "bytes": 255940,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "done",
+        "publish": "done",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-26T10:36:34.167Z"
     }
   }
 }

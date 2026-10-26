@@ -84,29 +84,52 @@ Values `getComputedStyle` on the Copyright page, cited `(selector · viewport)`.
 
 ## 8. EDS target
 
-- DA `Metadata`: `template=page` (STO) or `template=media-room-page` (MR, sets the MR chrome); title +
-  optional hero image.
-- Section model: one hero section + one single-column content section (SiteOrigin flattened to default
-  content + blocks). MR company pages add the sub-type blocks per `company-pages.md`.
-- Reuse: `hero` banner + default rich-text decoration. This is the "🟢 native" template in
-  `SKODA-MASTER.md` §16 fit-scale, mostly straight content.
+- **Side:** the header and footer come from the bulk metadata sheet by path (`/en/contacts` →
+  `/media-room/nav` + `/media-room/footer` + `section: media-room`); a page outside the Media Room paths
+  keeps the Storyboard chrome. `template` stays `page`.
+- **Band:** `Hero Image (page)` (SKODA-813): row 1 the banner picture or an empty cell, row 2 the H1.
+- **Body:** one section per SiteOrigin row, `Style: page-body` (`page-body, half` for a row set in the
+  left half of a 50/50 row; `empty-cell` when its right cell held an empty widget). Contract and runtime:
+  [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PENDING-BLOCK-CONTRACTS.md) `page-body`.
+- **Measured** (2026-10-21, live vs the import, 390 / 768 / 992 / 1080 / 1440 plus the 780 / 781 edge):
+  - band 240px at every width, the empty band's colours equal to the pixel (5% ink under the shared scrim);
+  - title 48/52.8/300 white, 16px above the band's edge, 10px into the column;
+  - every row 10px under the band or the row before (the source widget's 10px padding less its −10px
+    margin), text 20px in (30px from 781);
+  - h2 40/45/300 and h3 24/27.6/300 (16px under), p 16/24 (20px apart), half rows (W − 60 − 40) / 2 from
+    781 (340.5 / 446 / 490 / 574 at 781 / 992 / 1080 / 1440);
+  - footer 20px under the last paragraph.
+- MR company pages add the sub-type blocks per `company-pages.md` (SKODA-810).
 
 ## 9. Open decisions + recommended default
 
-- **Mobile heading scale** (🟡): source keeps `48px`/`40px` on mobile; **default = add a modest mobile
-  step** so the title doesn't overflow narrow screens (confirm vs source-faithful).
-- **STO vs MR shell selection**: driven by the `template=` Metadata value; confirm the two footers +
-  nav sets (see `_TEMPLATES.md` shell section, nav content differs per side).
+- **Mobile heading scale:** built source-faithful (48px title, 40px h2 on phones), per the PO's "same as
+  live" (2026-10-21); a mobile step would be a deviation to approve.
+- **STO vs MR shell selection:** by path in the bulk metadata sheet (§8), not by a `template` value.
+- **Contrast:** the white title on the empty band is the source's own: about 2.3:1 behind its first letters
+  (rgb 171 at 1440), down to 1.1:1 at the band's light right edge (rgb 240), below WCAG AA's 3:1 for large
+  text. Kept as on the live page (PO, 2026-10-21). A banner image (Contacts) sits under the same scrim as the
+  source's.
+- **Body link colour:** the source's #419468 (3.71:1 on white), kept (PO, 2026-10-21).
+- **Body link focus:** no ring, as on the source (PO, 2026-10-21, "match live"): an accepted exception to
+  css-guidelines §8 and WCAG 2.4.7. Header and footer links keep the site's ring.
+- **Text rendering:** `auto`, as the source (the site-wide `optimizespeed` dropped, PO 2026-10-21).
+- **Long titles:** the band stays 240px; a title that needs more lines rises out of it, under the header at
+  narrow widths, as on the source (PO, 2026-10-21).
 
 ## 10. Pixel-perfect acceptance criteria
 
-- [ ] Shell selected by side: `page-template-default`→STO chrome; `template-media-room-page`→MR chrome.
-- [ ] Hero banner `240px` with page title `h1 48px/52.8/300` white overlay.
-- [ ] Single-column `article` (no sidebar); content cap `1248`, gutter `~16px`; `h2 40px/45/300`, body
-      `16/24/400`, `p mb 20`.
-- [ ] MR variant hosts the company sub-type blocks (see `company-pages.md`); STO variant = plain rich text.
-- [ ] Mobile: single column; heading scale per the confirmed decision (§9).
-- [ ] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body).
+- [x] Shell selected by side: Copyright → STO chrome; Contacts → MR chrome (bulk metadata, §8).
+- [x] Hero banner `240px` with page title `h1 48px/52.8/300` white overlay.
+- [x] Single-column body (no sidebar); content cap `1248`; text 20px in (30px from 781); `h2 40px/45/300`,
+      body `16/24/400`, `p mb 20`.
+- [ ] MR variant hosts the company sub-type blocks (SKODA-810); STO variant = plain rich text.
+- [x] Mobile: single column; heading scale source-faithful (§9).
+- [x] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body): Copyright 0.00% / 0.00%; Contacts' hero
+      0.01% / 0.16% (its body, the contact directory, is SKODA-810). The method and results are in SKODA-813
+      ("Pixel gate").
+- [x] Also measured equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every body text box, the band's
+      pixels, the footer gap).
 
 ## 11. Reference screenshots
 

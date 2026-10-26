@@ -71,7 +71,8 @@
       "variants": [
         "story",
         "overlay",
-        "archive"
+        "archive",
+        "page"
       ]
     },
     "listing": {
@@ -201,6 +202,13 @@
     "tags": {
       "variants": [
         "chips"
+      ]
+    },
+    "timeline": {
+      "variants": [
+        "black",
+        "large",
+        "xl"
       ]
     },
     "widget": {

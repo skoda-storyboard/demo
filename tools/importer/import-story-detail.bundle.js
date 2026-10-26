@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-story-detail.js
+  // tools/importer/import-story-detail.js
   var import_story_detail_exports = {};
   __export(import_story_detail_exports, {
     default: () => import_story_detail_default
   });
 
-  // parsers/story-hero.js
+  // tools/importer/parsers/story-hero.js
   var HERO_MAX_WIDTH = 2560;
   function useLargestRendition(img) {
     const best = (img.getAttribute("srcset") || "").split(",").map((entry) => entry.trim().split(/\s+/)).map(([url, descriptor]) => ({ url, width: parseInt(descriptor, 10) })).filter(({ url, width }) => url && width > 0 && width <= HERO_MAX_WIDTH).sort((a, b) => b.width - a.width)[0];
@@ -104,7 +104,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
-  // parsers/story-flatten.js
+  // tools/importer/parsers/story-flatten.js
   var WIDGET_KINDS = [
     [/\bwidget_skoda-carousel-widget\b|so-widget-skoda-carousel-widget/, "carousel"],
     [/\bwidget_skoda-offset\b|so-widget-skoda-offset/, "offset"],
@@ -291,29 +291,99 @@ var CustomImportScript = (() => {
     const img = panel.querySelector("img");
     return img ? [img] : [];
   }
-  function milestonesNodes(panel, document2) {
-    const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, img"));
-    const out = [];
-    items.forEach((li) => {
-      var _a, _b;
-      const year = (((_a = li.querySelector(".year")) == null ? void 0 : _a.textContent) || "").replace(/\s+/g, " ").trim();
-      const title = (((_b = li.querySelector(".title")) == null ? void 0 : _b.textContent) || "").replace(/\s+/g, " ").trim();
-      if (year || title) {
-        const h = document2.createElement("h3");
-        h.textContent = [year, title].filter(Boolean).join(" \u2014 ");
-        out.push(h);
+  var MILESTONE_KEEP = /* @__PURE__ */ new Set(["P", "BR", "STRONG", "B", "EM", "I", "A", "UL", "OL", "LI"]);
+  function milestoneRich(source, document2) {
+    const clean = (node) => {
+      if (node.nodeType === 3) return [document2.createTextNode(node.textContent)];
+      if (node.nodeType !== 1) return [];
+      const kids = [...node.childNodes].flatMap(clean);
+      if (!MILESTONE_KEEP.has(node.tagName)) return kids;
+      const el = document2.createElement(node.tagName.toLowerCase());
+      if (node.tagName === "A" && node.getAttribute("href")) el.setAttribute("href", node.getAttribute("href"));
+      const trailing = [];
+      while (/^(STRONG|B|EM|I)$/.test(node.tagName) && kids.length) {
+        const last = kids[kids.length - 1];
+        if (last.nodeType === 1 && last.tagName === "BR") trailing.unshift(kids.pop());
+        else if (last.nodeType === 3 && !last.textContent.trim()) kids.pop();
+        else break;
       }
-      const img = li.querySelector("img");
-      if (img) out.push(img);
+      el.append(...kids);
+      return [el, ...trailing];
+    };
+    const nodes = [...(source == null ? void 0 : source.childNodes) || []].flatMap(clean).filter((n) => !(n.nodeType === 3 && !n.textContent.trim()));
+    return nodes.filter((n) => !(n.tagName === "P" && !n.textContent.trim() && !n.querySelector("br, a")));
+  }
+  var MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
+  function milestoneTitleSize(items) {
+    const px = (value) => {
+      const m = String(value).match(/^([\d.]+)(pt|px)$/);
+      if (!m) return 0;
+      return m[2] === "pt" ? Number(m[1]) * 4 / 3 : Number(m[1]);
+    };
+    const sizes = items.flatMap((li) => [...li.querySelectorAll('.title [style*="font-size"]')].map((span) => px(span.style.fontSize.trim())).filter(Boolean));
+    if (!sizes.length) return "";
+    const counts = /* @__PURE__ */ new Map();
+    sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
+    const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+    if (dominant >= 32) return "xl";
+    return dominant >= 24 ? "large" : "";
+  }
+  var MILESTONE_SPACER = 44;
+  function milestoneSpace(title) {
+    let space = 0;
+    const paragraphs = title ? [...title.querySelectorAll(":scope > p")] : [];
+    const first = paragraphs.find((p) => {
+      if ((p.textContent || "").trim() || p.querySelector("img, a")) return true;
+      space += MILESTONE_SPACER;
+      return false;
     });
-    if (!out.length) {
-      panel.querySelectorAll("img").forEach((img) => out.push(img));
-      const text5 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-      if (text5 && !panel.querySelector("img")) {
-        const p = document2.createElement("p");
-        p.textContent = text5;
-        out.push(p);
-      }
+    if (!first) return 0;
+    const margin = (first.getAttribute("style") || "").match(/margin-top\s*:\s*(\d+(?:\.\d+)?)px/i);
+    return Math.round(space + (margin ? Number(margin[1]) : 0));
+  }
+  var SPACE_ATTR = "data-title-space";
+  function markMilestoneSpaces(root) {
+    root.querySelectorAll(".so-widget-ys-milestones li").forEach((li) => {
+      const space = milestoneSpace(li.querySelector(".title"));
+      if (space) li.setAttribute(SPACE_ATTR, String(space));
+    });
+  }
+  function titleSpaceOf(li) {
+    if (li.hasAttribute(SPACE_ATTR)) return Number(li.getAttribute(SPACE_ATTR)) || 0;
+    return milestoneSpace(li.querySelector(".title"));
+  }
+  function milestonesCells(panel, document2) {
+    var _a;
+    const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, .description, img"));
+    if (!items.length) return null;
+    const variants = [
+      MILESTONE_BLACK.test(((_a = items[0].querySelector(".year")) == null ? void 0 : _a.getAttribute("style")) || "") ? "black" : "",
+      milestoneTitleSize(items)
+    ].filter(Boolean);
+    const cells = [[variants.length ? `Timeline (${variants.join(", ")})` : "Timeline"]];
+    const spaces = items.map(titleSpaceOf);
+    const spaced = spaces.some(Boolean);
+    items.forEach((li, i) => {
+      var _a2;
+      const year = (((_a2 = li.querySelector(".year")) == null ? void 0 : _a2.textContent) || "").replace(/\s+/g, " ").trim();
+      const title = milestoneRich(li.querySelector(".title"), document2);
+      const thumbs = [...li.querySelectorAll(".thumbnail img")];
+      const imgs = thumbs.length ? thumbs : [...li.querySelectorAll("img")].slice(0, 1);
+      const description = li.querySelector(".description");
+      description == null ? void 0 : description.querySelectorAll(".dot").forEach((dot) => dot.remove());
+      const row = [year, title, imgs.length ? imgs : "", milestoneRich(description, document2)];
+      if (spaced) row.push(spaces[i] ? String(spaces[i]) : "");
+      cells.push(row);
+    });
+    return cells;
+  }
+  function milestonesFallback(panel, document2) {
+    const out = [...panel.querySelectorAll("img")];
+    const text5 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (text5) {
+      const p = document2.createElement("p");
+      p.textContent = text5;
+      out.push(p);
     }
     return out;
   }
@@ -470,10 +540,45 @@ var CustomImportScript = (() => {
       const m = find(mobile, test, "margin") || d;
       return [d || fallback, m || fallback];
     };
+    const cellGeometry = (cells) => {
+      const per = cells.map((cell) => {
+        const widget = cell.querySelector(":scope > .so-panel, :scope > .panel-cell-style > .so-panel");
+        const isWidget = (s) => !!(widget == null ? void 0 : widget.id) && s.endsWith(`#${widget.id}`);
+        const isCell = (s) => s.replace(/\s+/g, "") === `#${cell.id}>.panel-cell-style`;
+        const marginD = find(desktop, isWidget, "margin");
+        const marginM = find(mobile, isWidget, "margin") || marginD;
+        const padD = find(desktop, isCell, "padding");
+        const padM = find(mobile, isCell, "padding") || padD;
+        return {
+          own: !!(marginD || marginM || padD || padM),
+          marginD: marginD || DEFAULT_TEXT_MARGIN[0],
+          marginM: marginM || DEFAULT_TEXT_MARGIN[1],
+          padD: padD || "0px 0px 0px 0px",
+          padM: padM || "0px 0px 0px 0px"
+        };
+      });
+      if (!per.some((c) => c.own)) return {};
+      const join = (key) => per.map((c) => c[key]).join(" | ");
+      return {
+        "highlight-cell-margin": join("marginD"),
+        "highlight-cell-margin-mobile": join("marginM"),
+        "highlight-cell-padding": join("padD"),
+        "highlight-cell-padding-mobile": join("padM")
+      };
+    };
     return (grid) => {
       const out = {};
-      const cells = grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell");
-      if ([...cells].filter((c) => c.querySelector(".so-panel")).length > 1) return out;
+      const cells = [...grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell")].filter((c) => c.querySelector(".so-panel"));
+      if (cells.length > 1) {
+        const filled = cells.filter((c) => (c.textContent || "").trim() || c.querySelector("img, picture, iframe, video"));
+        if (filled.length > 1) Object.assign(out, cellGeometry(cells));
+        if (Object.keys(out).length) {
+          const { padD: padD2, padM: padM2 } = rowPadding(grid);
+          if (padD2) out["highlight-padding"] = padD2;
+          if (padM2) out["highlight-padding-mobile"] = padM2;
+        }
+        return out;
+      }
       const { padD, padM } = rowPadding(grid);
       if (padD) out["highlight-padding"] = padD;
       if (padM) out["highlight-padding-mobile"] = padM;
@@ -492,6 +597,27 @@ var CustomImportScript = (() => {
   var THEME_ROW_TOP = "32px 0px 0px 0px";
   var ROW_PAD_ATTR = "data-row-padding";
   var ROW_PAD_MOBILE_ATTR = "data-row-padding-mobile";
+  var FULL_ENOUGH_PX = 1600;
+  function useLargestSources(document2) {
+    let count = 0;
+    document2.querySelectorAll(".panel-layout img[srcset]").forEach((img) => {
+      var _a;
+      if (img.closest(".search-results.media-box, .search-results-gallery, .sb-gallery")) return;
+      const candidates = (img.getAttribute("srcset") || "").split(",").map((c) => c.trim().split(/\s+/)).map(([url, d]) => ({ url, w: parseInt((d || "").replace(/w$/, ""), 10) })).filter(({ url, w }) => url && w > 0);
+      if (!candidates.length) return;
+      const largest = candidates.reduce((a, b) => b.w > a.w ? b : a);
+      const src = img.getAttribute("src") || "";
+      const current = ((_a = candidates.find((c) => c.url === src)) == null ? void 0 : _a.w) || parseInt((src.match(/-(\d+)x\d+\.\w+(?:$|\?)/) || [])[1], 10) || 0;
+      const slide = !!img.closest(".search-results.carousel-widget");
+      const authored = !slide && parseInt(img.getAttribute("width"), 10) || Infinity;
+      if (current >= FULL_ENOUGH_PX) return;
+      if (largest.url !== src && largest.w > current && authored > current) {
+        img.setAttribute("src", largest.url);
+        count += 1;
+      }
+    });
+    return count;
+  }
   function markRowPadding(document2) {
     const { rowPadding } = layoutRules(headCss(document2));
     let count = 0;
@@ -536,7 +662,11 @@ var CustomImportScript = (() => {
     "highlight-gallery-margin-mobile",
     "highlight-background",
     "highlight-color",
-    "highlight-link"
+    "highlight-link",
+    "highlight-cell-margin",
+    "highlight-cell-margin-mobile",
+    "highlight-cell-padding",
+    "highlight-cell-padding-mobile"
   ];
   var CELL_WIDTH_ATTR = "data-cell-width";
   function markCellWidths(document2) {
@@ -930,7 +1060,11 @@ var CustomImportScript = (() => {
         nodes = buttonNodes(panel, document2);
         break;
       case "milestones":
-        nodes = milestonesNodes(panel, document2);
+        cells = milestonesCells(panel, document2);
+        if (!cells) {
+          nodes = milestonesFallback(panel, document2);
+          stats.fallback.push(kind);
+        }
         break;
       default:
         nodes = editorNodes(panel, document2);
@@ -1028,6 +1162,7 @@ var CustomImportScript = (() => {
       byKind: {},
       deferred: [],
       unknown: [],
+      fallback: [],
       multiColumn: 0,
       highlights: 0
     };
@@ -1075,16 +1210,17 @@ var CustomImportScript = (() => {
       images: { narrow: narrow.length, centred },
       highlights: stats.highlights,
       deferred: stats.deferred,
-      unknown: stats.unknown
+      unknown: stats.unknown,
+      fallback: stats.fallback
     };
-    if (stats.deferred.length || stats.unknown.length) {
+    if (stats.deferred.length || stats.unknown.length || stats.fallback.length) {
       console.warn(`[story-flatten] deferred/unknown widgets: ${JSON.stringify(summary)}`);
     } else {
       console.log(`[story-flatten] flattened: ${JSON.stringify(summary)}`);
     }
   }
 
-  // parsers/downloads.js
+  // tools/importer/parsers/downloads.js
   var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
   function serialiseMp4(href) {
     try {
@@ -1167,7 +1303,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
-  // parsers/press-kit-media.js
+  // tools/importer/parsers/press-kit-media.js
   var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var SOURCE_DATE2 = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
   var tileDate = (item) => {
@@ -1243,7 +1379,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table, ...notes.map((note) => Object.assign(document2.createElement("p"), { textContent: note })));
   }
 
-  // transformers/skoda-drop-cap.js
+  // tools/importer/transformers/skoda-drop-cap.js
   var ATTR = "data-skoda-drop-cap";
   var ROWS = [
     ["text", "drop-cap-text"],
@@ -1309,7 +1445,7 @@ var CustomImportScript = (() => {
     return true;
   }
 
-  // parsers/footnotes.js
+  // tools/importer/parsers/footnotes.js
   var MARK = "data-skoda-footnote";
   var NAME = "Footnotes";
   var BODY_PX = 16;
@@ -1388,7 +1524,7 @@ var CustomImportScript = (() => {
     p.replaceWith(table);
   }
 
-  // transformers/skoda-page-cleanup.js
+  // tools/importer/transformers/skoda-page-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -1472,7 +1608,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-story-cleanup.js
+  // tools/importer/transformers/skoda-story-cleanup.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -1833,7 +1969,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-story-aside.js
+  // tools/importer/transformers/skoda-story-aside.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var NEWSLETTER_BLOCK = "Newsletter Stub (card)";
   var NEWSLETTER_DEFAULTS = {
@@ -2032,7 +2168,7 @@ var CustomImportScript = (() => {
     sidebar.replaceWith(...frag.childNodes);
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -2077,7 +2213,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook4 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS2 = [
     "model",
@@ -2364,7 +2500,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook5 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -2804,7 +2940,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform7(hookName, element, payload) {
@@ -2822,7 +2958,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -2941,7 +3077,7 @@ var CustomImportScript = (() => {
     normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
   }
 
-  // import-story-detail.js
+  // tools/importer/import-story-detail.js
   var parsers = {
     // SKODA-816: story hero → Hero Image with heading, caption and metadata
     // inside one block, not the overlay Hero banner used by page/archive.
@@ -3039,12 +3175,14 @@ var CustomImportScript = (() => {
      * source's glued non-breaking spaces (html2md would turn them into spaces).
      */
     preprocess: ({ document: document2 }) => {
+      useLargestSources(document2);
       markHighlights(document2);
       markCellWidths(document2);
       markRowPadding(document2);
       markCentredImages(document2);
       markTextStyles(document2);
       markDropCap(document2);
+      markMilestoneSpaces(document2.body);
       document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
         markFootnotes(body);
         markBoldHeadings(body);
@@ -3077,7 +3215,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              dates: block.name === "downloads"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

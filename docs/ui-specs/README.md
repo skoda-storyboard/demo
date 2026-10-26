@@ -53,6 +53,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `carousel-rails.md` | carousel + story-rail | underpins 201/stories/story-rail; MR rails | `/en/` sliders | CAPTURED |
 | `story-image-carousel.md` | gallery (slider variant) | 819 (supersedes 219) | Epiq + Octavia in-body widgets | CAPTURED (2 stories) |
 | `stories.md` | stories (new) | 214 (reuses 402 loader/paginate) | `/en/` "Latest Stories" feed | CAPTURED |
+| `timeline.md` | timeline (new; `black`, `large`) | 815 | story `ys-milestones` (steering wheel, iconic cars) | CAPTURED + BUILT |
 | `header-megamenu.md` | header | 301 | `/en/` nav | CAPTURED |
 | `mobile-nav.md` | header | 302 | `/en/` (<1080) | CAPTURED |
 | `language-switcher.md` | header | 303 | `/en/` topbar | CAPTURED |
