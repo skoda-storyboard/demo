@@ -215,5 +215,21 @@ The 48px under their pager (SKODA-209a's known deviation) is that Media Room pag
   current `main` after Enter loads 5→11. This is a baseline placeholder-interpolation defect under #492,
   separate from #486's contrast issue, not a successful localized-announcement acceptance claim.
 
+## PSI fix (2026-10-26)
+The PR's `aem-psi-check` failed on mobile `/en/category/emobility` (89, then 87 and 83 on earlier pushes;
+LCP 3.8s). On a phone the LCP element is the first story card (392×221, larger than the 412×184 term
+hero), and its image waited on a serial chain: hero image → `stories.js` → `placeholders.json` →
+`query-index.json` → card image.
+- **`scripts/scripts.js`** (`startListingIndex`): a Stories block that authors `columns` (the archive grid;
+  the home feed authors none) starts `stories.js`, its index and the placeholders during `loadEager`. All
+  are memoized, so the block reuses them.
+- **`blocks/stories/stories.js`:** the index request starts together with the placeholders, not after them.
+- **Measured** (local code, Chrome 4× CPU, 150ms RTT / 1.6 Mbps, 412×823, 3 runs each, cache off): first
+  card LCP **3.96s → 2.99s**. The hero paints 2.10s → 2.54s (it now shares bandwidth), still earlier
+  than the card. One `stories.js` and one index request per page; eMobility, Epiq (feature card), crew
+  and home render as before with no console errors.
+- **Test:** `stories-feature.test.mjs` asserts the index is requested while the placeholders are pending
+  (fails without the change). Not verified: the PSI rerun on the branch, which needs the push.
+
 ## M2 readiness review (2026-10-15)
 - The template is done for M1. The **volume** (378 EN archives, 41 live) and the keep / redirect rule move to SKODA-848.

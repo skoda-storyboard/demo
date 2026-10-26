@@ -353,6 +353,24 @@ export function decorateMain(main) {
  * @param {Element} main The main element (decorated)
  */
 function startListingIndex(main) {
+  // A category / tag archive's Stories grid (it authors `columns`) sits under the term hero, and
+  // on a phone its first card is the LCP element. Its code, index and placeholders otherwise
+  // load one after the other once the hero image is in: start all three now (SKODA-209). Modules
+  // and both requests are memoized, so the block reuses them. The home feed (no `columns`) is
+  // further down and keeps waiting.
+  const archive = main.querySelector('.stories');
+  if (archive) {
+    const { index, columns } = readBlockConfig(archive);
+    if (Number(columns)) {
+      import('../blocks/stories/stories.js').catch(() => {}); // loadBlock imports it again
+      Promise.all([import('./query-index.js'), import('./placeholders.js')])
+        .then(([{ loadQueryIndex, defaultIndexUrl }, { fetchPlaceholders }]) => Promise.all([
+          loadQueryIndex(index || defaultIndexUrl()),
+          fetchPlaceholders(),
+        ]))
+        .catch(() => {}); // the block reports a failed load itself
+    }
+  }
   const listing = main.querySelector('.section')?.querySelector('.listing');
   if (!listing) return;
   const { index, template = '', path = '' } = readBlockConfig(listing);

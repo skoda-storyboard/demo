@@ -316,6 +316,10 @@ function cardCell(row, eager) {
 export default async function decorate(block) {
   const cfg = parseFeedConfig(block);
   const feature = readFeature(block); // read before the config rows are cleared
+  // the index request starts with the placeholders, not after them: on an archive the first
+  // card is the LCP element (SKODA-209)
+  const indexRows = loadQueryIndex(cfg.index);
+  indexRows.catch(() => {}); // handled where it is awaited below
   const STRINGS = buildStrings(await fetchPlaceholders());
   // the featured model card takes two story slots on the first page (source parity)
   const firstPage = feature ? Math.max(1, cfg.initial - FEATURE_SLOTS) : cfg.initial;
@@ -376,7 +380,7 @@ export default async function decorate(block) {
   // Load + filter the index (self-contained; degrades to empty/error state).
   let scoped = [];
   try {
-    const rows = await loadQueryIndex(cfg.index);
+    const rows = await indexRows;
     scoped = scopeFeedRows(rows, cfg);
   } catch (e) {
     status.textContent = STRINGS.loadError;

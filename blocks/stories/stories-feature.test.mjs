@@ -424,3 +424,31 @@ test('decorate: the card still renders when the tag has no stories yet', async (
   assert.ok(block.querySelector('.stories-items > li.stories-feature'));
   assert.equal(block.querySelector('.stories-loadmore-btn'), null);
 });
+
+test('decorate: the index is requested with the placeholders, not after them (SKODA-209 LCP)', async () => {
+  feeds['/cs/feature-f.json'] = Array.from({ length: 8 }, (_, i) => story(i + 1));
+  const block = storiesBlock('/cs/feature-f.json', { feature: null });
+  // a locale whose placeholders no earlier test cached, held until the index has been asked for
+  window.history.replaceState(null, '', '/cs/tag/model/epiq');
+  const base = globalThis.fetch;
+  const asked = [];
+  let release;
+  const held = new Promise((resolve) => { release = resolve; });
+  globalThis.fetch = async (url) => {
+    const path = new URL(String(url), window.location.href).pathname;
+    asked.push(path);
+    if (path === '/cs/placeholders.json') await held;
+    return base(url);
+  };
+  try {
+    const done = decorate(block);
+    await new Promise((resolve) => { setTimeout(resolve, 0); });
+    assert.ok(asked.includes('/cs/feature-f.json'), `index requested while placeholders pend: ${asked}`);
+    release();
+    await done;
+  } finally {
+    globalThis.fetch = base;
+    window.history.replaceState(null, '', '/en/tag/model/epiq');
+  }
+  assert.equal(block.querySelectorAll('.stories-item').length, 6);
+});
