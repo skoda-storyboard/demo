@@ -38,7 +38,9 @@
       recorded before and after for Fabia and Enyaq.
 - [ ] `/en/images` and `/en/videos` render their first page from the head shard. The facet index loads after first
       paint. Facet counts and load-more match the whole-feed build (same rows, same order).
-- [ ] A story-page image link resolves its title from one keyed shard.
+- [ ] A page's image link (model-page drawings, press-kit article images) resolves its title from its keyed shard:
+      one shard per file, never the whole feed. *(Amended 2026-10-26 after QA #375: story pages don't read the feed;
+      their Media Box tiles carry their own details. Was: "A story-page image link…".)*
 - [ ] Without a registry, every reader behaves as today. Unit tests cover both paths.
 - [ ] Rows validate against contract `media-item` shape 3. Every sheet stays under 500k cells.
 - [ ] Mobile LCP of `/en/images` measured before and after (PSI or Lighthouse, same conditions).
@@ -153,3 +155,34 @@ cards, count, Load more count, facet options and lightbox.
 facet index too (`expandFacets()`), so its preview works with the published build.
 
 **Still open:** the Fabia / Enyaq bytes and the `/en/images` mobile LCP by PSI on this branch's preview.
+
+## QA round (#375, 2026-10-26, Kondalu)
+**AC6, mobile LCP of `/en/images` before and after.** PSI couldn't be run from here (the PageSpeed API's daily quota
+was used up), so the AC's other option: Lighthouse 12, mobile (PSI's lab settings: Moto G Power, slow 4G, simulated
+throttling), 3 runs each, the same machine, the same previewed content, the code served by `aem up`:
+- before: `76cc87a`, `main` just before #406 (reads the whole `/en/media-feed.json`, 3,442,255 B);
+- after: `main` today (registry 14.5 KB, head shard 70 KB, facet index 350 KB);
+- after + the fix below.
+
+| | LCP (median) | runs | score | CLS | bytes |
+|---|---:|---|---|---|---:|
+| before | **3,959 ms** | 3,815 / 3,959 / 3,964 | 84–86 | 0 | 821 KB |
+| after (`main`) | **2,953 ms** (−25%) | 2,789 / 2,954 / 2,953 | 89–92 | **0.061** (2 of 3) | 596 KB |
+| after + fix | **3,088 ms** (−22%) | 3,134 / 2,917 / 3,088 | 89–93 | **0** | 597 KB |
+
+QA's throttled test: 2.93 s → 1.74 s (−41%). Same direction.
+
+**Found while measuring: a layout shift that #406 introduced (CLS 0.061 on `/en/images`, mobile).** The first page
+paints from the head shard; the sort row ("Newest · Oldest", "Advanced filter (0)") was only built once the facet index
+had loaded, so it grew from 0 to 64px (mobile; 35px desktop) and pushed the grid down. Fixed in `blocks/listing/listing.js`:
+the sort row is built with the first paint, its buttons inert (`aria-disabled`) until the rows are in, then wired as
+before. Facet index held back 3 s: the grid stays at 321px (412 wide) / 251px (1280) from first paint, as before #406.
+Sort, the filter panel and Load more on `/en/images` and `/en/videos` (and `/en/news`, `/en/press-kits`, which use the
+regular index): as on `main`; a click on Oldest before the rows are in does nothing.
+
+**AC3, the keyed lookup:** story pages don't use the media feed (their Media Box tiles carry their own details). The
+keyed shards serve the image links of model pages and press kits, measured on `main`:
+- `/en/skoda-model/new-superb`: the slice on load; opening a drawing requests `key-24.json`, `key-38.json` (its two
+  drawings) and shows "Škoda Superb, File type: JPG, File size: 159 KB, Dimensions: 1400 × 480 px";
+- `/en/press-kits/skoda-peaq-press-kit-2/infographics`: 13 image links, 12 keyed shards (two share one), no whole feed;
+- the AC is reworded to that (above).
