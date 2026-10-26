@@ -98,7 +98,15 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
     publish together with the chrome). A link audit of the 6 test pages finds no live link to a demo page;
     the remaining live links name pages not migrated yet (SKODA-1002) and the source's `/direct-download/` files.
 - **Known, not changed here:** the language row's contrast at desktop (#403, EN too); the listing's "oldest" sort
-  button and the footer's "Manage subscription" link contrast (EN too); the footer social row missing on the
-  Media Room footers (SKODA-305, EN too); the header shows only a page's migrated translations (SKODA-303a), where
-  live always lists every locale; `lang="cs"` where live has `cs-CZ`.
+  button and the footer's "Manage subscription" link contrast (EN too); the header shows only a page's migrated
+  translations (SKODA-303a), where live always lists every locale; `lang="cs"` where live has `cs-CZ`; the
+  footer's App Store / Google Play badges are the English artwork in every locale, where live has each
+  language's (`#app-store-de`, `#google-play-cs`, …; #401, SKODA-1006).
+- **#485 review (2026-10-25), follow-up 2026-10-26:**
+  - The Media Room footers do have the social row: Facebook, Instagram and YouTube on `/cs/tiskove-zpravy` and
+    `/en/news`, as live. The earlier "no social row" note was stale and is removed.
+  - The badge gap above was missing from the deviation list.
+  - `/sl/query-index.json` is still 404 (no SL page is on preview yet). D1 makes SL on demand, so the
+    six-index criterion stays open until an SL page is imported; the five others respond with the same columns
+    and the 15 facets.
 - **Merge note:** merging this code removes the runtime locale rule, so the chrome fragments and the sheet above must be published together with it. Otherwise the relative `/cs/…` links in the published chrome, which the rule sent to live, become unmigrated EDS paths (404).
