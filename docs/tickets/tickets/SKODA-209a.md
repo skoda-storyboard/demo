@@ -99,7 +99,9 @@ Source vs branch preview, Playwright + Chrome DevTools (no screenshots), 1440 / 
     With `min-height`, `main` left none.
   - At 1920×1200 and 2560×1440 nothing is left over.
 - **Home, all stories loaded** (`?offset=9999`): the empty Load more band is gone, so the feed's last card →
-  next band is 68 instead of 100. On the source archives, an exhausted pager also has no button wrapper.
+  next band is 68 instead of 100. **Correction (2026-10-26, #487):** source archives do retain an empty 32px
+  wrapper after exhausting Load more, unlike an archive that fits initially. SKODA-209's review fix retains
+  that band only for count-enabled feeds whose total exceeds the effective first page; home remains unchanged.
 - **Home `/en`:** unchanged vs `main`. Same geometry from the feed to the footer, no count row.
 - **CLS (Lighthouse 12):**
 

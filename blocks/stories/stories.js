@@ -415,6 +415,9 @@ export default async function decorate(block) {
     if (countEl) renderCount(countEl, shownRows.length, all.length);
 
     // Load-more: dropped (not disabled) when the slice is exhausted (stories.md §5).
+    // Archives that needed paging retain the source's empty wrapper at exhaustion;
+    // an initially fitting archive and the home feed never gain that band.
+    loadMoreWrap.classList.toggle('is-paginated', cfg.count && all.length > firstPage);
     loadMoreWrap.textContent = '';
     if (shownRows.length < all.length) {
       const btn = document.createElement('button');

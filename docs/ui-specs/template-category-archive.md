@@ -73,7 +73,11 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
   - Wrapper → footer: the `.search-results` margin-bottom. It is **16 on categories and model tags** and **48 on the
     company / crew / derivative / environment / people / years tags** (all 41 measured at 1440, 2026-10-12).
   - Totals (16 case): last card → Load more 109, Load more → footer 32 (64 on those other tags).
-  - **When every story fits, the count row stays** ("3 / 3") with no button wrapper: last card → footer 93.
+  - **When every story fits initially, the count row stays** ("3 / 3") with no button wrapper: last card →
+    footer 93 on Storyboard, 125 on Media Room.
+  - **After exhausting Load more, the source retains its empty wrapper** (32px, padding `16px 0`).
+    The count row's 16px margin no longer collapses into the section margin: count → footer 64 on
+    Storyboard / 96 on Media Room; last card → footer 141 / 173. This is not the initially-fitting state.
   - The footer follows the content: there is no viewport min-height on a short archive.
   - EDS (SKODA-209a) ends every archive 16px under the pager. The 13 other tags are 32px short of the source,
     a known M1 deviation: they need an authored setting. **Fixed (SKODA-209, 2026-10-22):** those tags are Media Room
@@ -95,7 +99,8 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 
 - **Pagination (confirmed 2026-10-12):** a "Load more" button appends 6 stories and updates the count row
   ("6 / N" → "12 / N"). When every story is shown, the button goes and the count row stays ("34 / 34").
-  No infinite scroll.
+  No infinite scroll. The empty button wrapper stays only when the archive required pagination, including
+  an exhausted offset deep link; initially-fitting archives and the home feed do not gain this band (#487).
 - **EDS (SKODA-209a):** the `stories` block's authored N-column grid (`columns 3`, every archive) turns the count row on.
   An authored `count` row overrides that. The home featured feed has no count row, as on the source. The row
   is the polite live region on Load more.
@@ -130,9 +135,15 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 - [x] Content cap `1248`, gutter `~16px`.
 - [x] Pagination via an accessible "Load more" (or the confirmed source mechanism); focus/aria-live on
       new results.
-- [x] ~~Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).~~ Measured geometry instead (2026-10-22,
-      review evidence is measured values): frames, ratio, order, cap, count row and every gap to the footer equal
-      to the source (SKODA-209 close-out).
+- [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid). **Restored pending gate (2026-10-26):**
+      the geometry-only replacement had no linked human approval. Measurements and subsequent same-band
+      screenshot inspection are both required; neither establishes a passing per-pixel threshold. Residual
+      heading, layout and crop differences need human disposition under the PR's **Deviations from origin**.
+- **Focused pager evidence (2026-10-26, local Chrome MCP, not an all-41 recensus):** crew/eMobility source
+  vs local: button → footer 64; exhausted last card → footer 173 and count → footer 96, equal at
+  375/768/992/1080/1440. Initially-fitting GreenFuture stays 125 / 48 at 375/1080/1440.
+  Storyboard category/eMobility stays 32 with Load more and ends 141 / 64 after exhaustion at 1440.
+  The 2026-10-22 census above did not cover exhaustion and must not be read as full-state visual acceptance.
 
 ## 10a. Featured model card (model tag archives; measured 2026-09-30, SKODA-222)
 

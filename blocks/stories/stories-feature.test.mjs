@@ -283,6 +283,82 @@ test('decorate: Back to the page without an offset restores the 4-story first pa
   assert.equal(block.querySelector('.stories-items > li').className, 'stories-feature');
 });
 
+test('decorate: Media Room modifier follows authored section metadata only', async () => {
+  const meta = document.createElement('meta');
+  meta.name = 'section';
+  document.head.append(meta);
+  try {
+    for (const section of ['media-room', 'stories', '']) {
+      meta.content = section;
+      const block = await decorated(`/en/section-${section || 'blank'}.json`, 8, { feature: null });
+      assert.equal(block.classList.contains('stories-media-room'), section === 'media-room');
+    }
+    meta.remove();
+    const block = await decorated('/en/no-section.json', 8, { feature: null });
+    assert.equal(block.classList.contains('stories-media-room'), false);
+  } finally {
+    meta.remove();
+  }
+});
+
+test('decorate: an exhausted archive retains its pager band, count and first-new-card focus', async () => {
+  const block = await decorated('/en/archive-exhaustion.json', 14, { feature: null });
+  const wrapper = block.querySelector('.stories-loadmore');
+  const count = block.querySelector('.stories-count');
+  assert.ok(wrapper.classList.contains('is-paginated'));
+  click(wrapper.querySelector('button'));
+  assert.equal(block.querySelectorAll('.stories-item').length, 12);
+  click(wrapper.querySelector('button'));
+  assert.equal(block.querySelectorAll('.stories-item').length, 14);
+  assert.equal(wrapper.children.length, 0, 'the button is removed, not disabled');
+  assert.ok(wrapper.classList.contains('is-paginated'), 'the empty band is retained');
+  assert.equal(count.querySelector('.stories-count-current').textContent, '14');
+  assert.equal(count.querySelector('.stories-count-total').textContent, '14');
+  assert.equal(count.getAttribute('aria-live'), 'polite');
+  assert.equal(count.hidden, false);
+  assert.equal(document.activeElement, block.querySelectorAll('.stories-item a')[12]);
+  window.history.replaceState(null, '', '/en/tag/model/epiq');
+  window.dispatchEvent(new window.PopStateEvent('popstate'));
+  assert.equal(block.querySelectorAll('.stories-item').length, 6);
+  assert.ok(wrapper.querySelector('button'), 'Back restores Load more');
+  window.history.replaceState(null, '', '/en/tag/model/epiq?offset=18');
+  window.dispatchEvent(new window.PopStateEvent('popstate'));
+  assert.equal(wrapper.children.length, 0);
+  assert.ok(wrapper.classList.contains('is-paginated'), 'Forward restores the exhausted band');
+});
+
+test('decorate: a deep link to an exhausted archive retains the same band', async () => {
+  feeds['/en/archive-exhausted-deep.json'] = Array.from({ length: 8 }, (_, i) => story(i + 1));
+  const block = storiesBlock('/en/archive-exhausted-deep.json', { feature: null });
+  window.history.replaceState(null, '', '/en/tag/model/epiq?offset=9999');
+  await decorate(block);
+  assert.equal(block.querySelector('.stories-loadmore-btn'), null);
+  assert.ok(block.querySelector('.stories-loadmore').classList.contains('is-paginated'));
+  assert.equal(block.querySelectorAll('.stories-item').length, 8);
+});
+
+test('decorate: initially fitting and empty archives never gain the exhausted-pager band', async () => {
+  for (const total of [0, 3, 6]) {
+    const block = await decorated(`/en/archive-short-${total}.json`, total, { feature: null });
+    assert.equal(block.querySelector('.stories-loadmore-btn'), null);
+    assert.equal(block.querySelector('.stories-loadmore').classList.contains('is-paginated'), false);
+    assert.equal(block.querySelector('.stories-count').hidden, total === 0);
+  }
+});
+
+test('decorate: the home feed still removes its empty wrapper without a count row', async () => {
+  const block = await decorated('/en/home-exhaustion.json', 8, {
+    feature: null, rows: { columns: 'featured', initial: '5' },
+  });
+  assert.equal(block.querySelector('.stories-count'), null);
+  assert.equal(block.querySelectorAll('.stories-item').length, 5);
+  click(block.querySelector('.stories-loadmore-btn'));
+  assert.equal(block.querySelectorAll('.stories-item').length, 8);
+  assert.equal(block.querySelector('.stories-loadmore-btn'), null);
+  assert.equal(block.querySelector('.stories-loadmore').classList.contains('is-paginated'), false);
+  assert.equal(block.querySelector('.stories-status').textContent, '8 stories shown');
+});
+
 test('decorate: the card paints before the index and stays when the index fails', async () => {
   const realFetch = globalThis.fetch;
   globalThis.fetch = async (url) => (String(url).includes('placeholders')

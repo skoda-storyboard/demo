@@ -3,9 +3,9 @@
 - **Type:** template / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
-- **Status (2026-10-22):** 🟡 **In review** (branch `skoda-209-archive-closeout`): every acceptance criterion
-  measured against the source on all 41 archives; the 13 company / crew / derivative / environment / people /
-  years tag archives moved to the Media Room chrome, as on the source (see "Close-out" below).
+- **Status (2026-10-26):** 🟡 **In review** (branch `skoda-209-archive-closeout`, PR #475): exhausted-pager
+  review fix measured in local Chrome; the ≤2% visual gate and human disposition of retained deviations
+  remain open. The earlier 41-archive census covered initial states, not full acceptance.
 - **Status (2026-09-26):** 🟡 **M1 slice done** (pulled forward from M2 by stakeholder request): 41 archive pages live,
   and every tag / category link on the site points at them. The styled term hero (240px banner) **moved to
   [SKODA-828](SKODA-828.md) ([#196](https://github.com/skoda-storyboard/demo/issues/196)) F3** on 2026-09-28, including the `archive-hero` → `Hero Image (archive)` re-import.
@@ -104,7 +104,8 @@ Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/te
 - [x] Chrome as the source: Storyboard for the 15 categories and 13 model tags, **Media Room for the 13
       company / crew / derivative / environment / people / years tags** (corrected 2026-10-22, see below). Single
       `h1` = the term (category term; tag = parent + term, e.g. "Models Octavia") on 41 / 41. The source has no
-      `h1` there (its term title isn't a heading): a deliberate accessibility gain.
+      `h1` there (its term title isn't a heading). The single-H1 target is recorded in #58; residual
+      H1 → H3 heading-order failure is #459, not an agent-approved deviation.
 - *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. Resolved 2026-10-05: both figures were right. The
   band is 184px at 375 (224 at 576–767, 240 from 768); 160px is its image row, with the 24px label row under it.)*
 - [x] Card grid **3-up 1280 / 2-up 768 / 1-up 500**, the same on category and tag archives; visible 16:9 frame
@@ -114,9 +115,11 @@ Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/te
 - [x] Pagination via the accessible "Load more" and the "6 / N" count row (SKODA-209a): the count row is the
       polite live region, focus moves to the first new card.
 - [x] Content right edge equal to the source (cap `1248`, gutter `~16px`) on 123 / 123.
-- [x] **Measured geometry replaces the ≤ 2% pixel diff** (decision 2026-10-22: review evidence is measured values,
-      no screenshots): frames, ratio, order, cap, count row and every gap to the footer as above. Load more →
-      footer equal on 81 / 81 (32, and 64 on the Media Room tags); last card → footer equal where everything fits.
+- [ ] **Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).** Restored: no human approval
+      for replacing this gate with geometry is linked. Measurements and subsequent screenshot inspection
+      support QA; they do not establish the threshold or approve retained differences.
+- The historical census measured initial Load more → footer (32 / 64) and initially-fitting endings
+  (93 / 125), **not every ending state**. Exhaustion was 48px short until the review fix below (#487).
 
 ## Dependencies
 - Upstream: SKODA-201 (cards), SKODA-202 (hero), SKODA-402 (query-index retrieval), SKODA-601 (import infra)
@@ -151,9 +154,66 @@ The 48px under their pager (SKODA-209a's known deviation) is that Media Room pag
 - **Follow-up (card-wide, not this ticket):** the source rests every card image at 102% inside its 16:9 frame
   (`transform: scale(1.02)`); EDS card images rest at 100%. The frame is identical. It affects every card
   (rails, home, listings), so it belongs with the card primitive (SKODA-201), like SKODA-828's hero zoom.
+  Filed as [#488](https://github.com/skoda-storyboard/demo/issues/488), also covered by #477; not silently accepted.
 - **Content, not code:** 8 archives hold fewer migrated stories than one source row (company/production,
   environment/greenfuture, people/stefani, model/slavia, concepts, corporate-life, design-eng, skoda-world/heritage),
   and classic-cars has none yet. The volume is SKODA-848 / SKODA-801b.
+
+## Review fixes (2026-10-26)
+- **#487 exhausted pager:** `stories-loadmore.is-paginated` retains the source's empty 32px wrapper only for
+  count-enabled feeds whose total exceeds the effective first page (including a featured model's two slots).
+  This restores the missing 48px without changing initially-fitting archives or the home feed.
+  The button still disappears; the count row, announcements, first-new-card focus and history remain.
+- **Rendered DOM tests:** real `decorate()` calls cover `section: media-room` versus Storyboard, blank and
+  missing metadata; exhaustion, deep links, Back/Forward, initially-fitting/empty archives and the home feed.
+  The existing CSS contract test is no longer the only coverage.
+- **Merge:** current `main` is already included by `b94f75c`; GitHub reports MERGEABLE. Restored the
+  SKODA-210a backlog row and SKODA-210 amendment that the earlier conflict resolution dropped.
+- **Local Chrome MCP, serial source/local comparison:** actual `innerWidth` verified at each band.
+
+| Page / state | Widths | Source → local |
+|---|---|---|
+| Crew/eMobility, button → footer | 375 / 768 / 992 / 1080 / 1440 | 64 → 64 |
+| Crew/eMobility, exhausted last card → footer | same five bands | 173 → 173 (was 125 locally) |
+| Crew/eMobility, exhausted count → footer | same five bands | 96 → 96 (was 48 locally) |
+| GreenFuture, initially-fitting last card / count → footer | 375 / 1080 / 1440 | 125 / 48 → 125 / 48 |
+| Category/eMobility, button → footer; exhausted last card / count → footer | 1440 | 32; 141 / 64 → same |
+| Model/Octavia, collapsed feature height; button → footer | 375 | 201; 32 → same; opening/closing keeps 32 |
+| Home, first card size | 375 / 768 / 992 / 1080 | 355×199.6875 / 364×204.75 / 476×267.75 / 520×292.5 → same |
+
+- **Actual interactions:** crew Load more mouse 6→12, Tab/Enter 12→17; source loaded 6→118 through its own
+  handler. Local focus moved to cards 7 and 13, count stayed polite, button disappeared, Back restored 12
+  and Forward/reload restored 17 with the correct empty band. A real Enter on a card opened its matching
+  story/H1. Category source reached 206 and local 48; footer gaps match despite different corpora.
+  Octavia's disclosure opened/closed with Enter. Mobile menu opened with Enter and closed with Escape,
+  returning focus. Home Tab/Enter loaded 5→11 without a count row or Media Room/paginated modifier.
+- **Heading outline:** crew source = H3 card titles, local = H1 “Technology eMobility” then H3 cards; GreenFuture
+  and category use the same extra-H1 pattern. Octavia source starts H2 feature → H3 cards; local adds H1
+  “Models Octavia”. Home feed heading and cards remain H3 on both. These are baseline differences, not
+  accepted exceptions; #459 tracks the archive skipped level.
+- **Visual inspection:** source/local same-band screenshots inspected after measurements (1440 initial
+  archive, 1080 exhausted archive and home), kept out of the repository. Different migrated corpora, card
+  crop and title wrapping remain visible; this does not establish ≤2% pixel parity or waive that gate.
+- **Lighthouse snapshots at 1080:** local exhausted crew accessibility **95**, existing `heading-order`
+  (#459) and Manage subscription contrast **3.39:1** (#489). Home after Load more **96**, existing Subscribe
+  contrast **3.3:1** (#403) and status contrast **4.12:1** (#486). No new accessibility failure attributed to
+  the pager fix. Existing issues stay open; no unrelated footer/header/card styling is changed.
+- **Human disposition still required:** added term H1/outline (#58/#459), Kylaq/Slavia layout not copied,
+  featured-card overlap avoidance (§10a of the spec), and shared resting image scale 1.02 vs none (#488/#477).
+  No new approval is claimed. The visual gate remains pending.
+- No content or metadata sheet is uploaded or published by these review fixes.
+
+## Review-fix validation
+- `node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test blocks/stories/stories.test.mjs blocks/stories/stories-feature.test.mjs blocks/header/header.test.mjs`: **passed, 73/73**.
+- `npm run test:blocks`: **passed, 590/590**, independently executed by functional QA.
+- `npm run lint`: **passed** (ESLint and Stylelint). `git diff --check`: **passed**.
+- JavaScript/CSS guardrail self-check: pager state is derived from authored count configuration and scoped
+  results, not the URL/page type; existing padding tokens and intrinsic layout retained; no new breakpoint,
+  fixed spacer, dependency, content mutation or global style. Existing focus, live-region and history paths
+  are unchanged and exercised. Full `npm test` was not rerun; the restored visual gate remains pending.
+- Home's authored count announcement currently reads `11 {n} stories shown` on both this local branch and
+  current `main` after Enter loads 5→11. This is a baseline placeholder-interpolation defect under #492,
+  separate from #486's contrast issue, not a successful localized-announcement acceptance claim.
 
 ## M2 readiness review (2026-10-15)
 - The template is done for M1. The **volume** (378 EN archives, 41 live) and the keep / redirect rule move to SKODA-848.
