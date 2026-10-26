@@ -24,7 +24,7 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
 - [x] Gallery modals (gallery / story lightbox, Media Box lightbox) trap focus, close on Escape, and return focus to the
       trigger. The glossary modal is out of M1 (SKODA-206).
 - [x] Contrast passes WCAG 2.1 AA on the M1 pages, apart from the PO-accepted source greys (audit §3).
-- [x] All interactive controls are fully keyboard-operable (skip link, slider pause and size-menu keys added).
+- [x] All interactive controls are fully keyboard-operable (skip link and size-menu keys added; the story slider has no pause button, so it no longer autoplays: SKODA-819, PR #456, audit §2).
 - [x] Empty alts flagged / backfilled; `[RUNTIME-UNCONFIRMED]` a11y items confirmed in-browser. The human NVDA /
       VoiceOver pass (audit §6) is still open.
 
@@ -52,7 +52,7 @@ Audit and fixes: [`docs/reviews/SKODA-703-A11Y-AUDIT-2026-10-15.md`](../../revie
   source); fixes verified on an 18-page coverage set holding every template, block, block variant and section style
   (390 → 15 nodes, all PO-accepted); scripted keyboard / focus / ARIA pass on the 9 template URLs.
 - **Fixed:** contrast to AA (two new tokens; the PO-accepted greys kept), underlines where links were colour-only, the
-  locale links' label in name (EDS-introduced), a skip link, a pause control for the story slider's autoplay, arrow keys
+  locale links' label in name (EDS-introduced), a skip link, arrow keys
   in the Media Box / gallery size menu, alts for the 9 linked images that had none (5 Classic Days chapters re-pushed).
 - **Reverses for AA (PO to confirm):** SKODA-205 (tag chip grey) and SKODA-308 (footer "Manage subscription" green).
 - **Open:** the human screen-reader pass (audit §6); SKODA-703a (mega-menu semantics, M2); one DA-edited Classic Days
