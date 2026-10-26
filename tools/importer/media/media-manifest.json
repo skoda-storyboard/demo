@@ -241126,12 +241126,16 @@
       "page_refs": [
         "en/skoda-model/epiq"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
+        "mime": "application/pdf",
+        "bytes": 205410
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -241139,15 +241143,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/03/TD-Epiq-en_9ab9372d.pdf"
       ],
-      "bytes": null,
+      "bytes": 205410,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-26T10:36:24.745Z"
     },
     "8b558dfa__TD-Peaq-en_8fa4f649.pdf": {
       "kind": "document",
@@ -241158,12 +241167,16 @@
       "page_refs": [
         "en/skoda-model/peaq"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
+        "mime": "application/pdf",
+        "bytes": 255940
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -241171,15 +241184,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/TD-Peaq-en_8fa4f649.pdf"
       ],
-      "bytes": null,
+      "bytes": 255940,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-26T10:36:34.167Z"
     }
   }
 }
