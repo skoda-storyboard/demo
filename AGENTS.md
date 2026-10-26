@@ -68,6 +68,10 @@ Steps 4–9 exist because M1 manual QA found 57 of 94 defects that agent reviews
 ## Analysis & planning (read before scoping/estimating)
 `docs/` is organized into topic subfolders (see `docs/README.md`): `analysis/` (findings + block/widget data), `architecture/`, `media/`, `planning/` (technical data models + requirement mapping), `reviews/`, `archive/` (superseded, kept as reference), plus `tickets/` and `ui-specs/`.
 - `docs/analysis/SKODA-MASTER.md` is the canonical findings doc; its §16 map indexes every source report, and it carries the confirmed scope + milestones (M1 demo 15 Oct 2026 / M2 go-live 02 Jan 2027).
+- **Latest requirements review (M2, 2026-10-15 → 10-22): read it before scoping or estimating M2 work.**
+  - The four documents, in order: `docs/reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md`, `docs/reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md`, `docs/reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md` and `docs/planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md`.
+  - The current state is in the decision register, `docs/tickets/OVERVIEW.md` and the traceability matrix. They win over older reviews.
+  - The list is kept in `docs/README.md`.
 - `docs/planning/SKODA-CLIENT-REQUIREMENTS-MAPPING.md`, requirement IDs → build status → tickets; `docs/planning/SKODA-REQUIREMENTS-TRACEABILITY.md`, the bidirectional requirement↔ticket matrix + gap register.
 - `docs/planning/SKODA-METADATA-SCHEMA.md`, `-BLOCK-DATA-MODEL.md`, `-TEMPLATE-CONTENT-MODELS.md`, `-RAIL-FEED-MAP.md`, the demo migration data model (index contract, reuse-vs-new blocks, per-template DA shapes, rail sizing).
 - `docs/planning/SKODA-AGENT-HANDOFF-CANDIDATES.md`, parts fit for autonomous-agent handoff.

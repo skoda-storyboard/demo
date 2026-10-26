@@ -57,7 +57,7 @@ footer present; an earlier note here saying it drops the chrome was wrong):
 |---|---|---|---|---|---|
 | `template-homepage` | Storyboard home | STO | `stories` (Latest Stories Load-more feed), `carousel-rails` (promo-box featured + category rails), `card-teaser`, `hero`, `newsletter`, `social-share` | `template-home.md` + `stories.md` | SKODA-604/(home), SKODA-214 (feed) |
 | `template-media-room` | Media Room home | MR | `carousel-rails` (promo-box + `cover-box`/`cover-box dark` rails incl. News press-release rail), `card-teaser` | `template-home.md` | (MR home) |
-| `post-template-template-layout-article` + `siteorigin-panels` (`single-post`) | Story detail | STO | `hero`, rich text, `embeds`, `gallery-lightbox`, `highlight` (in-column dark panel), sidebar widgets, `social-share`, `tags`, `newsletter`, `carousel-rails` (related) | `story-detail.md`, `highlight.md` | SKODA-604, 801, 824 |
+| `post-template-template-layout-article` + `siteorigin-panels` (`single-post`) | Story detail | STO | `hero`, rich text, `embeds`, `gallery-lightbox`, `highlight` (in-column dark panel), `timeline` (`ys-milestones`), sidebar widgets, `social-share`, `tags`, `newsletter`, `carousel-rails` (related) | `story-detail.md`, `highlight.md`, `timeline.md` | SKODA-604, 801, 824, 815 |
 | `press_release-template-default` (`single-press_release`) | Press release detail | MR | text title (no hero), lead teaser + bullet-points + rich text, `highlight` (grey callout), secondary column (`downloads`/media-kit + `tags` + `newsletter` + ad), full-bleed dark related band | `template-press-release.md`, `highlight.md` | **SKODA-607**, 824 |
 | `skoda_model-template-default` (`single-skoda_model`) + siteorigin | Model page | MR | `hero`, "Model Description" rich text, **5 related rails** (`carousel-rails`/`story-rail`), `card-teaser` | `template-model-page.md` | **SKODA-208** |
 | `archive category` / tag archives | Category / tag listing | STO | `hero`, `card-teaser` grid (`search-results-items`), pagination, **no facets** | `template-category-archive.md` | **SKODA-209** |
@@ -69,7 +69,7 @@ footer present; an earlier note here saying it drops the chrome was wrong):
 | `single-skoda_series` | Series hub (5 in M1) | STO | `hero-image` (SERIES label + perex), `cards` (overlay, tiles) curated mosaic including a Press Kits tile | `series.md` | SKODA-207, 221 |
 | Škodapedia directory + term | Škodapedia (`post-type-archive`) | MR | `skodapedia` (A-Z nav `.sp__list-nav` 26 letters + term modal `.sp__term-detail`) | `skodapedia.md` | SKODA-206, 802 |
 | `press_kit-template-default` + sub-pages | Press kit (hub + chapter + gallery) | MR | `hero`, chapter-nav, `press-kit-media`, `press-kit-variant`, `faq-accordion`, `downloads` | `press-kit-template.md` | SKODA-805–808 |
-| `error404` | Branded 404 | global | minimal shell + "dead end" copy + homepage link | `template-404.md` | **SKODA-706** |
+| `error404` | Branded 404 | global | one of two random variants (DA fragments `/en/fragments/404/*`): full-bleed photo band + message + homepage link (`templates/error-404`) | `template-404.md` | **SKODA-706** |
 
 Bold tickets are new gap tickets created by this initiative. **`press_kit` nuance (verified live):** the
 rendered pages ARE a `press_kit` post type (`single-press_kit`, hub `press_kit-template-template-tiles`,

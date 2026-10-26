@@ -26,7 +26,7 @@ Whole page types = shell + ordered sections composed from the components above. 
 | Model page (`skoda_model`) | [`template-model-page.md`](template-model-page.md) | SKODA-208 | hero + icon section-nav + 5 tag rails |
 | Category / Tag archive | [`template-category-archive.md`](template-category-archive.md) | SKODA-209 | STO, hero + card grid 3/2/1, no facets |
 | Generic Page base shell | [`template-page-base.md`](template-page-base.md) | SKODA-813 | STO `page-template-default` + MR `template-media-room-page` |
-| 404 | [`template-404.md`](template-404.md) | SKODA-706 | branded, keeps chrome, real HTTP 404 |
+| 404 | [`template-404.md`](template-404.md) | SKODA-706 | branded, keeps chrome, real HTTP 404; two random variants (photo band + message) from DA fragments |
 | Home (Storyboard + Media Room) | [`template-home.md`](template-home.md) | SKODA-604 / home | `.cover-box` section stack; promo-box lead |
 | Custom microsite (event-gallery / campaign) | [`custom-microsite.md`](custom-microsite.md) | SKODA-210 | STO `template-custom-full-width`, full-bleed + big gallery; 201 pages, scope decision |
 | Story detail | [`story-detail.md`](story-detail.md) | SKODA-604 / 801 | STO, hero + `.content`/`.sidebar` |
@@ -53,6 +53,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `carousel-rails.md` | carousel + story-rail | underpins 201/stories/story-rail; MR rails | `/en/` sliders | CAPTURED |
 | `story-image-carousel.md` | gallery (slider variant) | 819 (supersedes 219) | Epiq + Octavia in-body widgets | CAPTURED (2 stories) |
 | `stories.md` | stories (new) | 214 (reuses 402 loader/paginate) | `/en/` "Latest Stories" feed | CAPTURED |
+| `timeline.md` | timeline (new; `black`, `large`) | 815 | story `ys-milestones` (steering wheel, iconic cars) | CAPTURED + BUILT |
 | `header-megamenu.md` | header | 301 | `/en/` nav | CAPTURED |
 | `mobile-nav.md` | header | 302 | `/en/` (<1080) | CAPTURED |
 | `language-switcher.md` | header | 303 | `/en/` topbar | CAPTURED |

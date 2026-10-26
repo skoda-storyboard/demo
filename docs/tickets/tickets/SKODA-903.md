@@ -1,7 +1,7 @@
 # SKODA-903 — Banner ad platform (per-market feed + vanilla client + geo/freq/tag)
 - **Epic:** E09 — Dynamic Services
 - **Type:** service
-- **Phase:** C  ·  **Pilot:** No · **Milestone:** M2 (go-live)
+- **Phase:** C  ·  **Pilot:** No · **Milestone:** M3 (post-go-live; moved off M2, decision 2026-10-22, D3: drop the ad server)
 - **Estimate:** 8 SP · AI-assisted 3–5d / manual 6–12d *(planning estimate, not a quote)*
 - **GitHub issue:** [#79](https://github.com/skoda-storyboard/demo/issues/79)
 

@@ -1,7 +1,7 @@
 # SKODA-906 — Restricted end-user article access (QR-code journey)
 - **Epic:** E09 — Dynamic Services
 - **Type:** service / investigation
-- **Phase:** C  ·  **Pilot:** No · **Milestone:** M2+ (investigation; scope once model defined)
+- **Phase:** C  ·  **Pilot:** No · **Milestone:** M3 (post-go-live; moved off M2, decision 2026-10-22, D17: out of go-live scope until the access model is defined)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–8d *(planning estimate, not a quote — provisional; re-point once the access model is defined)*
 
 ## Summary

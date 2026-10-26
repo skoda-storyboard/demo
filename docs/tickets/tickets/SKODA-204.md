@@ -55,3 +55,34 @@ Measurable gates live in [`embeds.md` §9](../../ui-specs/embeds.md); summary:
 ## Risks / Flags
 - Consent/analytics coupling: third-party iframes must respect OneTrust and re-emit `skoda-analytics` events (specs §7), full wiring is Phase B/C (SKODA-804/905), pilot uses the gate hook.
 - [RUNTIME-UNCONFIRMED]: embed lazy-load timing (specs §8), verify in browser.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [M2 integration gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, finding G-D-05
+(Medium). G-A-08 (Low, confirmed) is merged into G-D-05. This ticket is done on M1 scope (merged in #109); the
+amendment is new M2 work.
+
+**Added scope**
+- Correct step 7 and the MR-PR03 acceptance criterion: the AI audio box is a 200px Buzzsprout iframe of AI-voiced
+  readings, not an arbitrary third-party JS widget for the `widget` autoblock (G-D-05, G-A-08). The demo already
+  renders it through the embed block, and 204a already gates Buzzsprout, so this is a text correction (G-A-08).
+- Locale coverage: the box appears on 89 of the 100 most recent EN releases and 91 of 100 CS releases; DE 1/100
+  (an older 2022-23 sample), SK 0/100, SR 0/100. Treat it as EN + CS only, not "per-language" (G-D-05).
+- Show paths: of the 89 EN embeds, 56 use show 1878301 (the EN AI show) and 33 use the CS show path
+  (`/1730804/episodes/<EN id>`). These play only because Buzzsprout resolves by episode id. The Buzzsprout branch
+  must accept any show id in the path and must not rewrite it (G-D-05).
+- Authoring path: the episode is produced outside WordPress and pasted into each release, and nothing regenerates
+  it. After go-live, DA authors paste the episode URL per release on EN and CS. Step 7 should say so and point to
+  the SKODA-842 "AI audio" library entry and the author guide, which carry the workflow (G-D-05).
+- The AI-voice disclosure sits only inside the iframe; the label work is in SKODA-204a (G-G-09).
+
+**Added acceptance criteria**
+- [ ] Step 7 and the MR-PR03 criterion describe a Buzzsprout iframe through the embed block, EN + CS only
+      (G-D-05, G-A-08).
+- [ ] A test covers a Buzzsprout URL with each show path (1878301 and 1730804) and checks that the iframe keeps
+      the authored show and episode ids at the 200px audio height (G-D-05).
+- [ ] Step 7 links the SKODA-842 library entry and the author-guide paste-URL steps for EN and CS (G-D-05).
+
+**Estimate**
+- Estimate after the amendment: 3 SP (M1, done) + 0.25 SP new M2 work · AI-assisted 0.1d / manual 0.25d
+  *(planning estimate, not a quote)*. The rest of G-D-05's +0.5 SP (library entry, author guide) sits in
+  SKODA-842; the D19 AI-voice notice sits with D19.

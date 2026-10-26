@@ -1,7 +1,7 @@
 # SKODA-901 — Search: hosted body-relevance search fed by index (decision-gated)
 - **Epic:** E09 — Dynamic Services
 - **Type:** service
-- **Phase:** C  ·  **Pilot:** No · **Milestone:** M2 (go-live)
+- **Phase:** C  ·  **Pilot:** No · **Milestone:** M3 (post-go-live; moved off M2, decision 2026-10-22, D6: index-only search at go-live)
 - **Estimate:** 8 SP · AI-assisted 3–5d / manual 6–10d *(planning estimate, not a quote)*
 
 ## Summary

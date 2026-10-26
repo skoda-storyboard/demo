@@ -102,3 +102,20 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
 - 🟠 Highest-effort pilot block; the #1 prototype for proving the static architecture.
 - Index-only recall: this block filters on indexed columns/facets, not full-text body, reduced recall accepted for pilot.
 - `[RUNTIME-UNCONFIRMED]`: load-more scroll/render behavior and deep-link restoration need browser verification.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, row "401 / 402": G-KT-05
+(Medium, ESTIMATE-RISK, not re-verified). This ticket is done on M1 scope (#28 closed 2026-09-23): what follows is new
+M2 work, carried with the index side (slim index, budget, synthetic index) in SKODA-401a.
+
+**Added scope:**
+- Moved to SKODA-401a.
+
+**Added acceptance criteria:**
+- Moved to SKODA-401a.
+
+**Estimate after the amendment:** 8 SP done on M1 (unchanged); no open M2 work remains on this ticket. The new M2
+work (0.5 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*) is carried in
+**[SKODA-401a](SKODA-401a.md)** (2.5 SP with 401's part) rather than reopening this ticket.
+
+**Added dependencies:** Moved to SKODA-401a.

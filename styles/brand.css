@@ -52,6 +52,11 @@
   /* the source's page-header title band (#ccc; media cart page, SKODA-505b) */
   --skoda-grey-250: #ccc;
 
+  /* the story milestones timeline (SKODA-815; measured on the live `ys-milestones` widget):
+     its #e4e4e4 panel and the legacy #9c0 green of its year pills and dots */
+  --skoda-grey-225: #e4e4e4;
+  --skoda-lime: #9c0;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;

@@ -1,5 +1,11 @@
 # M2 readiness review (2026-10-15)
 
+> **Part 1 of the latest requirements review (2026-10-15 → 10-22).** It continues in the
+> [locale review](SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md), the
+> [integration and gap review](SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) and the
+> [scope and capacity doc](../planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md). Where figures here differ, the later
+> documents win. The full list is in [`docs/README.md`](../README.md).
+
 M1 (the 15 Oct demo) is done. This review covers three questions:
 
 - what is still ahead before go-live on **02 Jan 2027**;
@@ -147,6 +153,10 @@ The MR nav **Company** menu has 6 entries. Against the 15 Sep spec:
   and SKODA-1001. The follow-up pass over all five non-EN locales,
   [`SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20`](SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md), puts the non-EN
   corpus at ≈ 12,000 docs (CS ≈ 5,100) with no import ticket.
+- **Integrations and untouched areas:** the gap review
+  [`SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21`](SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) covers third-party
+  touchpoints, Škodapedia, podcasts, video, attachment pages, the launch and operations. 152 findings (two top-up rounds); the production
+  launch (CDN, DNS, TLS) has no owner.
 
 ### Confirmed
 

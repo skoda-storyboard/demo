@@ -24,3 +24,42 @@ the volume, and nobody has decided which of the archives must exist.
 
 ## Dependencies
 209, 402d, 841 (facets entered once), D12.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [M2 integration gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, findings
+G-D-03 (Medium, confirmed, with browser corrections) and G-E-03 (Low).
+
+**Added scope**
+- Podcast archives are keep archives (G-D-03). The source nav links `/en/category/podcast-en/` (200); the authored
+  demo slug `/en/category/podcast/` 404s on the source. The Buzzsprout, Apple and Spotify show pages advertise
+  this archive as the podcast website (RSS channel link). Per locale:
+  - EN `podcast-en`: 30 episodes, 5 server pages × 6 cards (`/page/2/`–`/page/5/` 200, `/page/6/` 404). The
+    visible UI is an AJAX "Load more" button; `/page/N/` is reachable only through `<link rel=next>`.
+  - CS `podcast-cz`: 20; SR `podcast-en`: 21; SL `podcast-en`: 17.
+  - SK `podcast-en` and DE `podcast-cz` are empty.
+- Keep or redirect `/en/category/podcast-en/page/2/` to `/page/5/` (G-D-03).
+- The demo sends the archive to WordPress: `scripts/links.js` LIVE_ONLY + LIVE_ALIASES rewrite it to the live
+  archive in a new tab, and that target disappears at cutover. Delete those entries once the EDS archive exists
+  (cutover checklist item) (G-D-03). Re-authoring the nav/footer link and correcting the "not an archive" note
+  belong to SKODA-209 (G-D-03).
+- 18 locale-less global-categories archives are missing from this ticket and the coverage matrix (G-E-03). They
+  sit at `/global-categories/{term}/` (brand, citigo, citigoe-iv, classic-cars, concepts, cycling, emobility,
+  enyaq-iv, fabia, kamiq, karoq, kodiaq, motorsport, octavia, rapid, scala, superb, yeti). They return 200 with
+  `index,follow`, render on the Media Room shell and paginate with Load more (`/global-categories/brand/` shows
+  6,718 items). The chrome never links them, and nothing redirects them today.
+- Add the 18 to the redirect list: model terms to `/en/models/{model}`, the others to the facet listing (G-E-03).
+  The coverage matrix row is a separate doc edit (G-E-03).
+
+**Added acceptance criteria**
+- [ ] The keep list names `/{locale}/category/podcast-*` for EN, CS, SR and SL; the empty SK and DE categories
+      get a redirect or are dropped by the agreed rule (G-D-03).
+- [ ] `/en/category/podcast-en/` and `/page/2/`–`/page/5/` resolve on EDS (kept or redirected); 0 links from EDS
+      pages to the WordPress podcast archive (G-D-03).
+- [ ] The `scripts/links.js` LIVE_ONLY / LIVE_ALIASES podcast entries are removed once the target exists, or the
+      removal is on the cutover checklist (G-D-03).
+- [ ] All 18 `/global-categories/{term}/` URLs have a redirect row (model terms to `/en/models/{model}`, the rest
+      to the facet listing), and none returns 404 (G-E-03).
+
+**Estimate**
+- Estimate after the amendment: 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*.
+  G-D-03 adds +0.5 SP; G-E-03 adds 18 redirect rows (about +0.5 SP with the model-term mapping).

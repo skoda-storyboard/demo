@@ -1,12 +1,12 @@
 # SKODA-834, Widget autoblock: only same-origin `/widgets/` links, never insert a failed response
 - **Epic:** E02, Core Blocks (runtime follow-up from the PR #253 / SKODA-828 review)
 - **Type:** runtime fix (`scripts/scripts.js`, `blocks/widget`)
-- **Phase:** A · **Milestone:** M1 (15 Oct demo)
+- **Phase:** A · **Milestone:** M2 (moved from M1, decision 2026-10-22)
 - **Renumbered (2026-10-07):** registered as SKODA-830 in PR #257, which collided with the story-import ticket
   [SKODA-830](SKODA-830.md) (#259, PR #269). This one moved to SKODA-834; the branch name `skoda-830-widget-origin` is historical.
 - **GitHub issue:** [#256](https://github.com/skoda-storyboard/demo/issues/256)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-10-06):** 🔵 TODO
+- **Status (2026-10-22):** 🔵 TODO, **reopened**. #256 was closed as completed on 2026-10-12, but the fix is not on `main`: `scripts/scripts.js:75-76` still selects every `a[href*="/widgets/"]` regardless of origin, and `blocks/widget/widget.js:66-67` inserts the response without checking `resp.ok` (gap review G-H-04)
 
 ## Origin
 Raised in the PR #253 (SKODA-828) review: the 9 overlay press kits now join the M1 URL set
