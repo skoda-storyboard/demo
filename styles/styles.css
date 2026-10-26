@@ -1569,7 +1569,7 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey) + .
    body track is the 10px inset + 2/3 of the inset content box, so the text lands on
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
-  /* overflow-x: the dark bands (`.section.dark::before`, below) are 100vw wide, which takes in
+  /* overflow-x: the dark bands (`.section.dark`, below) are 100vw wide, which takes in
      a desktop's classic scrollbar (15px), so the page scrolled 8px sideways at 1280–1440 (the
      Media Box, Related Stories). `clip` hides that and makes no scroll container (sticky works). */
   body.story {
@@ -1641,22 +1641,13 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey) + .
     padding-top: var(--story-aside-inset-top);
   }
 
+  /* The dark bands (Media Box, Related Stories) span the window up to 1440px and centre above
+     it, as the source's .cover-box.dark: the band's own box leaves the 1248px grid by half the
+     difference on each side (a margin % is of the grid area). Its wrappers keep the content in
+     the 1248px column (`main > .section > div`). #293 QA: the box, not only a painted bleed. */
   body.story main > .section.dark {
     grid-column: 1 / -1;
-    position: relative;
-    isolation: isolate;
-  }
-
-  body.story main > .section.dark::before {
-    content: '';
-    position: absolute;
-    inset-block: 0;
-    left: 50%;
-    width: 100vw;
-    max-width: var(--story-dark-band-max-width);
-    transform: translateX(-50%);
-    background: var(--dark-color);
-    z-index: -1;
+    margin-inline: min(0px, (100% - min(100vw, var(--story-dark-band-max-width))) / 2);
   }
 }
 
