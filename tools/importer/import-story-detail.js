@@ -18,8 +18,9 @@
 
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
-  markHighlights, markCellWidths, markRowPadding, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
-  markCentredImages, applyCentredImages, markTextStyles,
+  markHighlights, markCellWidths, markRowPadding, useLargestSources, markBoldHeadings,
+  restoreBoldHeadings, dropEmptySections, markCentredImages, applyCentredImages, markTextStyles,
+  markMilestoneSpaces,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
 import mediaParser from './parsers/press-kit-media.js';
@@ -140,6 +141,9 @@ export default {
    * source's glued non-breaking spaces (html2md would turn them into spaces).
    */
   preprocess: ({ document }) => {
+    // the body images' full file: a 2026 editor image's `src` is a 384 / 768px thumbnail, the
+    // full file only in its `srcset` (the charging story's photos)
+    useLargestSources(document);
     markHighlights(document);
     markCellWidths(document);
     markRowPadding(document);
@@ -148,6 +152,8 @@ export default {
     markTextStyles(document);
     // the source's drop cap and its inline colours (DA keeps neither)
     markDropCap(document);
+    // SKODA-815 (PR #373): the timeline title spaces, before preProcess drops the spacer <p>
+    markMilestoneSpaces(document.body);
     // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on
     // press kits (SKODA-805d); its size lives only in inline spans, which DA drops
     document.querySelectorAll('article .entry-content, article .content').forEach((body) => {
@@ -196,7 +202,11 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params });
+          // the story Media Box shows each item's date on every card, as the source (downloads
+          // `dates`, as the press-release Media Box, #274)
+          parser(block.element, {
+            document, url, params, dates: block.name === 'downloads',
+          });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }

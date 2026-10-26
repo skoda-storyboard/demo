@@ -19,6 +19,7 @@
     "media:audit": "node tools/importer/media/audit-m1-media.mjs",
     "media:validate-binaries": "node tools/importer/media/validate-binary-media.mjs",
     "media-items:build": "node tools/importer/media-items/build-media-items.mjs",
+    "media-items:shards": "node tools/importer/media-items/build-media-shards.mjs",
     "test:media": "node --test tools/importer/media/*.test.mjs",
     "media:validate-metadata": "node tools/importer/validate-metadata.mjs",
     "import:push": "node tools/importer/push-to-da.mjs",

@@ -152,7 +152,7 @@
 }
 
 .newsletter-stub .newsletter-stub-manage a {
-  color: var(--newsletter-manage-color);
+  color: var(--skoda-green-accent);
   font-weight: var(--weight-regular);
   text-decoration: underline;
 }

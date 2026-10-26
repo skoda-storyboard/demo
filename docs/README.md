@@ -9,6 +9,27 @@ documents are **not served** by EDS; they are project knowledge only.
 **Analysis start point:** [`analysis/SKODA-MASTER.md`](analysis/SKODA-MASTER.md) is the canonical findings doc;
 its §16 Document Map indexes every source report with its current path.
 
+**Latest requirements review (M2, 2026-10-15 → 2026-10-22):** start here for M2 requirements, scope and gaps. The four
+documents build on each other; read them in order:
+1. [`reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md`](reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md): EN census,
+   ticket readiness, the decision register.
+2. [`reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md`](reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md):
+   the five non-EN locales (90 findings).
+3. [`reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md`](reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md):
+   third-party integrations, untouched areas, launch and operations (152 findings, two top-up rounds, adversarially
+   verified).
+4. [`planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md`](planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md): open M2
+   work against the time left, and the scope levers.
+
+The **current state** lives in four documents, which these reviews updated:
+- the [decision register](planning/SKODA-DECISION-REGISTER.md) (D1–D20, Q-1–Q-21);
+- the [ticket backlog](tickets/OVERVIEW.md);
+- the [traceability matrix](planning/SKODA-REQUIREMENTS-TRACEABILITY.md);
+- the [client requirements mapping](planning/SKODA-CLIENT-REQUIREMENTS-MAPPING.md).
+
+Older reviews (`reviews/SKODA-ADVERSARIAL-REVIEW*.md`, `M1-*`, `SKODA-M1-GAP-REVIEW.md`) are background; where they
+disagree, the newer review wins.
+
 ## Folders
 
 | Folder | What's in it |
@@ -16,7 +37,7 @@ its §16 Document Map indexes every source report with its current path.
 | **`analysis/`** | Canonical findings (`SKODA-MASTER.md` + coverage proof) and the source analysis reports behind them, block/widget inventories + datasets, complex-systems deep-dive, flattener POC, header/footer analysis, discovery & drilldown. |
 | **`architecture/`** | Target-state build & architecture specs (`SKODA-EDS-DA-ARCHITECTURE.md`, `SKODA-SYSTEM-BUILD-SPECS.md`, `SKODA-DA-EW-EXTENSIBILITY.md`), the import-pipeline guide (`IMPORT-PIPELINE.md`), the M2 asset-ingestion review (`SKODA-ASSET-INGESTION-M2.md`), its App Builder connection review (`SKODA-APP-BUILDER-INTEGRATION.md`), and `SKODA-DIAGRAMS.md` (Mermaid: integration / authoring-flow / import-pipeline diagrams). |
 | **`media/`** | Media pipeline, media-cart/download feasibility, asset mapping, media deep-dive & integration review. |
-| **`planning/`** | The demo migration data model and requirement mapping: `SKODA-METADATA-SCHEMA.md` (index contract), `SKODA-BLOCK-DATA-MODEL.md` (reuse-vs-new + shared shells), `SKODA-TEMPLATE-CONTENT-MODELS.md` (per-template DA shapes), `SKODA-RAIL-FEED-MAP.md` + `skoda-rail-feed-corpus.txt` (rail sizing/corpus), `SKODA-CLIENT-REQUIREMENTS-MAPPING.md` (requirement IDs → status → tickets), `SKODA-REQUIREMENTS-TRACEABILITY.md` (bidirectional requirement↔ticket matrix + gap register), `SKODA-POC-URL-SET.md` + `skoda-poc-urls.json`/`.txt` (minimal live-URL coverage set), `SKODA-POC-COVERAGE-MATRIX.md` (URL × component × requirement join), `SKODA-AGENT-HANDOFF-CANDIDATES.md`, and `SKODA-DEMO-FALLBACK-CONFIRM.md` (dynamic-feature scope). |
+| **`planning/`** | The demo migration data model and requirement mapping: `SKODA-METADATA-SCHEMA.md` (index contract), `SKODA-BLOCK-DATA-MODEL.md` (reuse-vs-new + shared shells), `SKODA-TEMPLATE-CONTENT-MODELS.md` (per-template DA shapes), `SKODA-RAIL-FEED-MAP.md` + `skoda-rail-feed-corpus.txt` (rail sizing/corpus), `SKODA-CLIENT-REQUIREMENTS-MAPPING.md` (requirement IDs → status → tickets), `SKODA-REQUIREMENTS-TRACEABILITY.md` (bidirectional requirement↔ticket matrix + gap register), `SKODA-POC-URL-SET.md` + `skoda-poc-urls.json`/`.txt` (minimal live-URL coverage set), `SKODA-POC-COVERAGE-MATRIX.md` (URL × component × requirement join), `SKODA-AGENT-HANDOFF-CANDIDATES.md`, `SKODA-DEMO-FALLBACK-CONFIRM.md` (dynamic-feature scope), and `SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md` (open M2 work vs the time left, scope levers), `SKODA-M2-OPEN-SCOPE-QUESTIONS-2026-10-22.md` (the open client scope questions, by theme). |
 | **`reviews/`** | Adversarial reviews, correctness audit, block-implementation review, the M2 readiness review, its non-EN locale pass (`SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md`) and the integration and untouched-areas gap review (`SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md`). |
 | **`archive/`** | **Superseded material, retained as reference** (not deleted). Prior consolidated overview (`SKODA-STORYBOARD-ANALYSIS-OVERVIEW`), succeeded by `analysis/SKODA-MASTER.md`. |
 | **`ui-specs/`** | **Measured UI spec library**, 25 component specs (card, hero, footer, carousel, …) + 6 template specs, each with DOM + CSS captured live via Chrome DevTools at breakpoints 768/992/1080. `README.md` = component/template index + full requirement coverage matrix; `_TEMPLATES.md` = page-type → blocks → ticket census; `_FOUNDATIONS.md` = tokens/breakpoints; `_CAPTURE-PROTOCOL.md` = method; `tools/` = the Playwright measurement + visual-diff harness. |

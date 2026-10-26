@@ -28,7 +28,8 @@ import {
   buildBlock, decorateBlock, loadBlock, readBlockConfig, createOptimizedPicture, getMetadata,
   toClassName,
 } from '../../scripts/aem.js';
-import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
+import { defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
+import { loadRailRows } from '../../scripts/media-feed.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import { buildLightbox } from '../../scripts/lightbox.js';
 import { feedLightboxItem } from '../../scripts/media-lightbox.js';
@@ -602,8 +603,11 @@ export default async function decorate(block) {
     let indexRows = [];
     if (!curated) {
       try {
+        // a media feed with shards gives only the slice(s) of a facet the rail filters on
+        // (SKODA-517); any other index, or no shards, is read whole as before. A rail with an
+        // `order` list ignores its facets (selectRows), so it reads every row
         const [all, shown] = await Promise.all([
-          loadQueryIndex(cfg.index),
+          loadRailRows(cfg.index, cfg.order.length ? {} : cfg.facets),
           skipsPromo(cfg, { press, curated }) ? promoShownPaths(document) : [],
         ]);
         // one extra row tells a full press band apart from one that just fits

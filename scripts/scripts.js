@@ -348,15 +348,28 @@ export function decorateMain(main) {
  * A Listing in the first section shows nothing until its index has loaded, so the page's
  * first paint and LCP wait for that request (the media feed is 157KB). Start it now, before
  * the block's own code has loaded; query-index.js is memoized per URL, so the block reuses
- * this request (SKODA-702). Pages without a listing up front are untouched.
+ * this request (SKODA-702). A media feed with shards starts the request the block's first
+ * paint needs, its head shard (SKODA-517). Pages without a listing up front are untouched.
  * @param {Element} main The main element (decorated)
  */
 function startListingIndex(main) {
   const listing = main.querySelector('.section')?.querySelector('.listing');
   if (!listing) return;
-  const { index } = readBlockConfig(listing);
-  import('./query-index.js')
-    .then(({ loadQueryIndex, defaultIndexUrl }) => loadQueryIndex(index || defaultIndexUrl()))
+  const { index, template = '', path = '' } = readBlockConfig(listing);
+  Promise.all([import('./query-index.js'), import('./media-feed.js')])
+    .then(([{ defaultIndexUrl }, { openListingFeed }]) => openListingFeed(
+      index || defaultIndexUrl(),
+      { template, path },
+    ))
+    // the head only for the listing's default view (no filter, newest first, no more rows than
+    // it holds), as the block
+    .then((feed) => {
+      const params = new URLSearchParams(window.location.search);
+      const deepLinked = [...params.keys()].some((k) => k.startsWith('filter[') || k === 'sortby');
+      const offset = Number(params.get('offset')) || 0;
+      const fits = offset <= (feed.headRows ?? Infinity);
+      return feed.head && !path && !deepLinked && fits ? feed.head() : feed.rows();
+    })
     .catch(() => {}); // the block reports a failed load itself
 }
 

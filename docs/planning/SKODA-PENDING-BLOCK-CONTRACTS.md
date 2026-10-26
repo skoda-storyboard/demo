@@ -64,6 +64,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
 | `tags` | `chips` | – |
+| `timeline` | `black` (the black year pills), `large` (18pt titles), `xl` (24pt model lines) | – (SKODA-815; see `timeline` below) |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
@@ -282,6 +283,24 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `story-flatten.js` `skoda-quote`: not switched yet. It still emits a default-content `<blockquote>` and loses the attribution, and W1 switches it to this table.
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
+### `timeline`
+- **Status:** ✅ **built** in `blocks/timeline` (SKODA-815, on `main` once its PR merges). It is a baseline block (table above), so there is no pending entry; this section is the shape reference. **Ticket:** SKODA-815. **Spec:** [`timeline.md`](../ui-specs/timeline.md)
+- **Source:** the story `ys-milestones` widget (`section.milestones > ul > li`, each holding `.line > .year`, `.title`, `.thumbnail > img` and `.description` after a decorative `.dot`). It appears on 9 EN stories and their 9 CS counterparts (census `ys-milestones`).
+- **Shape:** header `Timeline`, then one row per milestone, in source order: `[year, title, <picture>, description]`.
+  - `year` is plain text (`1905`).
+  - `title` is a `<p>` with the source's lines as `<br>` and the model in `<strong>` (`Laurin & Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)`).
+  - The image cell holds the image at its own ratio (square on 8 of the 9 stories), alt as authored (empty on the source). A milestone with stacked images keeps them all, in order (iconic cars, 1970).
+  - `description` holds the `<p>` text with its links, href only.
+  - The source's inline font-size spans and the Škodapedia `term-explain` tooltip markup are unwrapped to their text (glossary tooltips are SKODA-206).
+- **`Timeline (black)`:** a widget whose year pills are `#000000` (125 years of Škoda: iconic cars); the default is the green `#9c0`.
+- **Fifth cell, space above the title (shape v2, PR #373 review):** optional; a plain pixel count (`15`, `44`), clamped to 200, set as the entry's `--timeline-title-space`. The importer writes it only from two source patterns: an inline `margin-top` on the first title paragraph (15px on four steering-wheel entries) and leading spacer paragraphs (`<p>&nbsp;</p>`, 44px each: iconic cars, 1970). When no entry has space, the rows keep four cells.
+- **Title semantics:** the title stays the source's paragraphs (`div.timeline-title > p`), not a heading (PR #373 review).
+- **`Timeline (xl)`:** the widgets with a 24pt (32px) model line under an 18pt maker (wheels, gear stick; the dominant inline title size is 32px). The block sizes the title paragraphs by role: an all-bold paragraph is the model line (32 / 48), a paragraph starting with "(" the note (16 / 24), the rest the maker line (24 / 36).
+- **`Timeline (large)`:** a widget whose titles are authored at 18pt (the dominant inline title size is 24px; 4 of the 9 EN stories): titles 24px on a 36px line instead of 18.67 / 28. The variants combine (`Timeline (black, large)`).
+- **Runtime:** an `<ol>` of entries (year pill, paragraph title, image, description; the line and dots are CSS). It is a left rail up to 1079px and two-sided from 1080 (the source's switch), and it keeps the rail inside a column narrower than 600px.
+- **Defensive:** a full four-cell row keeps its columns, so a blank year or image cell is a blank value and the description stays (PR #373 review). A shorter row is read by content: the image cell by its picture, and a row without a year (its first text cell longer than a label) renders without a pill. An empty row is dropped. Every link opens in a new tab with `noopener`, as the source widget's (DA keeps only the href).
+- **Importer:** `parsers/story-flatten.js` `milestonesCells`. A widget without list entries falls back to its images and text as default content, never dropped.
+
 ### `footnotes`
 - **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
 - **Why a block:** the source sets small print with an inline size (`<span style="font-size: 10pt">`). DA keeps no inline size, and its inline marks are only `strong`/`b`, `em`/`i`, `u`, `s`, `sup`, `sub`, `code` (no `small`, no `span`). It keeps classes only on block `<div>`s, so the small print has to be a block.
@@ -356,7 +375,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `highlight-padding` / `highlight-padding-mobile`: the row padding (`#pg-…> .panel-row-style { padding }`);
   - `highlight-margin` / `highlight-margin-mobile`: the text widgets' margin (`#pl-… #panel-… { margin }`), `0px 0px 0px 0px` when the layout gives them none;
   - `highlight-gallery-margin` / `highlight-gallery-margin-mobile`: the carousel widget's margin.
-  - The mobile row is the `@media (max-width:780px)` rule, or the desktop value when there's none. A multi-column row carries none (a margin per cell).
+  - The mobile row is the `@media (max-width:780px)` rule, or the desktop value when there's none.
+  - **A multi-column row (SKODA-227, 2026-10-19)** whose layout sets a cell's own widget margin or `.panel-cell-style` padding carries them per cell, one box per Columns cell joined by ` | `: `highlight-cell-margin` / `-mobile` and `highlight-cell-padding` / `-mobile` (a cell without its own keeps the theme's `0 15px` / `15px` margin, no padding), plus its `highlight-padding` rows. The runtime gives the section `hl-cells`: the panel keeps only its row padding, and each cell has the 10px cell padding + its padding + its margin. A panel right after it is pulled up 40px over its inset, as the source's row (`margin-top: -40px`). In use: the charging story's "Five questions" (`0px 0px 0px 15px | 0px 10px 0px 0px`; padding `0 | 15px`): its portrait is the source's 150 × 224 at 1280. Other multi-column panels (5 in the 82 stories) carry none and keep the default inset.
   - `parsers/story-flatten.js` `markHighlights()` reads them in `preprocess`. Delivered pages have them as the section's `data-highlight-*` attributes; `scripts/highlight-geometry.js` turns them into the section's `--hl-*` boxes.
   - Fallback: without the code the panel keeps the default inset (`readable`).
   - In use: 10 panels on 8 stories (camouflage ×2, sportline, what-you-learn ×2, cruise control, the plates story, designers on the Peaq, an epic start, park your Škoda).
@@ -410,8 +430,32 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Manifest gate (2026-09-29, #200 review):** every binary a row serves (thumbnail, `rendition-1920`, `original`,
   `poster`, `mp4`) has a row in `tools/importer/media/media-manifest.json` (`npm run media:build -- --feed …`);
   `media-items:build --push` refuses to publish while one is missing. DAM upload stays deferred (import-time rows).
-- **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
-  pages with `offset`).
+- **Sharding (SKODA-517; reader 2026-10-19, generator 2026-10-21):** a sheet holds 500k cells (~12,500 rows
+  at 40 columns), and every reader downloaded the whole feed. The feed is split by how it is read. A registry
+  sheet `/en/media-feed/index.json` lists one row per shard file: `kind | key | url | rows | total | build`.
+  - `head`, key = template (`image`, `video`): the newest 48 rows of one template, newest first; `total` = all
+    its rows. A listing's first page in the default view (no filter, no path, newest first, not past 48 rows).
+  - `facets`, no key: every row in the whole feed's order, with only `id`, `template`, `date`, `detail` (the
+    key of the detail shard holding the full row) and `f`, the facet values compact as
+    `key:value|key:value` (the reader expands them into the facet columns; 5 columns at any size).
+  - `detail`, key `<template>:<year>`, or `<template>:<year>-<n>` when a year holds more than 400 rows (parts
+    in the feed's newest-first order): full rows, filled in for the page a listing shows.
+  - `slice`, key `<facet>:<value>` for the rails' facets (`model`, `bodywork`): full rows carrying that value
+    (values of one facet are unioned).
+  - `keyed`, key `0` … `n-1`: full rows by file name, `keyShard(fileKey(original), n)` (32-bit FNV-1a) in
+    `scripts/media-feed.js`. The generator must import that function. Used for image-link and lightbox lookups.
+  - `url` is a root-relative `.json` path. Every row of a registry carries the same `build`: mixed builds, or
+    no valid row, mean no registry.
+  - **Generator:** `npm run media-items:shards -- [--feed <file|url>] [--dry-run] [--push]`
+    (`tools/importer/media-items/build-media-shards.mjs`, the pure split in `media-shards.mjs`). It reads the
+    published feed (its AEM Assets and Media Bus URLs) and writes every shard in the build's folder under
+    `/en/media-feed/` (the folder is a hash of the rows, so the same feed gives the same names). On `--push` it
+    publishes every shard first and the registry last: a failed run leaves the previous build live. A sheet
+    over 500k cells fails the build. Run it after every `media-items:build --push`.
+  - **Without a registry, every reader reads the whole feed, as before.** The loader (`scripts/media-feed.js`)
+    looks for a registry only for a `/{locale}/media-feed.json` index. A shard that fails to load, or a detail
+    shard without a row the facet index names, falls back to the whole feed, so publish it until the shards
+    replace it.
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.
 
 ### `page-body`
