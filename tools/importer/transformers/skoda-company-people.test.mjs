@@ -128,6 +128,7 @@ test('preprocess: a paragraph ending on a blank line keeps it (the nbsp placehol
     <p>Glued&nbsp;text<br>more</p></div></article></main>`).window;
   people('preprocess', document.body, { document });
   const [blank, other] = document.querySelectorAll('p');
-  assert.equal(blank.lastChild.nodeValue, '\u{F00A0}');
+  // the placeholder, then a word joiner: the delivery pipeline trims a trailing nbsp alone
+  assert.equal(blank.lastChild.nodeValue, '\u{F00A0}\u2060');
   assert.equal(other.textContent, 'Glued\u00a0textmore');
 });

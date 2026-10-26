@@ -31,6 +31,9 @@ const SPACER_INSET_PX = 10;
 
 // skoda-nbsp's placeholder for U+00A0 (keep in sync with that file and push-lib.mjs)
 const NBSP_PLACEHOLDER = '\u{F00A0}';
+// the delivery pipeline trims a paragraph's trailing whitespace, a non-breaking space too, so a
+// trailing blank line also gets a word joiner (U+2060: no width, not whitespace, not read out)
+const LINE_KEEPER = '\u2060';
 const NBSP_ONLY = /^[\s\u00a0]*\u00a0[\s\u00a0]*$/;
 
 const KEEP = new Set(['P', 'BR', 'STRONG', 'B', 'EM', 'I', 'A', 'IMG', 'UL', 'OL', 'LI']);
@@ -166,7 +169,7 @@ function keepBlankLines(element) {
     const nodes = [...p.childNodes].filter((n) => !(n.nodeType === 3 && !n.nodeValue.trim() && !n.nodeValue.includes('\u00a0')));
     const blank = (n) => n?.nodeType === 3 && NBSP_ONLY.test(n.nodeValue);
     const [br, tail] = nodes.slice(-2);
-    if (br?.nodeName === 'BR' && blank(tail)) tail.nodeValue = NBSP_PLACEHOLDER;
+    if (br?.nodeName === 'BR' && blank(tail)) tail.nodeValue = `${NBSP_PLACEHOLDER}${LINE_KEEPER}`;
     const [head, next] = nodes;
     if (next?.nodeName === 'BR' && blank(head) && nodes.length > 2) head.nodeValue = NBSP_PLACEHOLDER;
   });

@@ -124,7 +124,13 @@ export default function decoratePersonCard(card, prefix) {
     wrapFirstLine(identity, `${prefix}-name`);
   }
   paragraphs.filter((p) => p !== portrait).forEach((p) => {
-    p.querySelectorAll('picture').forEach((pic) => pic.classList.add(`${prefix}-icon`));
+    p.querySelectorAll('picture').forEach((pic) => {
+      pic.classList.add(`${prefix}-icon`);
+      // an icon beside its link's own text ("LinkedIn") is decorative: its alt would repeat
+      // the link (Lighthouse image-redundant-alt), so assistive tech skips it
+      const img = pic.querySelector('img');
+      if (img && p.textContent.trim()) img.alt = '';
+    });
   });
   linkPhones(card);
   decorateCardLinks(card);

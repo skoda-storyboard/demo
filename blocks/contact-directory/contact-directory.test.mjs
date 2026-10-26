@@ -45,7 +45,8 @@ test('one list item per authored row, its content kept; the name line, portrait 
   assert.equal(card.querySelector('.contact-directory-portrait img'), portrait, 'the authored image is kept');
   assert.equal(card.querySelector('.contact-directory-name').textContent, 'Tom Drechsler');
   assert.equal(card.querySelector('.contact-directory-identity strong:not(.contact-directory-name strong)').textContent, 'Head of Communications');
-  assert.equal(card.querySelector('.contact-directory-icon img').alt, 'linkedin');
+  // the icon beside the "LinkedIn" text is decorative (no repeated alt)
+  assert.equal(card.querySelector('.contact-directory-icon img').getAttribute('alt'), '');
   const phone = card.querySelector('a[href^="tel:"]');
   assert.equal(phone.getAttribute('href'), 'tel:+420730863027', 'the text phone is a tel: link');
   assert.equal(phone.textContent, '+420 730 863 027');

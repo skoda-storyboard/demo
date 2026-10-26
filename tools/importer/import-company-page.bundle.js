@@ -197,6 +197,7 @@ var CustomImportScript = (() => {
   var SPACER_PX = 24;
   var SPACER_INSET_PX = 10;
   var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var LINE_KEEPER = "\u2060";
   var NBSP_ONLY = /^[\s\u00a0]*\u00a0[\s\u00a0]*$/;
   var KEEP = /* @__PURE__ */ new Set(["P", "BR", "STRONG", "B", "EM", "I", "A", "IMG", "UL", "OL", "LI"]);
   var cellsOf2 = (row) => [...row.children].flatMap((child) => child.matches(".panel-row-style") ? [...child.children] : [child]).filter((c) => c.matches(".panel-grid-cell"));
@@ -297,7 +298,7 @@ var CustomImportScript = (() => {
       const nodes = [...p.childNodes].filter((n) => !(n.nodeType === 3 && !n.nodeValue.trim() && !n.nodeValue.includes("\xA0")));
       const blank = (n) => (n == null ? void 0 : n.nodeType) === 3 && NBSP_ONLY.test(n.nodeValue);
       const [br, tail] = nodes.slice(-2);
-      if ((br == null ? void 0 : br.nodeName) === "BR" && blank(tail)) tail.nodeValue = NBSP_PLACEHOLDER;
+      if ((br == null ? void 0 : br.nodeName) === "BR" && blank(tail)) tail.nodeValue = `${NBSP_PLACEHOLDER}${LINE_KEEPER}`;
       const [head, next] = nodes;
       if ((next == null ? void 0 : next.nodeName) === "BR" && blank(head) && nodes.length > 2) head.nodeValue = NBSP_PLACEHOLDER;
     });
