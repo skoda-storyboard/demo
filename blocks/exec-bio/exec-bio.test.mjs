@@ -43,6 +43,9 @@ function block(rows) {
 test('a card per member: the name line marked, the portrait kept, then an h2 toggle over a hidden panel', { skip }, () => {
   const el = block([[CARD, PANEL]]);
   const portrait = el.querySelector('img[alt="Holger Peters portrait"]');
+  const authoredPhoto = el.querySelector('img[src="/media_1.jpg"]');
+  authoredPhoto.setAttribute('data-authoring-hook', 'kept');
+  const authoredPicture = authoredPhoto.closest('picture');
   decorate(el);
   const card = el.querySelector(':scope > ul.exec-bio-list > li.exec-bio-card');
   assert.ok(card);
@@ -60,6 +63,11 @@ test('a card per member: the name line marked, the portrait kept, then an h2 tog
   assert.equal(panel.hidden, true);
   const photos = [...panel.querySelectorAll('ul.exec-bio-photos > li > button.exec-bio-photo')];
   assert.equal(photos.length, 2);
+  // the authored photo nodes are moved, not recreated (DA Layout-mode editability)
+  assert.equal(photos[0].querySelector('picture'), authoredPicture, 'the authored <picture> is kept');
+  assert.equal(photos[0].querySelector('img'), authoredPhoto, 'the authored <img> is kept');
+  assert.equal(authoredPhoto.getAttribute('data-authoring-hook'), 'kept', 'its attributes too');
+  assert.equal(panel.querySelectorAll(':scope > p > picture').length, 0, 'no photo left behind');
   assert.equal(photos[0].getAttribute('aria-label'), 'Open photo 1 of 2: Holger Peters');
   assert.ok(photos[0].querySelector('picture img[loading="lazy"]'));
   // the links follow the photos, web links in a new tab

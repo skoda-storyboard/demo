@@ -9,11 +9,13 @@
  *      per photo (the set), then the links (CV, photo set, press release, LinkedIn).
  * The label is the source's row-toggle title, an h2, here a button inside it that slides the
  * panel open and shut (the source's 400ms slideToggle). Each photo opens the shared lightbox
- * (scripts/lightbox.js, loaded on the first click) over the member's set. A row without a
- * panel cell is a plain card; a panel without photos keeps its links.
+ * (scripts/lightbox.js, loaded on the first click) over the member's set. The authored
+ * pictures move into their thumbnails, optimized in place (DA Layout-mode editability,
+ * SKODA-EDS-DA-ARCHITECTURE.md). A row without a panel cell is a plain card; a panel without
+ * photos keeps its links.
  */
 
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import { optimizeImages } from '../../scripts/card-teaser.js';
 import decoratePersonCard, { decorateCardLinks } from '../../scripts/person-card.js';
 
 const LABELS = {
@@ -69,11 +71,13 @@ function slide(panel, open) {
 /** Whether a paragraph holds only a picture (a photo of the set), no text. */
 const isPhoto = (node) => node.matches?.('p') && !!node.querySelector('img') && !node.textContent.trim();
 
-/** The photo grid: one button per photo, opening the lightbox over the set. */
+/** The photo grid: a button per photo (its authored picture), opening the lightbox on the set. */
 function photoGrid(photos, name) {
   const items = photos.map((p) => {
     const img = p.querySelector('img');
-    return { src: img.currentSrc || img.src, alt: img.getAttribute('alt') || name };
+    return {
+      src: img.src, alt: img.getAttribute('alt') || name, picture: img.closest('picture') || img,
+    };
   });
   const list = document.createElement('ul');
   list.className = 'exec-bio-photos';
@@ -86,7 +90,7 @@ function photoGrid(photos, name) {
         const title = document.createElement('p');
         title.textContent = item.alt;
         caption.append(title);
-        return { ...item, caption };
+        return { src: item.src, alt: item.alt, caption };
       }));
     }
     lightbox.open(index, trigger);
@@ -97,7 +101,7 @@ function photoGrid(photos, name) {
     button.type = 'button';
     button.className = 'exec-bio-photo';
     button.setAttribute('aria-label', LABELS.openPhoto(i + 1, items.length, item.alt));
-    button.append(createOptimizedPicture(item.src, item.alt, false, [{ width: THUMB_WIDTH }]));
+    button.append(item.picture);
     button.addEventListener('click', () => {
       open(i, button).catch((e) => {
         // eslint-disable-next-line no-console
@@ -107,6 +111,9 @@ function photoGrid(photos, name) {
     li.append(button);
     list.append(li);
   });
+  // the moved pictures keep their <img>; only their renditions change (thumbnail-sized, lazy)
+  optimizeImages(list, { selector: '.exec-bio-photo img', desktopWidth: THUMB_WIDTH, mobileWidth: THUMB_WIDTH });
+  photos.forEach((p) => p.remove());
   return list;
 }
 

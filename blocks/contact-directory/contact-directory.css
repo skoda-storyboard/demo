@@ -28,6 +28,12 @@
   font-size: var(--contact-directory-name-size);
 }
 
+/* a phone is a `tel:` link (the ticket's AC) set as the source sets the number: ink text, not
+   the green of the e-mail link (which fails AA contrast, as on the source) */
+.contact-directory .contact-directory-card p a[href^="tel:"]:any-link:not(.button) {
+  color: inherit;
+}
+
 .contact-directory .contact-directory-portrait img {
   display: block;
   inline-size: 100%;
