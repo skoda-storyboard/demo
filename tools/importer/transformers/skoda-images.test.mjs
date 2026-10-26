@@ -152,7 +152,7 @@ test('reports empty and missing alt separately without fabricating either', () =
 // --- the transformer hook signature (SKODA-509) ----------------------------------------------
 test('the hook acts on afterTransform only: other hooks leave the page untouched', () => {
   const html = '<p>Before <img src="a.jpg" alt="A" data-caption="Caption"> after</p>';
-  ['beforeTransform', 'preprocess', 'transform', undefined].forEach((hook) => {
+  ['beforeTransform', 'preprocess', 'transform', ''].forEach((hook) => {
     const doc = new JSDOM(`<main>${html}</main>`).window.document;
     const main = doc.querySelector('main');
     transform(hook, main, { document: doc });
@@ -161,6 +161,26 @@ test('the hook acts on afterTransform only: other hooks leave the page untouched
   const doc = new JSDOM(`<main>${html}</main>`).window.document;
   transform('afterTransform', doc.querySelector('main'), { document: doc });
   assert.ok(doc.querySelector('main > figure > div > img'), 'afterTransform: the image is lifted into a figure');
+});
+
+test('rejects the old normalizeImages(main, document) signature before changing the page', () => {
+  const html = '<h1>Classic Days</h1><p><a href="/a.jpg"><img src="a.jpg" alt=""></a></p>';
+  const doc = new JSDOM(`<main>${html}</main>`).window.document;
+  const main = doc.querySelector('main');
+  assert.throws(() => transform(main, doc), {
+    name: 'TypeError',
+    message: "skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).",
+  });
+  assert.equal(main.innerHTML, html, 'the invalid call does not partially normalize images');
+  transform('afterTransform', main, { document: doc });
+  assert.equal(main.querySelector('a > div > img').getAttribute('alt'), 'Classic Days');
+});
+
+test('rejects other non-string hook names instead of silently skipping normalization', () => {
+  const main = new JSDOM('<main></main>').window.document.querySelector('main');
+  [undefined, null, 0, false, {}, []].forEach((hook) => {
+    assert.throws(() => transform(hook, main), TypeError);
+  });
 });
 
 test('the hook builds with payload.document, or the element\'s own document without one', () => {

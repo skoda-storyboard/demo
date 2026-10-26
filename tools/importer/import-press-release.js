@@ -30,7 +30,7 @@ import layoutTransformer from './transformers/skoda-press-release-layout.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
 import nbspTransformer from './transformers/skoda-nbsp.js';
-import normalizeImages from './transformers/skoda-images.js';
+import imagesTransformer from './transformers/skoda-images.js';
 
 // PARSER REGISTRY
 const parsers = {
@@ -166,7 +166,7 @@ export default {
     // tags + facets). The built-in only produces a thinner Title/Description/Image
     // duplicate, so calling it here would append a second, competing Metadata table.
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages('afterTransform', main, payload);
+    imagesTransformer('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     // 6. Sanitized output path (map root '/' → '/index' to avoid the cwd crash).

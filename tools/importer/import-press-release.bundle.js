@@ -1584,6 +1584,9 @@ var CustomImportScript = (() => {
     });
   }
   function transform6(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
     if (hookName !== "afterTransform") return;
     normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
   }

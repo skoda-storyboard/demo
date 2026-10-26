@@ -163,6 +163,9 @@ function normalizeImages(root, document = root.ownerDocument) {
  * @param {{document?: Document}} payload the importer payload
  */
 export default function transform(hookName, element, payload) {
+  if (typeof hookName !== 'string') {
+    throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+  }
   if (hookName !== 'afterTransform') return;
   normalizeImages(element, payload?.document || element.ownerDocument);
 }

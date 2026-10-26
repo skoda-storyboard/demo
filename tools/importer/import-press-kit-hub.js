@@ -4,7 +4,7 @@ import parseHero from './parsers/press-kit-hub-hero.js';
 import parseTiles from './parsers/press-kit-hub-tiles.js';
 import metadata from './transformers/skoda-metadata.js';
 import links from './transformers/skoda-links.js';
-import normalizeImages from './transformers/skoda-images.js';
+import imagesTransformer from './transformers/skoda-images.js';
 
 // The kit's facets live only in its article classes (a hub has no Tags sidebar): every facet
 // of the shared 15-facet set (SKODA-401; skoda-metadata.js FACETS), so a kit is found under any
@@ -243,7 +243,7 @@ export default {
     metadata('afterTransform', main, payload);
     links('afterTransform', main, payload);
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages('afterTransform', main, payload);
+    imagesTransformer('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const pathname = new URL(params.originalURL).pathname.replace(/\/$/, '').replace(/\.html?$/, '');

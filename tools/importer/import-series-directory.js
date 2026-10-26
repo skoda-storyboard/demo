@@ -19,7 +19,7 @@ import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
 import nbspTransformer from './transformers/skoda-nbsp.js';
-import normalizeImages from './transformers/skoda-images.js';
+import imagesTransformer from './transformers/skoda-images.js';
 
 const parsers = {
   'series-hero': seriesHeroParser,
@@ -119,7 +119,7 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages('afterTransform', main, payload);
+    imagesTransformer('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

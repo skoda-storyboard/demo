@@ -9,7 +9,7 @@ import footnotes, { markFootnotes } from './parsers/footnotes.js';
 import answerLayout, { markAnswerLayout } from './parsers/answer-layout.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
-import normalizeImages from './transformers/skoda-images.js';
+import imagesTransformer from './transformers/skoda-images.js';
 import links from './transformers/skoda-links.js';
 import nbspTransformer from './transformers/skoda-nbsp.js';
 
@@ -130,7 +130,7 @@ export default {
       holder.append(group.el);
       media(group.el, payload);
       main.replaceChildren(holder);
-      normalizeImages('afterTransform', main, payload);
+      imagesTransformer('afterTransform', main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       links('afterTransform', main, payload);
       checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
@@ -185,7 +185,7 @@ export default {
     metadata('afterTransform', main, { ...payload, template });
 
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages('afterTransform', main, payload);
+    imagesTransformer('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
     links('afterTransform', main, payload);
 
