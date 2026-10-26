@@ -155,14 +155,16 @@ test('Media Box → its own dark media-box section: h3, stats line, Downloads; b
   });
 });
 
-test('Media Box rows: one per asset, [image, title, Original + 1920px links], images unique to the box kept', { skip }, () => {
+test('Media Box rows: one per asset, [image, date, title, Original + 1920px links], images unique to the box kept', { skip }, () => {
   const { sections, element } = importPage('como');
   const box = sections.find((s) => s.style === 'dark, full-width, media-box');
   const rows = rowsOf(box.tables[0]);
   assert.equal(rows.length, 13, 'the stats line says 13 images');
   rows.forEach((tr) => {
-    const [img, title, links] = [...tr.children];
+    // each card's source date before its title, as the source Media Box (SKODA-227)
+    const [img, date, title, links] = [...tr.children];
     assert.ok(img.querySelector('img[src^="https://cdn.skoda-storyboard.com/"]'), 'preview image');
+    assert.match(txt(date), /^\d{1,2}\. \d{1,2}\. \d{4}$/, 'the card date');
     assert.equal(txt(title), 'La dolce vita! Explore the surroundings of Lake Como');
     const labels = [...links.querySelectorAll('a')].map((a) => txt(a));
     assert.equal(labels[0], 'Original');

@@ -13,6 +13,7 @@
 import heroBannerParser from './parsers/hero-banner.js';
 
 // TRANSFORMER IMPORTS
+import pageRowsTransformer from './transformers/skoda-page-rows.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
@@ -58,8 +59,10 @@ const PAGE_TEMPLATE = {
   ],
 };
 
-// TRANSFORMER REGISTRY — cleanup + (sections if 2+) + shared metadata (afterTransform).
+// TRANSFORMER REGISTRY — the body's sections (before the cleanup drops the layout CSS),
+// cleanup + (sections if 2+) + shared metadata (afterTransform).
 const transformers = [
+  pageRowsTransformer,
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
@@ -95,8 +98,12 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
-  // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+  preprocess: ({ document }) => {
+    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+    nbspTransformer('preprocess', document.body, { document });
+    // mark the half-width rows while the layout CSS is still there (SKODA-813)
+    pageRowsTransformer('preprocess', document.body, { document });
+  },
 
   transform: (payload) => {
     const { document, url, params } = payload;
