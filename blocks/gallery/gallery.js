@@ -32,9 +32,6 @@ const LABELS = {
   slider: 'Image slider',
   slideOf: (n, total) => `${n} of ${total}`,
   goTo: (n) => `Go to image ${n}`,
-  // the autoplay control (WCAG 2.2.2, SKODA-703)
-  pause: 'Pause slideshow',
-  resume: 'Resume slideshow',
   // preview variant (SKODA-223): per-thumb name + the "+N" pill
   openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
   more: (n) => `+${n}`,
@@ -200,25 +197,22 @@ function overviewCols(count) {
  * - wrap-around: the track is [clone of last, 1..N, clone of first], so going
  *   past either end scrolls forward/back seamlessly; once the scroll settles on
  *   a clone it is swapped instantly for the real slide.
- * - autoplay every 3s (source), paused while hovered or focused, off-screen or
- *   in a hidden tab; stopped for good once the user navigates (as Flickity does);
- *   never started under prefers-reduced-motion.
+ * - no autoplay: the source rotates every 3s, but it has no pause / resume
+ *   control, and without a visible one the slider must not move by itself
+ *   (SKODA-819, WCAG 2.2.2). So it moves only when the user navigates (#361 QA:
+ *   no extra control; PR #456 review, 2026-10-23).
  * - mouse drag (native scrolling covers touch and trackpads).
  * The SKODA-212 rail's page maths (many cards per page, partial last page, no
  * wrap) doesn't fit a one-per-view looping slider, and blocks can't import each
  * other (AGENTS.md), so this is a purpose-built, smaller controller.
  * ========================================================================== */
 
-const SLIDER_AUTOPLAY_MS = 3000; // source Flickity autoPlay
 const SLIDER_SETTLE_MS = 120; // scroll idle time that counts as "settled"
 const SLIDER_DRAG_THRESHOLD = 40; // px a mouse drag must travel to change slide
 // The source's icon-font arrow (skoda-bnr-icons U+E00B, Flickity's own SVG is
 // hidden), traced into a 32×32 box: a left arrow with 45° arms, drawn in ink on
 // a light disc. The next button mirrors it in CSS.
 const SLIDER_ARROW_PATH = 'M8.55 16 16.5 8.05l1.66 1.66-4.94 4.94H23.4v2.7H13.22l4.94 4.94-1.66 1.66z';
-// the pause / resume control's glyphs, drawn on the same disc (SKODA-703)
-const SLIDER_PAUSE_PATH = 'M11.5 10h3v12h-3zm6 0h3v12h-3z';
-const SLIDER_PLAY_PATH = 'M13 10v12l9.5-6z';
 
 /**
  * Map a track scroll offset to a slide. With `looped`, physical position 0 is
@@ -252,11 +246,11 @@ export function dragTarget(start, dx) {
   return start;
 }
 
-function sliderButton(className, label, d) {
+function sliderArrow(dir) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = className;
-  btn.setAttribute('aria-label', label);
+  btn.className = `gallery-slider-${dir}`;
+  btn.setAttribute('aria-label', dir === 'prev' ? LABELS.prev : LABELS.next);
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('viewBox', '0 0 32 32');
@@ -271,17 +265,11 @@ function sliderButton(className, label, d) {
     svg.append(circle);
   });
   const path = document.createElementNS(NS, 'path');
-  path.setAttribute('d', d);
+  path.setAttribute('d', SLIDER_ARROW_PATH);
   svg.append(path);
   btn.append(svg);
   return btn;
 }
-
-const sliderArrow = (dir) => sliderButton(
-  `gallery-slider-${dir}`,
-  dir === 'prev' ? LABELS.prev : LABELS.next,
-  SLIDER_ARROW_PATH,
-);
 
 function buildSlider(block) {
   const items = readItems(block);
@@ -345,7 +333,7 @@ function buildSlider(block) {
 
   viewport.append(track);
   block.append(viewport);
-  if (!looped) return; // a single image: no controls, no autoplay
+  if (!looped) return; // a single image: no controls
 
   const prev = sliderArrow('prev');
   const next = sliderArrow('next');
@@ -382,54 +370,6 @@ function buildSlider(block) {
     track.scrollTo({ left: (target + 1) * slideWidth(), behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
   };
 
-  // ---- autoplay -----------------------------------------------------------
-  let timer = 0;
-  let stopped = REDUCED_MOTION;
-  const paused = {
-    hover: false, focus: false, hidden: document.hidden, offscreen: true,
-  };
-  const schedule = () => {
-    window.clearTimeout(timer);
-    if (stopped || Object.values(paused).some(Boolean)) return;
-    timer = window.setTimeout(() => { goTo(current + 1); schedule(); }, SLIDER_AUTOPLAY_MS);
-  };
-  const setPaused = (key, value) => { paused[key] = value; schedule(); };
-
-  // Pause / resume (WCAG 2.2.2 Pause, Stop, Hide, SKODA-703): the source has no such control, and
-  // hover / focus only pause while they last. A visible disc in the image's top corner, like the
-  // arrows, so touch and mouse users reach it too (PR #360 review); the carousel's first control.
-  // Its name and glyph follow the state (the WAI carousel rotation control: no aria-pressed).
-  // None under reduced motion, where autoplay never starts.
-  let toggle = null;
-  const showToggle = () => {
-    if (!toggle) return;
-    toggle.setAttribute('aria-label', stopped ? LABELS.resume : LABELS.pause);
-    toggle.querySelector('path').setAttribute('d', stopped ? SLIDER_PLAY_PATH : SLIDER_PAUSE_PATH);
-  };
-  const stop = () => { stopped = true; window.clearTimeout(timer); showToggle(); };
-  if (!REDUCED_MOTION) {
-    toggle = sliderButton('gallery-slider-pause', LABELS.pause, SLIDER_PAUSE_PATH);
-    viewport.prepend(toggle);
-    showToggle();
-    toggle.addEventListener('click', () => {
-      if (stopped) {
-        stopped = false;
-        showToggle();
-        schedule();
-      } else stop();
-    });
-  }
-
-  block.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') setPaused('hover', true); });
-  block.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') setPaused('hover', false); });
-  // focus on the pause control itself doesn't pause: "Resume" restarts the slideshow at once
-  const holdsFocus = (el) => block.contains(el) && el !== toggle;
-  block.addEventListener('focusin', (e) => setPaused('focus', holdsFocus(e.target)));
-  block.addEventListener('focusout', (e) => setPaused('focus', holdsFocus(e.relatedTarget)));
-  document.addEventListener('visibilitychange', () => setPaused('hidden', document.hidden));
-  new IntersectionObserver(([entry]) => setPaused('offscreen', !entry.isIntersecting), { threshold: 0.5 })
-    .observe(viewport);
-
   // ---- scroll tracking + wrap swap ---------------------------------------
   let dragging = null;
   let raf = 0;
@@ -462,19 +402,17 @@ function buildSlider(block) {
     jumpTo(current);
   }).observe(track);
 
-  // ---- user navigation (any of it stops autoplay, as on the source) -------
-  prev.addEventListener('click', () => { stop(); goTo(current - 1); });
-  next.addEventListener('click', () => { stop(); goTo(current + 1); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { stop(); goTo(i); }));
+  // ---- user navigation: the only thing that moves the slider ------------
+  prev.addEventListener('click', () => goTo(current - 1));
+  next.addEventListener('click', () => goTo(current + 1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
   track.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    stop();
     goTo(current + (e.key === 'ArrowRight' ? 1 : -1));
   });
 
   track.addEventListener('pointerdown', (e) => {
-    stop();
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     dragging = {
       x: e.clientX, lastX: e.clientX, left: track.scrollLeft, start: current,
