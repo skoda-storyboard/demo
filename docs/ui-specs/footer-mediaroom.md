@@ -74,7 +74,8 @@ no underline (also on hover), `li` gap 8px. Subscribe intro + Company blurb 12px
 **Build verification (2026-09-25):** every measured box above matches at 1280 / 1024 / 768, and at 375 apart
 from 1px sub-pixel centring on 3 icons. Footer heights match to the half-pixel at 375 / 767 / 768 / 992 /
 1024 / 1079 / 1280 / 1440. Pixel diff (element-scoped): 0.06–1.12% at all eight widths (gate 2%); what remains is the
-source rendering on a half-pixel row plus the `fi` ligature (the global `text-rendering: optimizespeed`).
+source rendering on a half-pixel row plus the `fi` ligature (the global `text-rendering: optimizespeed`,
+dropped in SKODA-813 for the source's `auto`).
 
 **Known deviations (deliberate / open):** weight 500 → 400 face (identical rendering); button radius
 `--pill-radius` (50px) vs `2em` (both fully round at 49px); the stub shows an "available soon" message instead

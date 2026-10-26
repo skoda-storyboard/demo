@@ -77,8 +77,8 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text4 = (a.textContent || "").trim();
-      if (!href || !text4) return;
+      const text5 = (a.textContent || "").trim();
+      if (!href || !text5) return;
       const link2 = document2.createElement("a");
       link2.setAttribute("href", href);
       link2.textContent = text5;

@@ -50,6 +50,9 @@ function decorateLabels(h1) {
  *                          overlaid in white (series / press-kit / model form).
  *   - `archive`          → full-bleed band (184/224/240), no scrim; the term h1
  *                          renders as label chips. With no image the band is empty.
+ *   - `page`             → the generic page's title band (SKODA-813): 240px at every
+ *                          width, the image covering it under the scrim, else the
+ *                          source's empty grey band; the white page title on it.
  *
  * The image is the eager-phase LCP element: real <img> in a <picture>,
  * fetchpriority=high + loading=eager, width/height preserved for low CLS.
@@ -59,6 +62,7 @@ function decorateLabels(h1) {
  */
 export default function decorate(block) {
   const isArchive = block.classList.contains('archive');
+  const isPage = block.classList.contains('page');
 
   const img = block.querySelector('img');
   const authoredPicture = img?.closest('picture');
@@ -105,7 +109,7 @@ export default function decorate(block) {
     media.append(picture);
   }
 
-  const isStory = !isArchive && !block.classList.contains('overlay');
+  const isStory = !isArchive && !isPage && !block.classList.contains('overlay');
   const content = document.createElement('div');
   content.className = 'hero-image-content';
   const caption = document.createElement('div');
@@ -152,7 +156,15 @@ export default function decorate(block) {
 
   // Rebuild the block per variant.
   block.textContent = '';
-  if (isArchive) {
+  if (isPage) {
+    // the band keeps its 240px without an image (the source's empty page band)
+    if (!media) {
+      media = document.createElement('div');
+      media.className = 'hero-image-media';
+    }
+    block.append(media);
+    if (content.childNodes.length) block.append(content);
+  } else if (isArchive) {
     // the band keeps its height without an image (the source's empty term band)
     if (!media) {
       media = document.createElement('div');

@@ -36,3 +36,25 @@ With the hardest template (story) solved in SKODA-801, this ticket completes tem
 ## Risks / Flags
 - **Škodapedia decision (🟡):** pre-bake (recommended, fully static) vs. keep a thin fetch — confirm with stakeholders; ~189 EN term docs to generate and keep in sync.
 - Modal focus behavior is `[RUNTIME-UNCONFIRMED]` — verify accessibility in a browser.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, row "802 / 206": G-C-02
+(Medium, was High, CONFIRMED), G-C-03 (Medium, CONFIRMED, browser-checked), G-C-04 (Medium, CONFIRMED), G-C-05 (Low,
+CONFIRMED), G-C-06 (Low, not re-verified). The block side is SKODA-206 / 206a. The in-body glossary spans
+(G-C-01) are SKODA-849a, not repeated here; 849a already links each span to "the term at the target locale's public
+path", which is the path SKODA-802a sets.
+
+**Added scope:**
+- Moved to SKODA-802a.
+
+**Added acceptance criteria:**
+- Moved to SKODA-802a.
+
+**Estimate after the amendment:** 7 SP in total (was 5 SP), split as proposed:
+- **SKODA-802** (2 SP · AI-assisted 1d / manual 1–3d, the 7 SP total less 802a *(planning estimate, not a quote)*):
+  generic pages. The Škodapedia items in the Description, Requirements and Acceptance Criteria above are carried by
+  802a, with term docs at `/{loc}/skodapedia/{slug}` instead of `/modals/skodapedia/{slug}`.
+- **[SKODA-802a](SKODA-802a.md)** (5 SP): Škodapedia: the directory parser with facets, the index sheet, term docs at
+  public paths, category archives, term media and the per-locale generator that 1004a–c run.
+
+**Added dependencies:** Moved to SKODA-802a.
