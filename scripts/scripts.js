@@ -389,7 +389,19 @@ function prioritizeLeadImage(main) {
   lead.setAttribute('fetchpriority', 'high');
 }
 
-// "Skip to content" per locale tree (the html lang set in loadEager)
+// The document language per locale tree: the source's own `<html lang>` (PO decision on #485,
+// 2026-10-26: the regional tag, as live; the URL prefix and the sheets stay `/cs/…`)
+const HTML_LANG = {
+  en: 'en-GB', cs: 'cs-CZ', de: 'de-DE', sk: 'sk-SK', sr: 'sr-RS', sl: 'sl-SI',
+};
+
+/** The page's locale tree (its URL prefix), `en` outside one. */
+function pageLocale() {
+  const locale = window.location.pathname.split('/')[1]?.toLowerCase();
+  return Object.hasOwn(HTML_LANG, locale) ? locale : 'en';
+}
+
+// "Skip to content" per locale tree (keyed by the URL prefix, not the regional html lang)
 const SKIP_LINK_LABELS = {
   en: 'Skip to content',
   cs: 'Přeskočit na obsah',
@@ -412,7 +424,7 @@ function addSkipLink(main) {
   const link = document.createElement('a');
   link.className = 'skip-link';
   link.href = `#${main.id}`;
-  link.textContent = SKIP_LINK_LABELS[document.documentElement.lang] || SKIP_LINK_LABELS.en;
+  link.textContent = SKIP_LINK_LABELS[pageLocale()] || SKIP_LINK_LABELS.en;
   document.body.prepend(link);
 }
 
@@ -422,8 +434,7 @@ function addSkipLink(main) {
  */
 async function loadEager(doc) {
   // the page language is its locale tree (SKODA-303a: the /cs/… translations are Czech)
-  const locale = window.location.pathname.split('/')[1]?.toLowerCase();
-  document.documentElement.lang = ['cs', 'de', 'sk', 'sr', 'sl'].includes(locale) ? locale : 'en';
+  document.documentElement.lang = HTML_LANG[pageLocale()];
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {

@@ -63,7 +63,7 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
 - 15 Storyboard and 10 Media Room chrome fragments.
 - The sheet, 551 rows (+100 Media Room rows; no row changed or removed).
 - Czech proof: three Czech stories and `/cs/category/e-mobilita-cs`. Its card reads `/cs/query-index.json`, which lists only the published Epiq story until the others are published.
-- `/cs/tiskove-zpravy`: Czech Media Room nav and footer at 1280 and 375, `lang="cs"`, no horizontal overflow. 0 cards, because no Czech press release is published.
+- `/cs/tiskove-zpravy`: Czech Media Room nav and footer at 1280 and 375, `lang="cs-CZ"` (as live, since 2026-10-26), no horizontal overflow. 0 cards, because no Czech press release is published.
 
 **Not done / notes:**
 - **3 Czech press releases** (the newest, 19–22 Oct) are imported locally but held by the binary gate: their 3 PDFs and 3 MP4s are tracked in `media-manifest.json` as pending; push them after the developer-machine DAM ingest (`tools/importer/media/README.md`).
@@ -99,9 +99,9 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
     the remaining live links name pages not migrated yet (SKODA-1002) and the source's `/direct-download/` files.
 - **Known, not changed here:** the language row's contrast at desktop (#403, EN too); the listing's "oldest" sort
   button and the footer's "Manage subscription" link contrast (EN too); the header shows only a page's migrated
-  translations (SKODA-303a), where live always lists every locale; `lang="cs"` where live has `cs-CZ`; the
-  footer's App Store / Google Play badges are the English artwork in every locale, where live has each
-  language's (`#app-store-de`, `#google-play-cs`, …; #401, SKODA-1006).
+  translations (SKODA-303a), where live always lists every locale; the footer's App Store / Google Play badges
+  are the English artwork in every locale, where live has each language's (`#app-store-de`, `#google-play-cs`,
+  …): **accepted** by the PO (2026-10-26); their accessible names stay localized work (SKODA-1003).
 - **#485 review (2026-10-25), follow-up 2026-10-26:**
   - The Media Room footers do have the social row: Facebook, Instagram and YouTube on `/cs/tiskove-zpravy` and
     `/en/news`, as live. The earlier "no social row" note was stale and is removed.
@@ -109,4 +109,14 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
   - `/sl/query-index.json` is still 404 (no SL page is on preview yet). D1 makes SL on demand, so the
     six-index criterion stays open until an SL page is imported; the five others respond with the same columns
     and the 15 facets.
+- **PO decisions on #485 (2026-10-26):**
+  - **Document language: the source's regional tags.** `scripts/scripts.js` sets `<html lang>` from the
+    page's locale tree to live's own tags: `en-GB`, `cs-CZ`, `de-DE`, `sk-SK`, `sr-RS`, `sl-SI` (measured on
+    live, Storyboard and Media Room pages alike). The URL prefixes (`/cs/`), the placeholders sheets and the
+    language links' `hreflang` / `lang` stay the two-letter codes. The skip link's text is looked up by the
+    URL locale, not the html lang, so it keeps its language (checked: `Přeskočit na obsah`, `Zum Inhalt
+    springen`, … on the CS / DE / SK / SR pages; axe: no `lang` violation).
+  - **English store-badge artwork: accepted** (above).
+  - **UI labels must be DA-managed:** the remaining English listing / search / header labels are #492
+    (SKODA-1003a, a child of #85 / SKODA-1003), not a permanent deviation.
 - **Merge note:** merging this code removes the runtime locale rule, so the chrome fragments and the sheet above must be published together with it. Otherwise the relative `/cs/…` links in the published chrome, which the rule sent to live, become unmigrated EDS paths (404).
