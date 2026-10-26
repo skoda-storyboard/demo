@@ -108,6 +108,27 @@ function findBlocksOnPage(document, template) {
   return pageBlocks;
 }
 
+// The Media Room chrome (SKODA-309: nav, footer, the Media Room tab) as page metadata, for a
+// source page on the Media Room template (`body.media-room`, marked in preprocess: the body's
+// classes are gone by the transform). The bulk metadata rows cover /en/contacts only; page
+// metadata wins over them and carries the same values (SKODA-810).
+const MEDIA_ROOM_CHROME = [['nav', '/media-room/nav'], ['footer', '/media-room/footer'], ['section', 'media-room']];
+const MEDIA_ROOM_ATTR = 'data-skoda-media-room';
+
+function addMediaRoomChrome(main, document) {
+  if (!document.documentElement.hasAttribute(MEDIA_ROOM_ATTR)) return;
+  const table = [...main.querySelectorAll('table')]
+    .find((t) => t.rows[0]?.cells[0]?.textContent.trim().toLowerCase() === 'metadata');
+  if (!table) return;
+  const has = (key) => [...table.rows].some((r) => r.cells[0]?.textContent.trim().toLowerCase() === key);
+  const body = table.tBodies[0] || table;
+  MEDIA_ROOM_CHROME.filter(([key]) => !has(key)).forEach(([key, value]) => {
+    const tr = body.insertRow();
+    tr.insertCell().textContent = key;
+    tr.insertCell().textContent = value;
+  });
+}
+
 export default {
   // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
   preprocess: ({ document }) => {
@@ -118,6 +139,8 @@ export default {
     companyPeopleTransformer('preprocess', document.body, { document });
     // the logo page's framed row, while the layout CSS is there (SKODA-810b)
     companyAssetsTransformer('preprocess', document.body, { document });
+    // a Media Room template page gets the Media Room chrome (SKODA-810)
+    if (document.body.classList.contains('media-room')) document.documentElement.setAttribute(MEDIA_ROOM_ATTR, '');
     // wholly bold headings (the logo page's `<h3><strong>`): helix strips their <strong>
     // before the transform, which puts it back (story-flatten, #296)
     markBoldHeadings(document.body);
@@ -146,6 +169,7 @@ export default {
 
     executeTransformers('afterTransform', main, payload);
     restoreBoldHeadings(main);
+    addMediaRoomChrome(main, document);
 
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);

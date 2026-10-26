@@ -498,6 +498,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Rows** (SKODA-309, 2026-09-28): every row sets `nav: /media-room/nav`, `footer: /media-room/footer` and `section: media-room`. `header-switcher.js` uses `section` to activate the Media Room tab; the Media Room header also gets a lighter topbar.
   - Patterns: `/en/press-releases/**`, `/en/press-kits/**`, `/en/skoda-model/**`, `/en/skodapedia/**`, plus an exact row and a `/**` row each for `/en/news`, `/en/images`, `/en/videos`, `/en/media-room`, `/en/contacts`, `/en/search` and `/en/newsletter` (the SKODA-305 footer list).
   - The rows don't overlap each other and none matches a Storyboard page. Page-level metadata still wins over the bulk rows (aem.live bulk metadata).
+  - **Exception (SKODA-810, 2026-10-26):** the company importer (`import-company-page.js`) writes the same three rows as page metadata for a source page on the Media Room template (`body.media-room`): `/en/contacts`, `/en/board-of-management` and `/en/skoda-media-services-application`. No bulk row matches the last two, and the values are identical to the bulk rows. The company logo (`template-custom-full-width`) keeps the Storyboard chrome.
 - **Fragment check:** `fragmentPaths()` reads the preview and live `/metadata.json` rows whose pattern matches a pushed page (`bulkPatternMatches`). So an MR batch requires `/media-room/nav` and `/media-room/footer` to be live, and Storyboard batches don't.
 
 ### `skodapedia`

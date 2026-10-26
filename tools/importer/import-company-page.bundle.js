@@ -1386,6 +1386,26 @@ var CustomImportScript = (() => {
     console.log(`Found ${pageBlocks.length} block instances on page`);
     return pageBlocks;
   }
+  var MEDIA_ROOM_CHROME = [["nav", "/media-room/nav"], ["footer", "/media-room/footer"], ["section", "media-room"]];
+  var MEDIA_ROOM_ATTR = "data-skoda-media-room";
+  function addMediaRoomChrome(main, document2) {
+    if (!document2.documentElement.hasAttribute(MEDIA_ROOM_ATTR)) return;
+    const table = [...main.querySelectorAll("table")].find((t) => {
+      var _a, _b;
+      return ((_b = (_a = t.rows[0]) == null ? void 0 : _a.cells[0]) == null ? void 0 : _b.textContent.trim().toLowerCase()) === "metadata";
+    });
+    if (!table) return;
+    const has = (key) => [...table.rows].some((r) => {
+      var _a;
+      return ((_a = r.cells[0]) == null ? void 0 : _a.textContent.trim().toLowerCase()) === key;
+    });
+    const body = table.tBodies[0] || table;
+    MEDIA_ROOM_CHROME.filter(([key]) => !has(key)).forEach(([key, value]) => {
+      const tr = body.insertRow();
+      tr.insertCell().textContent = key;
+      tr.insertCell().textContent = value;
+    });
+  }
   var import_company_page_default = {
     // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
     preprocess: ({ document: document2 }) => {
@@ -1393,6 +1413,7 @@ var CustomImportScript = (() => {
       transform("preprocess", document2.body, { document: document2 });
       transform2("preprocess", document2.body, { document: document2 });
       transform3("preprocess", document2.body, { document: document2 });
+      if (document2.body.classList.contains("media-room")) document2.documentElement.setAttribute(MEDIA_ROOM_ATTR, "");
       markBoldHeadings(document2.body);
     },
     transform: (payload) => {
@@ -1415,6 +1436,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       restoreBoldHeadings(main);
+      addMediaRoomChrome(main, document2);
       WebImporter.rules.transformBackgroundImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
