@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // tools/importer/import-company-page.js
+  // import-company-page.js
   var import_company_page_exports = {};
   __export(import_company_page_exports, {
     default: () => import_company_page_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // parsers/hero-banner.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .image-wrapper img, img");
     const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
@@ -51,10 +51,14 @@ var CustomImportScript = (() => {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero Image (overlay)"]];
+    const cells = [["Hero Image (page)"]];
     cells.push([img || ""]);
     const contentCell = [];
-    if (heading) contentCell.push(heading);
+    if (heading && heading.tagName !== "H1") {
+      const h1 = document2.createElement("h1");
+      h1.textContent = (heading.textContent || "").trim();
+      contentCell.push(h1);
+    } else if (heading) contentCell.push(heading);
     if (perex && (perex.textContent || "").trim()) {
       const p = document2.createElement("p");
       p.textContent = (perex.textContent || "").trim();
@@ -71,7 +75,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // tools/importer/transformers/skoda-page-cleanup.js
+  // transformers/skoda-page-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -155,7 +159,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-model-sections.js
+  // transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -200,7 +204,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-metadata.js
+  // transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -487,7 +491,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // tools/importer/transformers/skoda-links.js
+  // transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1148,7 +1152,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/transformers/skoda-nbsp.js
+  // transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -1166,7 +1170,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/import-company-page.js
+  // import-company-page.js
   var parsers = {
     "hero-banner": parse
   };

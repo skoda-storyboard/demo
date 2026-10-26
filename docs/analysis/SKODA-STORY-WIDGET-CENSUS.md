@@ -47,7 +47,7 @@ Canonicalized (button-wire instance variants folded into `sow-button`, charge-ma
 | **`skoda-image-box`** *(new)* | 60 | 0.2% | 16 | image/card block |
 | **`charge-map`** (`k2tools`) | 42 | 0.1% | 30 | **interactive — external embed / defer** |
 | `sow-image` | 41 | 0.1% | ~8 | image |
-| **`ys-milestones`** *(new)* | 36 | 0.1% | 18 | timeline → new/omit block |
+| **`ys-milestones`** *(new)* | 36 | 0.1% | 18 | timeline → `Timeline` block (SKODA-815) |
 | **`ys-embed-share`** *(new)* | 31 | 0.1% | 12 | share widget → chrome/omit |
 | `siteorigin-panels-builder` | 7 | 0.02% | 6 | **nested builder — edge, skip+log** |
 | `highlights` | 6 | 0.02% | 2 | small block/omit |

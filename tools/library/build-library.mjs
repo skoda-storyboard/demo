@@ -127,6 +127,10 @@ export function sampleFor(pages, name, cls) {
 // Variants no live page uses yet, or whose default rows don't show the variant's contract
 const img = (r) => `<picture><img src="./images/placeholder-${r}.png" alt="Sample image"></picture>`;
 const chips = '<div><div><p><strong><a href="/en/tag/years/2026">2026</a></strong> <a href="/en/tag/model/elroq">Elroq</a> <a href="/en/tag/model/peaq">Peaq</a></p></div></div>';
+const timelineSample = (variant = '') => `<div class="${['timeline', variant].filter(Boolean).join(' ')}">${[
+  ['1905', 'FIRST MODEL'], ['1925', 'NEXT MODEL'],
+].map(([year, model], index) => `<div><div>${year}</div><div><p>Maker</p><p><strong>${model}</strong></p><p>(vehicle on display: ${year})</p></div><div>${img('4x3')}</div><div><p>Describe this milestone and its significance.</p></div><div>${index === 0 ? '15' : ''}</div></div>`).join('')}</div>`;
+
 export const SYNTH = {
   embed: '<div class="embed"><div><div>url</div><div><a href="https://www.youtube.com/watch?v=d1xYSMyyWWA">https://www.youtube.com/watch?v=d1xYSMyyWWA</a></div></div><div><div>title</div><div>Oliver Solberg tests the Škoda Octavia RS</div></div></div>',
   fragment: '<div class="fragment"><div><div><p><a href="/en/fragments/sample-fragment">/en/fragments/sample-fragment</a></p></div></div></div>',
@@ -135,6 +139,10 @@ export const SYNTH = {
   'gallery story': `<div class="gallery story">${Array.from({ length: 5 }, (_, i) => `<div><div>${img('16x9')}</div><div>Caption for image ${i + 1}</div></div>`).join('')}</div>`,
   'tags chips': `<div class="tags chips">${chips}</div>`,
   'tags chips outline': `<div class="tags chips outline">${chips}</div>`,
+  timeline: timelineSample(),
+  'timeline black': timelineSample('black'),
+  'timeline large': timelineSample('large'),
+  'timeline xl': timelineSample('xl'),
 };
 
 const libraryMeta = (n, d) => `<div class="library-metadata"><div><div>name</div><div>${esc(n)}</div></div><div><div>description</div><div>${esc(d)}</div></div></div>`;
