@@ -38,9 +38,11 @@
       recorded before and after for Fabia and Enyaq.
 - [ ] `/en/images` and `/en/videos` render their first page from the head shard. The facet index loads after first
       paint. Facet counts and load-more match the whole-feed build (same rows, same order).
-- [ ] A page's image link (model-page drawings, press-kit article images) resolves its title from its keyed shard:
-      one shard per file, never the whole feed. *(Amended 2026-10-26 after QA #375: story pages don't read the feed;
-      their Media Box tiles carry their own details. Was: "A story-page image link…".)*
+- [x] A story-page image link resolves its title from one keyed shard. **PO decision (2026-10-26): story pages stay
+      as live, and the AC is met as "behaves as live".** Live story pages have no linked body images (0 on the
+      charging, Peaq and Octavia stories, as on the demo); their Media Box and gallery lightboxes take their details
+      from the page, as live. The keyed shards serve the image links live does have: model-page drawings and
+      press-kit article images (one shard per file, never the whole feed; QA #375 and the #494 review).
 - [ ] Without a registry, every reader behaves as today. Unit tests cover both paths.
 - [ ] Rows validate against contract `media-item` shape 3. Every sheet stays under 500k cells.
 - [ ] Mobile LCP of `/en/images` measured before and after (PSI or Lighthouse, same conditions).
@@ -185,4 +187,5 @@ keyed shards serve the image links of model pages and press kits, measured on `m
 - `/en/skoda-model/new-superb`: the slice on load; opening a drawing requests `key-24.json`, `key-38.json` (its two
   drawings) and shows "Škoda Superb, File type: JPG, File size: 159 KB, Dimensions: 1400 × 480 px";
 - `/en/press-kits/skoda-peaq-press-kit-2/infographics`: 13 image links, 12 keyed shards (two share one), no whole feed;
-- the AC is reworded to that (above).
+- PO decision (2026-10-26): story pages stay as live (no linked body images there); AC3 is met as "behaves as live"
+  (above).
