@@ -29,8 +29,9 @@
 }
 
 .app-promo .app-promo-cell img {
+  /* its own size (the width / height attributes, which also reserve its box before it loads:
+     no layout shift), at most the cell's, centred */
   display: block;
-  inline-size: auto;
   max-inline-size: 100%;
   block-size: auto;
   margin-inline: auto;
