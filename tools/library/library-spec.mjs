@@ -203,6 +203,7 @@ export const SECTION_STYLES = [
   ['body-column, text-small', 'A run of story text in 10pt; text-medium is 14pt, text-large 16pt, text-xlarge 18pt. Combine with text-center.'],
   ['body-column, text-box', 'Story text in a padded, coloured box; optional rows box-background (colour), box-padding (1–4 px values), box-color (text colour), box-shadow (e.g. 0px 2px 6px #999999).'],
   ['body-column, highlight-dark / highlight-grey: colours', 'Optional rows on a highlight box: highlight-background, highlight-color, highlight-link (a hex colour each, e.g. #f1f1f1).'],
+  ['body-column, highlight-dark / highlight-grey: two-column cells', 'Optional rows on a highlight box holding a Columns row whose cells have their own inset: highlight-cell-margin, highlight-cell-padding (and -mobile), one px box per cell joined by " | " (e.g. 0px 0px 0px 15px | 0px 10px 0px 0px).'],
   ['dark, full-width, media-box', 'The Media Box band (holds the Media Box Downloads block).'],
   ['dark, full-width, related', 'The dark related band at the end of a press release.'],
   ['dark', 'Dark band (e.g. the Related Stories rail).'],
