@@ -303,16 +303,8 @@
   "text": "Bild {n} öffnen",
   "source": "draft"
  },
- "galleryPause": {
-  "text": "Diashow anhalten",
-  "source": "draft"
- },
  "galleryPrev": {
   "text": "Vorheriges Bild",
-  "source": "draft"
- },
- "galleryResume": {
-  "text": "Diashow fortsetzen",
   "source": "draft"
  },
  "gallerySlide": {

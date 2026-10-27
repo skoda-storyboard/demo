@@ -311,16 +311,8 @@
   "text": "Otvoriť obrázok {n}",
   "source": "draft"
  },
- "galleryPause": {
-  "text": "Pozastaviť prezentáciu",
-  "source": "draft"
- },
  "galleryPrev": {
   "text": "Predchádzajúci obrázok",
-  "source": "draft"
- },
- "galleryResume": {
-  "text": "Pokračovať v prezentácii",
   "source": "draft"
  },
  "gallerySlide": {

@@ -463,6 +463,36 @@ async function buildListing(block, onFirstPaint) {
     else moreQueued = true;
   };
 
+  // --- sort row: sort options + "Advanced filter (n)" toggle -------------
+  // (its listeners for the toggle and the facet panel are wired once the rows are in, below)
+  // The toggle comes last: below 768 it is its own row under the sort options; from 768 CSS
+  // moves it to the left of them.
+  const sortList = document.createElement('div');
+  sortList.className = 'listing-sort-options';
+  [['newest', STRINGS.newest], ['oldest', STRINGS.oldest]].forEach(([val, lbl]) => {
+    const s = document.createElement('button');
+    s.type = 'button';
+    s.className = 'listing-sort-btn';
+    s.dataset.sort = val;
+    s.textContent = lbl;
+    s.setAttribute('aria-pressed', String(state.sort === val));
+    // a sort change veils, updates and collapses like a chip removal (live: veil at once; the
+    // active sort switches with the new results)
+    s.addEventListener('click', () => {
+      // inert until the rows are in (a first page from the head shard paints before them)
+      if (!rowsLoaded || state.sort === val) return; // the source's active sort is plain text
+      state.sort = val;
+      state.revealed = cfg.perpage;
+      applyFilterChange(0);
+    });
+    sortList.append(s);
+  });
+  sortRow.append(sortList, filterToggle);
+  labelFilterToggle();
+  // built with the first paint, so the row holds its place and the grid doesn't move when the
+  // facet index lands (SKODA-517 QA: CLS 0.061 on /en/images); its controls wait for the rows
+  sortRow.querySelectorAll('button').forEach((b) => b.setAttribute('aria-disabled', 'true'));
+
   function paintGrid(shownRows, total) {
     currentRows = shownRows;
     grid.textContent = '';
@@ -517,9 +547,11 @@ async function buildListing(block, onFirstPaint) {
     scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
   } catch (e) {
     status.textContent = STRINGS.loadError;
-    // a first page painted from the head shard stays, without a Load more that can't load
+    // a first page painted from the head shard stays, without a Load more or sort row that
+    // can't load
     status.hidden = false;
     loadMoreWrap.textContent = '';
+    sortRow.textContent = '';
     // eslint-disable-next-line no-console
     console.error('listing: index load failed', e);
     return;
@@ -704,8 +736,12 @@ async function buildListing(block, onFirstPaint) {
       pill.classList.toggle('active', n > 0);
       pill.querySelector('.facet-count').textContent = n ? String(n) : '';
     });
-    // the source always shows the count, "(0)" included; regular weight in every state (PO,
-    // 2026-10-14, #333: the source turns it 700 while a filter is on)
+    labelFilterToggle();
+  }
+
+  // "Advanced filter (n)": the source always shows the count, "(0)" included; regular weight in
+  // every state (PO, 2026-10-14, #333: the source turns it 700 while a filter is on)
+  function labelFilterToggle() {
     filterToggle.textContent = '';
     const count = document.createElement('span');
     count.className = 'listing-filter-count';
@@ -885,30 +921,6 @@ async function buildListing(block, onFirstPaint) {
     facetOptions.append(panel);
   });
 
-  // --- sort row: sort options + "Advanced filter (n)" toggle -------------
-  // The toggle comes last: below 768 it is its own row under the sort options; from 768 CSS
-  // moves it to the left of them.
-  const sortList = document.createElement('div');
-  sortList.className = 'listing-sort-options';
-  [['newest', STRINGS.newest], ['oldest', STRINGS.oldest]].forEach(([val, lbl]) => {
-    const s = document.createElement('button');
-    s.type = 'button';
-    s.className = 'listing-sort-btn';
-    s.dataset.sort = val;
-    s.textContent = lbl;
-    s.setAttribute('aria-pressed', String(state.sort === val));
-    // a sort change veils, updates and collapses like a chip removal (live: veil at once; the
-    // active sort switches with the new results)
-    s.addEventListener('click', () => {
-      if (state.sort === val) return; // the source's active sort is plain text
-      state.sort = val;
-      state.revealed = cfg.perpage;
-      applyFilterChange(0);
-    });
-    sortList.append(s);
-  });
-  sortRow.append(sortList, filterToggle);
-
   // Facet disclosure (SKODA-402a): an inline panel opened by the toggle at every width. It
   // is not a modal. The panel comes before the toggle in the DOM (it opens above the sort row),
   // so Tab from the toggle would skip it: opening hands focus to the panel's first stop, the
@@ -978,6 +990,7 @@ async function buildListing(block, onFirstPaint) {
   renderChips();
   renderGrid();
   rowsLoaded = true;
+  sortRow.querySelectorAll('[aria-disabled]').forEach((b) => b.removeAttribute('aria-disabled'));
   if (moreQueued) loadMore();
 
   // names that came after the first paint: rename and reorder the options in place (their

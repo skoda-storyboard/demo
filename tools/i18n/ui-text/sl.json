@@ -319,16 +319,8 @@
   "text": "Odpri sliko {n}",
   "source": "draft"
  },
- "galleryPause": {
-  "text": "Ustavi diaprojekcijo",
-  "source": "draft"
- },
  "galleryPrev": {
   "text": "Prejšnja slika",
-  "source": "draft"
- },
- "galleryResume": {
-  "text": "Nadaljuj diaprojekcijo",
   "source": "draft"
  },
  "gallerySlide": {

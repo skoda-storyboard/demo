@@ -311,16 +311,8 @@
   "text": "Otvori sliku {n}",
   "source": "draft"
  },
- "galleryPause": {
-  "text": "Pauziraj prikaz slajdova",
-  "source": "draft"
- },
  "galleryPrev": {
   "text": "Prethodna slika",
-  "source": "draft"
- },
- "galleryResume": {
-  "text": "Nastavi prikaz slajdova",
   "source": "draft"
  },
  "gallerySlide": {
