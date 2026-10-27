@@ -145,3 +145,17 @@ demo index holds 55 kits and 79 chapter pages, in these shapes:
   Page height and the first paragraph's position don't change (4024 / 184 on Peaq Exterior), and no layout shift is
   recorded while wheel-scrolling through it (the source's affix records 0.03 – 0.05). The page doesn't get wider.
   `press-kit.test.mjs` 21 / 21 (1 new). Lint clean.
+
+**Related Press Releases band on the resource pages (2026-10-27, reported on the Peaq FAQ).** The source ends the
+resource children without a Media Box (FAQ, Texts, Infographics, Technical data; checked on Peaq) in the dark
+"Related Press Releases" band; the import dropped it on every press-kit page.
+- **Import** (`skoda-press-kit-default-layout.js`): a band with cards becomes a `dark, full-width, related` section
+  (heading, "Based on tags" line, "All" link, `Story Rail (press)`), the press-release import's output. Chapters
+  with a Media Box have no such band and are unchanged. Tests: `press-kit-default.test.mjs` +2.
+- **Template** (`templates/press-kit`): the band's header, "All" pill and two-line card titles (see the UI spec
+  §9); an FAQ column ends on its last question (the accordion margin under it was 20px too much; the rule
+  matches the Peaq and Epiq FAQs only, of the 79 pages in the four kits). `press-kit.test.mjs` +1.
+- **Measured** (source vs branch code with the re-imported FAQ, 375 / 768 / 992 / 1080 / 1280 / 1440): band box,
+  header, pill, cards, dates, titles and the 16px to the footer equal; the band top equal before a scroll (the
+  source's affix pulls the page up 44px after one). Next, a card and All give the same results by real click; the
+  outline is equal (35 headings). The other resource pages get the band when re-imported.

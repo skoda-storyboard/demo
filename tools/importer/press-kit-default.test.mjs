@@ -321,6 +321,52 @@ test('resource Images child: inline asset grids become Downloads tables, no Medi
   assert.ok(!/Related Press Releases/.test(page.textContent), 'related band dropped, as on chapter pages');
 });
 
+// The FAQ, Texts, Infographics and Technical data children end in the source's dark Related Press
+// Releases band (live 2026-10-27); chapters with a Media Box have none.
+const relatedCard = (n, title) => `<div class="search-results-item flickity-cell"><article class="article-teaser press_release media-cart-item">
+  <div class="article-teaser-media"><div class="entry-thumbnail media-cart-image"><a class="colorbox" href="" data-id="${n}">
+  <img src="https://cdn.skoda-storyboard.com/2026/06/peaq-${n}-768x432.jpg" alt="${title}" data-caption="x" srcset="a 1x" itemprop="image"></a></div>
+  <div class="media-cart-actions"><a class="media-cart-action add" href="#">+</a></div></div>
+  <div class="article-teaser-content"><span class="entry-published">${n}. 6. 2026</span>
+  <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/en/press-releases/peaq-${n}/">${title}</a></h3></div></article></div>`;
+const RELATED_BAND = `<div class="cover-box dark"><div class="search-results type-press_release"><div class="search-results-container">
+  <header class="search-results-header"><h3 class="search-results-heading">Related Press Releases <span class="subheading">Based on tags: 2026, Peaq, SUV</span></h3>
+  <a class="btn-ghost-compact search-results-header-link" href="https://www.skoda-storyboard.com/en/news/?filter[model]%5B0%5D=61611">All</a></header>
+  <div class="search-results-items">${relatedCard(22, 'World premiere of the all-new Škoda Peaq')}${relatedCard(15, 'Škoda Peaq: Comprehensive testing')}</div>
+  </div></div></div>`;
+
+test('resource FAQ child: the Related Press Releases band becomes a dark related section with a Story Rail (press)', { skip: !JSDOM }, () => {
+  const html = resourcePage(grid(widget('<p>Answer.</p>')))
+    .replace('<div class="search-results type-press_release"><h2 class="search-results-heading">Related Press Releases</h2></div>', RELATED_BAND);
+  const page = run(html, `${base}skoda-peaq-press-kit-2/texts/`);
+  const style = rows(page, 'Section Metadata').map((row) => txt(row.children[1]));
+  assert.ok(style.includes('dark, full-width, related'), `a related section: ${style}`);
+  const rail = blocks(page, 'Story Rail (press)');
+  assert.equal(rail.length, 1);
+  const cards = rows(page, 'Story Rail (press)');
+  assert.deepEqual(cards.map((row) => txt(row.children[1].querySelector('h3'))), ['World premiere of the all-new Škoda Peaq', 'Škoda Peaq: Comprehensive testing']);
+  assert.deepEqual(cards.map((row) => txt(row.children[1].querySelector('p'))), ['22. 6. 2026', '15. 6. 2026']);
+  cards.forEach((row) => {
+    const img = row.children[0].querySelector('img');
+    assert.ok(img, 'card image');
+    ['data-caption', 'srcset', 'itemprop'].forEach((attr) => assert.equal(img.hasAttribute(attr), false, attr));
+    assert.ok(row.children[1].querySelector('h3 a[href*="/press-releases/peaq-"]'), 'card link');
+  });
+  // heading, the "Based on tags" line and the All link, before the rail, in the related section
+  const headings = [...page.querySelectorAll('h3')].map(txt);
+  assert.ok(headings.includes('Related Press Releases'));
+  assert.ok(/Based on tags: 2026, Peaq, SUV/.test(page.textContent));
+  const all = [...page.querySelectorAll('p > a')].find((a) => txt(a) === 'All');
+  assert.ok(all && /filter/.test(all.getAttribute('href')), 'the All link keeps its filter');
+  assert.equal(page.querySelectorAll('.cover-box, .media-cart-actions, .flickity-cell').length, 0, 'no source band markup left');
+});
+
+test('a band without cards and a Media Box band are not a related section', { skip: !JSDOM }, () => {
+  const page = run(resourcePage(grid(widget('<p>Answer.</p>'))), `${base}skoda-peaq-press-kit-2/texts/`);
+  assert.equal(blocks(page, 'Story Rail (press)').length, 0);
+  assert.ok(!rows(page, 'Section Metadata').some((row) => /related/.test(txt(row.children[1]))));
+});
+
 test('resource Videos child: each clip keeps its Vimeo URL and its MP4 master, with a labelled download after it', { skip: !JSDOM }, () => {
   const video = (id, file) => `<h2>Škoda Peaq | Footage</h2><div class="media-cart-item attachment"><div class="video-container">
     <iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">

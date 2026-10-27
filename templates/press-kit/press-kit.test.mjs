@@ -109,6 +109,21 @@ test('held at the top, the Chapters bar is marked stuck; scrolled back it is not
   }
 });
 
+test('the Related Press Releases band\'s lone "All" link becomes its ghost pill; other lines stay text', () => {
+  const main = setup(`<div class="section body-column"><div class="default-content-wrapper"><p>Answer</p></div></div>
+    <div class="section dark related"><div class="default-content-wrapper">
+      <h3>Related Press Releases</h3><p>Based on tags: 2026, Peaq</p>
+      <p><a href="/en/news?filter%5Bmodel%5D%5B0%5D=61611">All</a></p>
+    </div><div class="story-rail-wrapper"></div></div>`);
+  decorate(main);
+  const ps = main.querySelectorAll('.section.related .default-content-wrapper > p');
+  assert.equal(ps[0].classList.contains('button-container'), false, 'the tags line is not a button');
+  assert.ok(ps[1].classList.contains('button-container'));
+  assert.ok(ps[1].querySelector('a').classList.contains('button'));
+  // a body paragraph holding only a link is not touched
+  assert.equal(main.querySelector('.section.body-column .button-container'), null);
+});
+
 test('without a hub link in the menu there is no Introduction link (defensive)', () => {
   const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
       <li><a href="#chapters-links">Chapters</a></li>

@@ -530,6 +530,80 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
+/* Related Press Releases band: the pages without a Media Box (FAQ, Texts, Infographics, Technical
+   data) end in it instead, in the same place (measured on the Peaq FAQ, 2026-10-27, 375 – 1440).
+   72px over the header, 60 under the cards; the header is the press release's: the heading and
+   the grey "Based on tags" line left, the "All" ghost pill right, centred on them; 20px to the
+   cards. The heading is the kit's band title, 20/25 up to 768, 26/32.5 above. */
+body.press-kit main > .section.related {
+  margin-block: var(--pk-band-gap) var(--spacing-m);
+  padding-block: var(--pk-band-padding-top) var(--media-box-padding-bottom);
+}
+
+body.press-kit .section.related .default-content-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.press-kit .section.related .default-content-wrapper > :not(.button-container) {
+  grid-column: 1;
+  margin: 0;
+}
+
+body.press-kit .section.related .default-content-wrapper > :is(h2, h3) {
+  font-size: var(--media-box-title-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+}
+
+body.press-kit .section.related .default-content-wrapper > p {
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+body.press-kit .section.related .default-content-wrapper > .button-container {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+
+/* source .btn-ghost-compact: a 36px pill (8px + 16/16 + 8px, 2px border), 32px sides, 1px
+   tracking; hover fills #f1f1f1 */
+body.press-kit .section.related .button-container a.button {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: var(--spacing-xs) calc(2 * var(--spacing-m));
+  border: 2px solid var(--pr-ghost-color);
+  border-radius: var(--pill-radius);
+  background: var(--background-color);
+  color: var(--pr-ghost-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 1px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+body.press-kit .section.related .button-container a.button:hover,
+body.press-kit .section.related .button-container a.button:focus-visible {
+  background: var(--skoda-grey-50);
+  color: var(--pr-ghost-color);
+  text-decoration: none;
+}
+
+/* the kit's cards keep two title lines ending in "…" (the press release's keep one): 20/24 up
+   to 768, 18/21.6 above */
+body.press-kit .section.related .story-rail.press .card-teaser-title {
+  -webkit-line-clamp: 2;
+  max-height: 2.4em;
+  font-size: var(--related-band-card-title-compact);
+}
+
 /* A Videos chapter's clip title, right before its clip: the source authors each one centred at
    18pt (24px) in its light h2 (Peaq, Epiq and Classic Days Videos). The box starts 64px under
    the clip before (past its 8px + 36px toolbar), and its clip follows 16px on. */
@@ -568,6 +642,10 @@ body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wr
 
   body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
     font-size: var(--heading-font-size-story-h3);
+  }
+
+  body.press-kit .section.related .story-rail.press .card-teaser-title {
+    font-size: var(--heading-font-size-s);
   }
 
 }
@@ -724,6 +802,12 @@ body.press-kit .section.body-column .accordion {
   margin-block-end: var(--paragraph-gap);
 }
 
+/* ...but an FAQ column ends on its last question: the source's toggle row has no margin under it
+   (the column's 10px row inset and 60px margin follow) */
+body.press-kit .section.body-column > .accordion-wrapper:last-child > .accordion {
+  margin-block-end: 0;
+}
+
 /* Toggles that open the body (a kit's FAQ chapter) keep the source row cell's 10px above the
    first question: title → first trigger 26px at 1280, 28 at 768 (PR #263 review). After other
    content the source gap is already met by the rhythm above (40px on first glimpse / Elroq). */
@@ -802,7 +886,8 @@ body.press-kit .section.body-column .columns.callout {
     max-width: calc((100% + 2 * var(--page-gutter)) * 2 / 3 - 2 * var(--page-gutter));
   }
 
-  body.press-kit main > .section.media-box {
+  body.press-kit main > .section.media-box,
+  body.press-kit main > .section.related {
     box-shadow: 0 0 0 100vmax var(--dark-color);
     clip-path: inset(0 -100vmax);
   }

@@ -101,6 +101,20 @@ function mediaBox(main) {
   if (section?.querySelector('.downloads')) section.id = 'media-box';
 }
 
+// The Related Press Releases band's "All" (the import's `<p><a>All</a></p>` after the heading
+// and the "Based on tags" line) is the band's ghost pill, as on press releases; decorateButtons
+// skips it (it buttonizes bold or italic links only).
+function relatedLinks(main) {
+  main.querySelectorAll(':scope > .section.related .default-content-wrapper > p').forEach((p) => {
+    const link = p.querySelector(':scope > a[href]');
+    const onlyLink = link && p.children.length === 1
+      && p.textContent.trim() === link.textContent.trim();
+    if (!onlyLink) return;
+    p.classList.add('button-container');
+    link.classList.add('button');
+  });
+}
+
 // The sidebar preview shows 4 images; the source's "+51" pill on the last one points at the
 // rest, which are the Media Box. The import keeps it as a `+N` link after the gallery: hand it
 // to the (not yet decorated) Gallery (preview) block, which draws the pill.
@@ -315,6 +329,7 @@ export default function decorate(main) {
   header(main);
   chapters(main);
   mediaBox(main);
+  relatedLinks(main);
   galleryMore(main);
   accordionMedia(main);
   sidebarMediaBox(main);

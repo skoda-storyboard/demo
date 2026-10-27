@@ -175,6 +175,59 @@ function sourceTables(content, document) {
   });
 }
 
+/*
+ * The resource children without a Media Box (FAQ, Texts, Infographics, Technical data) end in
+ * the source's dark "Related Press Releases" band: its heading, the "Based on tags" line, the
+ * "All" link and the cards, a `Story Rail (press)` as on press releases (same output as
+ * skoda-press-release-layout.js `relatedContent`; transformers can't import each other).
+ */
+function relatedContent(document, band) {
+  const results = band.querySelector('.search-results');
+  if (!results) return [];
+  const link = (href, value) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.textContent = value;
+    return a;
+  };
+  const rows = [['Story Rail (press)']];
+  results.querySelectorAll('article.article-teaser').forEach((card) => {
+    const titleLink = card.querySelector('.entry-title a[href]');
+    const href = titleLink && titleLink.getAttribute('href');
+    if (!href || !text(titleLink)) return; // never emit a card without a target
+    const img = card.querySelector('.article-teaser-media img');
+    if (img) ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop'].forEach((a) => img.removeAttribute(a));
+    const body = [];
+    const date = text(card.querySelector('.entry-published'));
+    if (date) body.push(make(document, 'p', date));
+    const title = document.createElement('h3');
+    title.append(link(href, text(titleLink)));
+    body.push(title);
+    rows.push([img || '', body]);
+  });
+  if (rows.length === 1) return [];
+
+  const headingEl = results.querySelector('.search-results-heading');
+  const sub = text(headingEl && headingEl.querySelector('.subheading'));
+  let heading = 'Related Press Releases';
+  if (headingEl) {
+    const clone = headingEl.cloneNode(true);
+    clone.querySelectorAll('.subheading').forEach((s) => s.remove());
+    heading = text(clone) || heading;
+  }
+  // the source band heading is an h3 (.search-results-heading, #274)
+  const out = [make(document, 'h3', heading)];
+  if (sub) out.push(make(document, 'p', sub));
+  const all = results.querySelector('a.search-results-header-link[href], .search-results-header a[href]');
+  if (all && all.getAttribute('href')) {
+    const p = document.createElement('p');
+    p.append(link(all.getAttribute('href'), text(all) || 'All'));
+    out.push(p);
+  }
+  out.push(WebImporter.DOMUtils.createTable(rows, document));
+  return out;
+}
+
 function rebuild(element, document) {
   if (!/\bpress_kit-template-default\b/.test(document.body.className)) {
     throw new Error('Not a default press-kit article (body class missing)');
@@ -255,6 +308,10 @@ function rebuild(element, document) {
       .forEach((node) => node.remove());
     out.push(media);
   }
+  const relatedBand = [...article.querySelectorAll('.cover-box.dark')]
+    .find((band) => !band.querySelector('.search-results.media-box') && band.querySelector('article.article-teaser'));
+  const related = relatedBand ? relatedContent(document, relatedBand) : [];
+  if (related.length) out.push(marker(document, 'dark, full-width, related'), ...related);
   article.replaceChildren(...out);
   // No source site chrome or orphaned gallery/media cards outside the article.
   element.replaceChildren(article);
