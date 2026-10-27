@@ -138,3 +138,43 @@ gives them the `newsletter` category its rails read.
 
 **Pre-existing, not fixed here:** slider caption line height 24 vs origin 20 (museum, King of space, Clever
 luggage); the 40px intro line of "King of space" renders at 16px.
+
+## QA round (#293, 2026-10-26, Kondalu)
+**1. "Dates are not displaying on the Media Box cards": content not published, no code change.**
+- The #414 importer writes the date cell, and its re-import went to **preview only** (125 stories, 22 press
+  releases; see above). QA tested the published site (`main--…aem.live`).
+- On the six QA stories, the visible Media Box dates are equal to origin on preview, and 0 when published:
+
+| Story | origin | preview (`.aem.page`) | published (`.aem.live`) |
+|---|---:|---:|---:|
+| skodas-smarter-wireless-charging-goes-beyond-phones | 7 (9. 7. 2026) | 7 | 0 |
+| the-skoda-peaq-will-win-you-over-fast | 16 (22. 9. 2026) | 16 | 0 |
+| skoda-epiq-will-win-you-over-in-just-a-few-seconds | 19 (15. 9. 2026) | 19 | 0 |
+| meet-the-peaq-comfort-just-like-at-home | 8 (23. 7. 2026) | 8 | 0 |
+| how-the-skoda-octavia-reached-365-km-h | 16 (11. 8. 2026) | 16 | 0 |
+| la-dolce-vita-explore-the-surroundings-of-lake-como | 13 (30. 7. 2026) | 13 | 0 |
+
+- Fix: publish the re-imported pages (`npm run import:push -- --urls <file> --stage publish`, on request).
+
+**2. "The green bands aren't full width above 1248px": fixed (`styles/styles.css`, story pages only).**
+- Cause: a story's `main` is the 1248px article grid. The Media Box and Related Stories bands were grid items,
+  1248px wide, and painted their full width with a 100vw `::before` behind them (since 2026-09-24). So the band
+  looked full width, but its box (what DevTools shows) stopped at 1248px, unlike origin's `.cover-box.dark`.
+- Now the band's own box leaves the grid: `margin-inline: min(0px, (100% - min(100vw, 1440px)) / 2)`, and the
+  `::before` is gone. Its wrappers keep the content in the 1248px column, as before.
+- Measured, band box `x + width`, charging and Peaq stories (both bands; the other four QA stories at 390 / 1280 /
+  1440):
+
+| Window | before | after | origin |
+|---:|---|---|---|
+| 768 / 1080 / 1248 | 0 + window | 0 + window | 0 + window |
+| 1264 | 8 + 1248 | 0 + 1264 | 0 + 1264 |
+| 1280 | 16 + 1248 | 0 + 1280 | 0 + 1280 |
+| 1366 | 59 + 1248 | 0 + 1366 | 0 + 1366 |
+| 1440 | 96 + 1248 | 0 + 1440 | 0 + 1440 |
+| 1920 | 336 + 1248 | 240 + 1440 | 240 + 1440 |
+
+- Unchanged against `main`: band heights, the title and the first tile / card position inside both bands at every
+  width, no horizontal overflow (390 / 1280 / 1440), Related Stories Next (the track scrolls, the band stays
+  0 + 1440). The rule is `body.story` only: press release, press kit, model page, home and News are equal to `main`
+  at 1280 and 1440.
