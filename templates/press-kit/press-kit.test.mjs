@@ -78,6 +78,37 @@ test('the hub becomes the bar\'s "Introduction" link before the toggle; the menu
   assert.deepEqual([...nav.querySelectorAll('ul a[aria-current="page"]')].map((a) => a.textContent), ['Exterior']);
 });
 
+test('held at the top, the Chapters bar is marked stuck; scrolled back it is not (PR #503 review)', () => {
+  const observed = [];
+  globalThis.IntersectionObserver = class {
+    constructor(callback, options) { Object.assign(this, { callback, options }); }
+
+    observe(target) { observed.push({ target, observer: this }); }
+  };
+  try {
+    const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="/en/press-kits">Kit</a></li><li><a href="/en/press-kits/kit">Exterior</a></li>
+      </ul></div></div><div class="section body-column"></div>`);
+    decorate(main);
+    const section = main.querySelector('.section.press-kit-chapters');
+    assert.equal(observed.length, 1);
+    const [{ target, observer }] = observed;
+    assert.equal(target, section);
+    assert.equal(observer.options.rootMargin, '-1px 0px 0px 0px');
+    const report = (ratio, top) => observer.callback([{ intersectionRatio: ratio, boundingClientRect: { top } }]);
+    report(1, 108);
+    assert.equal(section.classList.contains('is-stuck'), false, 'in its place under the header');
+    report(0.98, 0);
+    assert.equal(section.classList.contains('is-stuck'), true, 'held at the top');
+    report(1, 1);
+    assert.equal(section.classList.contains('is-stuck'), false, 'scrolled back');
+    report(0.5, 600);
+    assert.equal(section.classList.contains('is-stuck'), false, 'cut off at the bottom of a short window is not stuck');
+  } finally {
+    delete globalThis.IntersectionObserver;
+  }
+});
+
 test('without a hub link in the menu there is no Introduction link (defensive)', () => {
   const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
       <li><a href="#chapters-links">Chapters</a></li>

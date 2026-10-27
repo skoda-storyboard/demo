@@ -19,6 +19,10 @@ body.press-kit {
   --pk-chapters-menu-overhang: 15px;
   --pk-chapters-item-line: 18px;
   --pk-chapters-item-pad: 13px 24px 10px; /* a 41px row */
+
+  /* stuck at the top, the source's fixed bar adds 8px above and a 24px white band below */
+  --pk-chapters-stuck-top: 8px;
+  --pk-chapters-stuck-bottom: 24px;
   --pk-sidebar-inset: var(--spacing-xxl);
   --pk-article-top: 32px;
   --pk-date-size: 11px;
@@ -222,6 +226,24 @@ body.press-kit .section.press-kit-chapters {
   background: var(--background-color);
 }
 
+/* Stuck (press-kit.js sets is-stuck), the bar is the source's fixed .chapter-nav (PR #503 review,
+   measured 2026-10-27 at 1280 / 375): text 8px lower, a 76.3px white band across the viewport and
+   the menu opening at its bottom. Nothing is laid out again (no layout shift): the row moves by a
+   translate, and the band is painted (border-image, which doesn't widen the page) past the bar's
+   box, with a layer under the row that takes the clicks on the white below it. */
+body.press-kit .section.press-kit-chapters.is-stuck {
+  border-image: linear-gradient(var(--background-color) 0 0) fill 0 / /
+    0 100vw calc(var(--pk-chapters-stuck-top) + var(--pk-chapters-stuck-bottom));
+}
+
+body.press-kit .section.press-kit-chapters.is-stuck::after {
+  content: "";
+  position: absolute;
+  inset: 100% 0 auto;
+  z-index: -1;
+  height: calc(var(--pk-chapters-stuck-top) + var(--pk-chapters-stuck-bottom));
+}
+
 /* The bar as the source draws it (SKODA-805, measured 2026-10-26 at 375 – 1440): "← Introduction"
    (the hub) on the left, "Chapters ⌄" on the right, both 20 / 22.5 / 500, their text on the bar's
    bottom (20px top inset). The row spans the 1248 content cap with the 10px page gutter below it
@@ -236,6 +258,11 @@ body.press-kit .press-kit-chapters-nav {
   min-height: var(--pk-chapters-height);
   margin-inline: calc(-1 * var(--page-gutter)); /* out of the section's gutter, to its edge… */
   padding-inline: var(--pk-chapters-inset); /* …then in by the fluid inset */
+}
+
+/* stuck, the row sits 8px lower, as the source's (see `.is-stuck` above) */
+body.press-kit .section.press-kit-chapters.is-stuck .press-kit-chapters-nav {
+  translate: 0 var(--pk-chapters-stuck-top);
 }
 
 body.press-kit .press-kit-chapters-nav > .press-kit-chapters-intro,

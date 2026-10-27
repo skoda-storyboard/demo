@@ -59,7 +59,9 @@ Measurable gates live in [`press-kit-template.md` §9](../../ui-specs/press-kit-
       order, boxes equal (2:1 feature tiles, then 1:1; 1-up at 375). *(805a, 828 F1, 221.)*
 - [x] **Chapter pages:** story-detail-style two-column sub-pages, one per tile (805b), with the source's **Chapters
       bar** (fixed here, see below): "← Introduction" (the hub) left, "Chapters ⌄" right, 20 / 22.5 / 500, sticky,
-      `nav` labelled "Chapters" with a `button aria-expanded`; Escape closes and returns focus.
+      `nav` labelled "Chapters" with a `button aria-expanded`; Escape closes and returns focus. Stuck at the top it
+      is the source's fixed bar: a 76.3 white band, text 8px lower, the menu at y 76.3 (PR #503 review, measured
+      2026-10-27 at 1280 / 375 on all 4 kits, menu open and closed).
 - [x] **Narrative order** follows the source: the Peaq-2 outline is H1 → Introduction → Exterior → Interior →
       Battery and powertrain variants → Safety and assistance systems → Connectivity → Sportline → FAQ → Texts →
       Infographics → Technical data → Images → Videos, equal to the source.
@@ -127,6 +129,7 @@ demo index holds 55 kits and 79 chapter pages, in these shapes:
 | Right | "Chapters", a space, 4px, `\e007` (16px); a 66 × 2 ink line under the word when open |
 | Insets | 10px up to the 1248 content cap, then on the cap's edge (fluid `clamp()`, no breakpoint) |
 | Menu | white, shadow `0 3px 8px rgb(0 0 0 / 15%)`, 24px under the bar, as wide as its longest title (max-content, capped at the viewport less 10px), right-aligned with the toggle (15px past it once the cap leaves room); rows of 41px, 16 / 18 / 500, inset 24 / 12; the chapters only (the hub is the bar's link) |
+| Stuck (PR #503 review) | the source's `.chapter-nav.affix` (fixed, padding `8px 0 24px`): a white band 0 – 76.3 across the viewport, text at y 27 (8px lower than just before it sticks), the menu opening at y 76.3. EDS: `.is-stuck` (an IntersectionObserver) moves the row by a translate and paints the band; a layer under the row takes the clicks on its white |
 
 - **Measured equal at 375 – 1440 on Peaq-2, Epiq-2 and Classic Days** (the toggle within 1px: icon-glyph metrics).
 - **Motorsport's menu is wider than the source** (820 vs 706 at 1280): its source titles carry line breaks (`<br>`)
@@ -135,3 +138,10 @@ demo index holds 55 kits and 79 chapter pages, in these shapes:
   minus the bold.
 - **Checks:** `press-kit.test.mjs` 20 / 20 (2 new); lint clean; axe on the chapter page: no new rule, open or
   closed.
+- **Stuck state (review fix, 2026-10-27), source vs branch code at 1280 and 375 on all 4 kits, after a 1500px
+  scroll, menu opened by a real click:** band 76.3, text y 27, menu y 76.3 on both; before the scroll still y 127
+  and menu 176.3. At 1280 the white reaches x 0 – 1280 (screenshot pixels: white from the top down to the content
+  at 75.5, the same as the source). It sticks at a 108px scroll and comes off again under 100, without flickering.
+  Page height and the first paragraph's position don't change (4024 / 184 on Peaq Exterior), and no layout shift is
+  recorded while wheel-scrolling through it (the source's affix records 0.03 – 0.05). The page doesn't get wider.
+  `press-kit.test.mjs` 21 / 21 (1 new). Lint clean.

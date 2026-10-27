@@ -267,6 +267,11 @@ Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expecte
       16 / 18 / 500 inset 24 / 12, the chapters only. `nav` labelled "Chapters", `button aria-expanded`, Escape
       closes and returns focus. *(Motorsport's titles carry `<br>`s the import drops: its menu is wider until
       re-imported, #498.)*
+      **Stuck** (scrolled past the header; the source's `.chapter-nav.affix`, `position: fixed`, padding
+      `8px 0 24px`, measured 2026-10-27 at 1280 / 375 on all 4 kits): a white band 76.3 tall across the viewport,
+      the bar's text 8px lower (y 27 vs 19 just before it sticks) and the menu opening at y 76.3. The bar stays
+      sticky; `.is-stuck` moves the row by a translate and paints the band, so the page under it doesn't move
+      (no layout shift; the source's affix shifts it, 0.03–0.05).
 - [x] Sub-section rich text: `p` = `16px / 24px / weight 400 / #161718`, `margin-bottom 20px`
       (parity with story-detail.md, no delta); sub-page title `h1` `26px / weight 600`.
 - [x] Metadata: block carries `template/model/bodywork/category/date`; passes lint; surfaces the kit under

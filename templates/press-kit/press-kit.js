@@ -16,6 +16,15 @@ function header(main) {
 // the Chapters bar's link back to the kit's hub, as the source labels it
 const INTRODUCTION = 'Introduction';
 
+// The bar is sticky; once it is held at the top it takes the source's fixed-bar spacing
+// (press-kit.css `.is-stuck`). Held means its top edge sits in the 1px the root margin cuts off.
+function stuckState(section) {
+  if (typeof IntersectionObserver === 'undefined') return;
+  new IntersectionObserver(([entry]) => {
+    section.classList.toggle('is-stuck', entry.intersectionRatio < 1 && entry.boundingClientRect.top < 1);
+  }, { rootMargin: '-1px 0px 0px 0px', threshold: [1] }).observe(section);
+}
+
 function chapters(main) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
@@ -78,6 +87,7 @@ function chapters(main) {
   list.replaceWith(nav);
   if (intro) nav.append(intro);
   nav.append(button, list);
+  stuckState(section);
 }
 
 /*
