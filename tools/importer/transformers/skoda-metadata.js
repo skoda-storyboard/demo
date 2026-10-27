@@ -377,6 +377,10 @@ export default function transform(hookName, element, payload) {
   if (template) meta.template = template;
   // page layout for a template=page page (e.g. the series directory, SKODA-207)
   if (overrides.theme) meta.theme = overrides.theme;
+  // a page with its own chrome (the Sustainable Offices nav and footer fragments, SKODA-843);
+  // the others take theirs from the bulk metadata sheet
+  if (overrides.nav) meta.nav = overrides.nav;
+  if (overrides.footer) meta.footer = overrides.footer;
   // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
   if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;

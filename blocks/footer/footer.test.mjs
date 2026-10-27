@@ -196,3 +196,12 @@ test('outbound: without a page origin nothing is changed', () => {
   decorateFooterSections(footer, '');
   assert.ok([...footer.querySelectorAll('a')].every((a) => a.getAttribute('target') === null));
 });
+
+test('a footer without its middle section (SKODA-843): social and legal, no nav', () => {
+  const footer = parseHTML(`${SOCIAL}${LEGAL('Notice <a href="/en/copyright/">Copyright</a>.')}`);
+  decorateFooterSections(footer, 'https://main--demo--skoda-storyboard.aem.page');
+  const [social, legal] = footer.children;
+  assert.ok(social.classList.contains('footer-social'));
+  assert.ok(legal.classList.contains('footer-legal'));
+  assert.equal(footer.querySelector('.footer-nav, .footer-widgets'), null);
+});

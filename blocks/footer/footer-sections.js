@@ -183,7 +183,8 @@ export function openOutboundLinks(footer, origin) {
 }
 
 /**
- * Tags and decorates the three authored footer sections, in order: social / middle / legal.
+ * Tags and decorates the three authored footer sections, in order: social / middle / legal (two:
+ * social / legal).
  * The middle section is the Storyboard sitemap, or — when it carries headings — the Media Room
  * widget columns.
  * @param {Element} footer container whose children are the fragment sections
@@ -193,7 +194,11 @@ export default function decorateFooterSections(
   footer,
   origin = typeof window !== 'undefined' ? window.location?.origin : '',
 ) {
-  const [social, middle, legal] = footer.children;
+  // a footer without the middle section (the Sustainable Offices footer, SKODA-843): social, legal
+  const sections = [...footer.children];
+  const [social, middle, legal] = sections.length === 2
+    ? [sections[0], null, sections[1]]
+    : sections;
 
   if (social) {
     social.classList.add('footer-social');

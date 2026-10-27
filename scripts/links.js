@@ -31,7 +31,9 @@ export const LIVE_ONLY = [
   /^\/en\/skodapedia(?:\/|$)/i,
   /^\/en\/category\/podcast(?:-en)?(?:\/|$)/i,
   /^\/en\/(?:press-releases\/)?feed(?:\/|$)/i,
-  /^\/en\/documents\//i,
+  // the documents the demo doesn't carry (`what-are-your-rights`: live 302s it to skoda-auto.com);
+  // the index, the consent and the cookies document are migrated (SKODA-843)
+  /^\/en\/documents\/(?!(?:consent-to-personal-data-processing-information-on-personal-data-processing|cookies)?\/?$)/i,
   /^\/en\/newsletter-settings(?:\/|$)/i,
 ];
 
@@ -64,10 +66,13 @@ export const LIVE_ALIASES = {
 // live host: they stay on the demo, site-relative, query + hash kept (listing filters).
 // `/en/media-cart` is the demo's own cart page (SKODA-505b): the cart badge links there.
 // `/en/contacts` and `/en/copyright` are the migrated page-shell pages (SKODA-813): the header's
-// Contacts and the footers' contact and Copyright links.
+// Contacts and the footers' contact and Copyright links. The migrated documents (SKODA-843) too:
+// the newsletter forms' absolute consent link.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
   '/en/series-2', '/en/search', '/en/media-cart', '/en/contacts', '/en/copyright',
+  '/en/documents', '/en/documents/cookies',
+  '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing',
 ]);
 
 // Source anchors a demo page has under another id: the Media Room footer links to the source's

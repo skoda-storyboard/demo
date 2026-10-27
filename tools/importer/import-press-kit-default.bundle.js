@@ -35,7 +35,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-press-kit-default.js
+  // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
     IMAGE_LIMIT: () => IMAGE_LIMIT,
@@ -44,7 +44,7 @@ var CustomImportScript = (() => {
     fragmentPath: () => fragmentPath
   });
 
-  // parsers/gallery.js
+  // tools/importer/parsers/gallery.js
   function parse(element, { document }) {
     let items = Array.from(element.querySelectorAll("article.gallery-item"));
     if (items.length === 0) items = Array.from(element.querySelectorAll(".items > .item"));
@@ -70,7 +70,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/tags.js
+  // tools/importer/parsers/tags.js
   function parse2(element, { document }) {
     const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
@@ -95,7 +95,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/series-grid.js
+  // tools/importer/parsers/series-grid.js
   function siteOriginWidths(document) {
     const widths = {};
     document.querySelectorAll("style").forEach((style) => {
@@ -113,7 +113,7 @@ var CustomImportScript = (() => {
     return widths;
   }
 
-  // parsers/press-kit-hub-tiles.js
+  // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
@@ -210,7 +210,7 @@ var CustomImportScript = (() => {
     return WebImporter.DOMUtils.createTable(rows, document);
   }
 
-  // parsers/press-kit-content.js
+  // tools/importer/parsers/press-kit-content.js
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var boldCaption = (node) => (node == null ? void 0 : node.matches("p")) && !!text(node) && text(node) === [...node.querySelectorAll("strong, b")].map(text).join(" ").trim();
   function clipTitle(document, file, attachment) {
@@ -456,7 +456,7 @@ var CustomImportScript = (() => {
     element.querySelectorAll(".sa-bnr, .media-cart-actions").forEach((node) => node.remove());
   }
 
-  // parsers/press-kit-media.js
+  // tools/importer/parsers/press-kit-media.js
   var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
   var tileDate = (item) => {
@@ -532,7 +532,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
-  // parsers/quote.js
+  // tools/importer/parsers/quote.js
   var QUOTE = "data-skoda-quote";
   var BY = "data-skoda-quote-by";
   var text3 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -671,7 +671,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
   }
 
-  // parsers/footnotes.js
+  // tools/importer/parsers/footnotes.js
   var MARK = "data-skoda-footnote";
   var NAME = "Footnotes";
   var BODY_PX = 16;
@@ -750,7 +750,7 @@ var CustomImportScript = (() => {
     p.replaceWith(table);
   }
 
-  // parsers/answer-layout.js
+  // tools/importer/parsers/answer-layout.js
   var ANSWERS = ".widget_ys-row-toggle + .widget_siteorigin-panels-builder";
   var text5 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var blank = (node) => !text5(node) && !node.querySelector("img, picture, iframe, video, a[href]");
@@ -808,7 +808,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-press-kit-default-layout.js
+  // tools/importer/transformers/skoda-press-kit-default-layout.js
   var text6 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var marker2 = (document, style) => {
     const hr = document.createElement("hr");
@@ -1100,7 +1100,7 @@ var CustomImportScript = (() => {
     if (hookName === "afterTransform") finish(element, payload.document);
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -1373,6 +1373,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = template === "story" ? extractCategories(document) : [];
@@ -1387,7 +1389,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent2(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1502,7 +1504,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1942,7 +1944,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform4(hookName, element, payload) {
@@ -1960,7 +1962,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // import-press-kit-default.js
+  // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   function templateFor(document, pageUrl) {
     const hub = document.querySelector(".chapter-nav .link-intro[href]");

@@ -16,12 +16,13 @@ function closeOnEscape(e) {
     // the listener is live before the header is shown (it waits up to HEADER_ASSET_WAIT)
     if (!nav) return;
     const navSections = nav.querySelector('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    // a nav without a menu (/sustainability/nav, SKODA-843) still closes its drawer
+    if (!navSections && isDesktop.matches) return;
+    const navSectionExpanded = navSections?.querySelector('[aria-expanded="true"]');
     // desktop: the open dropdown, or the one shown because focus is inside it (:focus-within)
     // or the pointer is over it (:hover), which must be dismissible too (WCAG 1.4.13)
     const shown = navSectionExpanded || document.activeElement?.closest?.('.nav-drop')
-      || navSections.querySelector('.nav-drop:hover');
+      || navSections?.querySelector('.nav-drop:hover');
     if (shown && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections);
@@ -560,11 +561,16 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  // 4-row fragment (topbar + brand + sections + tools) vs 3-row (brand + sections + tools)
-  const hasTopbar = nav.children.length >= 4;
-  const classes = hasTopbar
-    ? ['topbar', 'brand', 'sections', 'tools']
-    : ['brand', 'sections', 'tools'];
+  // 4-row fragment (topbar + brand + sections + tools) vs 3-row (brand + sections + tools), or a
+  // section's own 3-row nav without a menu (topbar + brand + tools: /sustainability/nav,
+  // SKODA-843), told apart by its first row: the topbar's tab list
+  const hasTopbar = nav.children.length >= 4 || !!nav.firstElementChild?.querySelector('ul');
+  let classes = ['brand', 'sections', 'tools'];
+  if (hasTopbar) {
+    classes = nav.children.length >= 4
+      ? ['topbar', 'brand', 'sections', 'tools']
+      : ['topbar', 'brand', 'tools'];
+  }
   classes.forEach((c, i) => {
     const section = nav.children[i];
     if (section) section.classList.add(`nav-${c}`);

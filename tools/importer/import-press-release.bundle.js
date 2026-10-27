@@ -35,7 +35,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-press-release.js
+  // tools/importer/import-press-release.js
   var import_press_release_exports = {};
   __export(import_press_release_exports, {
     default: () => import_press_release_default
@@ -92,7 +92,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/downloads.js
+  // tools/importer/parsers/downloads.js
   var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
   function serialiseMp4(href) {
     try {
@@ -175,7 +175,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
-  // parsers/quote.js
+  // tools/importer/parsers/quote.js
   var QUOTE = "data-skoda-quote";
   var BY = "data-skoda-quote-by";
   var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -234,7 +234,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document2));
   }
 
-  // transformers/skoda-press-release-cleanup.js
+  // tools/importer/transformers/skoda-press-release-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function wpVideosToEmbeds(element, document2) {
     element.querySelectorAll(".wp-video").forEach((wrapper) => {
@@ -368,7 +368,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-press-release-layout.js
+  // tools/importer/transformers/skoda-press-release-layout.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var MARKER = "data-pr-section";
   var NBSP_PLACEHOLDER = "\u{F00A0}";
@@ -724,7 +724,7 @@ var CustomImportScript = (() => {
     if (hookName === TransformHook2.afterTransform) finish(element, document2);
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -997,6 +997,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = template === "story" ? extractCategories(document2) : [];
@@ -1011,7 +1013,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook4 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1451,7 +1453,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER2 = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -1469,7 +1471,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1584,7 +1586,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // import-press-release.js
+  // tools/importer/import-press-release.js
   var parsers = {
     gallery: parse,
     tags: parse2,

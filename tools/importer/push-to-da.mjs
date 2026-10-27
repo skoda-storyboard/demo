@@ -64,6 +64,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MANIFEST = path.join(HERE, 'push', 'push-manifest.json');
 const REPORT_DIR = path.join(HERE, 'reports', 'push');
 const MEDIA_MANIFEST = path.join(HERE, 'media', 'media-manifest.json');
+const DEAD_SOURCES = path.join(HERE, 'media', 'dead-source-images.json');
 const ADMIN = 'https://admin.hlx.page';
 const DA = 'https://admin.da.live';
 const BATCH = 100; // paths per bulk job
@@ -202,6 +203,7 @@ async function adminStatus(a, p) {
 
 export default async function main(argv = process.argv.slice(2), {
   manifestFile = MANIFEST, mediaManifestFile = MEDIA_MANIFEST, reportDir = REPORT_DIR,
+  deadSourcesFile = DEAD_SOURCES,
 } = {}) {
   const a = parseArgs(argv);
   const log = (...m) => console.log(...m);
@@ -210,9 +212,16 @@ export default async function main(argv = process.argv.slice(2), {
   const mediaManifest = JSON.parse(readFileSync(mediaManifestFile, 'utf8'));
   // One byte probe per image per run: the preview/publish/fragment rechecks reuse it.
   const mediaCache = new Map();
+  // source images verified dead on live (SKODA-843): stripped as live, not blocked
+  // a file without an `images` list, or a row without a url, is no dead source (#843 review)
+  const deadRows = existsSync(deadSourcesFile)
+    ? JSON.parse(readFileSync(deadSourcesFile, 'utf8')).images : [];
+  const deadSources = new Set((Array.isArray(deadRows) ? deadRows : [])
+    .map((row) => row?.url).filter(Boolean));
   const mediaGate = (html, p) => conditionInlineMedia(html, {
     base: `${h.page}${p}.html`,
     manifest: mediaManifest,
+    deadSources,
     maxBytes: a.maxImageBytes,
     minEdge: a.minImageEdge,
     cache: mediaCache,

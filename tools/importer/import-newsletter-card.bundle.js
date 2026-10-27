@@ -18,13 +18,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-newsletter-card.js
+  // tools/importer/import-newsletter-card.js
   var import_newsletter_card_exports = {};
   __export(import_newsletter_card_exports, {
     default: () => import_newsletter_card_default
   });
 
-  // transformers/skoda-story-aside.js
+  // tools/importer/transformers/skoda-story-aside.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var NEWSLETTER_BLOCK = "Newsletter Stub (card)";
   var NEWSLETTER_DEFAULTS = {
@@ -223,7 +223,7 @@ var CustomImportScript = (() => {
     sidebar.replaceWith(...frag.childNodes);
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform2(hookName, element, payload) {
@@ -241,7 +241,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -356,7 +356,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // import-newsletter-card.js
+  // tools/importer/import-newsletter-card.js
   var NEWSLETTER_BLOCK2 = "Newsletter Stub (card)";
   var PAGE_TEMPLATE = {
     name: "newsletter-card",

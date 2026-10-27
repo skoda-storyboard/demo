@@ -1,0 +1,12 @@
+{
+  "about": "Source images that are dead on the live site itself (the original answers 4xx), so live shows nothing where they sit. The push's media gate strips them from a page's body instead of blocking the page (SKODA-843). Add a row only after checking the original on live; a hero or card image is never stripped this way.",
+  "images": [
+    {
+      "url": "https://skoda-ms.s3.amazonaws.com/2018/05/Blok.jpg",
+      "status": 403,
+      "checked": "2026-10-26",
+      "page": "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/",
+      "note": "44×38 icon beside the 'Information on Personal Data Processing' heading, alt empty"
+    }
+  ]
+}

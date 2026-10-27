@@ -35,6 +35,7 @@ var CustomImportScript = (() => {
     if (href.startsWith("#")) return href;
     try {
       const url = new URL(href, "https://www.skoda-storyboard.com");
+      if (/^#s_[ac]id=/.test(url.hash)) url.hash = "";
       if (LIVE_HOST.test(url.hostname)) return `${url.pathname}${url.search}${url.hash}`;
       return url.href;
     } catch (e) {
@@ -113,8 +114,10 @@ var CustomImportScript = (() => {
     root.append(para(document, ...badges), para(document, ...socials));
     root.append(document.createElement("hr"));
     const menu = footer.querySelector(".footer-nav ul.menu");
-    if (menu) root.append(menuList(document, menu, { keepHeading: false, newsletter: false }));
-    root.append(document.createElement("hr"));
+    if (menu) {
+      root.append(menuList(document, menu, { keepHeading: false, newsletter: false }));
+      root.append(document.createElement("hr"));
+    }
     const notice = footer.querySelector(".copyright-text p");
     if (notice) {
       const p = document.createElement("p");

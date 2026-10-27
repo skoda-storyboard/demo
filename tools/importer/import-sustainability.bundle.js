@@ -1,0 +1,1063 @@
+/* eslint-disable */
+var CustomImportScript = (() => {
+  var __defProp = Object.defineProperty;
+  var __defProps = Object.defineProperties;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // tools/importer/import-sustainability.js
+  var import_sustainability_exports = {};
+  __export(import_sustainability_exports, {
+    default: () => import_sustainability_default
+  });
+
+  // tools/importer/transformers/skoda-sustainability.js
+  var BLANK = /^[\s\u00a0]*$/;
+  var INLINE = /* @__PURE__ */ new Set(["#text", "A", "STRONG", "B", "EM", "I", "SPAN", "SUP", "SUB", "BR", "IMG", "PICTURE", "U"]);
+  var slug = (value) => value.toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, "").replace(/\s/g, "-");
+  var text = (el) => ((el == null ? void 0 : el.textContent) || "").replace(/\s+/g, " ").trim();
+  function trimBlankLines(p) {
+    const strip = (pick) => {
+      for (let node = pick(); node; node = pick()) {
+        const blank = node.nodeType === 3 && BLANK.test(node.nodeValue);
+        if (!blank && node.nodeName !== "BR") return;
+        node.remove();
+      }
+    };
+    strip(() => p.firstChild);
+    strip(() => p.lastChild);
+  }
+  function filmOf(frame, holder, { doc, title }) {
+    const url = frame.getAttribute("src") || frame.getAttribute("data-src") || "";
+    const name = frame.getAttribute("title") || title || url;
+    const link = (href) => Object.assign(doc.createElement("a"), { href, textContent: name });
+    const file = [...holder.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((a) => a.getAttribute("href")).find((href) => /\.mp4([?#]|$)/i.test(href));
+    if (file && /(^|\.)vimeo\.com$/i.test(new URL(url, "https://player.vimeo.com").hostname)) {
+      const rows = [["Embed (vimeo)"], ["url", link(url)], ["file", link(file)]];
+      if (name !== url) rows.push(["title", name]);
+      return WebImporter.DOMUtils.createTable(rows, doc);
+    }
+    const film = doc.createElement("p");
+    film.append(link(url));
+    return film;
+  }
+  function blocksOf(widget, ctx) {
+    const { doc } = ctx;
+    const out = [];
+    let run = null;
+    const flush = () => {
+      if (run) out.push(run);
+      run = null;
+    };
+    [...widget.childNodes].forEach((node) => {
+      if (node.nodeType === 1 && node.matches(".media-cart-actions")) return;
+      const attachment = node.nodeType === 1 && node.matches(".media-cart-item") && node.querySelector("iframe");
+      if (attachment || node.nodeName === "IFRAME") {
+        flush();
+        out.push(filmOf(attachment || node, node, ctx));
+      } else if (node.nodeName === "DIV") {
+        flush();
+        out.push(...blocksOf(node, ctx));
+      } else if (INLINE.has(node.nodeName)) {
+        if (!run) run = doc.createElement("p");
+        run.append(node);
+      } else if (node.nodeType === 1) {
+        flush();
+        out.push(node);
+      }
+    });
+    flush();
+    out.forEach((el) => {
+      el.querySelectorAll("span").forEach((span) => span.replaceWith(...span.childNodes));
+      el.querySelectorAll("a[href]").forEach((a) => {
+        if (!text(a) && /\.(jpe?g|png|webp|gif)([?#]|$)/i.test(a.getAttribute("href"))) {
+          a.replaceWith(...a.childNodes);
+        }
+      });
+      if (el.matches("p")) trimBlankLines(el);
+    });
+    return out.filter((el) => !el.matches("p") || text(el) || el.querySelector("img, iframe"));
+  }
+  function splitFilm(p, ctx) {
+    const frame = p.querySelector("iframe[src]");
+    if (!frame) return [p];
+    const film = filmOf(frame, p, ctx);
+    p.querySelectorAll(".media-cart-action").forEach((a) => a.remove());
+    frame.remove();
+    trimBlankLines(p);
+    return text(p) ? [p, film] : [film];
+  }
+  var looseText = (row) => [...row.querySelectorAll(".image-card_text-inner")].some((inner) => [...inner.childNodes].some((n) => n.nodeType === 3 ? !BLANK.test(n.nodeValue) : INLINE.has(n.nodeName) && n.nodeName !== "BR"));
+  var cellsOf = (row) => [...row.querySelectorAll(".panel-grid-cell")].filter((cell) => cell.closest(".panel-grid") === row);
+  var widgetOf = (cell) => cell.querySelector(".siteorigin-widget-tinymce") || cell;
+  function transform(hookName, element, payload) {
+    if (hookName !== "beforeTransform") return;
+    const doc = (payload == null ? void 0 : payload.document) || element.ownerDocument;
+    if (!doc.body.matches(".page-template-template-sustainability")) return;
+    const layout = element.querySelector(".panel-layout");
+    if (!layout) return;
+    const anchorTargets = /* @__PURE__ */ new Map();
+    layout.querySelectorAll("[id]").forEach((el) => {
+      const h2 = el.querySelector("h2");
+      if (h2 && !el.matches(".panel-grid, .panel-grid-cell, .so-panel")) anchorTargets.set(el.id, slug(text(h2)));
+    });
+    const ctx = { doc, title: text(layout.querySelector("h1")) };
+    const table = (name, cells) => WebImporter.DOMUtils.createTable([[name], cells], doc);
+    const out = [];
+    let header = true;
+    [...layout.children].filter((row) => row.matches(".panel-grid")).forEach((row, index) => {
+      var _a;
+      const classes = (_a = row.querySelector(":scope > .panel-row-style")) == null ? void 0 : _a.classList;
+      const has = (name) => !!(classes == null ? void 0 : classes.contains(name));
+      if (has("image-card") && has("hide-desktop")) return;
+      const small = looseText(row);
+      const cells = cellsOf(row).map((cell) => blocksOf(widgetOf(cell), ctx));
+      let nodes;
+      if (has("image-card")) nodes = [table(`Columns (image-card${small ? ", text-small" : ""})`, cells)];
+      else if (has("info-blocks")) nodes = [table("Columns (info-blocks)", cells)];
+      else nodes = cells.flat().flatMap((node) => node.matches("p") ? splitFilm(node, ctx) : [node]);
+      if (!nodes.length) return;
+      if (header) {
+        if (index === 0 || nodes.every((n) => n.matches("p") && n.querySelector("img") && !text(n))) {
+          out.push(...nodes);
+          return;
+        }
+        out.push(WebImporter.Blocks.createBlock(doc, { name: "Section Metadata", cells: { Style: "sustainability-header" } }));
+        out.push(doc.createElement("hr"));
+        header = false;
+      }
+      if (nodes[0].matches("h2")) out.push(doc.createElement("hr"));
+      out.push(...nodes);
+    });
+    out.forEach((node) => {
+      node.querySelectorAll('a[href^="#"]').forEach((a) => {
+        const target = anchorTargets.get(a.getAttribute("href").slice(1));
+        if (target) a.setAttribute("href", `#${target}`);
+      });
+    });
+    if (!out.length) return;
+    const article = layout.closest("main") || layout.parentElement;
+    article.replaceChildren(...out);
+  }
+
+  // tools/importer/transformers/skoda-page-cleanup.js
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function transform2(hookName, element, payload) {
+    if (hookName === TransformHook.beforeTransform) {
+      WebImporter.DOMUtils.remove(element, [
+        // Site header / nav / language switcher / search overlay chrome
+        "header.header",
+        ".site-header",
+        ".mega-menu",
+        ".megamenu",
+        ".menu-toggle",
+        ".language-switcher",
+        ".lang-switch",
+        ".search-form-wrap",
+        ".search-form",
+        // Footer chrome (also carries the .social strip)
+        "footer.footer",
+        ".site-footer",
+        ".footer-mediaroom",
+        // Secondary widgets / banners. The representative pages carry a standalone
+        // newsletter surface as <section id="newsletter-popups"> / .newsletter-popup
+        // (form.mailguide-subscribe) OUTSIDE header.header, so removing the header
+        // alone leaves it as leading default content — remove those too.
+        ".newsletter-subscribe-widget",
+        "#newsletter-popups",
+        ".newsletter-popup",
+        ".mailguide-subscribe",
+        ".mailguide-form",
+        ".side-banner",
+        ".sa-bnr",
+        // Cookie / consent (defensive)
+        "#onetrust-consent-sdk",
+        "#onetrust-banner-sdk",
+        "#onetrust-pc-sdk",
+        ".onetrust-pc-dark-filter",
+        ".ot-sdk-container",
+        "#ot-sdk-btn",
+        ".ot-sdk-show-settings",
+        '[id*="cookie" i]',
+        '[class*="cookie" i]',
+        '[class*="consent" i]',
+        // Floating affordances
+        ".scroll-top",
+        ".social-share",
+        ".media-cart-flyout",
+        ".share-bar",
+        // Homepage live-Instagram social strip (not index-driven, external links).
+        ".socials-static",
+        // Chrome resource elements. Scripts carry per-request nonces / random
+        // container-id hashes (ys_ajax_loader) that would break byte-identical
+        // re-runs (SKODA-602 idempotency) if they survived into default content.
+        "script",
+        "noscript",
+        "style",
+        'link[rel="stylesheet"]',
+        "link"
+      ]);
+    }
+    if (hookName === TransformHook.afterTransform) {
+      element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
+        a.setAttribute("href", a.getAttribute("href").split("#s_aid=")[0].split("#s_cid=")[0]);
+      });
+      element.querySelectorAll('a[href*="%25"]').forEach((a) => {
+        const href = a.getAttribute("href") || "";
+        let decoded = href;
+        for (let i = 0; i < 8; i += 1) {
+          let next;
+          try {
+            next = decodeURIComponent(decoded);
+          } catch (e) {
+            break;
+          }
+          if (next === decoded) break;
+          decoded = next;
+        }
+        if (decoded !== href) a.setAttribute("href", encodeURI(decoded));
+      });
+      element.querySelectorAll('img[src^="https://i.vimeocdn.com/"]').forEach((img) => {
+        const src = img.getAttribute("src");
+        img.setAttribute("src", src.replace(/-d_\d+(?:x\d+)?(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg"));
+      });
+    }
+  }
+
+  // tools/importer/transformers/skoda-metadata.js
+  var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var FACETS = [
+    "model",
+    "bodywork",
+    "derivative",
+    "motorsport",
+    "equipment",
+    "technology",
+    "years",
+    "view",
+    "company",
+    "concept",
+    "environment",
+    "happening",
+    "history",
+    "sponsorship",
+    "vip"
+  ];
+  var TEMPLATE_SIGNALS = [
+    [/\bsingle-skoda_model\b|\bskoda_model-template\b/, "skoda_model"],
+    [/\bsingle-skoda_series\b|\bskoda_series-template\b/, "skoda_series"],
+    [/\bsingle-press_release\b|\bpress_release-template\b/, "press_release"],
+    [/\bsingle-press_kit\b|\bpress_kit-template\b/, "press_kit"],
+    [/\bsingle-post\b|\bpost-template\b/, "story"],
+    // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
+    // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
+    [/\bpost-type-archive-skodapedia\b/, "page"],
+    [/\berror404\b/, "page"],
+    [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
+  ];
+  var SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+  function cleanTitle(raw) {
+    const t = String(raw || "").replace(/\s+/g, " ").trim();
+    return t.replace(SITE_SUFFIX, "").trim() || t;
+  }
+  var SOFT_BREAK = /[\u00A0\u{F00A0}]/gu;
+  function spacedText(h1) {
+    const copy = h1.cloneNode(true);
+    copy.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
+    return copy.textContent.replace(SOFT_BREAK, " ").replace(/\s+/g, " ").trim();
+  }
+  function respacedTitle(title, h1) {
+    if (!title || !h1) return title;
+    const spaced = spacedText(h1);
+    const bare = (s) => s.replace(SOFT_BREAK, "").replace(/\s+/g, "");
+    const words = (s) => s.split(" ").length;
+    return bare(spaced) === bare(title) && words(spaced) > words(title) ? spaced : title;
+  }
+  function metaContent(document, selector) {
+    const el = document.querySelector(selector);
+    const val = el && el.getAttribute("content");
+    return val && val.trim() ? val.trim() : null;
+  }
+  function normalizeDate(value) {
+    if (!value) return "";
+    const m = String(value).match(/\d{4}-\d{2}-\d{2}/);
+    return m ? m[0] : "";
+  }
+  function extractDate(document) {
+    const meta = metaContent(document, 'meta[property="article:published_time"]');
+    if (normalizeDate(meta)) return normalizeDate(meta);
+    const attrEl = document.querySelector("[data-publish-date]");
+    const attr = attrEl && attrEl.getAttribute("data-publish-date");
+    if (normalizeDate(attr)) return normalizeDate(attr);
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const s of scripts) {
+      try {
+        const data = JSON.parse(s.textContent);
+        const graph = data["@graph"] || (Array.isArray(data) ? data : [data]);
+        for (const node of graph) {
+          if (node && node.datePublished) {
+            const d = normalizeDate(node.datePublished);
+            if (d) return d;
+          }
+        }
+      } catch (e) {
+      }
+    }
+    const span = document.querySelector(".entry-published, time[datetime]");
+    if (span) {
+      const d = normalizeDate(span.getAttribute("datetime") || span.textContent);
+      if (d) return d;
+    }
+    const modified = metaContent(document, 'meta[property="article:modified_time"]');
+    if (normalizeDate(modified)) return normalizeDate(modified);
+    return "";
+  }
+  function extractTemplate(document) {
+    const cls = document.body && document.body.getAttribute("class") || "";
+    for (const [re, value] of TEMPLATE_SIGNALS) {
+      if (re.test(cls)) return value;
+    }
+    return "";
+  }
+  function extractCategory(url) {
+    try {
+      const segs = new URL(url).pathname.split("/").filter(Boolean);
+      if (segs.length < 2) return "";
+      if (segs[1] === "category") return segs[2] || "";
+      if (segs[1] === "tag") return segs[segs.length - 1] || "";
+      return segs[1];
+    } catch (e) {
+    }
+    return "";
+  }
+  var CATEGORY_PARENTS = {
+    "120-years-of-skoda-motorsport": "motorsport",
+    adventures: "lifestyle",
+    "annual-reports": "media",
+    citigo: "models",
+    connectivity: "innovation-and-technology",
+    cycling: "sports",
+    design: "skoda-world",
+    elroq: "models",
+    enyaq: "models",
+    "enyaq-coupe-rs-iv": "models",
+    epiq: "models",
+    fabia: "models",
+    heritage: "skoda-world",
+    hockey: "sports",
+    "innovation-and-technology": "skoda-world",
+    kamiq: "models",
+    "kamiq-china": "models",
+    karoq: "models",
+    kodiaq: "models",
+    kushaq: "models",
+    kylaq: "models",
+    livestream: "media",
+    motorsport: "lifestyle",
+    octavia: "models",
+    "octavia-combi": "models",
+    "octavia-combi-greenline": "models",
+    "octavia-combi-rs": "models",
+    "octavia-greenline": "models",
+    "octavia-rs": "models",
+    "octavia-scout": "models",
+    other: "media",
+    "peaq-en": "models",
+    people: "lifestyle",
+    rapid: "models",
+    "rapid-spaceback": "models",
+    responsibility: "skoda-world",
+    scala: "models",
+    slavia: "models",
+    speeches: "media",
+    sports: "lifestyle",
+    superb: "models",
+    "superb-combi": "models",
+    "technical-data": "media",
+    technology: "innovation-and-technology",
+    yeti: "models",
+    "yeti-outdoor": "models"
+  };
+  function extractCategories(document) {
+    const cls = document.body && document.body.getAttribute("class") || "";
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document.querySelector(`article.post-${id[1]}`);
+    const out = [];
+    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+      let slug2 = m && m[1];
+      while (slug2 && !out.includes(slug2)) {
+        out.push(slug2);
+        slug2 = CATEGORY_PARENTS[slug2];
+      }
+    });
+    return out;
+  }
+  function extractTagsAndFacets(document, pageUrl = "") {
+    const tags = [];
+    const byFacet = {};
+    const seen = /* @__PURE__ */ new Set();
+    const add = (taxonomy, slug2) => {
+      if (!taxonomy || !slug2) return;
+      const key = `${taxonomy}:${slug2}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      (byFacet[taxonomy] = byFacet[taxonomy] || []).push(slug2);
+      tags.push(slug2);
+    };
+    const scopes = document.querySelectorAll("ol.entry-tags, ul.entry-tags, .entry-tags, .tag-list");
+    const roots = scopes.length ? scopes : [document];
+    for (const root of roots) {
+      root.querySelectorAll("a[href]").forEach((a) => {
+        const href = a.getAttribute("href") || "";
+        let m = href.match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
+        if (m) {
+          add(m[1].toLowerCase(), m[2].toLowerCase());
+          return;
+        }
+        m = href.match(/filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&"]+)/i);
+        if (m) {
+          let slug2;
+          try {
+            slug2 = decodeURIComponent(m[2]);
+          } catch (e) {
+            slug2 = m[2];
+          }
+          add(m[1].toLowerCase(), slug2.toLowerCase());
+        }
+      });
+    }
+    if (tags.length === 0) {
+      const cls = document.body && document.body.getAttribute("class") || "";
+      const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+      const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+      if (tax && term) {
+        const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
+        const slug2 = term[1].toLowerCase();
+        if (FACETS.includes(taxonomy) && slug2 && !/^\d+$/.test(slug2)) add(taxonomy, slug2);
+      }
+    }
+    if (tags.length === 0) {
+      const cls = document.body && document.body.getAttribute("class") || "";
+      const canonical = document.querySelector('link[rel="canonical"]');
+      const href = pageUrl || canonical && canonical.getAttribute("href") || "";
+      if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
+        const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
+        if (m) add("series", m[1].toLowerCase());
+      } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
+        const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
+        if (m) add("model", m[1].toLowerCase());
+      }
+    }
+    if (tags.length === 0) {
+      const cls = document.body && document.body.getAttribute("class") || "";
+      const id = cls.match(/\bpostid-(\d+)\b/);
+      const post = id && document.querySelector(`article[data-post-id="${id[1]}"]`);
+      String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+        const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
+        if (m && FACETS.includes(m[1]) && !/^\d+$/.test(m[2])) add(m[1], m[2]);
+      });
+    }
+    return { tags, byFacet };
+  }
+  function splitList(value) {
+    return value ? String(value).split(",").map((s) => s.trim()).filter(Boolean) : [];
+  }
+  function hasMetadataBlock(element) {
+    const tables = element.querySelectorAll("table");
+    for (const t of tables) {
+      const firstCell = t.querySelector("tr th, tr td");
+      if (firstCell && firstCell.textContent.trim().toLowerCase() === "metadata") return true;
+    }
+    return false;
+  }
+  function transform3(hookName, element, payload) {
+    if (hookName !== TransformHook2.afterTransform) return;
+    if (hasMetadataBlock(element)) return;
+    const { document, url, params } = payload;
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
+    const overrides = payload.template && payload.template.metadata || {};
+    const h1 = document.querySelector("h1");
+    const title = respacedTitle(cleanTitle(overrides.title || metaContent(document, 'meta[property="og:title"]') || (document.querySelector("title") ? document.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : "")), h1);
+    const description = overrides.description || metaContent(document, 'meta[property="og:description"]') || metaContent(document, 'meta[name="description"]') || "";
+    const imageSrc = overrides.image || metaContent(document, 'meta[property="og:image"]') || "";
+    const publisheddate = overrides.publisheddate || extractDate(document);
+    const template = overrides.template || extractTemplate(document) || overrides.templateDefault || "";
+    const category = overrides.category || extractCategory(pageUrl);
+    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
+    const meta = {};
+    if (title) meta.Title = title;
+    if (description) meta.Description = description;
+    if (imageSrc) {
+      const img = document.createElement("img");
+      img.src = imageSrc;
+      meta.Image = img;
+    }
+    if (publisheddate) meta.publisheddate = publisheddate;
+    if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
+    if (category) meta.category = category;
+    const categories = template === "story" ? extractCategories(document) : [];
+    if (categories.length) meta.categories = categories.join(", ");
+    const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
+    if (allTags.length) meta.tags = allTags.join(", ");
+    FACETS.forEach((f) => {
+      const merged = [.../* @__PURE__ */ new Set([...byFacet[f] || [], ...splitList(overrides[f])])];
+      if (merged.length) meta[f] = merged.join(", ");
+    });
+    const block = WebImporter.Blocks.getMetadataBlock(document, meta);
+    element.append(block);
+  }
+
+  // tools/importer/transformers/skoda-links.js
+  var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
+  var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
+  var DEMO_PATHS = [
+    "/en",
+    "/en/category/classic-cars",
+    "/en/category/concepts",
+    "/en/category/corporate-life",
+    "/en/category/design-eng",
+    "/en/category/emobility",
+    "/en/category/lifestyle",
+    "/en/category/lifestyle/adventures",
+    "/en/category/lifestyle/people",
+    "/en/category/lifestyle/sports",
+    "/en/category/models",
+    "/en/category/skoda-world",
+    "/en/category/skoda-world/design",
+    "/en/category/skoda-world/heritage",
+    "/en/category/skoda-world/innovation-and-technology",
+    "/en/category/skoda-world/responsibility",
+    "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+    "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+    "/en/emobility/a-true-czech-from-spain",
+    "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+    "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+    "/en/emobility/camouflage-to-get-you-hooked",
+    "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+    "/en/emobility/come-and-play-skoda-is-heading-to-milan",
+    "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+    "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint",
+    "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
+    "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv",
+    "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak",
+    "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way",
+    "/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq",
+    "/en/emobility/meet-peaq-safe-and-comfortable",
+    "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
+    "/en/emobility/meet-the-peaq-comfort-just-like-at-home",
+    "/en/emobility/meet-the-peaq-spacious-inside-and-out",
+    "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+    "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
+    "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging",
+    "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
+    "/en/emobility/skoda-elroq-and-a-happy-family",
+    "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+    "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
+    "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
+    "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
+    "/en/emobility/teaser",
+    "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
+    "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
+    "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+    "/en/emobility/whats-behind-epiq-design",
+    "/en/images",
+    "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
+    "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
+    "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
+    "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
+    "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
+    "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como",
+    "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
+    "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
+    "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+    "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
+    "/en/media-cart",
+    "/en/media-room",
+    "/en/models/skoda-elroq-through-designers-eyes",
+    "/en/news",
+    "/en/press-kits",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+    "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+    "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+    "/en/press-kits/classic-days-2026-press-kit/images",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+    "/en/press-kits/classic-days-2026-press-kit/texts",
+    "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+    "/en/press-kits/classic-days-2026-press-kit/videos",
+    "/en/press-kits/lets-explore-albania-press-kit",
+    "/en/press-kits/new-skoda-enyaq-press-kit-2",
+    "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
+    "/en/press-kits/skoda-elroq-press-kit",
+    "/en/press-kits/skoda-elroq-press-kit-2",
+    "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+    "/en/press-kits/skoda-epiq-press-kit-2",
+    "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+    "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+    "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+    "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+    "/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-epiq-press-kit-2/images",
+    "/en/press-kits/skoda-epiq-press-kit-2/infographics",
+    "/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+    "/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+    "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+    "/en/press-kits/skoda-epiq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-epiq-press-kit-2/texts",
+    "/en/press-kits/skoda-epiq-press-kit-2/videos",
+    "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+    "/en/press-kits/skoda-octavia-media-launch-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit-2",
+    "/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps",
+    "/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit",
+    "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+    "/en/press-kits/skoda-peaq-press-kit",
+    "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
+    "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
+    "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
+    "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-peaq-press-kit-2/images",
+    "/en/press-kits/skoda-peaq-press-kit-2/infographics",
+    "/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot",
+    "/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems",
+    "/en/press-kits/skoda-peaq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-peaq-press-kit-2/texts",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+    "/en/press-kits/skoda-peaq-press-kit-2/videos",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
+    "/en/press-kits/skoda-vision-o-press-kit",
+    "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
+    "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
+    "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
+    "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
+    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
+    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
+    "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
+    "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
+    "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
+    "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
+    "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
+    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq",
+    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation",
+    "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east",
+    "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
+    "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
+    "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
+    "/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny",
+    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter",
+    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year",
+    "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running",
+    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
+    "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+    "/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling",
+    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
+    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",
+    "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category",
+    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain",
+    "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
+    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq",
+    "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
+    "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
+    "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
+    "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
+    "/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities",
+    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
+    "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+    "/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores",
+    "/en/press-releases/the-updated-octavia-now-with-all-wheel-drive",
+    "/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
+    "/en/search",
+    "/en/series-2",
+    "/en/series/125-years-of-motorsport",
+    "/en/series/130-years",
+    "/en/series/60-seconds-walkaround",
+    "/en/series/back-to-the-past",
+    "/en/series/czech-footprint",
+    "/en/series/evolution-of-parts",
+    "/en/series/hidden-helpers",
+    "/en/series/minutes-from-car-production",
+    "/en/series/my-life-my-car",
+    "/en/series/road-trip",
+    "/en/series/roads-places",
+    "/en/series/sustainable-mobility",
+    "/en/series/unexpected-jobs",
+    "/en/series/unknown-parts",
+    "/en/series/winter-tips",
+    "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
+    "/en/skoda-model/elroq",
+    "/en/skoda-model/elroq/elroq-rs",
+    "/en/skoda-model/elroq/elroq-sportline",
+    "/en/skoda-model/enyaq-iv-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
+    "/en/skoda-model/enyaq-iv-2/enyaq-rs",
+    "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv",
+    "/en/skoda-model/epiq",
+    "/en/skoda-model/kamiq",
+    "/en/skoda-model/karoq-6",
+    "/en/skoda-model/karoq-6/karoq-sportline",
+    "/en/skoda-model/new-fabia",
+    "/en/skoda-model/new-kodiaq",
+    "/en/skoda-model/new-kodiaq/kodiaq-rs",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-iv",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-sportline",
+    "/en/skoda-model/new-superb",
+    "/en/skoda-model/new-superb/new-superb-iv",
+    "/en/skoda-model/octavia",
+    "/en/skoda-model/octavia/octavia-rs",
+    "/en/skoda-model/octavia/octavia-sportline",
+    "/en/skoda-model/peaq",
+    "/en/skoda-model/scala",
+    "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
+    "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
+    "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
+    "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
+    "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
+    "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+    "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+    "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
+    "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+    "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+    "/en/skoda-world/making-driving-easier-how-cruise-control-works",
+    "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
+    "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
+    "/en/skoda-world/peaq-inside-a-designblok",
+    "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+    "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
+    "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
+    "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
+    "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
+    "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/en/tag/company/design",
+    "/en/tag/company/production",
+    "/en/tag/crew/electro-vehicle",
+    "/en/tag/crew/electromobility",
+    "/en/tag/crew/emobility",
+    "/en/tag/crew/technology",
+    "/en/tag/derivative/sportline",
+    "/en/tag/environment/greenfuture",
+    "/en/tag/environment/sustainability",
+    "/en/tag/model/elroq",
+    "/en/tag/model/enyaq",
+    "/en/tag/model/epiq",
+    "/en/tag/model/fabia",
+    "/en/tag/model/kamiq",
+    "/en/tag/model/karoq",
+    "/en/tag/model/kodiaq",
+    "/en/tag/model/kylaq",
+    "/en/tag/model/octavia",
+    "/en/tag/model/peaq",
+    "/en/tag/model/scala",
+    "/en/tag/model/slavia",
+    "/en/tag/model/superb",
+    "/en/tag/people/stefani",
+    "/en/tag/years/2024",
+    "/en/tag/years/2025",
+    "/en/tag/years/2026",
+    "/en/videos"
+  ];
+  var DEMO_ALIASES = {
+    "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
+  };
+  var LIVE_ONLY_PATHS = [
+    "/en/emobility/a-true-czech-from-spain",
+    "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+    "/en/emobility/come-and-play-skoda-is-heading-to-milan",
+    "/en/emobility/meet-peaq-safe-and-comfortable",
+    "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
+    "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+    "/en/emobility/teaser",
+    "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
+    "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
+    "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+    "/en/emobility/whats-behind-epiq-design",
+    "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
+    "/en/media-cart",
+    "/en/media-room",
+    "/en/news",
+    "/en/press-kits",
+    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
+    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
+    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
+    "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
+    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
+    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq",
+    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation",
+    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter",
+    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year",
+    "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running",
+    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
+    "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
+    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",
+    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain",
+    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq",
+    "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
+    "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
+    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
+    "/en/search",
+    "/en/series-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
+    "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
+    "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+    "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+    "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
+    "/en/skoda-world/peaq-inside-a-designblok",
+    "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion"
+  ];
+  var ALLOWED = new Set(DEMO_PATHS);
+  var LIVE_ONLY = new Set(LIVE_ONLY_PATHS);
+  function edsPath(sourcePath) {
+    let p = sourcePath || "/";
+    try {
+      p = decodeURIComponent(p);
+    } catch (e) {
+    }
+    p = p.replace(/\.html?$/i, "").replace(/\/+$/, "");
+    if (!p) return "/";
+    return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
+  }
+  var SCHEMELESS_SOURCE = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com\/(?:[^?#]*\/)?)?(?:www\.)?skoda-storyboard\.com(?=\/)/i;
+  function schemelessSource(href) {
+    const m = href.match(SCHEMELESS_SOURCE);
+    return m ? `${SOURCE_ORIGIN}${href.slice(m[0].length)}` : href;
+  }
+  function rewriteHref(href) {
+    const m = href.match(SOURCE_HOST);
+    if (!m) return null;
+    const rest = href.slice(m[0].length);
+    const cut = rest.search(/[?#]/);
+    const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
+    let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
+    target = DEMO_ALIASES[target] || target;
+    if (LIVE_ONLY.has(target) && /[?&]filter(?:\[|%5B)(?!search(?:\]|%5D))/i.test(tail.split("#")[0])) {
+      return null;
+    }
+    return ALLOWED.has(target) ? `${target}${tail}` : null;
+  }
+  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  function tagPageHref(href) {
+    const m = href.match(TAG_FILTER);
+    if (!m) return null;
+    const slug2 = edsPath(`/${m[2]}`).slice(1);
+    const exact = `/en/tag/${m[1].toLowerCase()}/${slug2}`;
+    if (ALLOWED.has(exact)) return exact;
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug2}`) && p.split("/").length === 5);
+    return bySlug.length === 1 ? bySlug[0] : null;
+  }
+  var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
+  function transform4(hookName, element, payload) {
+    if (hookName !== TransformHook3.afterTransform) return;
+    element.querySelectorAll("a[href]").forEach((a) => {
+      let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
+      if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      href = schemelessSource(href);
+      if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
+      if (href !== a.getAttribute("href")) a.setAttribute("href", href);
+    });
+  }
+
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform5(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
+  }
+
+  // tools/importer/import-sustainability.js
+  var PAGE_TEMPLATE = {
+    name: "sustainability",
+    description: "\u0160koda Sustainable Offices page. SiteOrigin rows -> header section, intro, a section per theme (Columns image-card rows, the info-blocks band), the event section. Metadata template=page, theme=sustainability.",
+    urls: ["https://www.skoda-storyboard.com/en/sustainable-offices/"],
+    // its own chrome: the Sustainability tab, no menu, no sitemap (import-sustainability-nav/-footer)
+    metadata: {
+      templateDefault: "page",
+      theme: "sustainability",
+      nav: "/sustainability/nav",
+      footer: "/sustainability/footer"
+    },
+    blocks: [],
+    sections: []
+  };
+  var transformers = [
+    transform,
+    transform2,
+    transform3,
+    transform4
+  ];
+  function executeTransformers(hookName, element, payload) {
+    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
+    transformers.forEach((transformerFn) => {
+      try {
+        transformerFn.call(null, hookName, element, enhancedPayload);
+      } catch (e) {
+        console.error(`Transformer failed at ${hookName}:`, e);
+      }
+    });
+  }
+  var import_sustainability_default = {
+    preprocess: ({ document }) => {
+      transform5("preprocess", document.body, { document });
+      document.querySelectorAll('.panel-layout a.media-cart-action.download[href], .panel-layout a[data-action="download"][href]').forEach((a) => {
+        if (!a.textContent.trim()) a.textContent = "Download";
+      });
+    },
+    transform: (payload) => {
+      const { document, url, params } = payload;
+      const main = document.body;
+      executeTransformers("beforeTransform", main, payload);
+      executeTransformers("afterTransform", main, payload);
+      WebImporter.rules.transformBackgroundImages(main, document);
+      WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
+      return [{
+        element: main,
+        path,
+        report: {
+          title: document.title,
+          template: PAGE_TEMPLATE.name,
+          blocks: ["columns"]
+        }
+      }];
+    }
+  };
+  return __toCommonJS(import_sustainability_exports);
+})();

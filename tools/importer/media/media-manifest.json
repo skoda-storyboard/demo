@@ -244079,6 +244079,707 @@
       },
       "status": "partial",
       "note": ""
+    },
+    "aac5f28c__BG.jpg": {
+      "logical_id": "aac5f28c__BG.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/05/BG-1920x576.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/05/BG.jpg",
+      "dam_page_path": "en/iihf/ru/picture-guidelines",
+      "page_refs": [
+        "en/iihf/ru/picture-guidelines",
+        "en/iihf/ru/gdpr"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/05/BG.jpg",
+      "da_path": "",
+      "alt": "Фото Рекомендации",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/05/BG-1920x576.jpg",
+        "https://cdn.skoda-storyboard.com/2021/05/BG-1440x432.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4094485,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "942a4fe2__Blok.jpg": {
+      "logical_id": "942a4fe2__Blok.jpg",
+      "source_url": "https://skoda-ms.s3.amazonaws.com/2018/05/Blok.jpg",
+      "master_url": "https://skoda-ms.s3.amazonaws.com/2018/05/Blok.jpg",
+      "dam_page_path": "en/documents/consent-to-personal-data-processing-information-on-personal-data-processing",
+      "page_refs": [
+        "en/documents/consent-to-personal-data-processing-information-on-personal-data-processing"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://skoda-ms.s3.amazonaws.com/2018/05/Blok.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": null,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "skipped",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": "no safe delivery rendition: master-unreachable-and-source-oversize-or-unknown"
+    },
+    "86741f96__Office_new_header_25c3926e.jpg": {
+      "logical_id": "86741f96__Office_new_header_25c3926e.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_25c3926e.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_25c3926e.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_25c3926e.jpg",
+      "da_path": "",
+      "alt": "Office_new_header_25c3926e",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_25c3926e.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 513166,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "86741f96__Office_new_header_phone_129f26d6.jpg": {
+      "logical_id": "86741f96__Office_new_header_phone_129f26d6.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_phone_129f26d6.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_phone_129f26d6.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_phone_129f26d6.jpg",
+      "da_path": "",
+      "alt": "Office_new_header_phone_129f26d6",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/02/Office_new_header_phone_129f26d6.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 596778,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "86741f96__AFI_2025_0971-a_1920x1215_3a4da185.jpg": {
+      "logical_id": "86741f96__AFI_2025_0971-a_1920x1215_3a4da185.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0971-a_1920x1215_3a4da185.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0971-a_1920x1215_3a4da185.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0971-a_1920x1215_3a4da185.jpg",
+      "da_path": "",
+      "alt": "AFI_2025_0971-a_1920x1215_3a4da185",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0971-a_1920x1215_3a4da185.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 901050,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0931-b_dcda5bc0.png": {
+      "logical_id": "155c772a__AFI_2025_0931-b_dcda5bc0.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0931-b_dcda5bc0.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0931-b_dcda5bc0.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0931-b_dcda5bc0.png",
+      "da_path": "",
+      "alt": "AFI_2025_0931-b_dcda5bc0",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0931-b_dcda5bc0.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6200751,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0214-a_4f111d1e.png": {
+      "logical_id": "155c772a__AFI_2025_0214-a_4f111d1e.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0214-a_4f111d1e.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0214-a_4f111d1e.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0214-a_4f111d1e.png",
+      "da_path": "",
+      "alt": "AFI_2025_0214-a_4f111d1e",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0214-a_4f111d1e.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5404154,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0396-a_d740a44c.JPG.jpg": {
+      "logical_id": "155c772a__AFI_2025_0396-a_d740a44c.JPG.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0396-a_d740a44c.JPG.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0396-a_d740a44c.JPG.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0396-a_d740a44c.JPG.jpg",
+      "da_path": "",
+      "alt": "AFI_2025_0396-a_d740a44c.JPG",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0396-a_d740a44c.JPG.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 10451612,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0305-a_878d716b.png": {
+      "logical_id": "155c772a__AFI_2025_0305-a_878d716b.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0305-a_878d716b.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0305-a_878d716b.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0305-a_878d716b.png",
+      "da_path": "",
+      "alt": "AFI_2025_0305-a_878d716b",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0305-a_878d716b.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6551866,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0805-a_449baadc.png": {
+      "logical_id": "155c772a__AFI_2025_0805-a_449baadc.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0805-a_449baadc.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0805-a_449baadc.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0805-a_449baadc.png",
+      "da_path": "",
+      "alt": "AFI_2025_0805-a_449baadc",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0805-a_449baadc.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5400352,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0911-a_6b474e18.png": {
+      "logical_id": "155c772a__AFI_2025_0911-a_6b474e18.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0911-a_6b474e18.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0911-a_6b474e18.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0911-a_6b474e18.png",
+      "da_path": "",
+      "alt": "AFI_2025_0911-a_6b474e18",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0911-a_6b474e18.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6055911,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0688-a_bc3ae01c.png": {
+      "logical_id": "155c772a__AFI_2025_0688-a_bc3ae01c.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0688-a_bc3ae01c.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0688-a_bc3ae01c.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0688-a_bc3ae01c.png",
+      "da_path": "",
+      "alt": "AFI_2025_0688-a_bc3ae01c",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0688-a_bc3ae01c.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5425825,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0135-a_0e3e0c32.png": {
+      "logical_id": "155c772a__AFI_2025_0135-a_0e3e0c32.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0135-a_0e3e0c32.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0135-a_0e3e0c32.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0135-a_0e3e0c32.png",
+      "da_path": "",
+      "alt": "AFI_2025_0135-a_0e3e0c32",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0135-a_0e3e0c32.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5831813,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0086-a_3f56af9a.png": {
+      "logical_id": "155c772a__AFI_2025_0086-a_3f56af9a.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0086-a_3f56af9a.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0086-a_3f56af9a.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0086-a_3f56af9a.png",
+      "da_path": "",
+      "alt": "AFI_2025_0086-a_3f56af9a",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0086-a_3f56af9a.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5630606,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0541-b_a9bab7f6.png": {
+      "logical_id": "155c772a__AFI_2025_0541-b_a9bab7f6.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0541-b_a9bab7f6.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0541-b_a9bab7f6.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0541-b_a9bab7f6.png",
+      "da_path": "",
+      "alt": "AFI_2025_0541-b_a9bab7f6",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0541-b_a9bab7f6.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 7191737,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0015-b_579bda40.png": {
+      "logical_id": "155c772a__AFI_2025_0015-b_579bda40.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0015-b_579bda40.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0015-b_579bda40.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0015-b_579bda40.png",
+      "da_path": "",
+      "alt": "AFI_2025_0015-b_579bda40",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0015-b_579bda40.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5554632,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0551-a_101a5cbf.png": {
+      "logical_id": "155c772a__AFI_2025_0551-a_101a5cbf.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0551-a_101a5cbf.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0551-a_101a5cbf.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0551-a_101a5cbf.png",
+      "da_path": "",
+      "alt": "AFI_2025_0551-a_101a5cbf",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0551-a_101a5cbf.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6133505,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "86741f96__AFI_2025_0263-a_1920x1215_acdefa27.jpg": {
+      "logical_id": "86741f96__AFI_2025_0263-a_1920x1215_acdefa27.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0263-a_1920x1215_acdefa27.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0263-a_1920x1215_acdefa27.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0263-a_1920x1215_acdefa27.jpg",
+      "da_path": "",
+      "alt": "AFI_2025_0263-a_1920x1215_acdefa27",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0263-a_1920x1215_acdefa27.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1085991,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "86741f96__AFI_2025_0642-b_22afbb45.jpg": {
+      "logical_id": "86741f96__AFI_2025_0642-b_22afbb45.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0642-b_22afbb45.JPG-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0642-b_22afbb45.JPG.jpg",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0642-b_22afbb45.JPG-1440x960.jpg",
+      "da_path": "",
+      "alt": "AFI_2025_0642-b_22afbb45.JPG",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/02/AFI_2025_0642-b_22afbb45.JPG-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 519892,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0343-a_ca3346cb.png": {
+      "logical_id": "155c772a__AFI_2025_0343-a_ca3346cb.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0343-a_ca3346cb.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0343-a_ca3346cb.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0343-a_ca3346cb.png",
+      "da_path": "",
+      "alt": "AFI_2025_0343-a_ca3346cb",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0343-a_ca3346cb.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 7224517,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0358-a_a4108ca6.png": {
+      "logical_id": "155c772a__AFI_2025_0358-a_a4108ca6.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0358-a_a4108ca6.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0358-a_a4108ca6.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0358-a_a4108ca6.png",
+      "da_path": "",
+      "alt": "AFI_2025_0358-a_a4108ca6",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0358-a_a4108ca6.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 7066018,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "155c772a__AFI_2025_0856_a_dfeed94b.png": {
+      "logical_id": "155c772a__AFI_2025_0856_a_dfeed94b.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0856_a_dfeed94b.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0856_a_dfeed94b.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0856_a_dfeed94b.png",
+      "da_path": "",
+      "alt": "AFI_2025_0856_a_dfeed94b",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/12/AFI_2025_0856_a_dfeed94b.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5385200,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "3311ece9__header_main_a55a8fc5.png": {
+      "logical_id": "3311ece9__header_main_a55a8fc5.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/12/header_main_a55a8fc5-1440x595.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/12/header_main_a55a8fc5.png",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/12/header_main_a55a8fc5.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/12/header_main_a55a8fc5-1440x595.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3359097,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "c6d86b52__sustainable-offices-afi-2026-cz-en-tit_f9300b23.mp4": {
+      "kind": "video",
+      "logical_id": "c6d86b52__sustainable-offices-afi-2026-cz-en-tit_f9300b23.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/05/sustainable-offices-afi-2026-cz-en-tit_f9300b23.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/05/sustainable-offices-afi-2026-cz-en-tit_f9300b23.mp4",
+      "dam_page_path": "en/sustainable-offices",
+      "page_refs": [
+        "en/sustainable-offices"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "Škoda Offices of the Future",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/05/sustainable-offices-afi-2026-cz-en-tit_f9300b23.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
     }
   }
 }

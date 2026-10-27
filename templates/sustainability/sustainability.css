@@ -1,0 +1,347 @@
+/* stylelint-disable no-descending-specificity -- the template's rules go in page order (header,
+   intro, themes, band, film, event); their selectors never match the same element */
+
+/* ==========================================================================
+   Sustainable Offices (SKODA-843): /en/sustainable-offices, `theme: sustainability`
+   (scripts.js TEMPLATES). Measured on the live page (body.sustainability, its
+   sustainability.css and SiteOrigin layout) at 390 / 768 / 1280. The source's own type
+   scale: an 18/28 light text, 0.02em tracking, centred; 16/24 below 768. Its rows:
+   - the header: h1, the wide image (from 720) or its phone crop;
+   - the intro, 720px wide;
+   - a section per theme: the h2, `Columns (image-card)` rows (image + a grey text card,
+     stacked image first below 781), the `Columns (info-blocks)` band of three dark cards,
+     the "Interested in hiring…" line, the film in the last;
+   - the event section: h2, image (800px), text.
+   ========================================================================== */
+
+body.sustainability {
+  --sus-gap: 56px; /* between the page's parts */
+  --sus-top: 96px; /* the header → the title */
+  --sus-title-gap: 56px; /* the title → the header image */
+  --sus-intro-gap: 56px; /* the header image → the intro */
+  --sus-h2-gap: 50px; /* a theme's h2 → its first card */
+  --sus-card-gap: 50px; /* card → card */
+  --sus-card-gap-first: 56px; /* a theme's first card → its second */
+  --sus-band-end: var(--sus-gap); /* the band → the hire line */
+  --sus-card-pad: 0; /* a stacked text card (phones: 32 16 40) */
+  --sus-card-box-width: 615px; /* .image-card_text, stacked */
+  --sus-band-gap: 100px; /* card → the band */
+  --sus-hire-gap: var(--sus-gap); /* the last card → the hire line */
+  --sus-film-gap: calc(var(--sus-text-line) + var(--sus-film-end)); /* the hire line's blank line + 16 */
+  --sus-film-end: 16px; /* the film's attachment margin */
+  --sus-end: 80px; /* the event text → the footer (its row's 56px and a 24px spacer) */
+  --sus-inset: 0; /* a text column's side inset (phones) */
+  --sus-text-size: 18px;
+  --sus-text-line: 28px;
+  --sus-tracking: 0.02em;
+  --sus-h1-size: 56px;
+  --sus-h2-size: 44px;
+  --sus-band-color: var(--skoda-grey-850); /* the band cards (source .info-blocks .block) */
+  --sus-card-text-width: 426px; /* .image-card_text-inner */
+  --sus-card-text-inset: 80px;
+  --sus-band-title-pad: 32px; /* .info-blocks .block h3 */
+  --sus-intro-width: 720px;
+  --sus-band-inset-start: 22px; /* the phone band cards' left margin (.info-blocks .block) */
+  --sus-event-image-width: 800px;
+}
+
+body.sustainability main > .section {
+  margin: 0;
+  padding-block-start: var(--sus-gap);
+}
+
+body.sustainability main :is(h1, h2, h3, p) {
+  margin: 0;
+  letter-spacing: var(--sus-tracking);
+}
+
+body.sustainability main :is(h1, h2) {
+  text-align: center;
+}
+
+body.sustainability main h1 {
+  font-size: var(--sus-h1-size);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+}
+
+body.sustainability main h2 {
+  font-size: var(--sus-h2-size);
+  font-weight: var(--weight-light);
+  line-height: 1.125;
+}
+
+body.sustainability main p {
+  font-size: var(--sus-text-size);
+  font-weight: var(--weight-light);
+  line-height: var(--sus-text-line);
+  text-align: center;
+}
+
+/* a superscript raises its line, as the source's browser default (the intro's "17th": 5px) */
+body.sustainability main sup {
+  position: static;
+  vertical-align: super;
+  line-height: inherit;
+}
+
+body.sustainability main strong {
+  font-weight: var(--weight-semibold);
+}
+
+/* the source's green, underlined (as the generic pages' links: the PO's "same as live",
+   SKODA-813) */
+body.sustainability main .default-content-wrapper a:any-link {
+  color: var(--skoda-green-accent);
+  text-decoration: underline;
+}
+
+body.sustainability main .default-content-wrapper a:any-link:hover {
+  color: var(--text-color);
+}
+
+/* header: the title, then one of the two header images */
+body.sustainability main > .section.sustainability-header {
+  padding-block-start: var(--sus-top);
+}
+
+body.sustainability main > .section.sustainability-header h1 {
+  margin-block-end: var(--sus-title-gap);
+}
+
+body.sustainability main > .section.sustainability-header img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+body.sustainability .sustainability-header-phone {
+  display: none;
+}
+
+/* the intro */
+body.sustainability main > .section.sustainability-header + .section {
+  padding-block-start: var(--sus-intro-gap);
+}
+
+body.sustainability main > .section.sustainability-header + .section p {
+  max-inline-size: var(--sus-intro-width);
+  margin-inline: auto;
+  padding-inline: var(--sus-inset);
+}
+
+/* a theme: h2, cards, band, the hire line */
+body.sustainability main > .section > .default-content-wrapper:first-child:has(> h2:first-child) + .columns-wrapper {
+  margin-block-start: var(--sus-h2-gap);
+}
+
+body.sustainability main > .section > .columns-wrapper + .columns-wrapper {
+  margin-block-start: var(--sus-card-gap);
+}
+
+/* the source's rows put 56px after a theme's first card (its row's bottom padding), 50px after
+   the others; "Variable spaces" alone has 50 there too */
+body.sustainability main > .section > .default-content-wrapper:first-child + .columns-wrapper + .columns-wrapper:not(:has(> .info-blocks)) {
+  margin-block-start: var(--sus-card-gap-first);
+}
+
+body.sustainability main > .section > .columns-wrapper + .columns-wrapper:has(> .info-blocks) {
+  margin-block-start: var(--sus-band-gap);
+}
+
+body.sustainability main > .section > .columns-wrapper + .default-content-wrapper {
+  margin-block-start: var(--sus-hire-gap);
+}
+
+body.sustainability main > .section > .columns-wrapper:has(> .info-blocks) + .default-content-wrapper {
+  margin-block-start: var(--sus-band-end);
+}
+
+/* an image card: the image and a grey text card, its text centred in it, 426px at most */
+body.sustainability .columns.image-card > div {
+  gap: 0;
+  align-items: stretch;
+}
+
+body.sustainability .columns.image-card .columns-img-col img {
+  display: block;
+  height: auto;
+}
+
+body.sustainability .columns.image-card > div > div:not(.columns-img-col) {
+  display: grid;
+  grid-template-columns: minmax(0, var(--sus-card-text-width));
+  align-content: center;
+  padding: var(--sus-card-pad);
+  background-color: var(--skoda-grey-50);
+  font-size: var(--sus-text-size);
+  font-weight: var(--weight-light);
+  line-height: var(--sus-text-line);
+  letter-spacing: var(--sus-tracking);
+}
+
+body.sustainability .columns.image-card p {
+  text-align: start;
+}
+
+/* `text-small`: a card whose text the source set outside a paragraph, so at its page default
+   16/24 with no tracking (Variable spaces' first card) */
+body.sustainability .columns.image-card.text-small > div > div:not(.columns-img-col),
+body.sustainability .columns.image-card.text-small p {
+  font-size: var(--body-font-size-m);
+  line-height: var(--line-height-body);
+  letter-spacing: normal;
+}
+
+/* the band: three dark cards, white text, each as tall as its text */
+body.sustainability .columns.info-blocks > div {
+  gap: var(--spacing-l);
+  align-items: start;
+}
+
+body.sustainability .columns.info-blocks > div > div {
+  padding: 48px var(--spacing-l) 56px;
+  background-color: var(--sus-band-color);
+  color: var(--skoda-white);
+  font-weight: var(--weight-light);
+}
+
+body.sustainability .columns.info-blocks h3 {
+  color: inherit;
+  padding-block: var(--sus-band-title-pad);
+  font-size: var(--spacing-l);
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
+}
+
+body.sustainability .columns.info-blocks p {
+  text-align: start;
+}
+
+/* the film (the source's attachment: 16px margin; its cart toolbar isn't migrated) */
+body.sustainability main > .section > .embed-wrapper {
+  margin-block: var(--sus-film-gap) var(--sus-film-end);
+}
+
+/* the event section: h2, a blank line, the 800px image, its text a line apart */
+body.sustainability main > .section:last-child {
+  padding-block-end: var(--sus-end);
+}
+
+body.sustainability main > .section:last-child h2 + p:has(> picture) {
+  margin-block-start: var(--sus-text-line);
+}
+
+body.sustainability main > .section:last-child p:has(> picture) img {
+  display: block;
+  width: min(100%, var(--sus-event-image-width));
+  height: auto;
+  margin-inline: auto;
+}
+
+body.sustainability main > .section:last-child p:has(> picture) + p {
+  margin-block-start: var(--sus-gap);
+}
+
+body.sustainability main > .section:last-child p:not(:has(> picture)) + p {
+  margin-block-start: var(--sus-text-line);
+}
+
+@media (width >= 781px) {
+  body.sustainability .columns.image-card > div,
+  body.sustainability .columns.info-blocks > div {
+    flex-direction: row;
+  }
+
+  /* the source's 50% / 33.33% cells, padding inside */
+  body.sustainability .columns.image-card > div > div,
+  body.sustainability .columns.info-blocks > div > div {
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    order: unset;
+  }
+
+  body.sustainability .columns.image-card > div > div {
+    flex-basis: 50%;
+  }
+
+  body.sustainability .columns.image-card > div > div:not(.columns-img-col) {
+    padding: 0 0 0 var(--sus-card-text-inset);
+  }
+}
+
+/* up to 780px the source's rows stack (SiteOrigin's collapse) and take its phone rhythm, while
+   its type stays the desktop one down to 768: the title 64px down, the rows 64px apart, a theme's
+   last card right on its hire line. A card's text sits in a grey box at most 615px wide, centred,
+   the text at its left. */
+@media (width < 781px) {
+  body.sustainability {
+    --sus-top: 64px;
+    --sus-intro-gap: 120px;
+    --sus-h2-gap: 64px;
+    --sus-card-gap: 64px;
+    --sus-card-gap-first: 64px;
+    --sus-band-end: 72px;
+    --sus-hire-gap: 0;
+    --sus-card-pad: 0;
+  }
+
+  body.sustainability main > .section > .columns-wrapper:has(> .image-card) {
+    padding-inline: calc(var(--page-gutter) + var(--spacing-l));
+  }
+
+  body.sustainability .columns.image-card > div > div:not(.columns-img-col) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: var(--sus-card-box-width);
+    margin-inline: auto;
+  }
+}
+
+/* from 720 the source shows its desktop rows (stacked up to 780): their cells in authored order */
+@media (width >= 720px) {
+  body.sustainability .columns.image-card > div > div {
+    order: unset;
+  }
+}
+
+/* phones: the 16/24 text, the text inset 24px, the header's phone crop, each card image first
+   (the source's phone rows) */
+@media (width < 768px) {
+  body.sustainability {
+    --sus-inset: var(--spacing-l);
+    --sus-text-size: 16px;
+    --sus-text-line: 24px;
+    --sus-h1-size: 33px;
+    --sus-h2-size: 28px;
+    --sus-card-pad: 32px var(--spacing-m) var(--spacing-xl);
+  }
+
+  body.sustainability main > .section > div {
+    padding-inline: 0;
+  }
+
+  body.sustainability main > .section > .columns-wrapper:has(> .image-card) {
+    padding-inline: var(--sus-inset);
+  }
+
+  body.sustainability main > .section > .columns-wrapper:has(> .info-blocks) {
+    padding-inline: var(--sus-band-inset-start) var(--sus-inset);
+  }
+}
+
+@media (width < 720px) {
+  body.sustainability {
+    --sus-title-gap: 40px;
+    --sus-intro-gap: 119px;
+  }
+
+  body.sustainability .sustainability-header-wide {
+    display: none;
+  }
+
+  body.sustainability .sustainability-header-phone {
+    display: block;
+  }
+}

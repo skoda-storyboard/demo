@@ -137,7 +137,7 @@ function removeBodyImage(img) {
 
 export async function conditionInlineMedia(html, {
   base, manifest = { rows: {} }, maxBytes = OVERSIZE_BYTES, minEdge = MIN_RENDITION_EDGE,
-  fetchImpl = fetch, cache = new Map(),
+  fetchImpl = fetch, cache = new Map(), deadSources = new Set(),
 } = {}) {
   imageLimit(maxBytes);
   renditionEdge(minEdge);
@@ -160,6 +160,24 @@ export async function conditionInlineMedia(html, {
     try {
       const references = imageReferences(img);
       const urls = references.map((ref) => resolveUrl(ref, base));
+      // a body image recorded as dead on the source itself (media/dead-source-images.json,
+      // SKODA-843) shows nothing on live: it is stripped, as live, not blocked. A hero or card
+      // image is never stripped this way.
+      // any of its sources: the file may sit in a srcset or <source> only (#843 review)
+      if (urls.some((u) => deadSources.has(u))) {
+        // the page's share image (Metadata `Image`) when it is that dead file: its row goes, so
+        // the page has none, as live has none that loads
+        const metaRow = img.closest('.metadata > div');
+        if (metaRow) {
+          changes.push({ action: 'strip-dead', from: src, row: 'metadata image' });
+          metaRow.remove();
+          continue;
+        }
+        if (protectedImage(img)) throw new Error(`Dead source image in a hero or card cannot be stripped: ${src}`);
+        changes.push({ action: 'strip-dead', from: src, alt: img.getAttribute('alt') });
+        removeBodyImage(img);
+        continue;
+      }
       const lengths = await Promise.all(urls.map((url) => measure(url)));
       if (lengths.some((length) => length === null || length === 0)) {
         const missing = lengths.findIndex((length) => length === null || length === 0);

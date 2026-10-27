@@ -32,7 +32,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-press-kit-hub.js
+  // tools/importer/import-press-kit-hub.js
   var import_press_kit_hub_exports = {};
   __export(import_press_kit_hub_exports, {
     YEAR_TERMS: () => YEAR_TERMS,
@@ -41,7 +41,7 @@ var CustomImportScript = (() => {
     sourceFacets: () => sourceFacets
   });
 
-  // parsers/press-kit-hub-hero.js
+  // tools/importer/parsers/press-kit-hub-hero.js
   function parseHero(hero, document) {
     const image = hero.querySelector(".hero-image img");
     const title = hero.querySelector(".hero-caption h1");
@@ -69,7 +69,7 @@ var CustomImportScript = (() => {
     ], document);
   }
 
-  // parsers/series-grid.js
+  // tools/importer/parsers/series-grid.js
   function siteOriginWidths(document) {
     const widths = {};
     document.querySelectorAll("style").forEach((style) => {
@@ -87,7 +87,7 @@ var CustomImportScript = (() => {
     return widths;
   }
 
-  // parsers/press-kit-hub-tiles.js
+  // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
@@ -184,7 +184,7 @@ var CustomImportScript = (() => {
     return WebImporter.DOMUtils.createTable(rows, document);
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -457,6 +457,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = template === "story" ? extractCategories(document) : [];
@@ -471,7 +473,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -911,7 +913,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1026,7 +1028,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // import-press-kit-hub.js
+  // tools/importer/import-press-kit-hub.js
   var FACETS2 = [
     "model",
     "bodywork",

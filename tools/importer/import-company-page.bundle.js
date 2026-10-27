@@ -169,16 +169,26 @@ var CustomImportScript = (() => {
       if (!article) return;
       const rows = rowsOf(article);
       if (!rows.length) {
-        (article.querySelector(".entry-content") || article).setAttribute(MARK, BODY);
+        const body = article.querySelector(".entry-content") || article;
+        if (isFilled(body)) body.setAttribute(MARK, `${BODY}, plain`);
         return;
       }
       rows.forEach((row, i) => {
+        var _a;
         const half = row.getAttribute(HALF_ROW);
         let style = BODY;
         if (half !== null) style = half ? `${HALF}, ${half}` : HALF;
         row.removeAttribute(HALF_ROW);
         if (i > 0) row.before(doc.createElement("hr"));
         row.setAttribute(MARK, style);
+        if (!((_a = payload == null ? void 0 : payload.template) == null ? void 0 : _a.splitWidgets)) return;
+        const cells = cellsOf(row);
+        if (cells.length !== 1) return;
+        const widgets = [...cells[0].querySelectorAll(":scope > .so-panel, :scope > div > .so-panel")].filter((panel) => isFilled(panel));
+        widgets.slice(1).forEach((panel) => {
+          panel.before(doc.createElement("hr"));
+          panel.setAttribute(MARK, style);
+        });
       });
     }
     if (hookName === "afterTransform") {
@@ -841,6 +851,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = template === "story" ? extractCategories(document2) : [];
