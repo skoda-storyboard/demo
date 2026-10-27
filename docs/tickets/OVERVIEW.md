@@ -115,6 +115,49 @@ New M1 tickets:
 
 ---
 
+## M2 requirements additions (2026-10-27)
+
+The client Functional Requirements, NFRs and Deliverables PDFs supplied on 27 October
+supersede the older coverage claim above. [SKODA-718](tickets/SKODA-718.md) owns the
+rebaseline of all 120 functional/migration IDs, 47 general NFRs, 39 security NFRs
+(including two cancelled clauses), 27 functional open points and 19 unique deliverables.
+Source filenames and the assessment commit are recorded in that ticket.
+
+The following **17 new tickets** cover previously untracked or materially stronger scope.
+They are M2, unestimated, with proposed owner roles but no named assignees; approvals and
+platform applicability remain human gates. GitHub issue links are listed below.
+Historical SP/day totals elsewhere in this overview have **not** been recalculated.
+
+| Ticket | Additional scope | Parent / existing work |
+|---|---|---|
+| [SKODA-718](tickets/SKODA-718.md) ([#516](https://github.com/skoda-storyboard/demo/issues/516)) | Requirements Coverage Report, scope decisions and all 19 deliverable approvals | E07 |
+| [SKODA-719](tickets/SKODA-719.md) ([#517](https://github.com/skoda-storyboard/demo/issues/517)) | Accepted TS/Solution Design, EA models, LeanIX and integration/platform applicability | E07 |
+| [SKODA-720](tickets/SKODA-720.md) ([#518](https://github.com/skoda-storyboard/demo/issues/518)) | Enterprise DevOps, source ownership/Azure delivery, four-eyes review, release notes and rollback | E07; 712, 710 |
+| [SKODA-721](tickets/SKODA-721.md) ([#519](https://github.com/skoda-storyboard/demo/issues/519)) | Blocking Sonar/JFrog gates, recurring scans and vulnerability remediation | E07; 720 |
+| [SKODA-722](tickets/SKODA-722.md) ([#520](https://github.com/skoda-storyboard/demo/issues/520)) | ASA, technical security controls, provider assurance and accepted IRMA dispositions | E07; 101a, 521, 714 |
+| [SKODA-723](tickets/SKODA-723.md) ([#521](https://github.com/skoda-storyboard/demo/issues/521)) | Third-party approvals, FOSS reports and customer-facing licence agreements | E07; 712 vendor register |
+| [SKODA-724](tickets/SKODA-724.md) ([#522](https://github.com/skoda-storyboard/demo/issues/522)) | Supplier Test Strategy/Final Report, browser matrix, publish-wave validation and formal UAT | E07; 715, 716, 803, 710 |
+| [SKODA-725](tickets/SKODA-725.md) ([#523](https://github.com/skoda-storyboard/demo/issues/523)) | Formal GDPR/legal gate, controller/processor and retention responsibilities | E07; 804, 904, 907, 843, 711 |
+| [SKODA-726](tickets/SKODA-726.md) ([#524](https://github.com/skoda-storyboard/demo/issues/524)) | Independent source review, penetration test, remediation and retest acceptance | E07; 722, 724 |
+| [SKODA-712a](tickets/SKODA-712a.md) ([#525](https://github.com/skoda-storyboard/demo/issues/525)) | Logging Concept/Solution, CLA, retention and approved AEM/IMS exceptions | 712; 812, 511b |
+| [SKODA-712b](tickets/SKODA-712b.md) ([#526](https://github.com/skoda-storyboard/demo/issues/526)) | Monitoring Concept/Solution, SC3 and Watch Center integration | 712; 511b, 712a |
+| [SKODA-712c](tickets/SKODA-712c.md) ([#527](https://github.com/skoda-storyboard/demo/issues/527)) | Approved BIA and resolution of 99.95% requirement versus 99.9% contract | 712; 719 |
+| [SKODA-712d](tickets/SKODA-712d.md) ([#528](https://github.com/skoda-storyboard/demo/issues/528)) | Backup/Technical Recovery Plan and independent <12h RTO/RPO rehearsal | 712; 712c, 712e |
+| [SKODA-712e](tickets/SKODA-712e.md) ([#529](https://github.com/skoda-storyboard/demo/issues/529)) | Accepted installation/service manuals, L1/L2 KB and independent handover | 712; 720, 712d |
+| [SKODA-809a](tickets/SKODA-809a.md) ([#530](https://github.com/skoda-storyboard/demo/issues/530)) | Dual-controlled grants, account lifecycle and periodic rights review | 809; 101a, 812 |
+| [SKODA-850f](tickets/SKODA-850f.md) ([#531](https://github.com/skoda-storyboard/demo/issues/531)) | MR-I06 Must: asset inaccessible even from an already-public page, not merely absent from a feed | 850c; 811, 522 |
+| [SKODA-713e](tickets/SKODA-713e.md) ([#532](https://github.com/skoda-storyboard/demo/issues/532)) | NFR_SEO_02 Should: applicable VideoObject metadata beyond existing Article schema | 713b; 523, 1001, 1005 |
+
+Existing execution tickets remain authoritative for consent/analytics (804/905/907),
+newsletter (904/908c), full content/locale migration (803/801b/847/848/1004), media
+ingestion/sync/lifecycle (504a/511/518–523), roles/preview/page embargo (809/101a/811),
+production URLs/cutover/SEO (103a–e/709–714) and performance/accessibility (715/716).
+The additions link that work rather than commission duplicate implementations.
+Client-marked DONE identity/accessibility clauses need evidence reconciliation, not
+automatic reimplementation; cancelled native-mobile clauses create no build scope.
+
+---
+
 ## 1. Program Summary
 
 Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
