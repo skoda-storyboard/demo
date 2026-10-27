@@ -105,7 +105,7 @@ after the review fixes, on current `main`)**
   - all 7 IIHF pages;
   - consent at 390 and 1280.
 - Remaining, each a deviation below:
-  - BGC −54 everywhere;
+  - BGC −64 everywhere, all of it under the film (the first paragraph and the film equal live at 390 / 768 / 992);
   - consent −45 at 768;
   - terms −169 / −91 / −90 / −89;
   - Botas −48 / −24 / 0 / 0.
@@ -133,7 +133,7 @@ after the review fixes, on current `main`)**
     exec-bio, brand-asset, app-promo, columns, embed.
 
 **Deviations from origin (for the PO; none accepted by an agent)**
-- BGC: the cart toolbar under the film (+, download, link) is not migrated, as on stories and press releases (SKODA-824 note): 54px shorter.
+- BGC: the cart toolbar under the film (+, download, link) is not migrated, as on stories and press releases (SKODA-824 note): 64px shorter (the source's 8px, its 40px row and 16px to the next paragraph). The earlier −54 was this net of the +10 the PR review found above the body.
 - Terms (`terms-and-conditions-2`): 7 run-in titles set inline at 18pt (24px) on the source show at the body size; DA carries no inline size.
 - Consent: the source's h2 holds the dead `Blok.jpg` (a broken 44×38 box that wraps the heading at 768); ours drops the image.
 - Botas: the sub-items `i.`–`iii.` lose their 16–17 `&nbsp;` lead-in. DA keeps it, but the EDS preview trims a
@@ -162,6 +162,17 @@ after the review fixes, on current `main`)**
 - Bundles: every import bundle rebuilt from the merged sources; parity on live pages, `main`'s bundle vs this branch's:
   the 4 company pages, the CS nav and footer, the DE footer, a story and a press release, all byte-identical. The 17
   generic pages re-imported with the fixes: unchanged in DA.
+
+**PR #511 review (2026-10-27, QA)**
+- P2: a row of spacer widgets only (BGC's first and last rows) took the page-body row's 10px top inset: BGC's text and
+  film sat 10px low (first paragraph 412 vs live 402 at 992, the same at 390 / 768 / 1080). Fixed in `styles.css`
+  (a `page-body` section holding only plain spacers has no top inset: 24 + 20 = the source row's 44px), which also
+  replaces the last-row rule. The importer output is unchanged, so no re-import, bundle or DA change. Measured: BGC's
+  first paragraph and film equal live at 390 / 768 / 992 (1080: the shared header, #410), the last row 44px (20 at
+  390); the other 23 pages (page-base, company pages, Copyright, Sustainable Offices, home) unchanged element by
+  element at 390 / 768 / 1280.
+- Open, from the same review: the Consent page's h2 → h4 skip, kept as the source's, is #512 (an accessibility
+  decision for a human).
 
 **Pending (needs an explicit request: DA writes and publishing)**
 - The 6 IIHF redirect rows (`/en/iihf`, `/en/iihf/lv`, `/en/iihf/ru`, each with and without the slash) → the live
