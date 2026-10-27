@@ -7,7 +7,7 @@
 - **Source:** supplemental user observations `WIRELESS-01` and `WIRELESS-02`, measured 2026-10-07; not #266 workbook records.
 - **Implementation references:** closed #148 / SKODA-824 and #142 / SKODA-225, references only.
 - **GitHub issue:** [#292](https://github.com/skoda-storyboard/demo/issues/292)
-- **Status (2026-10-15, from GitHub):** 🔵 TODO (M2), no owner.
+- **Status (2026-10-27):** 🟡 verified fixed on `main`, no code change in this ticket. The h2, portrait and panel now match origin at all five bands and at the transition edges: #414 / SKODA-227 (`23efa5c`) fixed it as part of its page-wide charging-story parity. See "Verification" below. Earlier (2026-10-15): 🔵 TODO (M2), no owner.
 
 ## Summary and M2 boundary
 
@@ -75,3 +75,37 @@ This issue does not alter completed #148/#142 or expand #127's importer scope.
 - [Team operating model](https://github.com/skoda-storyboard/demo/blob/main/AGENTS-TEAM.md)
 
 This grouped ticket preserves `WIRELESS-01` and `WIRELESS-02` as two observations, not two new workbook records.
+
+## Verification (2026-10-27, `main` preview vs origin, live DOM geometry, no screenshots)
+
+**Fixed by #414 / SKODA-227** (`23efa5c`, the charging story's page-wide parity). It uses the shared owners this ticket asked for:
+- the story body-column h2 rule in `styles/styles.css` (24/27 300 at ≤ 768, 40/45 300 above, `margin: 0 0 16px`);
+- the `split-NN` Columns widths in `blocks/columns/columns.css`;
+- the highlight geometry from Section Metadata `highlight-cell-*`.
+
+Nothing in this ticket needed a further change. No profile block, global h2 reset or page-specific override was added.
+
+Playwright, viewport height 900, DPR 1, fonts loaded. Origin `.panel-row-style-for-447920-1` in its `.panel-grid`; demo `.highlight-dark .columns.split-75` in its `.section`. Offsets are from the panel's top-left.
+
+| Width | h2 (size / line / weight, lines, margin) | Portrait w × h, origin / demo | Portrait offset | h2 offset | Panel height, origin / demo |
+|---|---|---|---|---|---|
+| 375 | 24 / 27 / 300, 1 line, `0 0 16px` | 315 × 472.5 / 315 × 472.3 | 25, 570 | 25, 25 | 1067.5 / 1067.3 |
+| 768 | 24 / 27 / 300, 1 line | 458.7 × 688.0 / 458.7 × 687.6 | 25, 506 | 25, 57 | 1219 / 1218.6 |
+| 769 | 40 / 45 / 300, 2 lines | 459.3 × 689.0 / 459.3 × 688.6 | 25, 569 | 25, 57 | 1283 / 1282.6 |
+| 780 | 40 / 45 / 300, 2 lines | 466.7 × 700.0 / 466.7 × 699.6 | 25, 569 | 25, 57 | 1294 / 1293.6 |
+| 781 | 40 / 45 / 300, 2 lines (split starts) | 71.8 × 107.7 / equal | 420.5, 57 | 25, 42 | 610 / 610 |
+| 992 | 40 / 45 / 300, 2 lines | 107.0 × 160.3 / 107.0 × 160.4 | 526, 57 | 25, 42 | 514 / 514 |
+| 1080 | 40 / 45 / 300, 1 line | 121.7 × 182.3 / 121.7 × 182.4 | 570, 57 | 25, 42 | 469 / 469 |
+| 1280 | 40 / 45 / 300, 1 line | 149.7 × 224.3 / 149.7 × 224.4 | 654, 57 | 25, 42 | 397 / 397 |
+
+Every h2 tuple, margin, line count and offset is equal on both. Portrait and panel differ by ≤ 0.4px (the image's intrinsic-ratio rounding).
+
+**Also checked:**
+- Intro and strong text are unchanged: `p` 16 / 24 / 400 white on `rgb(14, 58, 47)`, `strong` 600, on both.
+- **Heading outline:** the panel's "Five questions for Michal Zajíc" is an h2 on both, after the same h1. Media Box and Related Stories are h3 on both.
+- **Reflow:** at 320 and 640 (1280 at 400% / 200%), the page width equals the viewport on both. The h2 doesn't clip (`scrollWidth` = `clientWidth`), and the portrait is 260 × 390 / 580 × 870 on both.
+- **Lighthouse accessibility:** 100, no failing audit.
+
+**Found, not in this ticket's scope:** at 375 the panel *after* this one is 24px shorter on the demo (1794 vs 1818). One bold question wraps onto 3 lines instead of 4, because the source ends it with `&nbsp;</strong><br>` and the story importer drops a trailing nbsp. Filed as #509.
+
+The 1080 page offset (the source's Storyboard header is 64px taller) is #410.

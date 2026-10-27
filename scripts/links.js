@@ -68,9 +68,11 @@ export const LIVE_ALIASES = {
 // `/en/contacts` and `/en/copyright` are the migrated page-shell pages (SKODA-813): the header's
 // Contacts and the footers' contact and Copyright links. The migrated documents (SKODA-843) too:
 // the newsletter forms' absolute consent link.
+// `/en/newsletter` is the migrated plant newsletter page (SKODA-845): Company → Newsletter.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
   '/en/series-2', '/en/search', '/en/media-cart', '/en/contacts', '/en/copyright',
+  '/en/newsletter',
   '/en/documents', '/en/documents/cookies',
   '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing',
 ]);

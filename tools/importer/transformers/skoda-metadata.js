@@ -215,11 +215,15 @@ const CATEGORY_PARENTS = {
 };
 // END GENERATED CATEGORY PARENTS
 
+/** The templates whose pages carry `categories` (SKODA-831 stories, SKODA-845 press releases). */
+const CATEGORY_TEMPLATES = new Set(['story', 'press_release']);
+
 /**
  * `categories` (SKODA-831): the category-<slug> classes of the page's own post
  * <article class="post-<postid> …"> (postid from the body's `postid-N`), each followed by
  * its ancestors, de-duped. A source category archive lists its descendants' stories, so
- * the design story is also in skoda-world. Story pages only (the caller gates on template).
+ * the design story is also in skoda-world. Stories and press releases (the caller gates on
+ * template).
  * Keep in sync with skoda-metadata-extract.mjs::pickCategories.
  */
 function extractCategories(document) {
@@ -384,8 +388,9 @@ export default function transform(hookName, element, payload) {
   // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
   if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
-  // story: its WP categories + ancestors, for the category archives (SKODA-831)
-  const categories = template === 'story' ? extractCategories(document) : [];
+  // story: its WP categories + ancestors, for the category archives (SKODA-831); press
+  // release: the same, for the newsletter page's plant rails (`categories: newsletter`, SKODA-845)
+  const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
   if (categories.length) meta.categories = categories.join(', ');
 
   // tags = derived ∪ override (comma-joined → AEM splits into article:tag metas).

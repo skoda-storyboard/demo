@@ -37,7 +37,7 @@ globalThis.document = {
 };
 
 const {
-  arrowState, railVariant, dotState, dragStep, swallowClick, bindDrag, DRAG_THRESHOLD,
+  arrowState, railVariant, dotState, dragStep, swallowClick, bindDrag, DRAG_THRESHOLD, focusScrollLeft,
 } = await import('./carousel.js');
 
 // --- arrowState: arrows enable/disable at the track ends -------------------
@@ -333,4 +333,25 @@ test('video cards: the source play glyph, ring + outline triangle (#284)', async
   const icon = await readFile(new URL('../../icons/media-play.svg', import.meta.url), 'utf8');
   assert.match(icon, /<circle cx="16" cy="16" r="15"/, 'the 2px ring');
   assert.match(icon, /fill="none"/, 'an outline triangle');
+});
+
+// --- focusScrollLeft: a focused card that is only partly in view comes fully in (SKODA-845) ---
+
+test('focusScrollLeft: a card fully in view stays put', () => {
+  // 390px track, 10px inset, the first 331px card at 10
+  assert.equal(focusScrollLeft({ cellLeft: 10, cellWidth: 331, scrollLeft: 0, clientWidth: 390, inset: 10 }), null);
+});
+
+test('focusScrollLeft: the next card, one step off-screen, scrolls to its start', () => {
+  // the second card starts at 361 (10 + 331 + 20): only 29px of it shows
+  assert.equal(focusScrollLeft({ cellLeft: 361, cellWidth: 331, scrollLeft: 0, clientWidth: 390, inset: 10 }), 351);
+});
+
+test('focusScrollLeft: back to a card left of the view (Shift+Tab); never below 0', () => {
+  assert.equal(focusScrollLeft({ cellLeft: 10, cellWidth: 331, scrollLeft: 351, clientWidth: 390, inset: 10 }), 0);
+  assert.equal(focusScrollLeft({ cellLeft: 361, cellWidth: 331, scrollLeft: 700, clientWidth: 390, inset: 10 }), 351);
+});
+
+test('focusScrollLeft: sub-pixel edges count as in view', () => {
+  assert.equal(focusScrollLeft({ cellLeft: 9.6, cellWidth: 331, scrollLeft: 0, clientWidth: 390.4, inset: 10 }), null);
 });
