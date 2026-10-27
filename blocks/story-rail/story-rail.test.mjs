@@ -835,3 +835,14 @@ test('#332: promoShownPaths waits for the promo to load, and gives up after the 
     globalThis.window.MutationObserver = saved.window;
   }
 });
+
+// SKODA-841: a rail's `tag` matches the `tags` column or a facet column
+test('selectRows: a `tag` rail reaches pages that set the facet only', () => {
+  const pages = [
+    { path: '/en/x', title: 'Tagged', template: 'story', tags: 'kodiaq', date: '2026-01-02' },
+    { path: '/en/y', title: 'Facet only', template: 'story', model: 'kodiaq', date: '2026-01-01' },
+    { path: '/en/z', title: 'Other', template: 'story', model: 'karoq', date: '2026-01-03' },
+  ];
+  const cfg = parseConfig(cfgBlock([['template', 'story'], ['tag', 'kodiaq'], ['limit', '10']]));
+  assert.deepEqual(selectRows(pages, cfg).map((r) => r.title), ['Tagged', 'Facet only']);
+});

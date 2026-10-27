@@ -579,3 +579,14 @@ test('decorateCardCells: authored row WITH an image is not flagged no-image', ()
   assert.equal(imageCell.className, 'card-teaser-image', 'image cell classified');
   assert.ok(!li.classList.contains('card-teaser-no-image'), 'image present → not flagged');
 });
+
+// SKODA-841: an archive's `tag` reaches a page that sets the facet only (no `tags` row)
+test('scopeFeedRows: a tag archive lists a page whose slug is only in a facet column', () => {
+  const rows = [
+    { path: '/en/a', title: 'Tagged', template: 'story', tags: 'peaq, 2026', model: 'peaq' },
+    { path: '/en/b', title: 'Facet only', template: 'story', model: 'peaq' },
+    { path: '/en/c', title: 'Other', template: 'story', model: 'elroq' },
+  ];
+  const archive = parseFeedConfig(configBlock({ template: 'story', tag: 'peaq', excludefeatured: 'false' }));
+  assert.deepEqual(scopeFeedRows(rows, archive).map((r) => r.title), ['Tagged', 'Facet only']);
+});

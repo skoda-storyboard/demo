@@ -30,7 +30,7 @@ import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import { buildCardTeaser } from '../../scripts/card-teaser.js';
 import {
-  scopeRows, filterRows, sortRows, paginate, decodeState, encodeState,
+  scopeRows, filterRows, matchesTags, sortRows, paginate, decodeState, encodeState,
 } from '../listing/listing-logic.mjs';
 
 // The feed has no facets — an empty key list makes the shared URL codec operate
@@ -128,8 +128,9 @@ export const isFeatured = (row) => {
 
 /*
  * The feed's index rows for a parsed config: template/path scope, then the category /
- * categories / tag filter (listing-logic filterRows: any-of within a key, all keys must
- * match), then the promo-box hero posts out (source exclude_carousel_posts parity).
+ * categories filter (listing-logic filterRows: any-of within a key, all keys must match) and
+ * the tag (in `tags` or any facet column, SKODA-841), then the promo-box hero posts out
+ * (source exclude_carousel_posts parity).
  * Non-mutating; exported so tests and the archive simulation run the production path.
  */
 export function scopeFeedRows(rows, cfg) {
@@ -137,8 +138,8 @@ export function scopeFeedRows(rows, cfg) {
   const active = {};
   if (cfg.category?.length) active.category = cfg.category;
   if (cfg.categories?.length) active.categories = cfg.categories;
-  if (cfg.tag?.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
+  if (cfg.tag?.length) scoped = scoped.filter((row) => matchesTags(row, cfg.tag));
   if (cfg.excludeFeatured) scoped = scoped.filter((r) => !isFeatured(r));
   return scoped;
 }

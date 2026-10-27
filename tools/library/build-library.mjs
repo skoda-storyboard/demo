@@ -178,6 +178,53 @@ export function blocksSheet(names) {
   };
 }
 
+// SKODA-841: the page panel's metadata fields (Experience Workspace "block options", the `options`
+// tab of the Blocks sheet: key | blocks | values | type | label). The facets and the non-facet `tags`
+// are pick lists from the tag vocabulary (`/config/tags.json`); `multi` saves comma-separated, as the
+// index reads it. The facet names follow the listing's (blocks/listing/listing.js FACET_LABELS).
+const FACET_FIELDS = [
+  ['model', 'Model'], ['derivative', 'Derivative'], ['concept', 'Concept'], ['bodywork', 'Bodywork'],
+  ['equipment', 'Equipment'], ['years', 'Year'], ['company', 'Company'], ['happening', 'Event'],
+  ['history', 'History'], ['motorsport', 'Motorsport'], ['sponsorship', 'Sponsorship'], ['vip', 'People'],
+  ['view', 'Interior/Exterior'], ['technology', 'Technology'], ['environment', 'Environment'],
+];
+// the page types every block filter reads (`template`), as the query index holds them
+export const TEMPLATE_VALUES = ['story', 'press_release', 'press_kit', 'press_kit_chapter', 'skoda_model',
+  'skoda_series', 'page'];
+
+/**
+ * The Blocks sheet's `options` tab for page metadata.
+ * @param {object[]} vocabulary the tag vocabulary rows (`taxonomy | slug | label`)
+ */
+export function metadataOptions(vocabulary = []) {
+  const facetKeys = FACET_FIELDS.map(([key]) => key);
+  const pairs = (rows) => rows.map((r) => `${r.label}=${r.slug}`).join(' | ');
+  const others = vocabulary.filter((r) => !facetKeys.includes(r.taxonomy));
+  const field = (key, values, type, label) => ({
+    key, blocks: 'metadata', values, type, label,
+  });
+  return [
+    field('title', '', '', 'Title'),
+    field('description', '', '', 'Description'),
+    field('template', TEMPLATE_VALUES.join(' | '), '', 'Page type'),
+    ...FACET_FIELDS.map(([key, label]) => field(key, pairs(vocabulary.filter((r) => r.taxonomy === key)), 'multi', label)),
+    // the source's terms that are no facet (crew, people): each slug once, labelled with its taxonomy
+    field('tags', [...new Map(others.map((r) => [r.slug, `${r.label} (${r.taxonomy})=${r.slug}`])).values()].join(' | '), 'multi', 'Other tags'),
+  ];
+}
+
+/** The Blocks sheet with its two tabs: `data` (the blocks) and `options` (the page panel fields). */
+export function librarySheet(names, vocabulary) {
+  const tab = (data) => ({ total: data.length, offset: 0, limit: data.length, data });
+  return {
+    data: tab(blocksSheet(names).data),
+    options: tab(metadataOptions(vocabulary)),
+    ':names': ['data', 'options'],
+    ':version': 3,
+    ':type': 'multi-sheet',
+  };
+}
+
 /** The Templates sheet: key = the name in the Templates panel, value = the template document. */
 export function templatesSheet(templates) {
   const data = Object.entries(templates)
@@ -237,7 +284,11 @@ async function main(argv) {
   const sheet = (name, json) => writeFileSync(path.join(out, name), `${JSON.stringify(json, null, 2)}\n`);
   folder('blocks');
   Object.entries(docs).forEach(([name, d]) => writeFileSync(path.join(out, 'blocks', `${name}.plain.html`), d.html));
-  sheet('blocks.json', blocksSheet(Object.keys(docs)));
+  // the page panel's pick lists read the tag vocabulary (content/config/tags.json, the DA sheet's local
+  // copy from tools/importer/build-tag-vocabulary.mjs); without it the Blocks sheet keeps one tab
+  const vocabularyFile = path.resolve(ROOT, opt('--vocabulary', 'content/config/tags.json'));
+  const vocabulary = existsSync(vocabularyFile) ? JSON.parse(readFileSync(vocabularyFile, 'utf8')).data : null;
+  sheet('blocks.json', vocabulary ? librarySheet(Object.keys(docs), vocabulary) : blocksSheet(Object.keys(docs)));
   folder('templates');
   Object.entries(TEMPLATES).forEach(([key, t]) => writeFileSync(path.join(out, 'templates', `${key}.plain.html`), `${t.sections.join('\n')}\n`));
   sheet('templates.json', templatesSheet(TEMPLATES));

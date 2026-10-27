@@ -53,6 +53,20 @@ export function filterRows(rows, active = {}) {
   }));
 }
 
+/**
+ * Does a row carry any of these tag slugs (a feed's `tag` row)? In its `tags` column or in any facet
+ * column (SKODA-841: authors set the facets, so a page without a `tags` row still reaches its tag
+ * archives and rails). Measured on the 41 archives: the same pages as `tags` alone, no collisions.
+ * @param {object} row an index row (`tags` may be a comma string or an array)
+ * @param {string[]} slugs the wanted slugs (any of them)
+ */
+export function matchesTags(row, slugs = []) {
+  const want = slugs.map((s) => String(s).trim().toLowerCase()).filter(Boolean);
+  if (!want.length) return true;
+  return ['tags', ...INDEX_FACETS].some((key) => facetTokens(row?.[key])
+    .some((token) => want.includes(token.toLowerCase())));
+}
+
 /** Sort by date (default) — 'newest' desc, 'oldest' asc. Stable, non-mutating. */
 export function sortRows(rows, sort = 'newest') {
   const dir = sort === 'oldest' ? 1 : -1;

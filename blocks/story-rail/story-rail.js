@@ -35,7 +35,7 @@ import { buildLightbox } from '../../scripts/lightbox.js';
 import { feedLightboxItem } from '../../scripts/media-lightbox.js';
 import { decorateLinks } from '../../scripts/links.js';
 import {
-  scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
+  scopeRows, filterRows, matchesTags, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
 
 // Split a comma-separated config value into trimmed tokens.
@@ -136,8 +136,9 @@ export function selectRows(all, cfg) {
   let scoped = scopeRows(all, { template: cfg.template, path: cfg.path });
   const active = { ...(cfg.facets || {}) };
   if (cfg.category.length) active.category = cfg.category;
-  if (cfg.tag.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
+  // a `tag` matches the `tags` column or any facet column (SKODA-841)
+  if (cfg.tag.length) scoped = scoped.filter((row) => matchesTags(row, cfg.tag));
   if (cfg.exclude.length) {
     scoped = scoped.filter((r) => !cfg.exclude.some((s) => String(r.path || '').includes(s)));
   }

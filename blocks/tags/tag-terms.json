@@ -1,0 +1,25 @@
+{
+  "press_release": {
+    "company/design": "company",
+    "company/production": "company",
+    "derivative/sportline": "derivative",
+    "model/elroq": "model",
+    "model/enyaq": "model",
+    "model/epiq": "model",
+    "model/fabia": "model",
+    "model/karoq": "model",
+    "model/kodiaq": "model",
+    "model/octavia": "model",
+    "model/peaq": "model",
+    "model/slavia": "model",
+    "model/superb": "model",
+    "technology/electro-vehicle": "crew",
+    "technology/electromobility": "crew",
+    "technology/emobility": "crew",
+    "technology/technology": "crew",
+    "vip/stefani": "people",
+    "years/2024": "years",
+    "years/2025": "years",
+    "years/2026": "years"
+  }
+}
