@@ -11,6 +11,7 @@ import { cleanTitle, currentLocale } from './query-index.js';
 import { fileKey, findRowsByFile } from './media-feed.js';
 import { formatCardDate } from './card-teaser.js';
 import { downloadHref } from './media-card.js';
+import { fetchPlaceholders } from './placeholders.js';
 
 /*
  * One shared-lightbox item from a media feed row (contract media-item shape 5): the stage
@@ -80,13 +81,18 @@ export const mediaFeedUrl = () => `/${currentLocale()}/media-feed.json`;
  */
 export function wireImageLinks(links) {
   if (!links.length) return;
-  let lightbox = null;
+  // one build for every link: a second click while the first is still waiting reuses it (a
+  // failed build is retried on the next click)
+  let pending = null;
   const build = async () => {
-    // only the keyed shards of these files when the feed has them (SKODA-517)
-    let byFile = new Map();
-    try {
-      byFile = await findRowsByFile(mediaFeedUrl(), links.map((a) => a.href));
-    } catch (e) { /* titled by the alt */ }
+    // only the keyed shards of these files when the feed has them (SKODA-517); with the page
+    // locale's sheet (memoized, never longer than SHEET_WAIT_MS), so the items and the lightbox
+    // are built in its labels, as every other lightbox caller does (PR #496 review)
+    // (no feed: each item is titled by its alt; no sheet: English)
+    const [byFile] = await Promise.all([
+      findRowsByFile(mediaFeedUrl(), links.map((a) => a.href)).catch(() => new Map()),
+      fetchPlaceholders().catch(() => ({})),
+    ]);
     const items = links.map((a) => {
       const img = a.querySelector('img');
       const row = byFile.get(fileKey(a.href));
@@ -106,8 +112,11 @@ export function wireImageLinks(links) {
     a.addEventListener('click', async (e) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
-      lightbox = lightbox || await build();
-      lightbox.open(i, a, true);
+      pending = pending || build().catch((err) => {
+        pending = null;
+        throw err;
+      });
+      (await pending).open(i, a, true);
     });
   });
 }

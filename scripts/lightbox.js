@@ -35,7 +35,7 @@
 
 import { loadCSS } from './aem.js';
 import { fetchPlaceholders, localize, fillText } from './placeholders.js';
-import { META_CLASS, RELATED_CLASS } from './media-panel.js';
+import { META_CLASS, RELATED_CLASS, relabelMediaPanel } from './media-panel.js';
 
 // UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
 // `lightbox…` ({n}, {total} filled in), a clip's as `lightboxVideo…`.
@@ -326,6 +326,9 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     nextBtn.setAttribute('aria-label', text.next);
     setDetails(overlay.classList.contains('is-details-open'));
     if (named) nameActions(named);
+    // the shown caption is a copy of the item's: its media-panel labels too (PR #496 review),
+    // in place, so a playing video and the reader's focus stay where they are
+    relabelMediaPanel(stageCaption, ph);
     // an open lightbox: its counter's name and the player's fallback name too
     if (!overlay.hidden && items.length) {
       counter.setAttribute('aria-label', text.counterLabel(current + 1, items.length));

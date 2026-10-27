@@ -6,9 +6,10 @@
  * UI text (SKODA-1003): the metadata labels are the source panel's, read from the page locale's
  * placeholders sheet as `mediaPanel…` (CS "Typ souboru", DE "Dateityp"). A panel built before the
  * sheet has loaded (a lightbox item built early and cached, PR #496 review) shows English and takes
- * the locale's labels when the sheet arrives; without a sheet they stay English. The metadata and
- * related-article paragraphs carry classes, so the lightbox finds them in any language
- * (lightbox.js).
+ * the locale's labels when the sheet arrives; without a sheet they stay English. Each label is a
+ * span carrying its key (LABEL_ATTR), so a copy of the panel (the lightbox's displayed caption)
+ * relabels the same way (relabelMediaPanel). The metadata and related-article paragraphs carry
+ * classes, so the lightbox finds them in any language (lightbox.js).
  */
 
 import { localize, placeholdersNow, fetchPlaceholders } from './placeholders.js';
@@ -26,6 +27,23 @@ export const MEDIA_PANEL_LABELS = {
 
 export const META_CLASS = 'lightbox-meta';
 export const RELATED_CLASS = 'lightbox-related';
+// a sheet-driven label's key (a fixed label passed by the caller has none, so it never changes)
+export const LABEL_ATTR = 'data-media-label';
+
+const labelText = (t, key) => `${t[key] || MEDIA_PANEL_LABELS[key] || key}: `;
+
+/**
+ * Relabel a media panel, or any copy of one, from a placeholders map: every sheet-driven label in
+ * `root` takes the map's text (English where the map has none). Values are untouched.
+ * @param {ParentNode} root a panel, or an element holding a copy of one
+ * @param {Record<string,string>} ph from fetchPlaceholders()
+ */
+export function relabelMediaPanel(root, ph) {
+  const t = localize(MEDIA_PANEL_LABELS, ph, 'mediaPanel');
+  root.querySelectorAll(`[${LABEL_ATTR}]`).forEach((el) => {
+    el.textContent = labelText(t, el.getAttribute(LABEL_ATTR));
+  });
+}
 
 /**
  * The detail panel's content.
@@ -45,13 +63,15 @@ export function buildMediaPanel({
 } = {}, labels = undefined) {
   const loaded = placeholdersNow();
   const text = labels || localize(MEDIA_PANEL_LABELS, loaded, 'mediaPanel');
-  const name = (t, key) => `${t[key] || MEDIA_PANEL_LABELS[key] || key}: `;
-  // the label text nodes, by their key, to relabel once the sheet has loaded
-  const named = [];
+  let named = 0;
   const label = (key) => {
-    const node = document.createTextNode(name(text, key));
-    named.push([node, key]);
-    return node;
+    const span = document.createElement('span');
+    span.textContent = labelText(text, key);
+    if (!labels) {
+      span.setAttribute(LABEL_ATTR, key);
+      named += 1;
+    }
+    return span;
   };
   const caption = document.createElement('div');
   const para = (...nodes) => {
@@ -80,12 +100,9 @@ export function buildMediaPanel({
     a.textContent = related.title || related.href;
     para(label('relatedArticle'), a).className = RELATED_CLASS;
   }
-  if (!labels && named.length && !Object.keys(loaded).length) {
+  if (named && !Object.keys(loaded).length) {
     fetchPlaceholders()
-      .then((ph) => {
-        const t = localize(MEDIA_PANEL_LABELS, ph, 'mediaPanel');
-        named.forEach(([node, key]) => { node.nodeValue = name(t, key); });
-      })
+      .then((ph) => relabelMediaPanel(caption, ph))
       .catch(() => { /* the English labels stay */ });
   }
   return caption;
