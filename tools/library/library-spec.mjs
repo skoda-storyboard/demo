@@ -22,6 +22,18 @@ export const SPEC = {
       { class: 'faq', label: 'faq', description: 'FAQ chapter of a press kit: same rows, and the page gets FAQPage structured data for search engines.' },
     ],
   },
+  'app-promo': {
+    structure: 'rows by shape',
+    purpose: 'app promotion page: intro, mockup, screenshots, QR code and store badges',
+    description: 'The media-services app page: one row per source row, each read from its shape. [icon picture | intro text] the intro; [picture] the full-width mockup; [cell | cell] two columns of text and screenshots; [text] the download heading; [QR picture | App Store badge link | Google Play badge link] the store strip. The heading and the store strip share the emerald download panel. Images keep their size up to the cell width, centred. Put it in a section with Style "page-body".',
+    variants: [],
+  },
+  'brand-asset': {
+    structure: 'single cell tile repeating',
+    purpose: 'downloadable brand assets: logo image with PDF / PNG links',
+    description: 'Company logo tiles: one row per asset, one cell: the logo image (optionally linked to the file), then its "PDF download" and "PNG download" links. Three tiles to a row from 781px, each 17% of the page, centred; one below. Put each row of three in its own section with Style "brand-assets", and the group heading (h3) in its own "brand-assets" section above.',
+    variants: [],
+  },
   cards: {
     structure: 'image-body repeating',
     purpose: 'card grid: image + linked title + text, one row per card',
@@ -62,6 +74,12 @@ export const SPEC = {
       { class: 'gallery story', label: 'gallery, story', description: "A photo grid in a story's text: photos only (1 / 2 / 3 across), each opening the lightbox with its download sizes. Add rows collapse | auto for the \"Show more\" of a long set, and columns | 3." },
     ],
   },
+  'contact-directory': {
+    structure: 'single cell card repeating',
+    purpose: 'company contacts: person cards with e-mail, phone and LinkedIn',
+    description: 'One row per person, one cell, as on the source: the name and title in bold (one paragraph, the name its first line, shown larger), the portrait, the e-mail line (a phone after it as text: "t: +420 …") and an optional LinkedIn line with its small icon picture before the link. Two cards to a row from 781px, one below. Put each source row in its own section (Style "page-body") and the group headings (h2) between them.',
+    variants: [],
+  },
   embed: {
     structure: 'config or bare url',
     purpose: 'video / podcast embed',
@@ -77,6 +95,12 @@ export const SPEC = {
     variants: [
       { class: 'line', label: 'line', description: 'A blank line in the text (44px: one line and its paragraph gap), shown at every width.' },
     ],
+  },
+  'exec-bio': {
+    structure: 'card-panel repeating',
+    purpose: 'board members: person card with a show-more photo set and links',
+    description: 'One row per board member, two cells. Cell 1, the card: the name and roles in bold (one paragraph, the name its first line, shown larger), then the portrait. Cell 2, the "show more" panel: its label as the first paragraph, one paragraph per photo (each opens the lightbox over the set; a portrait photo is cropped from its top, a landscape one centred, or write "top" / "center" after the photo), then the links (CV, photo set, press release, LinkedIn). Two members to a row from 781px, one below. A row without cell 2 is a plain card; a panel without a label reads "show more".',
+    variants: [],
   },
   footnotes: {
     structure: 'single cell text',
@@ -194,6 +218,9 @@ export const SECTION_STYLES = [
   ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
   ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
   ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
+  ['brand-assets', 'Company logo rows across the whole page: a group heading (h3, in the middle half from 781px, 100px under the row before, 50 at the top of the page) or a row of Brand Asset tiles.'],
+  ['brand-assets, framed', 'A Brand Asset row the source frames 70px in on every side (the company logo page\'s last row).'],
+  ['page-body, pull-up', 'A row pulled 20px up into the one before from 768px wide (the Contacts rows under a group heading); combine with half where needed.'],
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],
