@@ -147,6 +147,23 @@ const prefersReducedMotion = () => window.matchMedia
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /*
+ * Where the track should scroll so a card that took keyboard focus is fully in view (exported for
+ * tests): its start at the track's start inset (a snap position; the browser clamps the last
+ * cards), or null when the whole card already shows. The browser scrolls only when the focused
+ * element itself is hidden, and a card's title link starts 16px inside the card, so a card one
+ * step off-screen would keep its focus ring out of view (WCAG 2.4.11, SKODA-845).
+ * Positions are in the track's scroll coordinates.
+ */
+export function focusScrollLeft({
+  cellLeft = 0, cellWidth = 0, scrollLeft = 0, clientWidth = 0, inset = 0,
+} = {}) {
+  const viewStart = scrollLeft + inset;
+  const viewEnd = scrollLeft + clientWidth - inset;
+  if (cellLeft >= viewStart - 1 && cellLeft + cellWidth <= viewEnd + 1) return null;
+  return Math.max(0, cellLeft - inset);
+}
+
+/*
  * Pure arrow-state decision (exported so tests exercise the production logic,
  * not a copy). prev hides at the left end, next at the right end, both hide when
  * the whole rail fits. Tolerant of sub-pixel scrollLeft (±1px).
@@ -305,6 +322,24 @@ export default function decorate(block) {
   }
   prev.addEventListener('click', () => scrollByPage(-1));
   next.addEventListener('click', () => scrollByPage(1));
+
+  // keyboard focus on a card that is only partly in view: bring the whole card in (not a mouse
+  // press, which focuses the link too and would fight a drag)
+  track.addEventListener('focusin', (e) => {
+    if (!e.target.matches(':focus-visible')) return;
+    const cell = [...track.children].find((c) => c.contains(e.target));
+    if (!cell) return;
+    const t = track.getBoundingClientRect();
+    const c = cell.getBoundingClientRect();
+    const left = focusScrollLeft({
+      cellLeft: c.left - t.left + track.scrollLeft,
+      cellWidth: c.width,
+      scrollLeft: track.scrollLeft,
+      clientWidth: track.clientWidth,
+      inset: parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0,
+    });
+    if (left !== null) track.scrollTo({ left, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  });
 
   track.addEventListener('scroll', scheduleSync, { passive: true });
   if (window.ResizeObserver) {

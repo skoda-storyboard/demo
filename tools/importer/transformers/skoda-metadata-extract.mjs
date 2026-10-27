@@ -256,14 +256,17 @@ export function withCategoryAncestors(slugs, parents = CATEGORY_PARENTS) {
   return out;
 }
 
+/** The templates whose pages carry `categories` (SKODA-831 stories, SKODA-845 press releases). */
+export const CATEGORY_TEMPLATES = new Set(['story', 'press_release']);
+
 /**
- * The `categories` metadata of a story (SKODA-831): the category-<slug> classes of the
- * page's own post <article class="post-<postid> …"> (postid from the body's `postid-N`)
- * plus their ancestors. Story pages only: '' for any other template or when the post
- * article is missing. Comma-joined like the facets (a plain name= meta, not split).
+ * The `categories` metadata of a story or press release (SKODA-831, SKODA-845): the
+ * category-<slug> classes of the page's own post <article class="post-<postid> …"> (postid
+ * from the body's `postid-N`) plus their ancestors. '' for any other template or when the
+ * post article is missing. Comma-joined like the facets (a plain name= meta, not split).
  */
 export function pickCategories({ template = '', postClass = '' } = {}, parents = CATEGORY_PARENTS) {
-  if (template !== 'story') return '';
+  if (!CATEGORY_TEMPLATES.has(template)) return '';
   return withCategoryAncestors(categoriesFromPostClass(postClass), parents).join(', ');
 }
 
@@ -339,7 +342,7 @@ export function buildMetaFields({
   // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
   if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
-  // story: its WP categories + ancestors, for the category archives (pickCategories, SKODA-831)
+  // story / press release: its WP categories + ancestors (pickCategories, SKODA-831 / 845)
   if (categories) meta.categories = categories;
 
   const facetValues = {};

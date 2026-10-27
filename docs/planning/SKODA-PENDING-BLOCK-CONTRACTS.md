@@ -62,7 +62,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
 | `media-cart` | – | – (an empty block: authored cells are ignored; it renders the device's cart, the cart page `/{lang}/media-cart`, SKODA-505b) |
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
-| `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
+| `story-rail` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band; `categories` since SKODA-845, as the `stories` block reads it) |
 | `tags` | `chips` | – |
 | `timeline` | `black` (the black year pills), `large` (18pt titles), `xl` (24pt model lines) | – (SKODA-815; see `timeline` below) |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
@@ -475,6 +475,21 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   30px from 781px; h2 40/45 and h3 24/27.6, wt300, 16px under; paragraphs 20px apart; green links, ink on hover.
 - **Example** (`/en/copyright/`): `page-body` (the h2 row), `page-body, half, empty-cell`, then 3 × `page-body,
   half`. Equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every text box, the band, the footer gap).
+
+### `carousel-listing`
+- **Status:** `pinned` (2026-10-22) · **Ticket:** SKODA-845 · **Fallback:** readable (the heading and the rail
+  with the default section spacing) · **Styles:** `carousel-listing`
+- **Emitted by:** `parsers/carousel-listing.js` (`import-carousel-listing`, the Media Room Newsletter page,
+  `template-carousel-listing`). One section per source carousel: a break, the plant's h3, a `Story Rail`
+  config table, then its `Section Metadata`.
+- **Shape:** `Story Rail` with `template: press_release` and what every teaser of the source carousel shares:
+  `categories: <category-* slug>` and `company: <company-* slug>` (term-id classes skipped). A carousel whose
+  teasers share neither is dropped (a rail without a filter would list every press release).
+- **Runtime (styles.css):** each h3 24px under the band and 48px under the rail before, the cards 20px under
+  it, the last rail 48px above the footer; no list-item margin under the cards. The rail is the landing
+  page's wide news rail (`story-rail-wide`, SKODA-827): 90 / 45 / 30% cells, 20px apart.
+- **Example** (`/en/newsletter/`): Kvasiny (`categories: newsletter`, `company: kvasiny`), Vrchlabí
+  (`company: vrchlabi`). Equal to the source at 390 / 768 / 992 / 1280 / 1440 (SKODA-845).
 
 ### `brand-assets`
 - **Status:** `pinned` (2026-10-23) · **Ticket:** SKODA-810b · **Fallback:** readable (unstyled tiles under

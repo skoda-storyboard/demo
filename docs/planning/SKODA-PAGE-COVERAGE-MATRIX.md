@@ -49,7 +49,7 @@ Press kits have no REST list. Their full EN list has to come from the `/en/press
 | Media cart | `template-media-cart` | MR | 2 | 1 | 1 | 505 ✅ | `/en/media-cart/` + `/en/your-downloads/` |
 | 404 content | `template-404` | STO | 2 | 0 | 0 | 706 | `youve-reached-a-dead-end`, `welcome-to-our-remote-car-park` |
 | Homes | `template-homepage` / `template-media-room` | STO / MR | 2 | 2 | 2 | 611 ✅ | – |
-| **Newsletter** | `template-carousel-listing` | MR | 1 | 0 | 0 | **845** | 2 carousels, 30 press-release teasers grouped by plant |
+| **Newsletter** | `template-carousel-listing` | MR | 1 | 0 | 0 | **845** | 2 carousels, press-release teasers grouped by plant (6 on 2026-10-22: 3 Kvasiny, 3 Vrchlabí) |
 | **Newsletter settings** | `template-newsletter-subscription-settings` | STO | 1 | 0 | 0 | 904 | the mailguide subscriber form; a service, not a page |
 | **Sustainability** | `template-sustainability` | STO | 1 | 0 | 0 | **843** | `/en/sustainable-offices/`: 2,193 words, 28 images, 75 editor widgets |
 | **IIHF 2021** | `template-iihf-2021` | STO | 1 | 0 | 0 | 210 | campaign page |
