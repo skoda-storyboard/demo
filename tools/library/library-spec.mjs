@@ -99,7 +99,7 @@ export const SPEC = {
   'exec-bio': {
     structure: 'card-panel repeating',
     purpose: 'board members: person card with a show-more photo set and links',
-    description: 'One row per board member, two cells. Cell 1, the card: the name and roles in bold (one paragraph, the name its first line, shown larger), then the portrait. Cell 2, the "show more" panel: its label as the first paragraph, one paragraph per photo (each opens the lightbox over the set), then the links (CV, photo set, press release, LinkedIn). Two members to a row from 781px, one below. A row without cell 2 is a plain card; a panel without a label reads "show more".',
+    description: 'One row per board member, two cells. Cell 1, the card: the name and roles in bold (one paragraph, the name its first line, shown larger), then the portrait. Cell 2, the "show more" panel: its label as the first paragraph, one paragraph per photo (each opens the lightbox over the set; a portrait photo is cropped from its top, a landscape one centred, or write "top" / "center" after the photo), then the links (CV, photo set, press release, LinkedIn). Two members to a row from 781px, one below. A row without cell 2 is a plain card; a panel without a label reads "show more".',
     variants: [],
   },
   footnotes: {

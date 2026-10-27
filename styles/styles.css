@@ -115,9 +115,9 @@
   --brand-assets-heading-share: 25%;
   --brand-assets-frame: 70px;
 
-  /* the source heading's line height, 27.6px at 24px (1.15). Its bold text in a light line
-     renders one line 27.6px high in Chrome on macOS; Chrome on Linux makes the source's own
-     line 28.6px (its font files' vertical metrics), which ours don't reproduce (PR #483) */
+  /* the source heading's line height, 27.6px at 24px (1.15). Its bold run in a light line
+     makes the line box itself (27.6px in Chrome on macOS, 28.6 on Linux), the same for ours,
+     since the h3 keeps the source's <strong> (PR #483 review 3) */
   --brand-assets-heading-line: 27.6px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
 

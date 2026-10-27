@@ -214,8 +214,19 @@ differ. Blocks: `blocks/contact-directory`, `blocks/exec-bio`, the shared card i
   inside it. 68px bar: 10px under the portrait's 20px margin (30px), padding 24, 1px `#e4e4e4` top and bottom,
   16/18 600, the icon font's `\e027` in a 32px round hit area (hover `#f1f1f1`), rotated 45° open (0.2s ease-in).
   The card ends 10px under the closed bar. The panel slides open in 400ms (jQuery swing), 15 to 378px measured.
-- **Board panel:** photos 46px under the bar, 29px in (19 below 781); 16:9 tiles, 8px corners, the photo centred
-  at 102%, 20px apart; **1 column below 768, 2 from 768, 3 from 992** (not 576). The links 52px under the tiles
+- **Board panel:**
+  - **The box:** the source's rounded grey builder widget (`.so-rounded`).
+    - Background `#e3e5e6` (`--skoda-grey-215`), 8px corners, 10px padding.
+    - 10px under the bar, 1px wider than the card on each side.
+    - Its bottom padding overlaps the card's end (`margin-bottom: -10px`).
+    - It slides with its margins (PR #483 review 3).
+  - **The photos:** 46px under the bar, 29px in (19 below 781).
+    - 16:9 tiles with 8px corners, 20px apart.
+    - Each photo at 102%, cropped from its top or centre as the source's `snap-top` / `snap-center`. A portrait
+      photo goes from its top and a landscape one centred; the importer writes "top" / "center" after the 6
+      photos the source sets otherwise, so all 42 match.
+    - **1 column below 768, 2 from 768, 3 from 992** (not 576).
+  - **The links:** 52px under the tiles
   (24px lines, the CV / photo-set / press-release links all 600: the source's bold sits inside the links). Each
   member's set: 6 / 9 / 4 / 13 / 9 / 1 photos.
 - **Measured result (closed and open):** Board: every heading, portrait and link box equal at 1440 / 1080 /
@@ -230,10 +241,13 @@ differ. Blocks: `blocks/contact-directory`, `blocks/exec-bio`, the shared card i
   centred from 781px (24.5% either side), one per row below; a tile is 10px down, 20px in (10 below 781), the
   logo at the tile's width, 20px under it "PDF download" / "PNG download" centred, 16/24 600 green (ink on
   hover), new tab to the live download route, 20px after. A group heading sits 100px under the row before (50
-  at the top), h3 24px light with bold text on the source's 28.6px line pitch (its bold rides 1px above the
-  27.6px line box: 28.6 one line, 57.2 two), in the middle half from 781px. The last row is framed 70px in
-  on every side (its tiles 17% of the narrower row). Measured: every heading, logo and link box within 1px at
-  1440 / 992 / 781 / 780 / 768 / 390; at 1080–1081 the source's Storyboard header is 64px taller (header, #410).
+  at the top), h3 24/27.6 light with bold text (the source's `line-height`), in the middle half from 781px.
+  - **Heading height:** the h3 keeps the source's `<strong>`, so its line box is the source's on each platform:
+    27.59px in Chrome on macOS, 28.59px in Chrome on Linux (the bold run's metrics), equal on both
+    (PR #483 review 3: an earlier 28.6px `line-height` was measured before the bold was restored).
+  - The last row is framed 70px in on every side (its tiles 17% of the narrower row).
+  - Measured: every heading, logo and link box equal; the pixel diff 0.16–0.74% at 390 / 768 / 992 / 1440. At
+    1080–1081 the source's Storyboard header is 64px taller (the header, #410).
 - **Media-services app** (`/en/skoda-media-services-application/`, Media Room page): the title band (Hero Image
   (page), 2-line h1), then one `App Promo` block in a `page-body` section: the intro (icon 17.5%, bold text
   82.5%, centred on each other), the 1188px mockup, two columns (text, then the screenshot 119px under it, 95
