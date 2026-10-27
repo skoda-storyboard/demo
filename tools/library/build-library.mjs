@@ -36,8 +36,10 @@ const EXTRA_PATHS = ['/en', '/en/media-room', '/en/news', '/en/images', '/en/vid
   '/media-room/footer', '/nav-newsletter'];
 
 const WIDE = new Set(['hero-image', 'gallery']);
+// SKODA-810b: every App Promo row is its own part (intro, mockup, columns, heading, store
+// strip), so a sample with fewer loses them; a logo row is three tiles
 const MAX_ROWS = {
-  downloads: 2, gallery: 3, cards: 3, accordion: 2, tags: 3, 'promo-box': 3,
+  downloads: 2, gallery: 3, cards: 3, accordion: 2, tags: 3, 'promo-box': 3, 'app-promo': 5, 'brand-asset': 3,
 };
 
 export const title = (s) => s.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');

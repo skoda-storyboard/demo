@@ -1,0 +1,62 @@
+/* Brand Asset (SKODA-810b): measured on the live /en/company-logo (390–1440). The source's
+   full-width SiteOrigin rows: from 781px three tiles of 17% each, centred (24.5% either side),
+   below one tile to the row. A tile is the source cell and its editor widget: 10px down, 20px
+   in from 781 (10 below), the logo at the tile's width, 20px under it the two download links
+   centred on two 24px lines (600, green, ink on hover), 20px after them. */
+.brand-asset {
+  --brand-asset-tile-share: 17%;
+  --brand-asset-pad-top: var(--page-gutter);
+  --brand-asset-inset: var(--page-gutter);
+  --brand-asset-inset-wide: var(--paragraph-gap);
+}
+
+.brand-asset .brand-asset-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brand-asset .brand-asset-tile {
+  margin: 0;
+  padding: var(--brand-asset-pad-top) var(--brand-asset-inset) 0;
+}
+
+.brand-asset .brand-asset-tile p {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+.brand-asset .brand-asset-image img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.brand-asset .brand-asset-links {
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-body);
+  text-align: center;
+}
+
+.brand-asset .brand-asset-links a:any-link {
+  color: var(--skoda-green-accent);
+  text-decoration: none;
+}
+
+.brand-asset .brand-asset-links a:any-link:hover {
+  color: var(--skoda-ink);
+}
+
+/* the source's row stacks its cells below 781px (SiteOrigin's switch, a viewport one: the
+   tiles are shares of the page) */
+@media (width >= 781px) {
+  .brand-asset .brand-asset-list {
+    grid-template-columns: repeat(3, var(--brand-asset-tile-share));
+  }
+
+  .brand-asset .brand-asset-tile {
+    padding-inline: var(--brand-asset-inset-wide);
+  }
+}

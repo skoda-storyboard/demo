@@ -1,0 +1,21 @@
+{
+  "variantName": "brand-asset",
+  "baseBlock": "brand-asset",
+  "version": "1.0.0",
+  "created": "2026-10-23T12:00:00.000Z",
+  "name": "Brand Asset",
+  "description": "Company logo tiles: one row per asset, one cell: the logo image (optionally linked to the file), then its \"PDF download\" and \"PNG download\" links. Three tiles to a row from 781px, each 17% of the page, centred; one below. Put each row of three in its own section with Style \"brand-assets\", and the group heading (h3) in its own \"brand-assets\" section above.",
+  "visualCharacteristics": {
+    "purpose": "downloadable brand assets: logo image with PDF / PNG links"
+  },
+  "contentPattern": {
+    "structure": "single cell tile repeating"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/company-logo"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-23T12:00:00.000Z"
+  }
+}

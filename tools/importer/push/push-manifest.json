@@ -46,6 +46,11 @@
       "pushedAt": "2026-10-12T14:31:57.718Z",
       "previewedHash": "dddb62e8723aa7222df866b691c02c0e7a07b2464028954db041d07e8aeaac43"
     },
+    "/en/board-of-management": {
+      "hash": "801bdaff21515fd55fbd8b11d5b9091a52979b88963977179d1a98387fcf9879",
+      "pushedAt": "2026-10-27T05:46:42.264Z",
+      "previewedHash": "801bdaff21515fd55fbd8b11d5b9091a52979b88963977179d1a98387fcf9879"
+    },
     "/en/category/classic-cars": {
       "hash": "b41148386a72b1615dc0b9fd6b85cd03785f8169cc79ef3b7125c8d0a79cd3c5",
       "pushedAt": "2026-10-07T08:47:25.538Z",
@@ -121,10 +126,15 @@
       "pushedAt": "2026-10-07T08:47:25.538Z",
       "previewedHash": "7120e21b6b4d3b767761b2c0bf33d348a4551824be30398b7c2b1a5a4c489a35"
     },
+    "/en/company-logo": {
+      "hash": "8e21bbdffcab37c809479539765d84ed7c24efffb82bbd69557b90b44ec0ba7c",
+      "pushedAt": "2026-10-26T16:10:18.001Z",
+      "previewedHash": "8e21bbdffcab37c809479539765d84ed7c24efffb82bbd69557b90b44ec0ba7c"
+    },
     "/en/contacts": {
-      "hash": "24fc44222284b90f46b73478f5e65f55d515963a5c579b48a9c41e8fe1d3166c",
-      "pushedAt": "2026-10-21T13:54:48.593Z",
-      "previewedHash": "24fc44222284b90f46b73478f5e65f55d515963a5c579b48a9c41e8fe1d3166c"
+      "hash": "f7ab85d26cc9ceb2784afeb5864740293c507a98ee6931f536268cfc594fa318",
+      "pushedAt": "2026-10-26T15:47:06.710Z",
+      "previewedHash": "f7ab85d26cc9ceb2784afeb5864740293c507a98ee6931f536268cfc594fa318"
     },
     "/en/copyright": {
       "hash": "23ed62d3a6d8595dfa2020ed860916cd710a7f35a46d4b15e90dc248558a8bda",
@@ -1625,6 +1635,11 @@
       "pushedAt": "2026-10-16T13:58:45.274Z",
       "previewedHash": "c925f8628d1ac9229a1af3037ab25918c60682a5451273db5afcc041cfbdb1c8"
     },
+    "/en/skoda-media-services-application": {
+      "hash": "f3372bb0c80be37e388d2c80f435b65d4d3f5b688eedcdd5b18624c239309c72",
+      "pushedAt": "2026-10-26T08:43:38.802Z",
+      "previewedHash": "f3372bb0c80be37e388d2c80f435b65d4d3f5b688eedcdd5b18624c239309c72"
+    },
     "/en/skoda-model/elroq": {
       "hash": "0247bc7421886a6972886f1a43bc85b7598ec9bb40a3c8db555e1170cebab367",
       "pushedAt": "2026-09-27T19:49:07.302Z",
@@ -1662,9 +1677,9 @@
       "previewedHash": "e79f6a0b93fb053da2e03ecf34c396a484ac2119d94f7a8109c648f1ed346f08"
     },
     "/en/skoda-model/epiq": {
-      "hash": "87a1a476f1fef81f5514fefb55e55a2825896b349e112683f4c64cf71ade6e18",
-      "pushedAt": "2026-10-12T09:41:49.349Z",
-      "previewedHash": "87a1a476f1fef81f5514fefb55e55a2825896b349e112683f4c64cf71ade6e18"
+      "hash": "874abea91dce214d5b0931347464645ad8c36e0d8461b39191ca7af3c2ab915e",
+      "pushedAt": "2026-10-26T10:42:51.297Z",
+      "previewedHash": "874abea91dce214d5b0931347464645ad8c36e0d8461b39191ca7af3c2ab915e"
     },
     "/en/skoda-model/kamiq": {
       "hash": "baf02a0bd0cbd2e2dd0596cd3a61a441ef6c9342bbbba625fab01501a1ba9cd1",
@@ -1731,9 +1746,9 @@
       "previewedHash": "31b17364d26805abddb5eeca7dfa072a5fbc9fd771cd8aeaca1a87f74b7ee0a6"
     },
     "/en/skoda-model/peaq": {
-      "hash": "d00281bda7fff2d11a452c02450317d0ec29c136e3bb9c9ebdefff00a291714e",
-      "pushedAt": "2026-10-12T09:41:49.349Z",
-      "previewedHash": "d00281bda7fff2d11a452c02450317d0ec29c136e3bb9c9ebdefff00a291714e"
+      "hash": "7e0840d16b029ba8fe95952cbfb6f9bf65f5894d8f8717728a4ce3a9c9126287",
+      "pushedAt": "2026-10-26T10:42:51.297Z",
+      "previewedHash": "7e0840d16b029ba8fe95952cbfb6f9bf65f5894d8f8717728a4ce3a9c9126287"
     },
     "/en/skoda-model/scala": {
       "hash": "841ff63209ca3d0b35268cfcc9d077e0a1021018edfb649dde2cd98c84c4a768",

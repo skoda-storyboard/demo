@@ -55,6 +55,9 @@
   /* the story milestones timeline (SKODA-815; measured on the live `ys-milestones` widget):
      its #e4e4e4 panel and the legacy #9c0 green of its year pills and dots */
   --skoda-grey-225: #e4e4e4;
+
+  /* the board's open "show more" panel (SKODA-810; measured on the live .so-rounded widget) */
+  --skoda-grey-215: #e3e5e6;
   --skoda-lime: #9c0;
 
   /* social network brand colors (footer icon hover tints — raw brand hex) */

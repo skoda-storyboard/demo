@@ -191,6 +191,86 @@ Applies to all five; sub-specs add their own. WHAT / WHERE / viewport / expected
 `company-logo-1280.png`, `skoda-media-services-application-1280.png`, `contacts-1280.png`.
 1024/768/mobile captures pending.
 
+## 11. SKODA-810a as built: Contacts + Board (re-measured 2026-10-23)
+
+Re-measured on the live pages at 1440 / 1080 / 992 / 991 / 781 / 780 / 768 / 576 / 575 / 390 (fresh loads, no
+query strings: the source serves its 404 page for a query string). These values supersede §3, A.2 and E.2 where they
+differ. Blocks: `blocks/contact-directory`, `blocks/exec-bio`, the shared card in `scripts/person-card.js`; importer
+`transformers/skoda-company-people.js` (company importer).
+
+- **Row layout:** two cells from **781px** (SiteOrigin's switch, not 768): cells 574px of text, 40px apart. Below
+  781 one column, the cells **10px apart**. Each source row is its own `page-body` section (SKODA-813: 10px top,
+  text 20px in, 30px from 781). Rows under a group heading carry the source's `pull-up` row style, -20px from
+  768px (section style `pull-up`).
+- **Card:** the name is the identity paragraph's first line at **24px** on both pages (the source's
+  `font-size: 18pt` span; 36px line), the title lines 16/24, all 600. Names stay a bold paragraph, as on the
+  source (decision 2026-10-23: no h3). The portrait is the card's width at its own ratio (574x323 at 1440;
+  source `object-fit: fill`), 20px under the identity. E-mail and LinkedIn lines at the page-body rhythm (20px).
+  The LinkedIn icon is 25x25, floated, 10px before the link.
+- **Phones:** the source writes them as text (`t: +420 …`); the card links each number (`tel:+420…`), per §9 /
+  E.5 and the ticket's AC, in the number's own ink colour (it looks as on the source, and adds no contrast
+  failure: the green e-mail links fail AA as on the source, 17 / 17 axe nodes).
+- **Board toggle:** `h2` "show more" (6 on the page, the source's heading outline), here a `button[aria-expanded]`
+  inside it. 68px bar: 10px under the portrait's 20px margin (30px), padding 24, 1px `#e4e4e4` top and bottom,
+  16/18 600, the icon font's `\e027` in a 32px round hit area (hover `#f1f1f1`), rotated 45° open (0.2s ease-in).
+  The card ends 10px under the closed bar. The panel slides open in 400ms (jQuery swing), 15 to 378px measured.
+- **Board panel:**
+  - **The box:** the source's rounded grey builder widget (`.so-rounded`).
+    - Background `#e3e5e6` (`--skoda-grey-215`), 8px corners, 10px padding.
+    - 10px under the bar, 1px wider than the card on each side.
+    - Its bottom padding overlaps the card's end (`margin-bottom: -10px`).
+    - It slides with its margins (PR #483 review 3).
+  - **The photos:** 46px under the bar, 29px in (19 below 781).
+    - 16:9 tiles with 8px corners, 20px apart.
+    - Each photo at 102%, cropped from its top or centre as the source's `snap-top` / `snap-center`. A portrait
+      photo goes from its top and a landscape one centred; the importer writes "top" / "center" after the 6
+      photos the source sets otherwise, so all 42 match.
+    - **1 column below 768, 2 from 768, 3 from 992** (not 576).
+  - **The links:** 52px under the tiles
+  (24px lines, the CV / photo-set / press-release links all 600: the source's bold sits inside the links). Each
+  member's set: 6 / 9 / 4 / 13 / 9 / 1 photos.
+- **Measured result (closed and open):** Board: every heading, portrait and link box equal at 1440 / 1080 /
+  992 / 781 / 780 / 768 / 390; open panel equal (tiles, columns, links) at 1440 / 992 / 991 / 780 / 575 / 390.
+  Contacts: equal except the PR's deviations (at most 7px).
+
+### SKODA-810b as built: company logo + media-services app (re-measured 2026-10-23)
+
+- **Company logo** (`/en/company-logo/`, `template-custom-full-width`: the Storyboard chrome, no title band or
+  h1, as on the source): **18 assets** in 3 groups (Standard, Wordmark Spacing 130, Wordmark Spacing 160), not
+  36. Every source row is a `brand-assets` section across the whole page. Tiles are 17% of the page, three
+  centred from 781px (24.5% either side), one per row below; a tile is 10px down, 20px in (10 below 781), the
+  logo at the tile's width, 20px under it "PDF download" / "PNG download" centred, 16/24 600 green (ink on
+  hover), new tab to the live download route, 20px after. A group heading sits 100px under the row before (50
+  at the top), h3 24/27.6 light with bold text (the source's `line-height`), in the middle half from 781px.
+  - **Heading height:** the h3 keeps the source's `<strong>`, so its line box is the source's on each platform:
+    27.59px in Chrome on macOS, 28.59px in Chrome on Linux (the bold run's metrics), equal on both
+    (PR #483 review 3: an earlier 28.6px `line-height` was measured before the bold was restored).
+  - The last row is framed 70px in on every side (its tiles 17% of the narrower row).
+  - Measured: every heading, logo and link box equal; the pixel diff 0.16–0.74% at 390 / 768 / 992 / 1440. At
+    1080–1081 the source's Storyboard header is 64px taller (the header, #410).
+- **Media-services app** (`/en/skoda-media-services-application/`, Media Room page): the title band (Hero Image
+  (page), 2-line h1), then one `App Promo` block in a `page-body` section: the intro (icon 17.5%, bold text
+  82.5%, centred on each other), the 1188px mockup, two columns (text, then the screenshot 119px under it, 95
+  below 720; the screenshot, then text flush under it), and the emerald download panel (`#78faae`,
+  `--skoda-green-emerald`): its centred heading (a blank first line, as the source's) and the QR (20%) with the
+  App Store and Google Play badges (29% each), centred; then the Spacer section. Images keep their size up to
+  the cell's, centred; below 781 everything stacks. Measured: every image, paragraph and the panel box equal at
+  1440 / 1080 / 992 / 781 / 780 / 768 / 720 / 719 / 390.
+- **Pixel diff (the ticket's ≤2% gate, 2026-10-26):** full-page screenshots of origin and the importer output
+  (local preview), the content between header and footer, images hidden (the gate excludes image content), a
+  pixel counted when a channel differs by more than 40. Board 0.01–0.02%, app 0.02–0.05%, company logo
+  0.16–0.37%, Contacts 0.56–0.92% at 768 / 992 / 1080 / 1440 and **4.03% at 390**: the source doesn't wrap its
+  glued "Product&nbsp;Communications" heading (it runs 65px past the phone's edge, `overflow-wrap: normal`), ours
+  wraps it (the site's headings break long words), so the rest of the page sits 37–45px lower. An accepted
+  deviation is needed (the PR lists it). To redo on the DA preview once the drafts are uploaded.
+- **Accessibility (axe-core 4.10, WCAG 2.1 A/AA + best practice, `main`):** the same results as the source's on
+  all four pages: Contacts 17 colour-contrast (the green links, the 813 decision) + 5 redundant alts, logo 36
+  colour-contrast (its green download links, as on the source), board and app none.
+- **Board's last spacer row:** two cells of spacer widgets, side by side from 781px, stacked below: the source's
+  page ends 20px (below 720) / 44px (720–780) lower before the footer. The import has one spacer (a deviation).
+- **Annual reports:** `/en/annual-reports/` still returns 404 (2026-10-23) and is not in the sitemap: no
+  `download-list` is built (no source to measure or import). The ticket records it.
+
 ---
 
 # PART 2, Per-sub-type sub-specs
