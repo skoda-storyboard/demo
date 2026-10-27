@@ -1,0 +1,221 @@
+/* Exec Bio (SKODA-810a): measured on the live /en/board-of-management (375–1440). Two members
+   to a row from 781px, 40px apart, one below, 10px apart. A card is the name (24/36) over its
+   roles (16/24, all 600), the portrait at the card's width and its own ratio, then the toggle:
+   a 68px bar ruled top and bottom, "show more" (16/18, 600) and the icon font's + (rotated
+   45° when open). Open, the panel slides down: the photos 46px under the bar, 29px in (19 below
+   781), 16:9 tiles with 8px corners, 20px apart, 1 / 2 / 3 across (768, 992), then the links
+   52px under the tiles. */
+.exec-bio {
+  --exec-bio-gutter: var(--page-body-half-gutter);
+  --exec-bio-name-size: 24px;
+  --exec-bio-toggle-gap: var(--page-gutter);
+  --exec-bio-toggle-pad: var(--spacing-l);
+  --exec-bio-toggle-line-height: 1.125;
+  --exec-bio-border-width: 1px;
+  --exec-bio-focus-width: 2px;
+  --exec-bio-motion: 0.2s ease-in;
+
+  /* the source plus: its icon font's \e027 at 16px / 600, in a round 32px hit area on the
+     bar's content edge (as the accordion's, SKODA-807) */
+  --exec-bio-icon-size: 1em;
+  --exec-bio-icon-pad: var(--spacing-xs);
+  --exec-bio-icon-box: calc(var(--exec-bio-icon-size) + 2 * var(--exec-bio-icon-pad));
+
+  /* the open panel: the source's rounded grey builder widget, 10px under the bar and 1px
+     wider than the card each side, 10px of padding; the photos 46px under the bar and 29px in
+     from the card (19 below 781), as before */
+  --exec-bio-panel-bg: var(--skoda-grey-215);
+  --exec-bio-panel-gap: var(--page-gutter);
+  --exec-bio-panel-overhang: 1px;
+  --exec-bio-panel-top: 46px;
+  --exec-bio-panel-inset: 19px;
+  --exec-bio-panel-inset-wide: 29px;
+  --exec-bio-photo-gap: var(--paragraph-gap);
+  --exec-bio-photo-zoom: 1.02;
+  --exec-bio-photos-after: 52px;
+}
+
+.exec-bio .exec-bio-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--page-gutter) var(--exec-bio-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* the source cell ends 10px under the closed bar; open, its panel's last margin closes it.
+   A column of its own: the bar's 10px adds to the portrait's 20px margin (the source widgets
+   don't collapse them) */
+.exec-bio .exec-bio-card {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding-block-end: var(--exec-bio-toggle-gap);
+}
+
+.exec-bio .exec-bio-card.is-open {
+  padding-block-end: 0;
+}
+
+/* the source name's 24px on the paragraph's 1.5 line: a 36px first line */
+.exec-bio .exec-bio-name {
+  font-size: var(--exec-bio-name-size);
+}
+
+.exec-bio .exec-bio-portrait img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* the source's row-toggle title is an h2: the page-body h2 type and margins don't apply */
+.exec-bio .exec-bio-card .exec-bio-heading {
+  margin: var(--exec-bio-toggle-gap) 0 0;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: var(--exec-bio-toggle-line-height);
+}
+
+.exec-bio .exec-bio-heading button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  inline-size: 100%;
+  padding: var(--exec-bio-toggle-pad);
+  border: 0;
+  border-block: var(--exec-bio-border-width) solid var(--divider-color);
+  background-color: var(--skoda-white);
+  color: var(--skoda-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.exec-bio .exec-bio-heading button:focus-visible {
+  outline: var(--exec-bio-focus-width) solid var(--skoda-green);
+  outline-offset: var(--exec-bio-focus-width);
+}
+
+.exec-bio .exec-bio-icon {
+  flex: none;
+  box-sizing: content-box;
+  inline-size: var(--exec-bio-icon-size);
+  block-size: var(--exec-bio-icon-size);
+  padding: var(--exec-bio-icon-pad);
+
+  /* the box overhangs the text line, as the source's absolute icon does, so the bar stays
+     68px tall */
+  margin-block: calc((var(--exec-bio-toggle-line-height) * 1em - var(--exec-bio-icon-box)) / 2);
+  border-radius: 50%;
+  transition: transform var(--exec-bio-motion);
+}
+
+.exec-bio .exec-bio-icon::before {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  font-family: var(--accordion-icon-font);
+  font-size: var(--exec-bio-icon-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--exec-bio-icon-size);
+  text-align: center;
+  content: '\e027';
+}
+
+.exec-bio .exec-bio-heading button:hover .exec-bio-icon {
+  background-color: var(--skoda-grey-50);
+}
+
+.exec-bio .exec-bio-heading button[aria-expanded="true"] .exec-bio-icon {
+  transform: rotate(45deg);
+}
+
+.exec-bio .exec-bio-panel {
+  box-sizing: border-box;
+
+  /* the widget's bottom padding hangs over the card's end (its -10px margin), so the card
+     still ends 20px under the links */
+  margin: var(--exec-bio-panel-gap) calc(-1 * var(--exec-bio-panel-overhang)) calc(-1 * var(--exec-bio-panel-gap));
+  padding: calc(var(--exec-bio-panel-top) - var(--exec-bio-panel-gap)) calc(var(--exec-bio-panel-inset) + var(--exec-bio-panel-overhang)) var(--exec-bio-panel-gap);
+  border-radius: var(--card-radius);
+  background-color: var(--exec-bio-panel-bg);
+}
+
+.exec-bio .exec-bio-photos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--exec-bio-photo-gap);
+  margin: 0 0 var(--exec-bio-photos-after);
+  padding: 0;
+  list-style: none;
+}
+
+.exec-bio .exec-bio-photos li {
+  margin: 0;
+}
+
+.exec-bio .exec-bio-photo {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.exec-bio .exec-bio-photo:focus-visible {
+  outline: var(--exec-bio-focus-width) solid var(--skoda-green);
+  outline-offset: var(--exec-bio-focus-width);
+}
+
+.exec-bio .exec-bio-photo img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+
+  /* the source shows each photo at 102% (its media-card image scale), centred in its tile,
+     or from its top (`snap-top`: a portrait photo, or one the source sets so) */
+  object-position: 50% 50%;
+  scale: var(--exec-bio-photo-zoom);
+}
+
+.exec-bio .exec-bio-photo.is-top img {
+  object-position: 50% 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exec-bio .exec-bio-icon {
+    transition: none;
+  }
+}
+
+/* the photo grid steps at the viewport, as the source's: the panel is as wide at 991px as at
+   992, so a container query can't place the 3-across switch */
+@media (width >= 768px) {
+  .exec-bio .exec-bio-photos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* the source's row stacks its cells below 781px: a viewport switch, not a container one (the
+   block is wider at 780 than at 781, where the page inset grows from 20 to 30px) */
+@media (width >= 781px) {
+  .exec-bio .exec-bio-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exec-bio .exec-bio-panel {
+    padding-inline: calc(var(--exec-bio-panel-inset-wide) + var(--exec-bio-panel-overhang));
+  }
+}
+
+@media (width >= 992px) {
+  .exec-bio .exec-bio-photos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
