@@ -216,3 +216,46 @@ test('a language menu link stays on the site only when its target is migrated (S
     '#subscribe',
   ]);
 });
+
+// #485 review: the Media Room footer's Subscribe widget keeps its intro, also when the source
+// nests it (the Slovak footer: `.widget_text > .textwidget > section.skoda-mailguide > p + form`)
+test('buildFooter: the Media Room newsletter intro, beside a direct or a nested form', () => {
+  globalThis.WebImporter = {
+    DOMUtils: {
+      createTable: (cells, d) => {
+        const table = d.createElement('table');
+        cells.forEach((row) => {
+          const tr = d.createElement('tr');
+          row.forEach((cell) => {
+            const td = d.createElement('td');
+            td.append(cell);
+            tr.append(td);
+          });
+          table.append(tr);
+        });
+        return table;
+      },
+    },
+  };
+  const form = '<form class="mailguide-form"><input type="email" placeholder="E-mail"><button>OK</button></form>';
+  const shapes = {
+    direct: `<section class="widget mailguide"><h3 class="heading">Subscribe</h3><p>Stay informed:</p>${form}</section>`,
+    nested: `<section class="widget text-3 widget_text"><div class="textwidget"><section class="widget skoda-mailguide">
+      <h3 class="heading">Odber noviniek</h3><p>Ak chcete byť informovaní, zadajte svoj e-mail:</p>${form}</section></div></section>`,
+  };
+  try {
+    Object.entries(shapes).forEach(([shape, widget]) => {
+      const d = new JSDOM(`<!DOCTYPE html><html><body><footer>
+        <div class="footer-widgets"><section class="app-download"></section></div>
+        <div class="footer-widgets">${widget}</div></footer></body></html>`, { url: `${LIVE}/sk/media-room/` }).window.document;
+      const [, middle] = sections(buildFooter(d, 'sk'));
+      const tags = middle.map((el) => el.tagName);
+      const intro = middle[tags.indexOf('TABLE') - 1];
+      assert.equal(intro?.tagName, 'P', `${shape}: a paragraph right before the form`);
+      assert.match(intro.textContent, shape === 'direct' ? /^Stay informed/ : /^Ak chcete byť informovaní/);
+      assert.equal(middle.filter((el) => el.tagName === 'TABLE').length, 1, `${shape}: one form`);
+    });
+  } finally {
+    delete globalThis.WebImporter;
+  }
+});

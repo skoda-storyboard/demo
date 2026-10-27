@@ -211,3 +211,37 @@ test('mergeSheet: the Media Room rows follow /{locale}/**, and a re-run replaces
   assert.ok(at(second, '/cs/**') < at(second, '/cs/tiskove-zpravy-archiv/**'));
   assert.equal(second.data.filter((r) => r.URL === '/cs/foto').length, 1, 'no duplicate rows');
 });
+
+// #485 review: a refresh replaces only the locales and families it brings
+test('mergeSheet: a Media Room refresh of one locale keeps every other locale and the Storyboard rows', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const installed = mergeSheet({ data: [] }, [], [...chromeRows(['cs', 'de']), ...mediaRoomRows(['cs', 'de'])]);
+  assert.equal(installed.data.length, 46);
+  const key = (r) => [r.URL, r.nav, r.footer, r.section].join(' ');
+  const refreshed = mergeSheet(installed, [], mediaRoomRows(['cs']));
+  assert.equal(refreshed.data.length, 46, 'no row lost (was 22)');
+  assert.deepEqual(new Set(refreshed.data.map(key)), new Set(installed.data.map(key)), 'the same rows');
+  assert.equal(refreshed.data.filter((r) => r.URL.startsWith('/de/')).length, 23, '/de/** and its 22 Media Room rows');
+});
+
+test('mergeSheet: a Storyboard refresh keeps the locale\'s Media Room rows after its /{locale}/** row', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const installed = mergeSheet({ data: [] }, [], [...chromeRows(['cs']), ...mediaRoomRows(['cs'])]);
+  const refreshed = mergeSheet(installed, [], chromeRows(['cs'], []));
+  const at = (url) => refreshed.data.findIndex((r) => r.URL === url);
+  assert.equal(refreshed.data.length, installed.data.length);
+  assert.equal(refreshed.data[at('/cs/**')].footer, '', 'the refreshed row');
+  assert.ok(at('/cs/**') < at('/cs/tiskove-zpravy-archiv/**'), 'the Media Room rows still come later, so they win');
+});
+
+test('mergeSheet: a refreshed family drops its stale rows; other locales keep theirs', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const stale = (code) => ({
+    URL: `/${code}/old-section/**`, nav: `/${code}/media-room/nav`, footer: `/${code}/media-room/footer`, section: 'media-room',
+  });
+  const installed = mergeSheet({ data: [stale('cs'), stale('de')] }, [], []);
+  const refreshed = mergeSheet(installed, [], mediaRoomRows(['cs']));
+  const urls = refreshed.data.map((r) => r.URL);
+  assert.equal(urls.includes('/cs/old-section/**'), false, 'the refreshed locale\'s stale row goes');
+  assert.ok(urls.includes('/de/old-section/**'), 'another locale\'s row stays');
+});

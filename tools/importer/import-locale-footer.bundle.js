@@ -117,7 +117,11 @@ var CustomImportScript = (() => {
       }
       const form = widget.querySelector("form.mailguide-form");
       if (form) {
-        const intro = widget.querySelector(":scope > p");
+        let intro = null;
+        for (let node = form.parentElement; node && !text(intro); node = node.parentElement) {
+          intro = node.querySelector(":scope > p");
+          if (node === widget) break;
+        }
         if (text(intro)) out.push(para(document, text(intro)));
         const consent = document.createElement("div");
         const label = form.querySelector("label[for]");
