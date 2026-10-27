@@ -146,16 +146,28 @@ demo index holds 55 kits and 79 chapter pages, in these shapes:
   recorded while wheel-scrolling through it (the source's affix records 0.03 – 0.05). The page doesn't get wider.
   `press-kit.test.mjs` 21 / 21 (1 new). Lint clean.
 
-**Related Press Releases band on the resource pages (2026-10-27, reported on the Peaq FAQ).** The source ends the
-resource children without a Media Box (FAQ, Texts, Infographics, Technical data; checked on Peaq) in the dark
-"Related Press Releases" band; the import dropped it on every press-kit page.
+**Related Press Releases band (2026-10-27, reported on the Peaq FAQ).** The source ends most kit pages in the dark
+"Related Press Releases" band: 58 of the four built kits' 79 chapters (Peaq 6, Epiq 10, Classic Days 30,
+Motorsport 12), after the Media Box when they have one (16px white strip between the bands). The import dropped
+it on every press-kit page.
 - **Import** (`skoda-press-kit-default-layout.js`): a band with cards becomes a `dark, full-width, related` section
-  (heading, "Based on tags" line, "All" link, `Story Rail (press)`), the press-release import's output. Chapters
-  with a Media Box have no such band and are unchanged. Tests: `press-kit-default.test.mjs` +2.
+  (heading, "Based on tags" line, "All" link, `Story Rail (press)`), the press-release import's output, after
+  the Media Box. Tests: `press-kit-default.test.mjs` +3.
 - **Template** (`templates/press-kit`): the band's header, "All" pill and two-line card titles (see the UI spec
   §9); an FAQ column ends on its last question (the accordion margin under it was 20px too much; the rule
   matches the Peaq and Epiq FAQs only, of the 79 pages in the four kits). `press-kit.test.mjs` +1.
 - **Measured** (source vs branch code with the re-imported FAQ, 375 / 768 / 992 / 1080 / 1280 / 1440): band box,
   header, pill, cards, dates, titles and the 16px to the footer equal; the band top equal before a scroll (the
   source's affix pulls the page up 44px after one). Next, a card and All give the same results by real click; the
-  outline is equal (35 headings). The other resource pages get the band when re-imported.
+  outline is equal (35 headings). Published 2026-10-27.
+- **Card titles:** the source's dotdotdot has cut most titles before the page is read (122 of 153 end in "…"); the
+  import takes the whole title from the card image's alt, and the band clamps it. After a Media Box the source
+  leaves one line from 769 (as on press releases), two lines below and on pages without one; the template matches
+  that (measured on Peaq Battery and Texts at 375 / 768 / 992 / 1280: dates and titles equal; 16px between the
+  bands and to the footer on Battery and Classic Days 645).
+- **The other 57 pages (re-imported 2026-10-27, compared with their preview):** 39 change only by the band; 10
+  also get the sidebar list the current import emits (DA holds an older "- Media contacts - Download Media Box"
+  paragraph). 2 of these 49 link PDFs not yet in AEM Assets (Classic Days Texts: 3; Peaq Technical data: 1), so
+  the binary gate holds them. **Held (8):** 6 Epiq pages (footnotes, the FAQ accordion, gallery Downloads with a
+  Fragment, Vimeo embeds, new live PDFs) and Motorsport Images (gallery Downloads) carry other import changes
+  besides the band, Epiq Images a fragment page not imported yet; they need their own review.

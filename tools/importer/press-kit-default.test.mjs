@@ -321,8 +321,8 @@ test('resource Images child: inline asset grids become Downloads tables, no Medi
   assert.ok(!/Related Press Releases/.test(page.textContent), 'related band dropped, as on chapter pages');
 });
 
-// The FAQ, Texts, Infographics and Technical data children end in the source's dark Related Press
-// Releases band (live 2026-10-27); chapters with a Media Box have none.
+// Most kit pages end in the source's dark Related Press Releases band (live 2026-10-27), after the
+// Media Box when they have one.
 const relatedCard = (n, title) => `<div class="search-results-item flickity-cell"><article class="article-teaser press_release media-cart-item">
   <div class="article-teaser-media"><div class="entry-thumbnail media-cart-image"><a class="colorbox" href="" data-id="${n}">
   <img src="https://cdn.skoda-storyboard.com/2026/06/peaq-${n}-768x432.jpg" alt="${title}" data-caption="x" srcset="a 1x" itemprop="image"></a></div>
@@ -359,6 +359,29 @@ test('resource FAQ child: the Related Press Releases band becomes a dark related
   const all = [...page.querySelectorAll('p > a')].find((a) => txt(a) === 'All');
   assert.ok(all && /filter/.test(all.getAttribute('href')), 'the All link keeps its filter');
   assert.equal(page.querySelectorAll('.cover-box, .media-cart-actions, .flickity-cell').length, 0, 'no source band markup left');
+});
+
+test('a chapter with both bands keeps the Media Box first, then the related section (Peaq Battery shape)', { skip: !JSDOM }, () => {
+  const page = run(fixture({}).replace('</article>', `${RELATED_BAND}</article>`), target);
+  const styles = rows(page, 'Section Metadata').map((row) => txt(row.children[1]));
+  const media = styles.findIndex((s) => /media-box/.test(s));
+  const related = styles.findIndex((s) => /related/.test(s));
+  assert.ok(media >= 0 && related > media, `media box, then related: ${styles}`);
+  assert.equal(blocks(page, 'Story Rail (press)').length, 1);
+  assert.equal(rows(page, 'Story Rail (press)').length, 2);
+  assert.ok(blocks(page, 'Downloads').length >= 1, 'the Media Box keeps its Downloads');
+});
+
+test('a related card title the source cut short ("…") is restored from its image alt; others are kept', { skip: !JSDOM }, () => {
+  const cutCard = relatedCard(19, 'The Škoda 1101 ‘Tudor’ celebrates 80 years with a special exhibition at the Škoda Museum')
+    .replace(/(<h3 class="entry-title"><a [^>]+>)[^<]+/, '$1The Škoda 1101 ‘Tudor’ celebrates 80…');
+  const otherCard = relatedCard(4, 'A different alt').replace(/(<h3 class="entry-title"><a [^>]+>)[^<]+/, '$1Short title…');
+  const band = RELATED_BAND.replace(/<div class="search-results-items">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>$/, `<div class="search-results-items">${cutCard}${otherCard}</div></div></div></div>`);
+  const html = resourcePage(grid(widget('<p>Answer.</p>')))
+    .replace('<div class="search-results type-press_release"><h2 class="search-results-heading">Related Press Releases</h2></div>', band);
+  const page = run(html, `${base}skoda-peaq-press-kit-2/texts/`);
+  const titles = rows(page, 'Story Rail (press)').map((row) => txt(row.children[1].querySelector('h3 a')));
+  assert.deepEqual(titles, ['The Škoda 1101 ‘Tudor’ celebrates 80 years with a special exhibition at the Škoda Museum', 'Short title…']);
 });
 
 test('a band without cards and a Media Box band are not a related section', { skip: !JSDOM }, () => {

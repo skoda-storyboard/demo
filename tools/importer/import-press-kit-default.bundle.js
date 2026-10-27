@@ -975,12 +975,18 @@ var CustomImportScript = (() => {
       const href = titleLink && titleLink.getAttribute("href");
       if (!href || !text6(titleLink)) return;
       const img = card.querySelector(".article-teaser-media img");
-      if (img) ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
+      if (img) {
+        ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
+      }
       const body = [];
       const date = text6(card.querySelector(".entry-published"));
       if (date) body.push(make(document, "p", date));
+      let label = text6(titleLink);
+      const alt = ((img == null ? void 0 : img.getAttribute("alt")) || "").trim();
+      const cut = label.endsWith("\u2026") && label.slice(0, -1).trim();
+      if (cut && alt.length > cut.length && alt.startsWith(cut)) label = alt;
       const title = document.createElement("h3");
-      title.append(link(href, text6(titleLink)));
+      title.append(link(href, label));
       body.push(title);
       rows.push([img || "", body]);
     });

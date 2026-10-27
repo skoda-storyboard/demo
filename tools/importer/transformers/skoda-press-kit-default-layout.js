@@ -176,10 +176,11 @@ function sourceTables(content, document) {
 }
 
 /*
- * The resource children without a Media Box (FAQ, Texts, Infographics, Technical data) end in
- * the source's dark "Related Press Releases" band: its heading, the "Based on tags" line, the
- * "All" link and the cards, a `Story Rail (press)` as on press releases (same output as
- * skoda-press-release-layout.js `relatedContent`; transformers can't import each other).
+ * Most kit pages end in the source's dark "Related Press Releases" band (58 of the four built
+ * kits' 79 chapters, live 2026-10-27), after the Media Box when they have one: its heading, the
+ * "Based on tags" line, the "All" link and the cards, a `Story Rail (press)` as on press releases
+ * (same output as skoda-press-release-layout.js `relatedContent`; transformers can't import each
+ * other).
  */
 function relatedContent(document, band) {
   const results = band.querySelector('.search-results');
@@ -196,12 +197,22 @@ function relatedContent(document, band) {
     const href = titleLink && titleLink.getAttribute('href');
     if (!href || !text(titleLink)) return; // never emit a card without a target
     const img = card.querySelector('.article-teaser-media img');
-    if (img) ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop'].forEach((a) => img.removeAttribute(a));
+    if (img) {
+      ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop']
+        .forEach((a) => img.removeAttribute(a));
+    }
     const body = [];
     const date = text(card.querySelector('.entry-published'));
     if (date) body.push(make(document, 'p', date));
+    // the source's dotdotdot has already cut a long title ("… celebrates 80…") when the page is
+    // read; its card image keeps the whole title as its alt: the link gets that, the band's line
+    // clamp shortens it on screen
+    let label = text(titleLink);
+    const alt = (img?.getAttribute('alt') || '').trim();
+    const cut = label.endsWith('…') && label.slice(0, -1).trim();
+    if (cut && alt.length > cut.length && alt.startsWith(cut)) label = alt;
     const title = document.createElement('h3');
-    title.append(link(href, text(titleLink)));
+    title.append(link(href, label));
     body.push(title);
     rows.push([img || '', body]);
   });

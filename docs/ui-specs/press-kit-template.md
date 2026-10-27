@@ -272,13 +272,13 @@ Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expecte
       the bar's text 8px lower (y 27 vs 19 just before it sticks) and the menu opening at y 76.3. The bar stays
       sticky; `.is-stuck` moves the row by a translate and paints the band, so the page under it doesn't move
       (no layout shift; the source's affix shifts it, 0.03–0.05).
-- [x] Related Press Releases band (measured on the Peaq FAQ, 2026-10-27, 375 – 1440): the pages without a Media
-      Box (FAQ, Texts, Infographics, Technical data) end in the source's dark `.cover-box` band instead, in the
-      same place. 72px over the header, 60 under the cards, 16 to the footer; full width (the Media Box band's
-      bleed). Header as the press release's: the h3 (20/25 up to 768, 26/32.5 above), the "Based on tags" line
+- [x] Related Press Releases band (measured on the Peaq FAQ, 2026-10-27, 375 – 1440): most kit pages end in the
+      source's dark `.cover-box` band (58 of 79 chapters), after the Media Box when they have one (a 16px white
+      strip between them), else in its place. 72px over the header, 60 under the cards, 16 to the footer; full
+      width (the Media Box band's bleed). Header as the press release's: the h3 (20/25 up to 768, 26/32.5 above), the "Based on tags" line
       (16/32/600 `#c4c6c7`) and the "All" ghost pill (91 × 36) right, 20px to the cards. Cards: `Story Rail
       (press)`, its 90 / 45 / 30% cells and arrows, titles two lines ending in "…" (20/24 up to 768, 18/21.6
-      above; the press release's band keeps one). Next / a card / All behave as the source (the source's cart +
+      above), one line from 769 after a Media Box (the source's dotdotdot result, as on press releases). Next / a card / All behave as the source (the source's cart +
       is `display: none`). An FAQ column ends on its last question (no accordion margin under it).
 - [x] Sub-section rich text: `p` = `16px / 24px / weight 400 / #161718`, `margin-bottom 20px`
       (parity with story-detail.md, no delta); sub-page title `h1` `26px / weight 600`.

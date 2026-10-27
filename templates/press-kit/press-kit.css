@@ -530,14 +530,20 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
-/* Related Press Releases band: the pages without a Media Box (FAQ, Texts, Infographics, Technical
-   data) end in it instead, in the same place (measured on the Peaq FAQ, 2026-10-27, 375 – 1440).
-   72px over the header, 60 under the cards; the header is the press release's: the heading and
+/* Related Press Releases band: most kit pages end in it, after the Media Box when they have one
+   (measured on the Peaq FAQ and Battery chapters, 2026-10-27, 375 – 1440). In a Media Box's place
+   on a page without one; 72px over the header, 60 under the cards; the header is the press
+   release's: the heading and
    the grey "Based on tags" line left, the "All" ghost pill right, centred on them; 20px to the
    cards. The heading is the kit's band title, 20/25 up to 768, 26/32.5 above. */
 body.press-kit main > .section.related {
   margin-block: var(--pk-band-gap) var(--spacing-m);
   padding-block: var(--pk-band-padding-top) var(--media-box-padding-bottom);
+}
+
+/* after a Media Box (a chapter with both bands) only that band's 16px white strip parts them */
+body.press-kit main > .section.media-box + .section.related {
+  margin-block-start: 0;
 }
 
 body.press-kit .section.related .default-content-wrapper {
@@ -646,6 +652,13 @@ body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wr
 
   body.press-kit .section.related .story-rail.press .card-teaser-title {
     font-size: var(--heading-font-size-s);
+  }
+
+  /* after a Media Box the source's dotdotdot leaves one line from 769 (two below), as on the press
+     releases' band (measured on the Peaq Battery and Classic Days 645 chapters, 769 – 1440) */
+  body.press-kit main:has(> .section.media-box) .section.related .story-rail.press .card-teaser-title {
+    -webkit-line-clamp: 1;
+    max-height: 1.2em;
   }
 
 }
