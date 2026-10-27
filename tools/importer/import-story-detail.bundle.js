@@ -540,10 +540,45 @@ var CustomImportScript = (() => {
       const m = find(mobile, test, "margin") || d;
       return [d || fallback, m || fallback];
     };
+    const cellGeometry = (cells) => {
+      const per = cells.map((cell) => {
+        const widget = cell.querySelector(":scope > .so-panel, :scope > .panel-cell-style > .so-panel");
+        const isWidget = (s) => !!(widget == null ? void 0 : widget.id) && s.endsWith(`#${widget.id}`);
+        const isCell = (s) => s.replace(/\s+/g, "") === `#${cell.id}>.panel-cell-style`;
+        const marginD = find(desktop, isWidget, "margin");
+        const marginM = find(mobile, isWidget, "margin") || marginD;
+        const padD = find(desktop, isCell, "padding");
+        const padM = find(mobile, isCell, "padding") || padD;
+        return {
+          own: !!(marginD || marginM || padD || padM),
+          marginD: marginD || DEFAULT_TEXT_MARGIN[0],
+          marginM: marginM || DEFAULT_TEXT_MARGIN[1],
+          padD: padD || "0px 0px 0px 0px",
+          padM: padM || "0px 0px 0px 0px"
+        };
+      });
+      if (!per.some((c) => c.own)) return {};
+      const join = (key) => per.map((c) => c[key]).join(" | ");
+      return {
+        "highlight-cell-margin": join("marginD"),
+        "highlight-cell-margin-mobile": join("marginM"),
+        "highlight-cell-padding": join("padD"),
+        "highlight-cell-padding-mobile": join("padM")
+      };
+    };
     return (grid) => {
       const out = {};
-      const cells = grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell");
-      if ([...cells].filter((c) => c.querySelector(".so-panel")).length > 1) return out;
+      const cells = [...grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell")].filter((c) => c.querySelector(".so-panel"));
+      if (cells.length > 1) {
+        const filled = cells.filter((c) => (c.textContent || "").trim() || c.querySelector("img, picture, iframe, video"));
+        if (filled.length > 1) Object.assign(out, cellGeometry(cells));
+        if (Object.keys(out).length) {
+          const { padD: padD2, padM: padM2 } = rowPadding(grid);
+          if (padD2) out["highlight-padding"] = padD2;
+          if (padM2) out["highlight-padding-mobile"] = padM2;
+        }
+        return out;
+      }
       const { padD, padM } = rowPadding(grid);
       if (padD) out["highlight-padding"] = padD;
       if (padM) out["highlight-padding-mobile"] = padM;
@@ -562,6 +597,27 @@ var CustomImportScript = (() => {
   var THEME_ROW_TOP = "32px 0px 0px 0px";
   var ROW_PAD_ATTR = "data-row-padding";
   var ROW_PAD_MOBILE_ATTR = "data-row-padding-mobile";
+  var FULL_ENOUGH_PX = 1600;
+  function useLargestSources(document2) {
+    let count = 0;
+    document2.querySelectorAll(".panel-layout img[srcset]").forEach((img) => {
+      var _a;
+      if (img.closest(".search-results.media-box, .search-results-gallery, .sb-gallery")) return;
+      const candidates = (img.getAttribute("srcset") || "").split(",").map((c) => c.trim().split(/\s+/)).map(([url, d]) => ({ url, w: parseInt((d || "").replace(/w$/, ""), 10) })).filter(({ url, w }) => url && w > 0);
+      if (!candidates.length) return;
+      const largest = candidates.reduce((a, b) => b.w > a.w ? b : a);
+      const src = img.getAttribute("src") || "";
+      const current = ((_a = candidates.find((c) => c.url === src)) == null ? void 0 : _a.w) || parseInt((src.match(/-(\d+)x\d+\.\w+(?:$|\?)/) || [])[1], 10) || 0;
+      const slide = !!img.closest(".search-results.carousel-widget");
+      const authored = !slide && parseInt(img.getAttribute("width"), 10) || Infinity;
+      if (current >= FULL_ENOUGH_PX) return;
+      if (largest.url !== src && largest.w > current && authored > current) {
+        img.setAttribute("src", largest.url);
+        count += 1;
+      }
+    });
+    return count;
+  }
   function markRowPadding(document2) {
     const { rowPadding } = layoutRules(headCss(document2));
     let count = 0;
@@ -606,7 +662,11 @@ var CustomImportScript = (() => {
     "highlight-gallery-margin-mobile",
     "highlight-background",
     "highlight-color",
-    "highlight-link"
+    "highlight-link",
+    "highlight-cell-margin",
+    "highlight-cell-margin-mobile",
+    "highlight-cell-padding",
+    "highlight-cell-padding-mobile"
   ];
   var CELL_WIDTH_ATTR = "data-cell-width";
   function markCellWidths(document2) {
@@ -976,6 +1036,8 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
+      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
+      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -3330,6 +3392,7 @@ var CustomImportScript = (() => {
      * source's glued non-breaking spaces (html2md would turn them into spaces).
      */
     preprocess: ({ document: document2 }) => {
+      useLargestSources(document2);
       markHighlights(document2);
       markCellWidths(document2);
       markRowPadding(document2);
@@ -3369,7 +3432,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              dates: block.name === "downloads"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

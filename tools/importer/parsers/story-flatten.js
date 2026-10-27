@@ -685,11 +685,55 @@ function highlightGeometry(css) {
     const m = find(mobile, test, 'margin') || d;
     return [d || fallback, m || fallback];
   };
+  // a multi-column row's own cell geometry (SKODA-227: the charging story's "Five questions"
+  // panel): each filled cell's widget margin and `.panel-cell-style` padding, desktop / mobile,
+  // as `highlight-cell-margin[-mobile]` / `highlight-cell-padding[-mobile]` rows, one box per cell
+  // joined by " | ". A cell without its own rule keeps the theme's (margin 0 15 / 15, no padding),
+  // a mobile value the desktop one. Only a layout that sets one of them gets the rows; the others
+  // keep the default panel inset.
+  const cellGeometry = (cells) => {
+    const per = cells.map((cell) => {
+      const widget = cell.querySelector(':scope > .so-panel, :scope > .panel-cell-style > .so-panel');
+      const isWidget = (s) => !!widget?.id && s.endsWith(`#${widget.id}`);
+      const isCell = (s) => s.replace(/\s+/g, '') === `#${cell.id}>.panel-cell-style`;
+      const marginD = find(desktop, isWidget, 'margin');
+      const marginM = find(mobile, isWidget, 'margin') || marginD;
+      const padD = find(desktop, isCell, 'padding');
+      const padM = find(mobile, isCell, 'padding') || padD;
+      return {
+        own: !!(marginD || marginM || padD || padM),
+        marginD: marginD || DEFAULT_TEXT_MARGIN[0],
+        marginM: marginM || DEFAULT_TEXT_MARGIN[1],
+        padD: padD || '0px 0px 0px 0px',
+        padM: padM || '0px 0px 0px 0px',
+      };
+    });
+    if (!per.some((c) => c.own)) return {};
+    const join = (key) => per.map((c) => c[key]).join(' | ');
+    return {
+      'highlight-cell-margin': join('marginD'),
+      'highlight-cell-margin-mobile': join('marginM'),
+      'highlight-cell-padding': join('padD'),
+      'highlight-cell-padding-mobile': join('padM'),
+    };
+  };
   return (grid) => {
     const out = {};
-    // a multi-column row has a margin per cell; its Columns block keeps the default inset
-    const cells = grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell');
-    if ([...cells].filter((c) => c.querySelector('.so-panel')).length > 1) return out;
+    // a multi-column row has a margin per cell: its Columns block keeps the default inset, unless
+    // the layout sets the cells' own (cellGeometry)
+    const cells = [...grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell')]
+      .filter((c) => c.querySelector('.so-panel'));
+    if (cells.length > 1) {
+      // only a row that becomes a Columns block (two cells with content) has cells to style
+      const filled = cells.filter((c) => (c.textContent || '').trim() || c.querySelector('img, picture, iframe, video'));
+      if (filled.length > 1) Object.assign(out, cellGeometry(cells));
+      if (Object.keys(out).length) {
+        const { padD, padM } = rowPadding(grid);
+        if (padD) out['highlight-padding'] = padD;
+        if (padM) out['highlight-padding-mobile'] = padM;
+      }
+      return out;
+    }
     const { padD, padM } = rowPadding(grid);
     if (padD) out['highlight-padding'] = padD;
     if (padM) out['highlight-padding-mobile'] = padM;
@@ -715,6 +759,46 @@ function highlightGeometry(css) {
 const THEME_ROW_TOP = '32px 0px 0px 0px';
 const ROW_PAD_ATTR = 'data-row-padding';
 const ROW_PAD_MOBILE_ATTR = 'data-row-padding-mobile';
+
+// a body image file this wide is full enough for the story column (819px at 2x)
+const FULL_ENOUGH_PX = 1600;
+
+/**
+ * Point each body image at its largest file: WordPress gives a 2026 editor image a thumbnail
+ * `src` (`…-384x216.jpg`, the charging story's photos), and the full file only in its `srcset`
+ * (`…jpg 1136w`), so the import kept the thumbnail and showed it at 384px. The media gate caps an
+ * oversize file at push. A slider gallery's slides too (one full-width photo each); the Media Box
+ * and photo-grid cards keep theirs (their parsers pick the files).
+ * Returns the number of images changed.
+ */
+export function useLargestSources(document) {
+  let count = 0;
+  document.querySelectorAll('.panel-layout img[srcset]').forEach((img) => {
+    if (img.closest('.search-results.media-box, .search-results-gallery, .sb-gallery')) return;
+    const candidates = (img.getAttribute('srcset') || '').split(',')
+      .map((c) => c.trim().split(/\s+/))
+      .map(([url, d]) => ({ url, w: parseInt((d || '').replace(/w$/, ''), 10) }))
+      .filter(({ url, w }) => url && w > 0);
+    if (!candidates.length) return;
+    const largest = candidates.reduce((a, b) => (b.w > a.w ? b : a));
+    const src = img.getAttribute('src') || '';
+    const current = candidates.find((c) => c.url === src)?.w
+      || parseInt((src.match(/-(\d+)x\d+\.\w+(?:$|\?)/) || [])[1], 10) || 0;
+    // only where the page shows the image wider than its `src` file (the charging photos: 1976
+    // authored, a 384px file); an image the author set at its thumbnail size keeps it. A slider
+    // slide's `width` is its file's (768), not its shown size (the slide's width): it ignores it
+    const slide = !!img.closest('.search-results.carousel-widget');
+    const authored = (!slide && parseInt(img.getAttribute('width'), 10)) || Infinity;
+    // a 1600px file already covers the 819px column at 2x: a 2560 rendition stays (its original
+    // would only be scaled back to it at push)
+    if (current >= FULL_ENOUGH_PX) return;
+    if (largest.url !== src && largest.w > current && authored > current) {
+      img.setAttribute('src', largest.url);
+      count += 1;
+    }
+  });
+  return count;
+}
 
 /** Mark each plain builder row's own padding (desktop / mobile). Returns the count. */
 export function markRowPadding(document) {
@@ -766,7 +850,8 @@ export function rowPaddingVariants(grid) {
 
 const GEOMETRY_KEYS = ['highlight-padding', 'highlight-padding-mobile', 'highlight-margin',
   'highlight-margin-mobile', 'highlight-gallery-margin', 'highlight-gallery-margin-mobile',
-  'highlight-background', 'highlight-color', 'highlight-link'];
+  'highlight-background', 'highlight-color', 'highlight-link',
+  'highlight-cell-margin', 'highlight-cell-margin-mobile', 'highlight-cell-padding', 'highlight-cell-padding-mobile'];
 
 // ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
 // SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
