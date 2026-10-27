@@ -48,8 +48,11 @@ function slide(panel, open) {
     panel.hidden = !open;
     return;
   }
-  // the panel's insets (46px above the photos) slide with its height, as the source's do
-  const { paddingTop, paddingBottom } = view.getComputedStyle(panel);
+  // the panel's insets and margins (10px under the bar) slide with its height, as jQuery's
+  // slideToggle does on the source
+  const {
+    paddingTop, paddingBottom, marginTop, marginBottom,
+  } = view.getComputedStyle(panel);
   const frame = (height) => {
     const share = height / full;
     return {
@@ -58,6 +61,8 @@ function slide(panel, open) {
       height: `${height}px`,
       paddingTop: `${parseFloat(paddingTop) * share}px`,
       paddingBottom: `${parseFloat(paddingBottom) * share}px`,
+      marginTop: `${parseFloat(marginTop) * share}px`,
+      marginBottom: `${parseFloat(marginBottom) * share}px`,
     };
   };
   const animation = panel.animate([frame(from), frame(to)], {
@@ -68,15 +73,38 @@ function slide(panel, open) {
   if (!open) animation.onfinish = () => { panel.hidden = true; };
 }
 
-/** Whether a paragraph holds only a picture (a photo of the set), no text. */
-const isPhoto = (node) => node.matches?.('p') && !!node.querySelector('img') && !node.textContent.trim();
+// a photo's crop, written after it when it isn't its orientation's default (the importer
+// carries the source's `snap-top` / `snap-center`): "top" or "center"
+const POSITION = /^(top|center)$/i;
+
+/** Whether a paragraph holds only a picture (a photo of the set), and at most its crop word. */
+const isPhoto = (node) => node.matches?.('p') && !!node.querySelector('img')
+  && (!node.textContent.trim() || POSITION.test(node.textContent.trim()));
+
+/**
+ * A photo's crop in its 16:9 tile: the authored word, else from the top for a portrait photo
+ * (taller than wide: the source's `snap-top`, heads kept) and centred for a landscape one.
+ * @param {Element} p the photo paragraph
+ * @returns {'top'|'center'}
+ */
+export function photoPosition(p) {
+  const word = p.textContent.trim().toLowerCase();
+  if (POSITION.test(word)) return word;
+  const img = p.querySelector('img');
+  const w = Number(img?.getAttribute('width'));
+  const h = Number(img?.getAttribute('height'));
+  return w > 0 && h > w ? 'top' : 'center';
+}
 
 /** The photo grid: a button per photo (its authored picture), opening the lightbox on the set. */
 function photoGrid(photos, name) {
   const items = photos.map((p) => {
     const img = p.querySelector('img');
     return {
-      src: img.src, alt: img.getAttribute('alt') || name, picture: img.closest('picture') || img,
+      src: img.src,
+      alt: img.getAttribute('alt') || name,
+      picture: img.closest('picture') || img,
+      top: photoPosition(p) === 'top',
     };
   });
   const list = document.createElement('ul');
@@ -99,7 +127,7 @@ function photoGrid(photos, name) {
     const li = document.createElement('li');
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'exec-bio-photo';
+    button.className = item.top ? 'exec-bio-photo is-top' : 'exec-bio-photo';
     button.setAttribute('aria-label', LABELS.openPhoto(i + 1, items.length, item.alt));
     button.append(item.picture);
     button.addEventListener('click', () => {

@@ -77,6 +77,27 @@ test('a card per member: the name line marked, the portrait kept, then an h2 tog
   assert.equal(panel.lastElementChild.tagName, 'P');
 });
 
+test('photo crop: a portrait photo from its top, a landscape one centred, an authored word wins', { skip }, async () => {
+  const { photoPosition } = await import('./exec-bio.js');
+  const photo = (attrs, word = '') => {
+    const p = document.createElement('p');
+    p.innerHTML = `<picture><img src="/x.jpg" alt="" ${attrs}></picture>${word}`;
+    return p;
+  };
+  assert.equal(photoPosition(photo('width="512" height="768"')), 'top');
+  assert.equal(photoPosition(photo('width="768" height="512"')), 'center');
+  assert.equal(photoPosition(photo('')), 'center', 'no size: centred');
+  assert.equal(photoPosition(photo('width="768" height="512"', ' top')), 'top');
+  assert.equal(photoPosition(photo('width="512" height="768"', ' center')), 'center');
+  const el = block([[CARD, `<p>show more</p><p><picture><img src="/media_1.jpg" alt="A" width="512" height="768"></picture></p>
+    <p><picture><img src="/media_2.jpg" alt="B" width="768" height="512"></picture> top</p>
+    <p><picture><img src="/media_3.jpg" alt="C" width="768" height="512"></picture></p>`]]);
+  decorate(el);
+  const tops = [...el.querySelectorAll('.exec-bio-photo')].map((b) => b.classList.contains('is-top'));
+  assert.deepEqual(tops, [true, true, false]);
+  assert.equal(el.querySelector('.exec-bio-panel').textContent.includes('top'), false, 'the crop word is not shown');
+});
+
 test('toggles open and close their own panel only (independent, unique ids)', { skip }, () => {
   const el = block([[CARD, PANEL], [CARD, PANEL]]);
   decorate(el);

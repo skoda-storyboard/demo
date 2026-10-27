@@ -115,9 +115,10 @@
   --brand-assets-heading-share: 25%;
   --brand-assets-frame: 70px;
 
-  /* the source heading's line pitch: its bold (600) text rides 1px above the light line box
-     (27.6px at 24px), so each line is 28.6px; one line high is 28.6, two 57.2 */
-  --brand-assets-heading-line: 28.6px;
+  /* the source heading's line height, 27.6px at 24px (1.15). Its bold text in a light line
+     renders one line 27.6px high in Chrome on macOS; Chrome on Linux makes the source's own
+     line 28.6px (its font files' vertical metrics), which ours don't reproduce (PR #483) */
+  --brand-assets-heading-line: 27.6px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
 
   /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from

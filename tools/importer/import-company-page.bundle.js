@@ -238,6 +238,7 @@ var CustomImportScript = (() => {
     label.textContent = ((toggle == null ? void 0 : toggle.textContent) || "").replace(/\s+/g, " ").trim() || "show more";
     const out = [label];
     builder == null ? void 0 : builder.querySelectorAll(".gallery-item").forEach((item) => {
+      var _a;
       const link = item.querySelector("a[href]");
       const img = item.querySelector("img");
       if (!link && !img) return;
@@ -246,6 +247,9 @@ var CustomImportScript = (() => {
       pic.setAttribute("src", ((link == null ? void 0 : link.getAttribute("href")) || img.getAttribute("src") || "").split("#")[0]);
       pic.setAttribute("alt", (img == null ? void 0 : img.getAttribute("alt")) || "");
       p.append(pic);
+      const snap = (((_a = item.querySelector(".image-holder")) == null ? void 0 : _a.className.match(/\bsnap-(top|center)\b/)) || [])[1];
+      const portrait = Number(img == null ? void 0 : img.getAttribute("height")) > Number(img == null ? void 0 : img.getAttribute("width"));
+      if (snap && snap !== (portrait ? "top" : "center")) p.append(` ${snap}`);
       out.push(p);
     });
     builder == null ? void 0 : builder.querySelectorAll(".so-panel.widget_sow-editor").forEach((editor) => {

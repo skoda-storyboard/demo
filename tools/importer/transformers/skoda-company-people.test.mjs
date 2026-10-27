@@ -99,7 +99,8 @@ test('board: Exec Bio rows [card, panel]: the toggle label, one image per photo,
     assert.equal(card.querySelectorAll('img').length, 1, 'one portrait');
     const paragraphs = [...panel.querySelectorAll(':scope > p')];
     assert.equal(paragraphs[0].textContent, 'show more');
-    const photos = paragraphs.filter((p) => p.querySelector('img') && !p.textContent.trim());
+    // a photo paragraph: its image, and at most its crop word
+    const photos = paragraphs.filter((p) => p.querySelector('img') && /^(top|center)?$/.test(p.textContent.trim()));
     assert.ok(photos.length > 0, 'the photo set');
     // one image per photo: the gallery's linked thumbnails are not repeated
     assert.equal(panel.querySelectorAll('a img').length, 0);
@@ -107,6 +108,11 @@ test('board: Exec Bio rows [card, panel]: the toggle label, one image per photo,
     // every member links the press release; the CV and photo set only where the source has them
     assert.ok([...panel.querySelectorAll('a')].some((a) => /press release/.test(a.textContent)));
   });
+  // a photo carries its crop word only where the source's differs from its orientation's
+  // default (portrait top, landscape centre): 5 landscape photos set to top, 1 portrait centred
+  const words = rows.flatMap((tr) => [...tr.cells[1].querySelectorAll(':scope > p')])
+    .filter((p) => p.querySelector('img') && p.textContent.trim()).map((p) => p.textContent.trim());
+  assert.deepEqual(words.sort(), ['center', 'top', 'top', 'top', 'top', 'top']);
   // the CV link keeps its bold (the source renders it at 600)
   assert.ok([...doc.querySelectorAll('strong a, a strong')].some((el) => /Download cv/.test(el.textContent)));
 });

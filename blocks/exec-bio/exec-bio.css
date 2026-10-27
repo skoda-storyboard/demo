@@ -20,6 +20,13 @@
   --exec-bio-icon-size: 1em;
   --exec-bio-icon-pad: var(--spacing-xs);
   --exec-bio-icon-box: calc(var(--exec-bio-icon-size) + 2 * var(--exec-bio-icon-pad));
+
+  /* the open panel: the source's rounded grey builder widget, 10px under the bar and 1px
+     wider than the card each side, 10px of padding; the photos 46px under the bar and 29px in
+     from the card (19 below 781), as before */
+  --exec-bio-panel-bg: var(--skoda-grey-215);
+  --exec-bio-panel-gap: var(--page-gutter);
+  --exec-bio-panel-overhang: 1px;
   --exec-bio-panel-top: 46px;
   --exec-bio-panel-inset: 19px;
   --exec-bio-panel-inset-wide: 29px;
@@ -126,7 +133,13 @@
 
 .exec-bio .exec-bio-panel {
   box-sizing: border-box;
-  padding: var(--exec-bio-panel-top) var(--exec-bio-panel-inset) 0;
+
+  /* the widget's bottom padding hangs over the card's end (its -10px margin), so the card
+     still ends 20px under the links */
+  margin: var(--exec-bio-panel-gap) calc(-1 * var(--exec-bio-panel-overhang)) calc(-1 * var(--exec-bio-panel-gap));
+  padding: calc(var(--exec-bio-panel-top) - var(--exec-bio-panel-gap)) calc(var(--exec-bio-panel-inset) + var(--exec-bio-panel-overhang)) var(--exec-bio-panel-gap);
+  border-radius: var(--card-radius);
+  background-color: var(--exec-bio-panel-bg);
 }
 
 .exec-bio .exec-bio-photos {
@@ -165,8 +178,14 @@
   aspect-ratio: 16 / 9;
   object-fit: cover;
 
-  /* the source centres each photo in its tile at 102% (its media-card image scale) */
+  /* the source shows each photo at 102% (its media-card image scale), centred in its tile,
+     or from its top (`snap-top`: a portrait photo, or one the source sets so) */
+  object-position: 50% 50%;
   scale: var(--exec-bio-photo-zoom);
+}
+
+.exec-bio .exec-bio-photo.is-top img {
+  object-position: 50% 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -191,7 +210,7 @@
   }
 
   .exec-bio .exec-bio-panel {
-    padding-inline: var(--exec-bio-panel-inset-wide);
+    padding-inline: calc(var(--exec-bio-panel-inset-wide) + var(--exec-bio-panel-overhang));
   }
 }
 

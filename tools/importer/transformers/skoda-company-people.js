@@ -104,6 +104,12 @@ function panelOf(cell, document) {
     pic.setAttribute('src', (link?.getAttribute('href') || img.getAttribute('src') || '').split('#')[0]);
     pic.setAttribute('alt', img?.getAttribute('alt') || '');
     p.append(pic);
+    // the source crops each photo from its top or centre (`snap-top` / `snap-center`); the
+    // block takes top for a portrait photo and centre for a landscape one, so only a photo the
+    // source sets otherwise carries the word (blocks/exec-bio photoPosition)
+    const snap = (item.querySelector('.image-holder')?.className.match(/\bsnap-(top|center)\b/) || [])[1];
+    const portrait = Number(img?.getAttribute('height')) > Number(img?.getAttribute('width'));
+    if (snap && snap !== (portrait ? 'top' : 'center')) p.append(` ${snap}`);
     out.push(p);
   });
   // the links under the photo set (the set itself sits in the same editor widget)
