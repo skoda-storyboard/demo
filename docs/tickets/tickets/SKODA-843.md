@@ -3,9 +3,10 @@
 - **Type:** import / template · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
 - **GitHub issue:** [#363](https://github.com/skoda-storyboard/demo/issues/363) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 2–3 SP *(planning estimate, not a quote)*
-- **Status (2026-10-27):** 🟡 Built on branch `skoda-843-generic-pages`: the EN set (17 pages) imported with
-  `import-page-base` and on preview; Sustainable Offices on its own importer and template. Locales follow #485 (PO,
-  2026-10-26). See "Implementation (2026-10-27)"; DA steps waiting on an explicit request are under "Pending".
+- **Status (2026-10-28):** 🟡 In QA. Code merged (#511, 2026-10-28); the 17 EN pages published, the 6 IIHF
+  redirects live, the PO approved deviations 1–6. Open: Sustainable Offices (the film's MP4 ingest, then its
+  re-push and publish) and the client's keep / drop list (AC1). Locales follow #485 (PO, 2026-10-26). See
+  "Implementation (2026-10-27)" and "Delivered (2026-10-28)".
 
 ## Why
 The census ([coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §2) found 41 EN `page-template-default` pages
@@ -132,7 +133,7 @@ after the review fixes, on current `main`)**
   - unchanged neighbours: `skoda-company-*`, `story-import-validity`, `press-release`, stories, contact-directory,
     exec-bio, brand-asset, app-promo, columns, embed.
 
-**Deviations from origin (for the PO; none accepted by an agent)**
+**Deviations from origin (all 6 approved by the PO, 2026-10-28, on #363)**
 - BGC: the cart toolbar under the film (+, download, link) is not migrated, as on stories and press releases (SKODA-824 note): 64px shorter (the source's 8px, its 40px row and 16px to the next paragraph). The earlier −54 was this net of the +10 the PR review found above the body.
 - Terms (`terms-and-conditions-2`): 7 run-in titles set inline at 18pt (24px) on the source show at the body size; DA carries no inline size.
 - Consent: the source's h2 holds the dead `Blok.jpg` (a broken 44×38 box that wraps the heading at 768); ours drops the image.
@@ -145,7 +146,9 @@ after the review fixes, on current `main`)**
   - The Sustainability tab and the logo link to this page; the source links both to `/en/?page_id=320705`, a 404 on live.
   - The CZ link shows once the page declares its Czech translation (with the locales, after #485); until then the switcher shows EN only.
 - The bold "Learn more" link (BGC) has no focus ring, as the body's text links: the SKODA-813 "match live" exception
-  (PO, 2026-10-21) extended to this one link, which the decoration makes a button. Needs the PO's confirmation.
+  (PO, 2026-10-21) extended to this one link, which the decoration makes a button. Confirmed by the PO (2026-10-28).
+  Its weight equals live: the source's text sits in `<a><strong>`, so the `<a>` computes 400 but the text paints at
+  600, as ours (82.0px wide on both; QA #363, item 5).
 
 **Code review (2026-10-27, an independent review of the diff, all findings fixed)**
 - P1: the page-body list rules reached the Contact Directory and Exec Bio blocks of the company pages (#483): every
@@ -174,13 +177,24 @@ after the review fixes, on current `main`)**
 - Open, from the same review: the Consent page's h2 → h4 skip, kept as the source's, is #512 (an accessibility
   decision for a human).
 
-**Pending (needs an explicit request: DA writes and publishing)**
-- The 6 IIHF redirect rows (`/en/iihf`, `/en/iihf/lv`, `/en/iihf/ru`, each with and without the slash) → the live
-  hockey story. Prepared; the DA sheet is backed up.
-- `/sustainability/nav` and `/sustainability/footer` (built locally, not in DA yet).
+**Delivered (2026-10-28, each on the PO's explicit request)**
+- **The 17 pages published** (08:00 GMT): live equals preview on every one. The Media Room footer's consent link
+  (since #511 on the demo) opens the Consent page on live again (QA #363 item 1, a 404 between the merge and the
+  publish).
+- **The 6 IIHF redirect rows** (`/en/iihf`, `/en/iihf/lv`, `/en/iihf/ru`, each with and without the slash) in the DA
+  redirects sheet, previewed and published (09:03 GMT): each 301s to the source hockey story
+  `/en/sports/15000-figures-of-hockey-fans-to-fill-the-stands-in-riga/` (not migrated), as the source's 302s. The 6
+  earlier rows unchanged; the previous sheet backed up first.
+- **`/sustainability/nav` and `/sustainability/footer`** built with `main`'s importers (byte-identical to the #511
+  copies) and pushed to DA + preview (09:08 GMT), not published: the page that uses them is not re-pushed yet.
+
+**Pending**
 - `/en/sustainable-offices` re-push: blocked by the binary gate until the film MP4 is ingested on a developer
-  machine (the PO's choice, 2026-10-26). Preview keeps the earlier version (Vimeo only, which Vimeo refuses here).
-- Publishing the 17 pages, the fragments and the page (AC: the footer-linked legal pages and BGC before go-live).
+  machine (the PO's choice, 2026-10-26). Preview keeps the earlier version (Vimeo only, which Vimeo refuses here,
+  and the ordinary chrome). Then publish the page and its two fragments together (QA #363 item 4).
+- AC1: the client-confirmed keep / drop list (and redirect rows for any dropped URL).
+- After #485: the fragments' links follow its link rule (the importers' skoda-links pass; SKODA-1001 note), so the
+  two fragments are re-imported and re-pushed with #485's chrome.
 
 **Notes (not in this ticket)**
 - The cookies page's "manage your consent by clicking this link" opens the source's consent centre; on the demo it
