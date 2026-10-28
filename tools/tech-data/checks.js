@@ -15,7 +15,7 @@ const ANCHOR_RE = /<a\b([^>]*?)\bhref="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/gi;
 // a Technical Data cell: <p><strong>value</strong></p><p>label</p>
 const CELL_RE = /(<p\b[^>]*>\s*<strong\b[^>]*>)([\s\S]*?)(<\/strong>\s*<\/p>\s*<p\b[^>]*>)([\s\S]*?)(<\/p>)/gi;
 // a range or consumption figure in running text
-const CLAIM_RE = /(\d[\d.,]*(?:\s*[-–]\s*\d[\d.,]*)?)\s*((?:kWh|l)\/100\s*km|km(?![/\w]))/g;
+const CLAIM_RE = /(\d[\d.,]*(?:\s*[-–]\s*\d[\d.,]*)?)\s*((?:kWh|l)\/100\s*km|km(?![/\w])|kilomet(?:re|er)s?\b)/g;
 const APPROXIMATE_RE = /\b(?:more than|over|at least|almost|nearly|around|approximately|about|in excess of|by)\s*$/i;
 // a range sentence about a drive, a test or a record states a measured result, not the WLTP figure
 const MEASURED_RE = /\b(?:record|test|tested|real-world|drive|drove|driven|covered|journey|trip)\b/i;
@@ -146,7 +146,7 @@ export function findUnlabelledRanges(html) {
   return textBlocks(html).flatMap((block) => block.split(SENTENCE_SPLIT_RE))
     .filter((s) => /\brange\b/i.test(s) && !/\bWLTP\b/.test(s) && !MEASURED_RE.test(s))
     .flatMap((sentence) => [...sentence.matchAll(CLAIM_RE)]
-      .filter((m) => m[2] === 'km')
+      .filter((m) => parseFigure(`${m[1]} ${m[2]}`)?.unit === 'km')
       .map((m) => ({ text: flat(`${m[1]} ${m[2]}`), sentence })));
 }
 

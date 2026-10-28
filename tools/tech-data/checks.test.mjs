@@ -131,8 +131,8 @@ test('linking prose: an official WLTP figure becomes a link, other numbers stay 
 });
 
 test('range figures in prose without WLTP are found, drive and record sentences are not', () => {
-  const html = doc('<p>The 90 variant has a maximum driving range of more than 640 km.</p><p>The record drive covered a range of 936 km.</p>');
-  assert.deepEqual(findUnlabelledRanges(html).map((f) => f.text), ['640 km']);
+  const html = doc('<p>The 90 variant has a maximum driving range of more than 640 km.</p><p>The record drive covered a range of 936 km.</p><p>The range ranges from 460 to over 600 kilometers on a single charge.</p>');
+  assert.deepEqual(findUnlabelledRanges(html).map((f) => f.text), ['640 km', '600 kilometers']);
 });
 
 test('a page the sheet does not list: grid values are not checked, WLTP claims are checked against every model', () => {

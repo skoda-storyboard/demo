@@ -84,7 +84,13 @@ function toNumber(token) {
   return Number.isFinite(n) ? n : null;
 }
 
-const UNIT_ALIASES = { 'kwh/100km': 'kWh/100 km', 'km/h': 'km/h' };
+const UNIT_ALIASES = {
+  'kwh/100km': 'kWh/100 km',
+  kilometre: 'km',
+  kilometres: 'km',
+  kilometer: 'km',
+  kilometers: 'km',
+};
 const normalizeUnit = (unit) => {
   const u = flat(unit).replace(/\s/g, '');
   return UNIT_ALIASES[u.toLowerCase()] ?? u;
