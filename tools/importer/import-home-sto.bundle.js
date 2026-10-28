@@ -1556,6 +1556,13 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
+  function transform7(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-home-sto.js
   var parsers = {
@@ -1646,7 +1653,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
-      normalizeImages(main, document2);
+      transform7("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

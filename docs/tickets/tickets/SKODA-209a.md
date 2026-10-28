@@ -43,8 +43,9 @@ Short pages: `main` `min-height` is dropped where the feed has a count row (arch
 - **The source wins over the issue's "no count row when every story fits":** the row stays ("3 / 3") and hides only
   with no stories. This also restores the screen-reader announcement on the last Load more. Before the change it
   was silent: the row hid, and the status line is not used on archives.
-- **Known deviation, accepted for M1:** the 13 non-model tag archives end 16px under the pager, where the source
-  has 48 (32px short; `main` had 40). The block settings can't tell them apart from model tags (Kylaq and Slavia
+- **Known deviation, accepted for M1 (fixed 2026-10-22 by SKODA-209):** the 13 non-model tag archives end 16px
+  under the pager, where the source has 48 (32px short; `main` had 40). *They are Media Room pages on the source;
+  they now get the Media Room chrome from bulk metadata, and the Stories grid ends 48px on a Media Room page.* The block settings can't tell them apart from model tags (Kylaq and Slavia
   have no featured card either). Matching the source needs an authored setting and a re-push of those 13 pages,
   which is planned after the demo.
 - **Not changed (reviewed):**
@@ -98,7 +99,9 @@ Source vs branch preview, Playwright + Chrome DevTools (no screenshots), 1440 / 
     With `min-height`, `main` left none.
   - At 1920×1200 and 2560×1440 nothing is left over.
 - **Home, all stories loaded** (`?offset=9999`): the empty Load more band is gone, so the feed's last card →
-  next band is 68 instead of 100. On the source archives, an exhausted pager also has no button wrapper.
+  next band is 68 instead of 100. **Correction (2026-10-26, #487):** source archives do retain an empty 32px
+  wrapper after exhausting Load more, unlike an archive that fits initially. SKODA-209's review fix retains
+  that band only for count-enabled feeds whose total exceeds the effective first page; home remains unchanged.
 - **Home `/en`:** unchanged vs `main`. Same geometry from the feed to the footer, no count row.
 - **CLS (Lighthouse 12):**
 
