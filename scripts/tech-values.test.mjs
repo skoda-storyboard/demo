@@ -1,3 +1,9 @@
+/*
+ * Linked technical values on the page (scripts/tech-values.js, SKODA-852).
+ * Run: node --test scripts/tech-values.test.mjs
+ */
+/* global globalThis */
+/* eslint-disable import/no-extraneous-dependencies */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';

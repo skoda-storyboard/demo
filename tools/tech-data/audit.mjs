@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /*
- * Technical-data audit (SKODA-852): run the Preflight checks over published pages.
+ * Technical-data audit (SKODA-852): run the Tech data check over published pages.
  *
- *   node tools/tech-data/audit.mjs [--host <origin>] [--sheet <file|url>] [--sitemap <path prefix>] [--json] [paths…]
+ *   npm run tech-data:audit -- [--host <origin>] [--sheet <file|url>] [--sitemap <prefix>]
+ *     [--json] [paths…]
  *
  * Defaults: the live demo host, the sheet served from that host, and every page the sheet's
  * `models` tab lists. `--sitemap /en/skoda-model/` adds every sitemap page under that prefix.
  * Read-only. Exit code 1 when any page has an Issue.
  */
+/* eslint-disable no-console */
 import fs from 'node:fs';
 import { parseArgs } from 'node:util';
 import { runChecks } from './checks.js';
@@ -49,19 +51,22 @@ async function main() {
   const sheet = await loadSheet(opts.sheet, host);
   const listed = sheet.models.flatMap((m) => m.pages);
   const fromSitemap = opts.sitemap ? await sitemapPaths(host, opts.sitemap) : [];
-  const paths = [...new Set((positionals.length ? positionals : [...listed, ...fromSitemap]).map(normalizePath))];
+  const requested = positionals.length ? positionals : [...listed, ...fromSitemap];
+  const paths = [...new Set(requested.map(normalizePath))];
 
-  const report = [];
-  // one page at a time: a few dozen small requests, no need to fan out
-  for (const path of paths) {
+  const auditPage = async (path) => {
     try {
-      // eslint-disable-next-line no-await-in-loop
       const html = await fetchText(`${host}${path}.plain.html`);
-      report.push({ path, results: runChecks({ html, path, sheet }) });
+      return { path, results: runChecks({ html, path, sheet }) };
     } catch (e) {
-      report.push({ path, error: e.message });
+      return { path, error: e.message };
     }
-  }
+  };
+  // one page at a time: a few dozen small requests, no need to fan out
+  const report = [];
+  await paths.reduce((previous, path) => previous.then(async () => {
+    report.push(await auditPage(path));
+  }), Promise.resolve());
 
   if (opts.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
