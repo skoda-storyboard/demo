@@ -27,7 +27,7 @@ function stuckState(section) {
   }, { rootMargin: '-1px 0px 0px 0px', threshold: [1] }).observe(section);
 }
 
-function chapters(main) {
+function chapters(main, relabel = []) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
   if (!list) return;
