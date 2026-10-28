@@ -174,11 +174,114 @@ test('chromeRows with --chrome-footer: locales without a translated footer keep 
     { URL: '/cs/**', nav: '/cs/nav', footer: '/cs/footer' },
     { URL: '/de/**', nav: '/de/nav', footer: '' },
   ]);
-  // an earlier chrome row (with /de/footer) is replaced, not kept next to the new one
+  // an earlier chrome row (with /de/footer) is replaced, not kept next to the new one, and in its
+  // place: the authored /de/x/** after it still overrides it (#485 review)
   const old = { data: [{ URL: '/de/**', nav: '/de/nav', footer: '/de/footer' }, { URL: '/de/x/**', nav: '/other', footer: '' }] };
   const merged = mergeSheet(old, [], chromeRows(['de'], []));
   assert.deepEqual(merged.data.map((r) => [r.URL, r.nav, r.footer]), [
-    ['/de/x/**', '/other', ''],
     ['/de/**', '/de/nav', ''],
+    ['/de/x/**', '/other', ''],
   ]);
+});
+
+// #485 review: bulk metadata applies the rows top to bottom, so a merge keeps their order
+test('mergeSheet: a kept chrome row keeps its place before an authored override', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const sheet = {
+    data: [
+      { URL: '/de/**', nav: '/de/nav', footer: '/de/footer' },
+      { URL: '/de/special', nav: '/de/special-nav', footer: '/de/special-footer' },
+    ],
+  };
+  const order = (s) => s.data.map((r) => [r.URL, r.nav, r.footer]);
+  const expected = [['/de/**', '/de/nav', '/de/footer'], ['/de/special', '/de/special-nav', '/de/special-footer']];
+  assert.deepEqual(order(mergeSheet(sheet, [])), expected, 'a run without chrome');
+  // a Czech Media Room refresh: German keeps its order; the new Czech rows go after the sheet
+  const cs = mergeSheet(sheet, [], mediaRoomRows(['cs']));
+  assert.deepEqual(order(cs).slice(0, 2), expected, 'a refresh of another locale');
+  assert.ok(cs.data.slice(2).every((r) => r.URL.startsWith('/cs/')));
+  // a German Storyboard refresh: the new /de/** row in the old one's place, before /de/special
+  const de = mergeSheet(sheet, [], chromeRows(['de'], []));
+  assert.deepEqual(order(de), [['/de/**', '/de/nav', ''], expected[1]], 'a refresh of the same row');
+});
+
+test('mergeSheet: a new family goes next to its locale\'s other one, Storyboard first', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const urls = (s) => s.data.map((r) => r.URL);
+  // Storyboard installed, then the Media Room: right after /cs/**, before the authored row after it
+  const sb = { data: [{ URL: '/cs/**', nav: '/cs/nav', footer: '/cs/footer' }, { URL: '/cs/x', nav: '/cs/x-nav', footer: '' }] };
+  const withMr = mergeSheet(sb, [], mediaRoomRows(['cs']));
+  const at = (s, url) => urls(s).indexOf(url);
+  assert.equal(at(withMr, '/cs/**'), 0);
+  assert.ok(at(withMr, '/cs/media-room') === 1, 'the Media Room rows follow /cs/**');
+  assert.equal(urls(withMr).at(-1), '/cs/x', 'the authored row stays last, so it still wins');
+  // Media Room installed, then the Storyboard row: before the Media Room rows, which override it
+  const mr = mergeSheet({ data: [{ URL: '/en/a', nav: '/nav', footer: '' }] }, [], mediaRoomRows(['cs']));
+  const withSb = mergeSheet(mr, [], chromeRows(['cs']));
+  assert.equal(at(withSb, '/en/a'), 0);
+  assert.equal(at(withSb, '/cs/**'), 1);
+  assert.ok(at(withSb, '/cs/**') < at(withSb, '/cs/media-room'));
+});
+
+// --- SKODA-1001: the Media Room chrome rows per locale -----------------------------------
+
+test('mediaRoomRows: each Media Room section and content prefix of a locale, with its /**', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const rows = mediaRoomRows(['cs']);
+  const urls = rows.map((r) => r.URL);
+  ['/cs/media-room', '/cs/tiskove-zpravy', '/cs/tiskove-zpravy-archiv/**', '/cs/foto', '/cs/kontakty/kosik', '/cs/skoda-model/**']
+    .forEach((u) => assert.ok(urls.includes(u), u));
+  assert.ok(rows.every((r) => r.nav === '/cs/media-room/nav' && r.footer === '/cs/media-room/footer' && r.section === 'media-room'));
+  // a section the locale lacks (Slovenian has no press kits) gets no row, never an English path
+  assert.ok(mediaRoomRows(['sl']).every((r) => r.URL.startsWith('/sl/')));
+  assert.deepEqual(mediaRoomRows(['en', 'xx']), []);
+});
+
+test('mergeSheet: the Media Room rows follow /{locale}/**, and a re-run replaces both in place', async () => {
+  const { mergeSheet, chromeRows, mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const extra = [...chromeRows(['cs']), ...mediaRoomRows(['cs'])];
+  const curated = { URL: '/en/press-releases/**', nav: '/media-room/nav', footer: '/media-room/footer', section: 'media-room' };
+  const first = mergeSheet({ data: [curated] }, [], extra);
+  const at = (sheet, url) => sheet.data.findIndex((r) => r.URL === url);
+  assert.ok(at(first, '/cs/**') < at(first, '/cs/tiskove-zpravy-archiv/**'), 'the specific rows come later, so they win');
+  assert.equal(at(first, '/en/press-releases/**'), 0, 'the curated English rows stay first, unchanged');
+  // a second run: the tool's own rows are replaced, not kept as curated before the new /cs/**
+  const second = mergeSheet(first, [], extra);
+  assert.equal(second.data.length, first.data.length);
+  assert.ok(at(second, '/cs/**') < at(second, '/cs/tiskove-zpravy-archiv/**'));
+  assert.equal(second.data.filter((r) => r.URL === '/cs/foto').length, 1, 'no duplicate rows');
+});
+
+// #485 review: a refresh replaces only the locales and families it brings
+test('mergeSheet: a Media Room refresh of one locale keeps every other locale and the Storyboard rows', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const installed = mergeSheet({ data: [] }, [], [...chromeRows(['cs', 'de']), ...mediaRoomRows(['cs', 'de'])]);
+  assert.equal(installed.data.length, 46);
+  const key = (r) => [r.URL, r.nav, r.footer, r.section].join(' ');
+  const refreshed = mergeSheet(installed, [], mediaRoomRows(['cs']));
+  assert.equal(refreshed.data.length, 46, 'no row lost (was 22)');
+  assert.deepEqual(new Set(refreshed.data.map(key)), new Set(installed.data.map(key)), 'the same rows');
+  assert.equal(refreshed.data.filter((r) => r.URL.startsWith('/de/')).length, 23, '/de/** and its 22 Media Room rows');
+});
+
+test('mergeSheet: a Storyboard refresh keeps the locale\'s Media Room rows after its /{locale}/** row', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const installed = mergeSheet({ data: [] }, [], [...chromeRows(['cs']), ...mediaRoomRows(['cs'])]);
+  const refreshed = mergeSheet(installed, [], chromeRows(['cs'], []));
+  const at = (url) => refreshed.data.findIndex((r) => r.URL === url);
+  assert.equal(refreshed.data.length, installed.data.length);
+  assert.equal(refreshed.data[at('/cs/**')].footer, '', 'the refreshed row');
+  assert.ok(at('/cs/**') < at('/cs/tiskove-zpravy-archiv/**'), 'the Media Room rows still come later, so they win');
+});
+
+test('mergeSheet: a refreshed family drops its stale rows; other locales keep theirs', async () => {
+  const { mediaRoomRows } = await import('./build-locale-alternates.mjs');
+  const stale = (code) => ({
+    URL: `/${code}/old-section/**`, nav: `/${code}/media-room/nav`, footer: `/${code}/media-room/footer`, section: 'media-room',
+  });
+  const installed = mergeSheet({ data: [stale('cs'), stale('de')] }, [], []);
+  const refreshed = mergeSheet(installed, [], mediaRoomRows(['cs']));
+  const urls = refreshed.data.map((r) => r.URL);
+  assert.equal(urls.includes('/cs/old-section/**'), false, 'the refreshed locale\'s stale row goes');
+  assert.ok(urls.includes('/de/old-section/**'), 'another locale\'s row stays');
 });

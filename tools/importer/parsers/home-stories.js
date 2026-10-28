@@ -18,11 +18,14 @@
  *   ['Stories']
  *   ['heading', 'Latest Stories'] ['template', 'story'] ['path', '/en/'] ['offset', '3']
  */
-export default function parse(element, { document }) {
+import { sourceLocale, homePath } from '../locale.js';
+export default function parse(element, { document, url, params }) {
   const headingEl = element.querySelector('.search-results-heading, .search-results-header h2, .search-results-header h3');
   const heading = headingEl ? headingEl.textContent.trim() : '';
   const rows = [['Stories']];
   if (heading) rows.push(['heading', heading]);
-  rows.push(['template', 'story'], ['path', '/en/'], ['offset', '3']);
+  // the page's own locale home (`/cs/`), SKODA-1001
+  const locale = sourceLocale((params && params.originalURL) || url);
+  rows.push(['template', 'story'], ['path', homePath(locale)], ['offset', '3']);
   element.replaceWith(WebImporter.DOMUtils.createTable(rows, document));
 }

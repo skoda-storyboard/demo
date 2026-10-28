@@ -1,0 +1,122 @@
+{
+  "run": "2026-10-22T12:34:54.658Z",
+  "args": {
+    "list": "../cache-1001/urls-cs-mr.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": false,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "blocked-binary": 3,
+    "unchanged": 1
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/cs/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/cs/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/cs/tiskove-zpravy-archiv/nabidku-modelu-skoda-kodiaq-rozsiruji-nove-vybavove-verze-top-selectionlaurin-klement-a-plug-in-hybridni-pohon-s-vykonem-200-kw",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/tiskove-zpravy-archiv/nabidku-modelu-skoda-kodiaq-rozsiruji-nove-vybavove-verze-top-selectionlaurin-klement-a-plug-in-hybridni-pohon-s-vykonem-200-kw",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/tiskove-zpravy-archiv/nabidku-modelu-skoda-kodiaq-rozsiruji-nove-vybavove-verze-top-selectionlaurin-klement-a-plug-in-hybridni-pohon-s-vykonem-200-kw",
+      "binaries": {
+        "count": 3,
+        "rewrites": 0,
+        "errors": [
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p_c7960674.mp4",
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p-1_95317fda.mp4",
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261022_Nabidku-modelu-Skoda-Kodiaq-rozsiruji-nove-vybavove-verze-Top-Selection-Laurin-Klement-a-plug-in-hybridni-pohon_417f0011.pdf",
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p_c7960674.mp4",
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p-1_95317fda.mp4",
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261022_Nabidku-modelu-Skoda-Kodiaq-rozsiruji-nove-vybavove-verze-Top-Selection-Laurin-Klement-a-plug-in-hybridni-pohon_417f0011.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p_c7960674.mp4; unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p-1_95317fda.mp4; unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261022_Nabidku-modelu-Skoda-Kodiaq-rozsiruji-nove-vybavove-verze-Top-Selection-Laurin-Klement-a-plug-in-hybridni-pohon_417f0011.pdf; unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p_c7960674.mp4; unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_kodiaq_range_expands_with_new_laurin__klement_trim_and_200_kw_plug-in_hybrid_powertrain-1080p-1_95317fda.mp4; unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261022_Nabidku-modelu-Skoda-Kodiaq-rozsiruji-nove-vybavove-verze-Top-Selection-Laurin-Klement-a-plug-in-hybridni-pohon_417f0011.pdf"
+    },
+    {
+      "path": "/cs/tiskove-zpravy-archiv/skoda-auto-na-ceskem-trhu-predstavuje-model-epiq-ve-vrcholnem-provedeni-sportline",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/tiskove-zpravy-archiv/skoda-auto-na-ceskem-trhu-predstavuje-model-epiq-ve-vrcholnem-provedeni-sportline",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/tiskove-zpravy-archiv/skoda-auto-na-ceskem-trhu-predstavuje-model-epiq-ve-vrcholnem-provedeni-sportline",
+      "binaries": {
+        "count": 1,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261021-Skoda-Auto-na-ceskem-trhu-predstavuje-model-Epiq-ve-vrcholnem-provedeni-Sportline-_32461183.pdf",
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261021-Skoda-Auto-na-ceskem-trhu-predstavuje-model-Epiq-ve-vrcholnem-provedeni-Sportline-_32461183.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261021-Skoda-Auto-na-ceskem-trhu-predstavuje-model-Epiq-ve-vrcholnem-provedeni-Sportline-_32461183.pdf; unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261021-Skoda-Auto-na-ceskem-trhu-predstavuje-model-Epiq-ve-vrcholnem-provedeni-Sportline-_32461183.pdf"
+    },
+    {
+      "path": "/cs/tiskove-zpravy-archiv/skoda-posouva-koncept-simply-clever-na-novou-uroven-diky-prislusenstvi-pro-3d-tisk",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/tiskove-zpravy-archiv/skoda-posouva-koncept-simply-clever-na-novou-uroven-diky-prislusenstvi-pro-3d-tisk",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/tiskove-zpravy-archiv/skoda-posouva-koncept-simply-clever-na-novou-uroven-diky-prislusenstvi-pro-3d-tisk",
+      "binaries": {
+        "count": 2,
+        "rewrites": 0,
+        "errors": [
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/3d-printable_accessories_take_simply_clever_to_the_next_level-1080p_de0f915f.mp4",
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261019_Skoda-posouva-koncept-Simply-Clever-na-novou-uroven-diky-prislusenstvi-pro-3D-tisk_b9ece39f.pdf",
+          "unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/3d-printable_accessories_take_simply_clever_to_the_next_level-1080p_de0f915f.mp4",
+          "unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261019_Skoda-posouva-koncept-Simply-Clever-na-novou-uroven-diky-prislusenstvi-pro-3D-tisk_b9ece39f.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/3d-printable_accessories_take_simply_clever_to_the_next_level-1080p_de0f915f.mp4; unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261019_Skoda-posouva-koncept-Simply-Clever-na-novou-uroven-diky-prislusenstvi-pro-3D-tisk_b9ece39f.pdf; unverified video link: https://www.skoda-storyboard.com/direct-download/2026/10/3d-printable_accessories_take_simply_clever_to_the_next_level-1080p_de0f915f.mp4; unverified document link: https://www.skoda-storyboard.com/direct-download/2026/10/261019_Skoda-posouva-koncept-Simply-Clever-na-novou-uroven-diky-prislusenstvi-pro-3D-tisk_b9ece39f.pdf"
+    },
+    {
+      "path": "/cs/tiskove-zpravy",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/tiskove-zpravy",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/tiskove-zpravy",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "unchanged",
+      "reason": "DA already matches local",
+      "daLastModified": "Thu, 22 Oct 2026 12:33:40 GMT",
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 0,
+        "selfHosted": 0,
+        "external": 0
+      },
+      "valid": true
+    }
+  ]
+}

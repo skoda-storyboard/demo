@@ -27,7 +27,9 @@
  *   … --push                              merge into DA /metadata.json, then preview it
  *   … --push --publish                    … and publish the sheet
  * Options: --paths a,b (only these EDS paths), --chrome cs,de,sk,sr, --chrome-footer cs (the
- *   locales with a translated footer; default: all --chrome ones), --origin <url> (the host of
+ *   locales with a translated footer; default: all --chrome ones), --chrome-media-room cs (the
+ *   locales with a Media Room nav / footer, SKODA-1001; default: all --chrome ones; their rows per
+ *   Media Room section and content prefix come after `/{locale}/**`), --origin <url> (the host of
  *   the hreflang URLs), --concurrency N (4).
  * Credentials: none here; admin.da.live / admin.hlx.page auth is injected by the environment.
  * Output: tools/importer/reports/locale-alternates/<stamp>.json
@@ -37,6 +39,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pickHreflang, ALTERNATE_LOCALES } from './transformers/skoda-metadata-extract.mjs';
 import { LIVE_ORIGIN } from '../../scripts/links.js';
+import { LOCALE_PATHS, CONTENT_PREFIXES } from '../../scripts/locale-paths.js';
 
 const ORG = 'skoda-storyboard';
 const SITE = 'demo';
@@ -119,8 +122,44 @@ export function chromeRows(codes = [], footers = codes) {
     .map((c) => ({ URL: `/${c}/**`, nav: `/${c}/nav`, footer: footers.includes(c) ? `/${c}/footer` : '' }));
 }
 
-/** A `/{locale}/**` chrome row this tool writes (replaced on every merge). */
-const isChromeRow = (r) => /^\/([a-z]{2})\/\*\*$/.test(r.URL || '') && r.nav === `${r.URL.slice(0, 3)}/nav`;
+// a locale's Media Room sections and content (scripts/locale-paths.js), as the English rows of
+// /media-room/nav: listings, cart, contacts, search, newsletter; press releases, kits, models
+const MEDIA_ROOM_SECTIONS = ['mediaRoom', 'news', 'pressKits', 'images', 'videos', 'mediaCart', 'contacts', 'search', 'newsletter'];
+const MEDIA_ROOM_CONTENT = ['press_release', 'press_kit', 'skoda_model'];
+
+/**
+ * A locale's Media Room chrome rows (SKODA-1001): each of its Media Room paths, and everything
+ * under it, takes `/{locale}/media-room/nav` and `/footer` and the `media-room` section. They come
+ * after the `/{locale}/**` row, so they override it. A section the locale lacks (its path falls
+ * back to English) gets no row.
+ * @param {string[]} codes the locales (not `en`)
+ */
+export function mediaRoomRows(codes = []) {
+  return codes.filter((c) => ALTERNATE_LOCALES.includes(c) && c !== 'en').flatMap((c) => {
+    const own = (p) => p && p.startsWith(`/${c}/`);
+    const paths = [
+      ...MEDIA_ROOM_SECTIONS.map((k) => LOCALE_PATHS[c]?.[k]),
+      ...MEDIA_ROOM_CONTENT.map((t) => CONTENT_PREFIXES[t]?.[c]),
+    ].filter(own);
+    return [...new Set(paths)].flatMap((p) => [p, `${p}/**`].map((URL) => ({
+      URL, nav: `/${c}/media-room/nav`, footer: `/${c}/media-room/footer`, section: 'media-room',
+    })));
+  });
+}
+
+/**
+ * The scope of a chrome row this tool writes, `{locale}:{family}`: the `/{locale}/**` Storyboard
+ * row (`storyboard`) or one of the locale's Media Room rows (`media-room`); null for any other row.
+ * @param {object} r a sheet row
+ * @returns {string|null}
+ */
+const chromeScope = (r) => {
+  const m = String(r.URL || '').match(/^\/([a-z]{2})(?:\/|$)/);
+  if (!m) return null;
+  if (r.URL === `/${m[1]}/**` && r.nav === `/${m[1]}/nav`) return `${m[1]}:storyboard`;
+  if (r.nav === `/${m[1]}/media-room/nav`) return `${m[1]}:media-room`;
+  return null;
+};
 
 const isHreflang = (column) => /^hreflang:/i.test(column);
 // the columns this tool writes: the native hreflang ones and the earlier custom `alternates`
@@ -128,10 +167,15 @@ const isGenerated = (column) => column === 'alternates' || isHreflang(column);
 
 /**
  * The sheet after the merge: the curated rows unchanged, this tool's earlier rows (URL + hreflang
- * or the old `alternates` only, and the `/{locale}/**` chrome rows when `extra` brings chrome
- * rows) replaced by the new ones, sorted by URL. The custom `alternates` column is dropped
+ * or the old `alternates` only, and the chrome rows of each locale and family `extra` brings)
+ * replaced by the new ones, sorted by URL. The custom `alternates` column is dropped
  * (#299 review: native hreflang only), and every row gets every column (an empty cell never
  * overwrites in bulk metadata), the hreflang ones last in the switcher's order.
+ * Bulk metadata applies the rows top to bottom (a later row wins), so the rows keep their place:
+ * a chrome row no run refreshes stays where it is, and a refreshed scope's new rows take its old
+ * rows' place (#485 review: moving the kept `/de/**` row below `/de/special` overrode that page's
+ * own nav). Only a scope new to the sheet is added: after the sheet, or for a locale that already
+ * has the other family, next to it, its `/{locale}/**` row always before its Media Room rows.
  * @param {object} sheet the DA sheet JSON ({ data: [...] })
  * @param {Array<object>} rows `{ URL, 'hreflang:en': …, … }`
  * @param {Array<object>} [extra] curated rows to ensure (e.g. chromeRows())
@@ -145,14 +189,49 @@ export function mergeSheet(sheet, rows, extra = []) {
   const shape = (r) => Object.fromEntries(columns.map((c) => [c, r[c] ?? '']));
   const generated = (r) => Object.keys(r).some((c) => isGenerated(c) && r[c])
     && Object.keys(r).every((c) => c === 'URL' || isGenerated(c) || !r[c]);
-  // the `/{locale}/**` chrome rows are replaced only by a run that brings its own (`--chrome`);
-  // a run without them keeps the existing ones, so it never drops the translated nav / footer
-  const replaceChrome = extra.some(isChromeRow);
-  const curated = data.filter((r) => !generated(r) && !(replaceChrome && isChromeRow(r)))
-    .map(shape);
-  const ensured = extra.map(shape);
-  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL)).map(shape);
-  const merged = [...curated, ...ensured, ...added];
+  // a locale's chrome rows of one family (its `/{locale}/**` row, or its Media Room rows) are
+  // replaced only by a run that brings that locale and family (`--chrome`, `--chrome-media-room`);
+  // every other locale's and family's rows stay (#485 review: a Czech Media Room refresh kept
+  // nothing of German or of either Storyboard row)
+  const fresh = new Map();
+  extra.filter(chromeScope).forEach((r) => {
+    const scope = chromeScope(r);
+    if (!fresh.has(scope)) fresh.set(scope, []);
+    fresh.get(scope).push(r);
+  });
+  // the sheet in its order: a refreshed scope's new rows at its first old row, its other old rows
+  // gone; every other row (curated, or chrome no run refreshes) where it was
+  const placed = new Set();
+  const kept = [];
+  data.forEach((r) => {
+    if (generated(r)) return;
+    const scope = chromeScope(r);
+    if (!scope || !fresh.has(scope)) {
+      kept.push(r);
+      return;
+    }
+    if (placed.has(scope)) return;
+    placed.add(scope);
+    kept.push(...fresh.get(scope));
+  });
+  // a scope new to the sheet: a Storyboard row goes before its locale's Media Room rows, Media Room
+  // rows right after their locale's Storyboard row (so they override it, and the rows after them
+  // still override both); a locale without either is added after the sheet, Storyboard first
+  const indexOf = (scope) => kept.findIndex((r) => chromeScope(r) === scope);
+  const appended = [];
+  const newScopes = [...fresh.keys()].filter((scope) => !placed.has(scope));
+  const locales = [...new Set(newScopes.map((scope) => scope.split(':')[0]))];
+  locales.forEach((code) => ['storyboard', 'media-room'].forEach((family) => {
+    const scope = `${code}:${family}`;
+    if (!newScopes.includes(scope)) return;
+    const other = indexOf(`${code}:${family === 'storyboard' ? 'media-room' : 'storyboard'}`);
+    if (other < 0) appended.push(...fresh.get(scope));
+    else if (family === 'storyboard') kept.splice(other, 0, ...fresh.get(scope));
+    else kept.splice(other + 1, 0, ...fresh.get(scope));
+  }));
+  const ensured = [...appended, ...extra.filter((r) => !chromeScope(r))];
+  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL));
+  const merged = [...kept, ...ensured, ...added].map(shape);
   return {
     ...sheet, total: merged.length, offset: 0, limit: merged.length, data: merged, ':type': 'sheet',
   };
@@ -263,7 +342,11 @@ async function main() {
     if (!start.includes(p)) report.translatedPages.push(p);
   }
   report.notMigratedTranslations = missing;
-  const extra = chromeRows(list('chrome'), value('chrome-footer') === null ? list('chrome') : list('chrome-footer'));
+  const extra = [
+    ...chromeRows(list('chrome'), value('chrome-footer') === null ? list('chrome') : list('chrome-footer')),
+    // after the `/{locale}/**` rows, so a Media Room page takes the Media Room chrome
+    ...mediaRoomRows(value('chrome-media-room') === null ? list('chrome') : list('chrome-media-room')),
+  ];
   report.chrome = extra;
 
   if (flag('push')) {

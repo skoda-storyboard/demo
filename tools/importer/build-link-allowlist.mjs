@@ -17,13 +17,15 @@
  *
  * Usage: npm run import:allowlist   (then re-bundle the importers)
  *        npm run import:allowlist -- --refresh-published   (first rewrite the published list
- *        from the live query index; run it after publishing new pages)
+ *        from every locale's live query index and the pages import:push previewed, SKODA-1001;
+ *        run it after pushing or publishing new pages)
  * skoda-links.test.mjs fails if the committed list drifts from the text files.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LOCALE_PATHS } from '../../scripts/locale-paths.js';
 import { parseSectionedList, mergeLists } from './push/m1-status-lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -31,10 +33,30 @@ export const SET = 'docs/planning/skoda-m1-url-set.txt';
 export const CORPUS = 'docs/planning/skoda-rail-feed-corpus.txt';
 export const ARCHIVES = 'docs/planning/skoda-archive-url-set.txt';
 export const PUBLISHED = 'docs/planning/skoda-published-url-set.txt';
-const LIVE_INDEX = 'https://main--demo--skoda-storyboard.aem.live/en/query-index.json?limit=10000';
+// every locale's live index (SKODA-1001): a translated page is a demo page too, so links to it
+// become site-relative; a locale without an index yet (404) is skipped
+const LIVE_INDEXES = Object.keys(LOCALE_PATHS)
+  .map((locale) => `https://main--demo--skoda-storyboard.aem.live/${locale}/query-index.json?limit=10000`);
 const SOURCE_ORIGIN = 'https://www.skoda-storyboard.com';
 // live demo-only pages that are not source pages (QA fixtures), never link targets
 const NOT_SOURCE = /^\/(?:drafts|en\/test)(?:\/|$)/;
+// the import's push record: the pages it pushed and previewed (SKODA-602)
+export const PUSH_MANIFEST = 'tools/importer/push/push-manifest.json';
+// chrome and shared fragments, never a page a link names
+const NOT_PAGE = /(?:^|\/)(?:nav|footer|nav-newsletter|metadata|placeholders)$|\/fragments\//;
+
+/**
+ * The pages import:push has previewed (a previewed hash in its manifest), chrome and fragments
+ * left out (pure; used by the test too). They count as demo pages before they are published, so
+ * a link to a previewed translation stays on the demo (SKODA-1001 review, PO 2026-10-23); they
+ * publish together with the chrome that links them.
+ * @param {{pages?: object}} manifest the push manifest
+ */
+export function previewedPaths(manifest) {
+  return Object.entries((manifest && manifest.pages) || {})
+    .filter(([p, row]) => p.startsWith('/') && row && row.previewedHash && !NOT_PAGE.test(p) && !NOT_SOURCE.test(p))
+    .map(([p]) => p);
+}
 export const TARGET = 'tools/importer/transformers/skoda-links.js';
 const BLOCK = /(\/\/ BEGIN GENERATED ALLOWLIST[^\n]*\n)[\s\S]*?(\/\/ END GENERATED ALLOWLIST)/;
 
@@ -79,8 +101,9 @@ export function renderPublished(indexPaths, date) {
     .sort()
     .map((p) => `${SOURCE_ORIGIN}${p === '/' ? '' : p}/`);
   return [
-    '# Škoda Demo — every page live on the demo (SKODA-801a), generated; do not edit by hand.',
-    `# From the live query index (${date}) via npm run import:allowlist -- --refresh-published.`,
+    '# Škoda Demo — every page live or previewed on the demo (SKODA-801a), generated; do not edit by hand.',
+    `# From every locale's live query index and the push manifest's previewed pages (${date}),`,
+    '# via npm run import:allowlist -- --refresh-published.',
     '# Feeds the SKODA-605 link allow-list, so imports rewrite links to these pages site-relative.',
     '',
     `# ===== PUBLISHED (${urls.length}) =====`,
@@ -91,11 +114,21 @@ export function renderPublished(indexPaths, date) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.includes('--refresh-published')) {
-    const response = await fetch(LIVE_INDEX);
-    if (!response.ok) throw new Error(`${LIVE_INDEX}: HTTP ${response.status}`);
-    const { data } = await response.json();
+    const paths = [];
+    for (const index of LIVE_INDEXES) {
+      // eslint-disable-next-line no-await-in-loop
+      const response = await fetch(index);
+      if (response.status === 404) { console.log(`${index}: no index yet, skipped`); continue; }
+      if (!response.ok) throw new Error(`${index}: HTTP ${response.status}`);
+      // eslint-disable-next-line no-await-in-loop
+      const { data } = await response.json();
+      paths.push(...data.map((row) => row.path));
+    }
+    const previewed = previewedPaths(JSON.parse(readFileSync(path.join(ROOT, PUSH_MANIFEST), 'utf8')));
+    console.log(`${PUSH_MANIFEST}: ${previewed.length} previewed pages`);
+    paths.push(...previewed);
     const today = new Date().toISOString().slice(0, 10);
-    const text = renderPublished(data.map((row) => row.path), today);
+    const text = renderPublished(paths, today);
     writeFileSync(path.join(ROOT, PUBLISHED), text);
     console.log(`${PUBLISHED}: ${text.match(/^https:/gm).length} pages`);
   }

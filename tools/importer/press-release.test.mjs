@@ -269,7 +269,8 @@ test('sidebar: Additional info list, Images + Gallery (preview), Tags heading + 
   assert.deepEqual(side.blocks, ['Gallery (preview)', 'Tags']);
   const info = side.content.find((n) => n.tagName === 'UL');
   assert.deepEqual([...info.querySelectorAll('a')].map((a) => [txt(a), a.getAttribute('href')]), [
-    ['Media contacts', 'https://www.skoda-storyboard.com/en/contacts/'],
+    // Contacts is a demo page (SKODA-810a; the link allowlist since the 2026-10-28 refresh)
+    ['Media contacts', '/en/contacts'],
     ['Download Media Box', '#media-box'],
   ]);
   const counts = {

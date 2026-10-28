@@ -8,10 +8,14 @@
  */
 
 import { buildFooter } from './locale-chrome.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 export default {
   transform: ({ document }) => {
     const element = buildFooter(document);
+    // links to demo pages become site-relative, the rest stay on the live site (SKODA-1001),
+    // as the locale chrome importers
+    linksTransformer('afterTransform', element, { document });
     return [{ element, path: '/sustainability/footer', report: { fragment: 'footer' } }];
   },
 };

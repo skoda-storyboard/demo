@@ -1,0 +1,126 @@
+{
+  "run": "2026-10-22T12:01:34.800Z",
+  "args": {
+    "list": "/backups/skoda-storyboard/demo/repo/.migration/cache-1001/paths-footers.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": false,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "new": 3
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/de/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sk/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sr/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/de/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 0,
+        "selfHosted": 0,
+        "external": 0
+      },
+      "valid": true
+    },
+    {
+      "path": "/sk/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 0,
+        "selfHosted": 0,
+        "external": 0
+      },
+      "valid": true
+    },
+    {
+      "path": "/sr/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 0,
+        "selfHosted": 0,
+        "external": 0
+      },
+      "valid": true
+    }
+  ]
+}

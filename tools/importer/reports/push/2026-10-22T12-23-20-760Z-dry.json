@@ -1,0 +1,236 @@
+{
+  "run": "2026-10-22T12:23:20.760Z",
+  "args": {
+    "list": "/backups/skoda-storyboard/demo/repo/.migration/cache-1001/paths-mr-chrome.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": true,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "new": 10
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/cs/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/cs/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/de/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/de/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sk/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sk/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sr/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sr/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sl/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sl/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/cs/media-room/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/media-room/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/media-room/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/cs/media-room/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/media-room/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/media-room/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/de/media-room/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/media-room/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/media-room/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/de/media-room/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/media-room/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/media-room/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sk/media-room/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/media-room/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/media-room/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sk/media-room/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/media-room/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/media-room/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sr/media-room/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/media-room/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/media-room/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sr/media-room/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/media-room/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/media-room/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sl/media-room/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sl/media-room/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sl/media-room/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sl/media-room/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sl/media-room/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sl/media-room/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    }
+  ]
+}

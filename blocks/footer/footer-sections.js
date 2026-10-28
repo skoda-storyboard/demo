@@ -5,12 +5,15 @@
 
 import { opensInSameTab } from '../../scripts/links.js';
 
-// social network → accessible label + hover-tint class, keyed by icon token name
+// social network → accessible label + hover-tint class, keyed by icon token name (TikTok and
+// LinkedIn: the German footer, SKODA-1001)
 const SOCIAL_NAMES = {
   facebook: 'Facebook',
   instagram: 'Instagram',
   youtube: 'YouTube',
   whatsapp: 'WhatsApp',
+  tiktok: 'TikTok',
+  linkedin: 'LinkedIn',
 };
 
 // UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
@@ -90,7 +93,23 @@ function decorateNav(section, labels = FOOTER_LABELS) {
   const list = section.querySelector('ul');
   const navEl = document.createElement('nav');
   navEl.setAttribute('aria-label', labels.nav);
-  if (list) navEl.append(list);
+  if (list) {
+    // a column whose label repeats its first link (the source parent is not a page, `#`: the
+    // German Modelle / Lifestyle): CSS shows the label only while the sub-links are hidden, and
+    // the column starts with that link once they show, as the source (SKODA-1001)
+    list.querySelectorAll(':scope > li > p').forEach((p) => {
+      const sub = [...p.parentNode.children].find((el) => el.tagName === 'UL');
+      const label = p.querySelector('a');
+      const first = sub?.querySelector('a');
+      // the same page AND the same name: the Slovak "Škoda svet" column's first link shares its
+      // page under another name, and the source keeps that label
+      if (!label || !first || label.getAttribute('href') !== first.getAttribute('href')
+        || label.textContent.trim() !== first.textContent.trim()) return;
+      p.classList.add('footer-nav-label');
+      sub.classList.add('footer-nav-sublist');
+    });
+    navEl.append(list);
+  }
   section.textContent = '';
   section.append(navEl);
 }

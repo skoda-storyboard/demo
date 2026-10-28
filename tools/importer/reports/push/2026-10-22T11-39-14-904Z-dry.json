@@ -1,0 +1,283 @@
+{
+  "run": "2026-10-22T11:39:14.904Z",
+  "args": {
+    "list": "/backups/skoda-storyboard/demo/repo/.migration/cache-1001/paths-sto-chrome.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": true,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "update": 9,
+    "blocked-binary": 3,
+    "new": 3
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/cs/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/cs/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/de/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sk/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sr/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/cs/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:45 GMT"
+    },
+    {
+      "path": "/cs/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:47 GMT"
+    },
+    {
+      "path": "/cs/nav-newsletter",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/nav-newsletter",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/nav-newsletter",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:46 GMT"
+    },
+    {
+      "path": "/de/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:57:32 GMT"
+    },
+    {
+      "path": "/de/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/footer",
+      "binaries": {
+        "count": 2,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+    },
+    {
+      "path": "/de/nav-newsletter",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/nav-newsletter",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/nav-newsletter",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:48 GMT"
+    },
+    {
+      "path": "/sk/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:57:32 GMT"
+    },
+    {
+      "path": "/sk/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/footer",
+      "binaries": {
+        "count": 1,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf"
+    },
+    {
+      "path": "/sk/nav-newsletter",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/nav-newsletter",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/nav-newsletter",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:49 GMT"
+    },
+    {
+      "path": "/sr/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:57:33 GMT"
+    },
+    {
+      "path": "/sr/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/footer",
+      "binaries": {
+        "count": 1,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+    },
+    {
+      "path": "/sr/nav-newsletter",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/nav-newsletter",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/nav-newsletter",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "update",
+      "reason": "local changed; DA still matches last push",
+      "daLastModified": "Thu, 08 Oct 2026 10:40:50 GMT"
+    },
+    {
+      "path": "/sl/nav",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sl/nav",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sl/nav",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sl/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sl/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sl/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    },
+    {
+      "path": "/sl/nav-newsletter",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sl/nav-newsletter",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sl/nav-newsletter",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null
+    }
+  ]
+}

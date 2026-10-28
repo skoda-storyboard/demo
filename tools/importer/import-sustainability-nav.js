@@ -9,11 +9,15 @@
  */
 
 import { buildSectionNav } from './locale-chrome.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 export default {
   transform: ({ document, params }) => {
     const page = new URL(params.originalURL).pathname;
     const element = buildSectionNav(document, page);
+    // links to demo pages become site-relative, the rest stay on the live site (SKODA-1001),
+    // as the locale chrome importers
+    linksTransformer('afterTransform', element, { document });
     return [{ element, path: '/sustainability/nav', report: { fragment: 'nav', page } }];
   },
 };

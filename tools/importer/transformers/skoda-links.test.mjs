@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  buildAllowlist, readLists, renderInto, renderPublished, TARGET,
+  buildAllowlist, readLists, renderInto, renderPublished, previewedPaths, TARGET,
 } from '../build-link-allowlist.mjs';
 
 let JSDOM = null;
@@ -235,4 +235,51 @@ test('a Story Rail viewall keeps the filtered listing, as the source rail "All" 
   // a tag chip elsewhere (another block, another row) still becomes the tag page
   assert.deepEqual(hrefs(rail('Tags', 'viewall', news)), ['/en/tag/model/superb']);
   assert.deepEqual(hrefs(rail('Story Rail', 'tags', news)), ['/en/tag/model/superb']);
+});
+
+// --- SKODA-1001: other locales -----------------------------------------------------------
+
+test('a published translation is a demo page: its link becomes site-relative', { skip }, () => {
+  assert.equal(one(`${SRC}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`), '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund');
+  // a translation that isn't migrated keeps opening the live site
+  assert.equal(one(`${SRC}/cs/category/modely-cs/`), `${SRC}/cs/category/modely-cs/`);
+});
+
+test('a Czech tag chip only becomes a Czech tag page, never an English one', { skip }, () => {
+  // no demo Czech tag page yet: the chip stays as it is (rule 1 then keeps it live)
+  const chip = `${SRC}/cs/tiskove-zpravy/?filter%5Bmodel%5D%5B%5D=elroq-cs`;
+  assert.equal(one(chip), chip);
+  // the English chip keeps working as before
+  assert.equal(one(`${SRC}/en/news/?filter%5Bmodel%5D%5B%5D=fabia`), '/en/tag/model/fabia');
+  // another listing in the same shape is not a tag chip
+  const other = `${SRC}/cs/foto/?filter%5Bmodel%5D%5B%5D=elroq-cs`;
+  assert.equal(one(other), other);
+});
+
+test('NEWS_LISTINGS mirrors the runtime per-locale News paths (scripts/locale-paths.js)', async () => {
+  const { LOCALE_PATHS } = await import('../../../scripts/locale-paths.js');
+  const src = readFileSync(fileURLToPath(new URL('./skoda-links.js', import.meta.url)), 'utf8');
+  const block = src.match(/const NEWS_LISTINGS = \{([\s\S]*?)\};/)[1];
+  const mirrored = Object.fromEntries([...block.matchAll(/(\w+): '([^']+)'/g)].map((m) => [m[1], m[2]]));
+  const runtime = Object.fromEntries(Object.entries(LOCALE_PATHS)
+    .filter(([, p]) => p.news).map(([l, p]) => [l, p.news.split('/')[2]]));
+  assert.deepEqual(mirrored, runtime);
+});
+
+test('previewedPaths: the pages import:push previewed count as demo pages; chrome and fragments do not (SKODA-1001)', () => {
+  const manifest = {
+    pages: {
+      '/cs/tiskove-zpravy': { hash: 'a', previewedHash: 'a' },
+      '/cs/e-mobilita-cs/x': { hash: 'b', previewedHash: 'b' },
+      '/cs/pushed-not-previewed': { hash: 'c' },
+      '/cs/nav': { hash: 'd', previewedHash: 'd' },
+      '/cs/media-room/footer': { hash: 'e', previewedHash: 'e' },
+      '/cs/nav-newsletter': { hash: 'f', previewedHash: 'f' },
+      '/en/fragments/newsletter-card': { hash: 'g', previewedHash: 'g' },
+      '/drafts/y': { hash: 'h', previewedHash: 'h' },
+    },
+  };
+  assert.deepEqual(previewedPaths(manifest), ['/cs/tiskove-zpravy', '/cs/e-mobilita-cs/x']);
+  assert.deepEqual(previewedPaths({}), []);
+  assert.deepEqual(previewedPaths(null), []);
 });
