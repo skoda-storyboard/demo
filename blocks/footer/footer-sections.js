@@ -6,18 +6,23 @@
 import { opensInSameTab } from '../../scripts/links.js';
 
 // social network → accessible label + hover-tint class, keyed by icon token name
-const SOCIAL_LABELS = {
+const SOCIAL_NAMES = {
   facebook: 'Facebook',
   instagram: 'Instagram',
   youtube: 'YouTube',
   whatsapp: 'WhatsApp',
 };
 
-// app-store badge → accessible label, keyed by icon token name
-const APP_BADGE_LABELS = {
-  appstore: 'Škoda Media Room on the App Store',
-  googleplay: 'Škoda Media Room on Google Play',
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `footer…` (footer.js passes them in); the networks' names above are brand names
+export const FOOTER_LABELS = {
+  nav: 'Footer',
+  appStore: 'Škoda Media Room on the App Store',
+  googlePlay: 'Škoda Media Room on Google Play',
 };
+
+// app-store badge → its FOOTER_LABELS key, keyed by icon token name
+const APP_BADGE_KEYS = { appstore: 'appStore', googleplay: 'googlePlay' };
 
 /**
  * Returns the icon token name (e.g. "facebook") for a link whose only content is
@@ -36,20 +41,20 @@ function iconNameOf(a) {
  * accessible labels + per-network hover classes.
  * @param {Element} section
  */
-function decorateSocial(section) {
+function decorateSocial(section, labels = FOOTER_LABELS) {
   const anchors = [...section.querySelectorAll('a')];
   const socialIcons = [];
   const appBadges = [];
 
   anchors.forEach((a) => {
     const name = iconNameOf(a);
-    if (name && SOCIAL_LABELS[name]) {
+    if (name && SOCIAL_NAMES[name]) {
       a.classList.add('social-link', `social-${name}`);
-      a.setAttribute('aria-label', SOCIAL_LABELS[name]);
+      a.setAttribute('aria-label', SOCIAL_NAMES[name]);
       socialIcons.push(a);
-    } else if (name && APP_BADGE_LABELS[name]) {
+    } else if (name && APP_BADGE_KEYS[name]) {
       a.classList.add('app-badge');
-      a.setAttribute('aria-label', APP_BADGE_LABELS[name]);
+      a.setAttribute('aria-label', labels[APP_BADGE_KEYS[name]]);
       appBadges.push(a);
     }
   });
@@ -81,10 +86,10 @@ function decorateSocial(section) {
  * wrapper and wraps it in a navigation landmark.
  * @param {Element} section
  */
-function decorateNav(section) {
+function decorateNav(section, labels = FOOTER_LABELS) {
   const list = section.querySelector('ul');
   const navEl = document.createElement('nav');
-  navEl.setAttribute('aria-label', 'Footer');
+  navEl.setAttribute('aria-label', labels.nav);
   if (list) navEl.append(list);
   section.textContent = '';
   section.append(navEl);
@@ -126,11 +131,59 @@ function decorateColumns(section) {
 }
 
 /**
+ * The © notice's year as the current one (the authored footers say "2026"; G-KT-10,
+ * SKODA-1003): the first 4-digit year after the ©, or the end of a range that directly follows
+ * it ("2019–2025" keeps its start). An open range ("2019 – present"), a later year the author
+ * set on purpose and any year further on ("Founded 1991") stay as they are.
+ * @param {Element} notice the copyright notice paragraph
+ * @param {number} year the current year
+ */
+export function updateCopyrightYear(notice, year) {
+  if (!Number.isInteger(year)) return;
+  const texts = [];
+  const collect = (node) => node.childNodes.forEach((child) => {
+    if (child.nodeType === 3) texts.push(child);
+    else if (child.nodeType === 1) collect(child);
+  });
+  collect(notice);
+  const seen = texts.findIndex((t) => t.textContent.includes('©'));
+  if (seen < 0) return;
+  // the text after the ©, across the notice's text nodes (a year may sit in a link or <strong>)
+  const parts = texts.slice(seen).map((node, i) => ({
+    node, from: i === 0 ? node.textContent.indexOf('©') + 1 : 0,
+  }));
+  let offset = 0;
+  parts.forEach((part) => {
+    part.start = offset;
+    offset += part.node.textContent.length - part.from;
+  });
+  const after = parts.map((part) => part.node.textContent.slice(part.from)).join('');
+  const match = after.match(/((?:19|20)\d{2})(?:(\s*[–—-]\s*)((?:19|20)\d{2}|\p{L}+))?/u);
+  if (!match) return;
+  const [, first, separator, end] = match;
+  let at = match.index;
+  let value = first;
+  if (end) {
+    if (!/^\d/.test(end)) return; // an open range
+    at += first.length + separator.length;
+    value = end;
+  }
+  if (Number(value) >= year) return;
+  const part = parts.findLast((p) => p.start <= at);
+  const local = part.from + at - part.start;
+  const text = part.node.textContent;
+  // a year split across two nodes is not one the author wrote: leave it
+  if (text.slice(local, local + 4) !== value) return;
+  part.node.textContent = `${text.slice(0, local)}${year}${text.slice(local + 4)}`;
+}
+
+/**
  * Marks the legal section parts (copyright text / notice / feed links) so CSS can style
  * and position them, and wraps the notice + feeds in a flex row.
  * @param {Element} section
+ * @param {number} [year] the current year, for the © notice
  */
-function decorateLegal(section) {
+function decorateLegal(section, year = new Date().getFullYear()) {
   const paras = [...section.querySelectorAll('p')];
   paras.forEach((p) => {
     const links = p.querySelectorAll('a');
@@ -139,6 +192,7 @@ function decorateLegal(section) {
       p.classList.add('feed-links');
     } else if (/©/.test(p.textContent)) {
       p.classList.add('copyright-notice');
+      updateCopyrightYear(p, year);
     } else if (p.textContent.trim()) {
       p.classList.add('copyright-text');
     }
@@ -189,10 +243,13 @@ export function openOutboundLinks(footer, origin) {
  * widget columns.
  * @param {Element} footer container whose children are the fragment sections
  * @param {string} [origin] the page origin, for the outbound-link rule
+ * @param {{labels?: typeof FOOTER_LABELS, year?: number}} [options] the locale's names (English
+ *   by default) and the current year (for the © notice)
  */
 export default function decorateFooterSections(
   footer,
   origin = typeof window !== 'undefined' ? window.location?.origin : '',
+  { labels = FOOTER_LABELS, year = new Date().getFullYear() } = {},
 ) {
   // a footer without the middle section (the Sustainable Offices footer, SKODA-843): social, legal
   const sections = [...footer.children];
@@ -202,7 +259,7 @@ export default function decorateFooterSections(
 
   if (social) {
     social.classList.add('footer-social');
-    decorateSocial(social);
+    decorateSocial(social, labels);
   }
 
   if (middle?.querySelector('h2, h3, h4, h5, h6')) {
@@ -210,12 +267,12 @@ export default function decorateFooterSections(
     decorateColumns(middle);
   } else if (middle) {
     middle.classList.add('footer-nav');
-    decorateNav(middle);
+    decorateNav(middle, labels);
   }
 
   if (legal) {
     legal.classList.add('footer-legal');
-    decorateLegal(legal);
+    decorateLegal(legal, year);
   }
 
   if (origin) openOutboundLinks(footer, origin);

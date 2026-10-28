@@ -101,3 +101,16 @@ test('a 404 footer fragment leaves an empty footer without throwing', async () =
   assert.ok(warnings.some((w) => w.includes('/media-room/footer')));
   console.warn = warn;
 });
+
+// --- text per locale (SKODA-1003) ---------------------------------------------------------------
+test('buildSearchScope: the scope options and the select\'s name in the page locale; English by default', async () => {
+  const { buildSearchScope, HEADER_LABELS } = await import('./header.js');
+  const { localize } = await import('../../scripts/placeholders.js');
+  const en = buildSearchScope('post');
+  assert.deepEqual([...en.select.options].map((o) => o.textContent), ['All', 'Stories', 'News', 'Press Kits', 'Images', 'Videos']);
+  assert.equal(en.select.value, 'post');
+  const cs = buildSearchScope('', localize(HEADER_LABELS, { headerScopeAll: 'Vše', headerSearchIn: 'Hledat v' }, 'header'));
+  assert.equal(cs.select.options[0].textContent, 'Vše');
+  assert.equal(cs.select.options[1].textContent, 'Stories', 'a missing key stays English');
+  assert.equal(cs.select.getAttribute('aria-label'), 'Hledat v');
+});

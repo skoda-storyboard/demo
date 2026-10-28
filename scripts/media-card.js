@@ -32,8 +32,9 @@ export const DEFAULT_LABELS = {
   size1920: '1920px',
 };
 
-// placeholders sheet keys (camelCased by fetchPlaceholders) → label keys
-const PLACEHOLDER_KEYS = {
+// placeholders sheet keys (camelCased by fetchPlaceholders) → label keys (the English master
+// list reads them too, tools/i18n/ui-text.mjs)
+export const PLACEHOLDER_KEYS = {
   add: 'mediaAddToCart',
   download: 'mediaDownload',
   addSize: 'mediaAddSize',
@@ -50,8 +51,13 @@ const PLACEHOLDER_KEYS = {
  * @returns {typeof DEFAULT_LABELS}
  */
 export function mediaLabels(ph = {}) {
+  // a blank or non-string sheet value keeps the English, as localize()
+  const own = (key) => {
+    const value = ph?.[PLACEHOLDER_KEYS[key]];
+    return typeof value === 'string' && value.trim() ? value : '';
+  };
   return Object.fromEntries(Object.entries(DEFAULT_LABELS)
-    .map(([key, text]) => [key, ph[PLACEHOLDER_KEYS[key]] || text]));
+    .map(([key, text]) => [key, own(key) || text]));
 }
 
 const named = (label, title) => (title ? `${label}: ${title}` : label);

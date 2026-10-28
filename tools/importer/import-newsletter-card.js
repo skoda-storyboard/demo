@@ -15,7 +15,7 @@
 
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
 import nbspTransformer from './transformers/skoda-nbsp.js';
-import normalizeImages from './transformers/skoda-images.js';
+import imagesTransformer from './transformers/skoda-images.js';
 
 const NEWSLETTER_BLOCK = 'Newsletter Stub (card)';
 
@@ -53,7 +53,7 @@ export default {
 
     const main = document.createElement('div');
     main.append(card);
-    normalizeImages(main, document);
+    imagesTransformer('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     return [{

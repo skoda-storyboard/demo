@@ -31,7 +31,13 @@
  *   consent-error  unchecked consent message
  */
 
-const DEFAULTS = {
+import { localize, placeholdersNow, fetchPlaceholders } from '../../scripts/placeholders.js';
+
+// UI text (SKODA-1003): the fallbacks under the authored rows, read from the page locale's
+// placeholders sheet as `newsletter…` (placeholdersNow: the block stays synchronous; a form built
+// before the sheet has loaded takes its texts when it arrives, refreshVisibleLabels; the imported
+// fragments author these rows per locale anyway)
+export const NEWSLETTER_LABELS = {
   label: 'Email address',
   placeholder: 'Enter your e-mail',
   button: 'Submit',
@@ -40,7 +46,9 @@ const DEFAULTS = {
   consentError: 'Please accept the terms before continuing.',
 };
 
-// the WHATWG `type=email` rule, so the check matches the browser's own
+/** The fallbacks in the page locale, from the sheet when it has loaded (else English). */
+const labels = () => localize(NEWSLETTER_LABELS, placeholdersNow(), 'newsletter');
+
 const EMAIL = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 let instance = 0;
@@ -61,6 +69,27 @@ function readConfig(block) {
 }
 
 const text = (cell, fallback = '') => cell?.textContent.trim() || fallback;
+
+/**
+ * A form built before the locale's sheet loaded shows the English fallbacks: once the bounded
+ * loader settles, the visible fallbacks (label, placeholder, the submit buttons) take the sheet's
+ * texts. Authored rows are never replaced. The messages are read when shown, so they need nothing.
+ * @param {Record<string, Element>} cfg the authored rows
+ * @param {{label: Element, input: HTMLInputElement, buttons: Element[]}} controls
+ * @returns {Promise<void>}
+ */
+function refreshVisibleLabels(cfg, { label, input, buttons }) {
+  return fetchPlaceholders()
+    .then((ph) => {
+      const t = localize(NEWSLETTER_LABELS, ph, 'newsletter');
+      if (!text(cfg.label)) label.textContent = t.label;
+      if (!text(cfg.placeholder)) input.setAttribute('placeholder', t.placeholder);
+      if (!text(cfg.button)) buttons.forEach((b) => { b.textContent = t.button; });
+    })
+    .catch(() => { /* the English fallbacks stay */ });
+}
+
+// the WHATWG `type=email` rule, so the check matches the browser's own
 
 /**
  * Moves a cell's inline content into target, unwrapping a single authored paragraph.
@@ -158,9 +187,9 @@ function cardValidation(cfg, form, input, id) {
     clear();
     // never leave the required consent hidden behind a failed submit
     form.classList.add('is-expanded');
-    if (!EMAIL.test(input.value.trim())) return fail(input, text(cfg.error, DEFAULTS.error));
+    if (!EMAIL.test(input.value.trim())) return fail(input, text(cfg.error, labels().error));
     if (checkbox && !checkbox.checked) {
-      return fail(checkbox, text(cfg['consent-error'], DEFAULTS.consentError));
+      return fail(checkbox, text(cfg['consent-error'], labels().consentError));
     }
     return true;
   };
@@ -186,17 +215,17 @@ export default function decorate(block) {
   // email + submit row
   const row = el('div', 'newsletter-stub-row');
   const label = el('label', 'newsletter-stub-label', { for: `${id}-email` });
-  label.textContent = text(cfg.label, DEFAULTS.label);
+  label.textContent = text(cfg.label, labels().label);
   const input = el('input', 'newsletter-stub-email', {
     id: `${id}-email`,
     name: 'email',
     type: 'email',
     autocomplete: 'email',
-    placeholder: text(cfg.placeholder, DEFAULTS.placeholder),
+    placeholder: text(cfg.placeholder, labels().placeholder),
     required: '',
   });
   const button = el('button', 'newsletter-stub-submit', { type: 'submit' });
-  button.textContent = text(cfg.button, DEFAULTS.button);
+  button.textContent = text(cfg.button, labels().button);
   row.append(label, input, button);
 
   // live region: always in the DOM so the announcement is reliable; empty until submit
@@ -233,10 +262,12 @@ export default function decorate(block) {
   // the consent, so it must also come after it in the tab order (email → consent → manage →
   // submit); the CSS shows one of the two buttons per band, the other is display:none (out of
   // the tab order and the accessibility tree)
+  const buttons = [button];
   if (block.classList.contains('topbar')) {
     const endButton = el('button', 'newsletter-stub-submit newsletter-stub-submit-end', { type: 'submit' });
     endButton.textContent = button.textContent;
     form.append(endButton);
+    buttons.push(endButton);
   }
 
   // the topbar and footer forms keep the browser's own validation (source: its tooltip on the
@@ -252,7 +283,6 @@ export default function decorate(block) {
     });
   }
 
-  const message = text(cfg.message, DEFAULTS.message);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!validate()) {
@@ -264,7 +294,8 @@ export default function decorate(block) {
     // read once as the focused text, so it leaves the live region first (not announced twice).
     status.removeAttribute('role');
     status.removeAttribute('aria-live');
-    status.textContent = message;
+    // read on submit, as the error messages: the sheet has loaded by now
+    status.textContent = text(cfg.message, labels().message);
     form.classList.add('is-sent');
     status.tabIndex = -1;
     status.focus?.({ preventScroll: true });
@@ -277,4 +308,5 @@ export default function decorate(block) {
 
   const header = isCard ? buildHeader(cfg) : null;
   block.replaceChildren(...(header ? [header, form] : [form]));
+  refreshVisibleLabels(cfg, { label, input, buttons });
 }

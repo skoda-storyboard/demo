@@ -5,21 +5,35 @@ import {
 import {
   decorateCardCells, optimizeImages, wireCardLink, buildCardTeaser,
 } from '../../scripts/card-teaser.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
 
 /* eslint-disable no-use-before-define */
 
 const CONFIG_KEYS = new Set(['index', 'template', 'path', 'category', 'tags', 'limit', 'sort']);
 const ROTATION_MS = 10000;
 
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `promo…` (`promoFeaturedStories`)
+export const PROMO_LABELS = {
+  featuredStories: 'Featured stories',
+  featuredStorySlides: 'Featured story slides',
+  goToStory: 'Go to featured story {number}',
+  pauseRotation: 'Pause rotation',
+  resumeRotation: 'Resume rotation',
+  unavailable: 'Featured stories unavailable',
+  carousel: 'carousel',
+};
+
 function buildStrings(ph = {}) {
+  const t = localize(PROMO_LABELS, ph, 'promo');
   return {
-    featured: ph.promoFeaturedStories || 'Featured stories',
-    slides: ph.promoFeaturedStorySlides || 'Featured story slides',
-    goToStory: ph.promoGoToStory || 'Go to featured story {number}',
-    pause: ph.promoPauseRotation || 'Pause rotation',
-    resume: ph.promoResumeRotation || 'Resume rotation',
-    unavailable: ph.promoUnavailable || 'Featured stories unavailable',
+    featured: t.featuredStories,
+    slides: t.featuredStorySlides,
+    goToStory: t.goToStory,
+    pause: t.pauseRotation,
+    resume: t.resumeRotation,
+    unavailable: t.unavailable,
+    carousel: t.carousel,
   };
 }
 
@@ -226,7 +240,7 @@ export function enablePromoRotation(block, track, strings = buildStrings()) {
     if (compact.matches) {
       slides = [...track.children];
       active = Math.max(0, slides.findIndex((slide) => slide.contains(document.activeElement)));
-      block.setAttribute('aria-roledescription', 'carousel');
+      block.setAttribute('aria-roledescription', strings.carousel);
       track.tabIndex = 0;
       select(active);
     } else {

@@ -15,7 +15,7 @@
  */
 
 import { decorateIcons } from '../../scripts/aem.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize, fillText } from '../../scripts/placeholders.js';
 import { SHARE_NETWORKS, shareUrl, sharePageData } from '../../scripts/share.js';
 
 const LIST_ID = 'float-dock-share-list';
@@ -37,12 +37,20 @@ function button(className, label, iconName) {
   return btn;
 }
 
-function buildShare(ph) {
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `dock…` (the source's: DE "Nach oben scrollen", SK "Prejsť na začiatok")
+export const DOCK_LABELS = {
+  shareThisPage: 'Share this page',
+  shareOn: 'Share on {network}',
+  scrollToTop: 'Scroll to top',
+};
+
+function buildShare(text) {
   const data = sharePageData(document);
   const share = document.createElement('div');
   share.className = 'float-dock-share';
 
-  const trigger = button('float-dock-trigger', ph.shareThisPage || 'Share this page', 'share');
+  const trigger = button('float-dock-trigger', text.shareThisPage, 'share');
   const list = document.createElement('ul');
   list.id = LIST_ID;
   list.className = 'float-dock-share-list';
@@ -60,7 +68,7 @@ function buildShare(ph) {
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
     }
-    a.setAttribute('aria-label', `${ph.shareOn || 'Share on'} ${label}`);
+    a.setAttribute('aria-label', fillText(text.shareOn, { network: label }));
     // white glyph on WhatsApp green is ~1.7:1; the ink glyph passes (social-share.md §6)
     a.append(icon(id === 'whatsapp' ? 'whatsapp-ink' : id));
     li.append(a);
@@ -93,8 +101,8 @@ function buildShare(ph) {
   return share;
 }
 
-function buildScrollTop(ph) {
-  const top = button('float-dock-top', ph.scrollToTop || 'Scroll to top', 'chevron-up');
+function buildScrollTop(text) {
+  const top = button('float-dock-top', text.scrollToTop, 'chevron-up');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   top.addEventListener('click', () => {
@@ -151,10 +159,11 @@ export async function buildCartBadge(slot, ph, load = () => Promise.all([
 
 export default async function decorate(block) {
   const ph = await fetchPlaceholders();
+  const text = localize(DOCK_LABELS, ph, 'dock');
   const slot = document.createElement('div');
   slot.className = 'float-dock-slot';
   slot.dataset.slot = 'media-cart';
-  const top = buildScrollTop(ph);
+  const top = buildScrollTop(text);
   // in place before the bar shows, so the share cluster doesn't jump when it arrives
   try {
     await buildCartBadge(slot, ph);
@@ -163,7 +172,7 @@ export default async function decorate(block) {
     console.error('float-dock: media cart unavailable', e);
   }
 
-  block.replaceChildren(buildShare(ph), slot, top);
+  block.replaceChildren(buildShare(text), slot, top);
   decorateIcons(block);
   // decorateIcons makes lazy <img>s, which wouldn't fetch while the bar is display:none;
   // eager, so the glyphs are there when the bar appears
