@@ -110,12 +110,13 @@ var CustomImportScript = (() => {
     const root = document.createElement("div");
     const topbar = document.querySelector(".topbar");
     const switcher = document.createElement("ul");
-    [...topbar ? topbar.querySelectorAll("a") : []].filter((a) => !a.closest(".lang-links") && !a.classList.contains("topbar__newsletter") && !a.closest(".topbar__dropdown")).slice(0, 2).forEach((a) => {
+    [...topbar ? topbar.querySelectorAll("a") : []].filter((a) => !a.closest(".lang-links") && !a.matches(".topbar__newsletter, .topbar__newsletter-override") && !a.closest(".topbar__dropdown")).slice(0, 2).forEach((a) => {
       const li = document.createElement("li");
       li.append(link(document, a.getAttribute("href"), text(a)));
       switcher.append(li);
     });
-    const subscribe = document.querySelector(".topbar__newsletter");
+    const subscribe = document.querySelector(".topbar__newsletter, .topbar__newsletter-override");
+    const subscribeHref = (subscribe == null ? void 0 : subscribe.classList.contains("topbar__newsletter-override")) ? authoredHref(subscribe.getAttribute("href") || "") : "#subscribe";
     const locales = document.createElement("p");
     const sourceLocale = new Map([...topbar ? topbar.querySelectorAll(".lang-links a[href]") : []].map((a) => [text(a).toLowerCase(), siteWideLocaleHref(a.getAttribute("href"))]).filter(([, href]) => href));
     LOCALE_ROW.forEach(([code, label2], i) => {
@@ -129,7 +130,7 @@ var CustomImportScript = (() => {
       }
     });
     root.append(switcher);
-    if (text(subscribe)) root.append(para(document, link(document, "#subscribe", text(subscribe))));
+    if (text(subscribe) && subscribeHref) root.append(para(document, link(document, subscribeHref, text(subscribe))));
     root.append(locales);
     root.append(document.createElement("hr"));
     const logo = document.querySelector("header a.logo");

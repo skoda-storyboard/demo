@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SITE_SUFFIX, cleanTitle, normalizeRow, loadQueryIndex, clearQueryIndexCache,
+  SITE_SUFFIX, cleanTitle, normalizeRow, loadQueryIndex, clearQueryIndexCache, isChromeFragment,
 } from './query-index.js';
 
 test('cleanTitle strips the SEO site suffix (hyphen, en dash, pipe, extra whitespace)', () => {
@@ -59,6 +59,43 @@ test('loadQueryIndex serves cleaned titles across chunks', async () => {
     clearQueryIndexCache();
     const rows = await loadQueryIndex('/en/query-index.json');
     assert.deepEqual(rows.map((r) => r.title), ['A', 'Škoda Storyboard', 'C']);
+  } finally {
+    globalThis.fetch = realFetch;
+    globalThis.window = realWindow;
+    clearQueryIndexCache();
+  }
+});
+
+// SKODA-1001 QA: a locale index covers its whole tree, fragments included
+test('isChromeFragment: the nav / footer and shared fragments, never a page', () => {
+  ['/cs/nav', '/cs/footer', '/de/media-room/nav', '/sk/media-room/footer', '/nav', '/footer',
+    '/media-room/nav', '/sustainability/footer', '/cs/fragments/newsletter-card', '/en/fragments/x']
+    .forEach((p) => assert.equal(isChromeFragment(p), true, p));
+  ['/cs', '/cs/e-mobilita-cs/navigace', '/en/newsletter', '/en/category/nav-tips', '/cs/navody',
+    '/en/media-room', '/en/media-room/news', '/sk/footer-story', '', undefined]
+    .forEach((p) => assert.equal(isChromeFragment(p), false, String(p)));
+});
+
+test('loadQueryIndex leaves the fragment rows out, across chunks', async () => {
+  const chunks = {
+    0: {
+      total: 4, offset: 0, limit: 2, data: [{ path: '/cs/nav', title: 'Stories' }, { path: '/cs/a', title: 'A' }],
+    },
+    2: {
+      total: 4, offset: 2, limit: 2, data: [{ path: '/cs/media-room/footer', title: ':appstore:' }, { path: '/cs/b', title: 'B' }],
+    },
+  };
+  const realFetch = globalThis.fetch;
+  const realWindow = globalThis.window;
+  globalThis.window = { location: { href: 'https://example.test/cs/x', pathname: '/cs/x' } };
+  globalThis.fetch = async (u) => {
+    const offset = Number(new URL(u).searchParams.get('offset') || 0);
+    return { ok: true, json: async () => chunks[offset] };
+  };
+  try {
+    clearQueryIndexCache();
+    const rows = await loadQueryIndex('/cs/query-index.json');
+    assert.deepEqual(rows.map((r) => r.path), ['/cs/a', '/cs/b'], 'both chunks read, the fragments gone');
   } finally {
     globalThis.fetch = realFetch;
     globalThis.window = realWindow;

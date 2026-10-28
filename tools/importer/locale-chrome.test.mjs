@@ -190,13 +190,24 @@ test('buildNav: a `#` parent with sub-items is a menu heading, not Subscribe (th
   assert.deepEqual(links(first.querySelector('ul')), [`Modelle=${LIVE}/de/category/modelle-de/`, `Fabia=${LIVE}/de/tag/model/fabia-de/`, `Scala=${LIVE}/de/tag/model/scala-de/`]);
 });
 
-test('buildNav: a topbar without Subscribe (DE / SK / SR on the source) authors none', () => {
+test('buildNav: a topbar without Subscribe (DE / SR on the source) authors none', () => {
   const d = doc();
   d.querySelector('.topbar__newsletter').remove();
   const [topbar] = sections(buildNav(d, 'de'));
   assert.equal(topbar.length, 2, 'switcher + locale row');
   assert.equal(topbar[1].querySelector('strong').textContent, 'DE');
   assert.equal(topbar.some((el) => el.querySelector('a[href="#subscribe"]')), false);
+});
+
+// SKODA-1003 QA: the Slovak topbar's Subscribe is a link to its newsletter page, not the form control
+test('buildNav: a Subscribe link to the locale\'s newsletter page (SK) keeps that page', () => {
+  const d = doc();
+  d.querySelector('.topbar__newsletter').outerHTML = `<a class="topbar__newsletter-override newsletter" data-ctatype="Newsletter" target=""
+    href="${LIVE}/sk/odber-noviniek/"><svg></svg> Odber noviniek </a>`;
+  const [topbar] = sections(buildNav(d, 'sk'));
+  assert.equal(topbar.length, 3, 'switcher, Subscribe, locale row');
+  assert.deepEqual(links(topbar[1]), [`Odber noviniek=${LIVE}/sk/odber-noviniek/`]);
+  assert.ok(!links(topbar[0]).some((l) => l.startsWith('Odber noviniek')), 'not taken for a section tab');
 });
 
 test('a language menu link stays on the site only when its target is migrated (SKODA-1001)', async () => {

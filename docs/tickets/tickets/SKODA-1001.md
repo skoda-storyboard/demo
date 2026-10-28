@@ -145,3 +145,17 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
   footer's RSS feeds go to the live site, its Copyright stays on the demo. The press-release and press-kit
   "Media contacts" link is now `/en/contacts` (a demo page; two importer tests updated). All 25 SKODA-843 / 810a
   pages equal `main` at 390 / 768 / 1280 on the merged code.
+- **QA on live after #485 (2026-10-28, #83):** AC1 (the six indexes), AC2 (listing, search suggestions: the #499
+  suggestion part fixed) and AC3 / AC4 on the Epiq cluster pass. Then:
+  - **The chrome fragments in the locale indexes** (`/{l}/nav`, `/footer`, `/media-room/nav`, `/media-room/footer`:
+    each locale index covers its whole tree; the English ones sit outside `/en/**`), so search suggested "Stories" →
+    `/cs/nav`. Fixed in `scripts/query-index.js`: the shared loader leaves chrome and shared-fragment rows out, for
+    every consumer (suggestions, search, stories, listings, promo, media feeds); measured: CS / DE "stories" and
+    "googleplay" suggest no fragment, the real results and 5 listings / searches equal live. The cleaner index
+    `exclude` for the locale definitions needs site-config access (403 here); the loader rule stays either way.
+  - **hreflang only on the Epiq cluster:** `build-locale-alternates` reads published pages and last ran before the
+    other CS pages were published. A re-run builds the expected rows (the 3 CS stories, the CS listing and category
+    ⇄ their EN pages); its push + publish is a metadata-sheet write, on the PO's request.
+  - **AC4 (PO, 2026-10-28): the 15 facet columns.** The 5 media columns (`original`, `rendition-1920`, `mp4`,
+    `vimeo-id`, `poster`) belong to media-item rows, which only the EN feed has (`BUILT.mediaFeed`); a locale gets
+    them with its own media feed.

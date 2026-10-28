@@ -142,3 +142,14 @@ templates, the tool and the translations), each finding reproduced before it was
   mobile menu, search and lightbox open (390, 1280); label-in-name (WCAG 2.5.3) on every named
   control; no overflow and unchanged page heights at 390 / 768 / 992, also with the DE, SL and SK
   sheets forced onto the CS pages.
+
+**QA on live after #485 (2026-10-28, #85)**
+- **The SK topbar's "Odber noviniek"** was missing from `/sk/nav` and `/sk/media-room/nav`: the source's Slovak
+  topbar links its newsletter page (`a.topbar__newsletter-override` → `/sk/odber-noviniek/`), where the Czech one is
+  the form control (`a.topbar__newsletter` → `#nl-form`), and the chrome importer knew only the latter. Fixed in
+  `locale-chrome.js` `buildNav` (the link kept as the source's; the page is not migrated, so it opens the source);
+  re-imported, only the two SK navs change. Their re-push is a DA write, on request.
+- **The CS press-release listing shows 0 results:** no CS release is imported yet. SKODA-1004a (the CS corpus); the
+  3 newest are held for their PDF / MP4 DAM ingest.
+- **The language homes (`/cs`, `/de`, `/sk`, `/sr`, `/sl`) are 404:** not imported. They come with the per-locale
+  corpus runs (SKODA-1004a–e), not with #485 (an earlier comment said otherwise).
