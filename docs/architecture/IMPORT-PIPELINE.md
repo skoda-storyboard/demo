@@ -166,6 +166,9 @@ npm run media:validate-binaries -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
 npm run import:validate-blocks -- --urls tools/importer/urls-<name>.txt   # SKODA-603; fails on unknown/superseded blocks
+# SKODA-814: the SiteOrigin body carried as the source has it (every text block, headings at the
+# source level, no SiteOrigin class, one h1); without --local it checks the preview
+node tools/importer/check-siteorigin-body.mjs --local=content tools/importer/urls-<name>.txt
 npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 
 # 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)

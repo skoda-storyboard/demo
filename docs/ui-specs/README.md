@@ -67,7 +67,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `skodapedia.md` | skodapedia (new) | 206 | `/en/skodapedia/` | CAPTURED |
 | `series.md` | cards reuse + hero | 207 | `/en/series-2/`, `/en/series/<slug>/` | CAPTURED |
 | `story-detail.md` | composition | 604 / 801 | `/en/<story>` | CAPTURED |
-| `siteorigin-body.md` | default content (import flatten) | 814 (feeds 801/208/813) | `/en/<story>` SiteOrigin body | DRAFT+MEASURED |
+| `siteorigin-body.md` | default content (import flatten) | 814 (feeds 801/208/813) | `/en/<story>`, model description, generic Page | MEASURED (2026-10-28, 7 widths, 3 instances) |
 | `newsletter.md` | newsletter-stub (footer built; sidebar variant pending) | 823 (prod 904) | `/en/` topbar + inline | CAPTURED |
 | `social-share.md` | share (chrome) | COM-15 / STO-D10 | **SKODA-215** page float dock (was unticketed; sweep 2026-09-25; draft 827 folded in) · gallery share → 216 | CAPTURED |
 | `promo-banner.md` | banner (E09/903) | COM-09 side / STO-D08 | flagged E09 | CAPTURED |
