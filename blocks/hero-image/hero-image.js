@@ -45,17 +45,18 @@ function decorateLabels(h1) {
  * viewport and 2000px above, which blurs it. These bands mirror hero-image.css: the band heights
  * (`--hero-page-h`, `--hero-archive-h-*` in styles.css) per min-width, and the image scale.
  */
+// `phoneMax`: the widest file a phone (below COVER_PHONE.below) gets. Page bands: 1440px, the
+// source's own phone rendition (there the band image is the LCP element). Archive bands: 1080px,
+// as their LCP element is the first story card, which a heavier hero delays (#480 review, eMobility
+// at DPR 1.75: 1920w = 244 KB vs 141 KB on main, the card ~550ms later, PSI 88; 1440w still
+// ~245ms). DPR 1 phones get the exact need on both.
 export const COVER_BANDS = {
-  page: { heights: [[0, 240]], scale: 1.02 },
-  archive: { heights: [[0, 184], [576, 224], [768, 240]], scale: 1 },
+  page: { heights: [[0, 240]], scale: 1.02, phoneMax: 1440 },
+  archive: { heights: [[0, 184], [576, 224], [768, 240]], scale: 1, phoneMax: 1080 },
 };
 // rendition widths offered below the master; the master itself is always the largest candidate
 export const COVER_WIDTHS = [750, 1080, 1440, 1920, 2560];
-// On phones (below 768px) the band offers at most 1440px, the source's own phone rendition: a
-// 1920w+ file on a DPR 2–3 phone sharpens the band a little more but weighs ~70% more, and on the
-// archives (whose LCP element is the first story card) it delayed the card by ~550ms (#480 review:
-// mobile PSI 88 on /en/category/emobility, 244 vs 141 KB). DPR 1 phones still get the exact need.
-export const COVER_PHONE = { below: 768, maxWidth: 1440 };
+export const COVER_PHONE = { below: 768 };
 
 /**
  * The `sizes` and width candidates for an image covering a fixed-height band: per band step the
@@ -98,7 +99,7 @@ export function coverSources({
  * `<img>` (original format) with width candidates up to the master and the crop's `sizes`. Only
  * media-bus images (`…/media_<hash>.<ext>`) are resized; anything else keeps its picture.
  * @param {HTMLPictureElement} picture the band's picture
- * @param {{heights: number[][], scale: number}} band COVER_BANDS entry
+ * @param {{heights: number[][], scale: number, phoneMax: number}} band COVER_BANDS entry
  * @param {{width: string|null, height: string|null}} size the master's authored size (no
  *   fallback: without it the crop is unknown and the picture stays as it is)
  */
@@ -119,8 +120,8 @@ function sizeForCover(picture, band, { width, height }) {
     return source;
   };
   picture.querySelectorAll('source').forEach((s) => s.remove());
-  // phones first (the first matching source wins): the widths up to COVER_PHONE.maxWidth
-  const phone = cover.widths.filter((w) => w <= COVER_PHONE.maxWidth);
+  // phones first (the first matching source wins): the widths up to the band's phoneMax
+  const phone = cover.widths.filter((w) => w <= band.phoneMax);
   if (phone.length < cover.widths.length) {
     picture.prepend(webp(phone, `(width < ${COVER_PHONE.below}px)`), webp(cover.widths));
   } else {

@@ -157,14 +157,18 @@ with archive heights also stepping at **576**.
     width candidates `750 / 1080 / 1440 / 1920 / 2560` below the master, plus the master itself, and a
     `sizes` equal to the drawn width: `max(viewport × scale, band height × scale × aspect)` per band
     step. The browser picks the file for its viewport, DPR and zoom.
-  - **Phones (below 768px) get at most 1440px**, the source's own phone rendition (`COVER_PHONE`). A
-    1920w file on a DPR 1.75 phone delayed the archives' LCP (the first story card) by about 550ms:
-    mobile PageSpeed 88 on `/en/category/emobility`, with the hero at 244 KB vs 141 KB. With the cap it
-    is 197 KB, the card about 245ms later than on `main` under the same throttling, and PageSpeed 91.
+  - **Phones (below 768px) get a capped width** (`phoneMax` in `COVER_BANDS`):
+    - **page band: at most 1440px**, the source's own phone rendition. There the band image is the
+      LCP element (mobile PageSpeed 100 on `/en/newsletter`).
+    - **archive band: at most 1080px.** Its LCP element is the first story card, which a heavier hero
+      delays. On `/en/category/emobility` at DPR 1.75, a 1920w hero (244 KB vs 141 KB on `main`) put the
+      card about 550ms later (mobile PageSpeed 88); 1440w (197 KB) still about 245ms.
+    - DPR 1 phones get the exact need on both bands.
   - Measured on `/en/newsletter`, `/en/contacts`, `/en/category/emobility` and `/en/tag/model/peaq`
     at 390–1440, DPR 1 and 2 and 390 at 175% zoom, real decoded pixels:
     - no stretch at DPR 1 (it was 1.09–1.71 on phones);
-    - phones at DPR 2: 1440w, stretch 1.13–1.78 (it was 2.18–3.42);
+    - phones at DPR 1.75–2: page bands 1440w, stretch 0.99–1.78 (it was 1.90–3.42); archive bands
+      1080w, stretch 1.53–1.78 (it was 2.20–2.56);
     - from 768px at DPR 2: the master where the need exceeds it, so any remaining stretch is the
       master's limit (the newsletter master in DA is 1920px, the source's 2237px);
     - at most one ladder step of overshoot;

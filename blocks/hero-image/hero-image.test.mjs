@@ -240,7 +240,7 @@ test('page band: the same picture and img, WebP sources + an img srcset sized fo
   const widths = (s) => s.getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]);
   assert.equal(sources.length, 2, 'a phone source, then the full one');
   assert.ok(sources.every((s) => s.type === 'image/webp' && s.getAttribute('sizes') === '(min-width: 1256px) 102vw, 1281px'));
-  // phones get at most the source's 1440px (COVER_PHONE): the card LCP on the archives (#480 review)
+  // phones get at most the page band's phoneMax, the source's 1440px (#480 review)
   assert.equal(sources[0].getAttribute('media'), '(width < 768px)');
   assert.deepEqual(widths(sources[0]), ['750w', '1080w', '1440w']);
   assert.equal(sources[1].getAttribute('media'), null);
@@ -253,12 +253,18 @@ test('page band: the same picture and img, WebP sources + an img srcset sized fo
   assert.deepEqual([img.getAttribute('width'), img.getAttribute('height')], ['1920', '367']);
 });
 
-test('archive band: sized for its three heights; a jpeg keeps the jpg format', () => {
+test('archive band: sized for its three heights; phones at most 1080w; a jpeg keeps the jpg format', () => {
   const hero = block('archive', `<div><div>${MEDIA_PICTURE('2500', '480').replace(/\.png/g, '.jpeg').replace(/format=png/g, 'format=jpeg')}</div></div><div><div><h1>eMobility</h1></div></div>`);
   decorate(hero);
   const img = hero.querySelector('img');
   assert.equal(img.getAttribute('sizes'), '(min-width: 1250px) 100vw, (min-width: 768px) 1250px, (min-width: 576px) 1167px, 959px');
   assert.match(img.getAttribute('srcset'), /format=jpg&optimize=medium 2500w$/);
+  // the archive's LCP is the first story card, which a heavier hero delays on phones (#480 review)
+  const sources = [...hero.querySelectorAll('source')];
+  const widths = (s) => s.getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]);
+  assert.equal(sources[0].getAttribute('media'), '(width < 768px)');
+  assert.deepEqual(widths(sources[0]), ['750w', '1080w']);
+  assert.deepEqual(widths(sources[1]), ['750w', '1080w', '1440w', '1920w', '2500w']);
 });
 
 test('bands without the master size or a media-bus image, and the story / overlay heroes, keep the authored picture', () => {
