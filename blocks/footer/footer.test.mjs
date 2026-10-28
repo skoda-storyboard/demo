@@ -120,6 +120,31 @@ test('social: badges + icons grouped and labelled; emptied paragraphs and wrappe
   assert.deepEqual(social.children.map((c) => c.className), ['app-badges', 'social-icons']);
 });
 
+test('sitemap: a label that repeats its column\'s first link is marked (shown only while the links are hidden), another is not (SKODA-1001)', () => {
+  const de = SITEMAP.replace('<li><p><a href="/en/category/emobility/">eMobility</a></p></li>',
+    '<li><p><a href="/de/category/modelle-de/">Modelle</a></p><ul><li><a href="/de/category/modelle-de/">Modelle</a></li><li><a href="/de/tag/model/fabia-de/">Fabia</a></li></ul></li>');
+  assert.notEqual(de, SITEMAP, 'fixture changed');
+  const nav = footerOf(SOCIAL, de, LEGAL('x')).querySelector('nav');
+  const [linked, text] = nav.querySelector('ul').children;
+  assert.equal(linked.querySelector('p').classList.contains('footer-nav-label'), false);
+  assert.equal(text.querySelector('p').className, 'footer-nav-label');
+  assert.equal(text.querySelector('ul').className, 'footer-nav-sublist');
+  // the Slovak "Škoda svet": the first link shares the label's page under another name: kept
+  const sk = SITEMAP.replace('<li><p><a href="/en/category/emobility/">eMobility</a></p></li>',
+    '<li><p><a href="/sk/category/skoda-svet-sk/">Škoda svet</a></p><ul><li><a href="/sk/category/skoda-svet-sk/">Inovácie a technológie</a></li><li><a href="/sk/x/">Dizajn</a></li></ul></li>');
+  const skCol = footerOf(SOCIAL, sk, LEGAL('x')).querySelector('nav ul').children[1];
+  assert.equal(skCol.querySelector('p').classList.contains('footer-nav-label'), false);
+});
+
+test('social: the German footer\'s TikTok and LinkedIn join the icon row, named (SKODA-1001 review)', () => {
+  const de = SOCIAL.replace('</p>\n</div>', '<a href="https://www.tiktok.com/@skoda_de"><span class="icon icon-tiktok"><img></span></a><a href="https://www.linkedin.com/company/skodade/"><span class="icon icon-linkedin"><img></span></a></p>\n</div>');
+  assert.notEqual(de, SOCIAL, 'fixture changed');
+  const social = footerOf(de, WIDGETS, LEGAL('x')).children[0];
+  const icons = social.querySelector('.social-icons');
+  assert.deepEqual(icons.children.map((a) => a.getAttribute('aria-label')).slice(-2), ['TikTok', 'LinkedIn']);
+  assert.equal(social.querySelector('.default-content-wrapper'), null, 'no paragraph of unnamed icon links left');
+});
+
 test('social: an authored title paragraph is kept', () => {
   const withTitle = SOCIAL.replace('<div class="default-content-wrapper">', '<div class="default-content-wrapper"><p>Follow us</p>');
   const social = footerOf(withTitle, SITEMAP, LEGAL('x')).children[0];

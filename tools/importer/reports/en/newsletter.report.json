@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/en/newsletter/",
+  "path": "en/newsletter",
+  "timestamp": "2026-10-28T05:14:52.257Z",
+  "title": "Newsletter - Škoda Storyboard",
+  "template": "carousel-listing",
+  "blocks": [
+    "hero-banner",
+    "carousel-listing",
+    "carousel-listing"
+  ]
+}

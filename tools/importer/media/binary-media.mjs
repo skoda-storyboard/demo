@@ -54,10 +54,28 @@ export function publicBinaryUrl(href) {
   }
 }
 
+/**
+ * Document hosts the client runs itself, linked as they are: their files are neither ingested
+ * into the DAM nor held by the gate. The Škoda cookie service (`assets.cookies.skoda-auto.com`)
+ * hosts the cookie-policy PDF the translated footers link (PO, 2026-10-22, SKODA-1001).
+ */
+export const EXTERNAL_DOCUMENT_HOSTS = [/^assets\.cookies\.skoda-auto\.com$/i];
+
+/** Whether an href is on an approved external document host (EXTERNAL_DOCUMENT_HOSTS). */
+export function isExternalDocument(href) {
+  try {
+    const { protocol, hostname } = new URL(href);
+    return protocol === 'https:' && EXTERNAL_DOCUMENT_HOSTS.some((re) => re.test(hostname));
+  } catch {
+    return false;
+  }
+}
+
 export function binaryAnchors(html) {
   const { document } = new JSDOM(html).window;
   return [...document.querySelectorAll('a[href]')].flatMap((a) => {
     const href = a.getAttribute('href');
+    if (isExternalDocument(href)) return [];
     const kind = binaryKind(href, a.getAttribute('type') || '');
     return kind ? [{
       href,
@@ -138,6 +156,7 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
     if (!target) return tag;
     const [, prefix, quote, quotedHref, bareHref] = target;
     const href = (quotedHref ?? bareHref).replace(/&amp;/gi, '&');
+    if (isExternalDocument(href)) return tag;
     const typeMatch = tag.match(/\stype\s*=\s*(?:(["'])(.*?)\1|([^\s>]+))/i);
     const type = typeMatch?.[2] ?? typeMatch?.[3] ?? '';
     const kind = binaryKind(href, type);

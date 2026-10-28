@@ -1,0 +1,12 @@
+https://main--demo--skoda-storyboard.aem.page/cs/nav
+https://main--demo--skoda-storyboard.aem.page/cs/footer
+https://main--demo--skoda-storyboard.aem.page/cs/nav-newsletter
+https://main--demo--skoda-storyboard.aem.page/de/nav
+https://main--demo--skoda-storyboard.aem.page/de/nav-newsletter
+https://main--demo--skoda-storyboard.aem.page/sk/nav
+https://main--demo--skoda-storyboard.aem.page/sk/nav-newsletter
+https://main--demo--skoda-storyboard.aem.page/sr/nav
+https://main--demo--skoda-storyboard.aem.page/sr/nav-newsletter
+https://main--demo--skoda-storyboard.aem.page/sl/nav
+https://main--demo--skoda-storyboard.aem.page/sl/footer
+https://main--demo--skoda-storyboard.aem.page/sl/nav-newsletter

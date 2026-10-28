@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani/",
+  "path": "cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+  "timestamp": "2026-10-23T05:52:12.820Z",
+  "title": "Poznejte Peaq: snadné a pohodlné ovládání - Škoda Storyboard",
+  "template": "story-detail",
+  "blocks": [
+    "story-hero",
+    "story-flatten",
+    "story-flatten",
+    "story-flatten",
+    "downloads"
+  ]
+}

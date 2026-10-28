@@ -84,3 +84,41 @@ test('News and Press Kits offer the source\'s 13 shown filter groups, in its ord
 test('Images and Videos offer the same 13 filter groups the source shows, in its order (#273)', { skip }, () => {
   ['images', 'videos'].forEach((token) => assert.deepEqual(run(token).facets.split(',').map((k) => k.trim()), SOURCE_SHOWN, token));
 });
+
+// --- SKODA-1001: a listing in another locale ----------------------------------------------
+
+// a translated listing: its body class token is the page slug (`foto`), and the source URL says
+// which locale and which listing it is
+function runAt(url, token) {
+  const { document } = new JSDOM(`<html><body class="page-template page-template-template-search-results media-room lang-cs ${token}">
+    <div id="search-filter-results"><form class="search-filter"></form><div class="search-results-items"></div></div>
+    </body></html>`).window;
+  listing(document.querySelector('#search-filter-results'), { document, url, params: { originalURL: url } });
+  return Object.fromEntries([...document.querySelectorAll('tr')].slice(1)
+    .map((tr) => [...tr.children].map((td) => td.textContent)));
+}
+
+test('a Czech listing is recognised from its path, not its slug class, and reads Czech content', { skip }, () => {
+  const images = runAt('https://www.skoda-storyboard.com/cs/foto/', 'foto');
+  assert.equal(images.template, 'image', '/cs/foto is Images, not the News default');
+  assert.equal(images.index, '/en/media-feed.json', 'no Czech feed built yet: the English one');
+  const news = runAt('https://www.skoda-storyboard.com/cs/tiskove-zpravy/', 'tiskove-zpravy');
+  assert.deepEqual([news.template, news.index, news.path],
+    ['press_release', '/cs/query-index.json', '/cs/tiskove-zpravy-archiv/']);
+  const kits = runAt('https://www.skoda-storyboard.com/cs/tiskove-mapy/', 'tiskove-mapy');
+  assert.deepEqual([kits.template, kits.path], ['press_kit', '/cs/tiskove-mapy/']);
+  const search = runAt('https://www.skoda-storyboard.com/cs/hledat/', 'hledat');
+  assert.deepEqual([search.search, search.index], ['true', '/cs/query-index.json']);
+  assert.equal(runAt('https://www.skoda-storyboard.com/cs/video/', 'video').template, 'video');
+});
+
+test('a Serbian listing scopes to the EDS form of its source prefix (`_` → `-`)', { skip }, () => {
+  assert.equal(runAt('https://www.skoda-storyboard.com/sr/news/', 'news').path, '/sr/press-release/');
+  assert.equal(runAt('https://www.skoda-storyboard.com/de/pressemappen/', 'pressemappen').path, '/de/pressemappe/');
+});
+
+test('an English listing with a source URL is unchanged', { skip }, () => {
+  const images = runAt('https://www.skoda-storyboard.com/en/images/', 'images');
+  assert.deepEqual([images.template, images.index], ['image', '/en/media-feed.json']);
+  assert.equal(runAt('https://www.skoda-storyboard.com/en/news/', 'news').path, '/en/press-releases/');
+});

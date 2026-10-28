@@ -15,6 +15,7 @@
  */
 
 import { wireImageLinks } from '../../scripts/media-lightbox.js';
+import { localePath } from '../../scripts/locale-paths.js';
 import { applyLocalized } from '../../scripts/placeholders.js';
 
 // heading id (importer slug) → section role, nav icon (icons/model-*.svg) and the source's
@@ -113,7 +114,7 @@ function anchorId(href) {
 function newsViewAll(rail) {
   const link = railRow(rail, 'viewall')?.querySelector('a[href]');
   const model = link && hrefPath(link.getAttribute('href')).match(TAG_PAGE)?.[1];
-  if (model) link.setAttribute('href', `/en/news?filter%5Bmodel%5D%5B%5D=${model}`);
+  if (model) link.setAttribute('href', `${localePath('news')}?filter%5Bmodel%5D%5B%5D=${model}`);
 }
 
 function decorateHero(main) {

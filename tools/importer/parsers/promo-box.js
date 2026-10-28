@@ -18,12 +18,15 @@
  *   ['Promo Box']
  *   [img, <a href>title</a>]
  */
-export default function parse(element, { document, indexDriven = false, promoTemplate = 'story' }) {
+import { sourceLocale, homePath } from '../locale.js';
+export default function parse(element, {
+  document, url, params, indexDriven = false, promoTemplate = 'story',
+}) {
   if (indexDriven) {
     element.replaceWith(WebImporter.DOMUtils.createTable([
       ['Promo Box'],
       ['template', promoTemplate],
-      ['path', '/en/'],
+      ['path', homePath(sourceLocale((params && params.originalURL) || url))],
       ['limit', '3'],
     ], document));
     return;

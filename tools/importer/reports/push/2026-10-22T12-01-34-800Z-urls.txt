@@ -1,0 +1,3 @@
+https://main--demo--skoda-storyboard.aem.page/de/footer
+https://main--demo--skoda-storyboard.aem.page/sk/footer
+https://main--demo--skoda-storyboard.aem.page/sr/footer

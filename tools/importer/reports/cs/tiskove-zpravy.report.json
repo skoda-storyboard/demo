@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/tiskove-zpravy/",
+  "path": "cs/tiskove-zpravy",
+  "timestamp": "2026-10-23T05:52:51.530Z",
+  "title": "Tiskové zprávy - Škoda Storyboard",
+  "template": "pr-listing",
+  "blocks": [
+    "listing"
+  ]
+}

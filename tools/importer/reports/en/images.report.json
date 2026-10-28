@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/en/images/",
+  "path": "en/images",
+  "timestamp": "2026-10-28T06:43:24.948Z",
+  "title": "Images - Škoda Storyboard",
+  "template": "images-listing",
+  "blocks": [
+    "listing"
+  ]
+}

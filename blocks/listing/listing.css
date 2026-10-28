@@ -473,9 +473,11 @@
   display: none;
 }
 
+/* grey-600 (4.54:1 on white): grey-500 was 4.1:1, under AA for this 16px text (SKODA-1001
+   review: an empty locale listing shows it) */
 .listing .listing-status {
   padding: var(--grid-gutter) 0;
-  color: var(--skoda-grey-500);
+  color: var(--skoda-grey-600);
 }
 
 /* --- result grid: fluid/intrinsic 1-up; column count via breakpoints --- */

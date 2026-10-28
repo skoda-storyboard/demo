@@ -32,7 +32,8 @@ const ROW = {
 let arrive = null;
 globalThis.fetch = (url) => {
   const u = String(url);
-  if (u.endsWith('/cs/media-feed.json')) {
+  // the page's media feed: the English one until a locale's is built (locale-paths.js BUILT)
+  if (u.endsWith('/media-feed.json')) {
     return Promise.resolve({ ok: true, json: async () => ({ data: [ROW] }) });
   }
   if (u !== '/cs/placeholders.json') return Promise.resolve({ ok: false, status: 404 });

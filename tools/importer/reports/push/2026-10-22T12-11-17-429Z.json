@@ -1,0 +1,150 @@
+{
+  "run": "2026-10-22T12:11:17.429Z",
+  "args": {
+    "list": "/backups/skoda-storyboard/demo/repo/.migration/cache-1001/paths-cs-proof.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": false,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "new": 4
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/cs/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/cs/footer",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/cs/fragments/newsletter-card",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 31,
+        "selfHosted": 31,
+        "external": 0
+      },
+      "valid": true
+    },
+    {
+      "path": "/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 38,
+        "selfHosted": 38,
+        "external": 0
+      },
+      "valid": true
+    },
+    {
+      "path": "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 46,
+        "selfHosted": 46,
+        "external": 0
+      },
+      "valid": true
+    },
+    {
+      "path": "/cs/category/e-mobilita-cs",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/cs/category/e-mobilita-cs",
+      "live": "https://main--demo--skoda-storyboard.aem.live/cs/category/e-mobilita-cs",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": []
+      },
+      "media": [],
+      "action": "new",
+      "reason": "not in DA",
+      "daLastModified": null,
+      "daStatus": 201,
+      "daReady": true,
+      "previewStatus": 200,
+      "validation": {
+        "plainStatus": 200,
+        "images": 1,
+        "selfHosted": 1,
+        "external": 0
+      },
+      "valid": true
+    }
+  ]
+}

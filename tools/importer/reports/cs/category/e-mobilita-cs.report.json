@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/category/e-mobilita-cs/",
+  "path": "cs/category/e-mobilita-cs",
+  "timestamp": "2026-10-23T05:52:44.047Z",
+  "title": "eMobilita - Škoda Storyboard",
+  "template": "category-archive",
+  "blocks": [
+    "archive-hero",
+    "archive-list",
+    "archive-list"
+  ]
+}

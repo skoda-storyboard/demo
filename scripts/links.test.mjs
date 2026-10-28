@@ -49,7 +49,6 @@ test('a trailing slash on a demo path is dropped, query + hash kept, relative st
 
 test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
   [
-    '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/',
     '/en/documents/what-are-your-rights/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
@@ -137,7 +136,16 @@ test('the podcast nav alias points at the live podcast-en archive', () => {
   );
 });
 
-test('the en locale and look-alike paths are not caught by the locale rule', () => {
+test('other-locale site paths stay on this site, only without the trailing slash (SKODA-1001)', () => {
+  // the importers write a not-yet-migrated translation as a live-site link; a site path is a demo page
+  assert.deepEqual(policyHref('/cs/', PAGE), { href: '/cs', newTab: false });
+  assert.deepEqual(policyHref('/de/some/page/', PAGE), { href: '/de/some/page', newTab: false });
+  ['/cs/e-mobilita-cs/x', '/sk', '/sl/slike', '/sr/media-room'].forEach((href) => {
+    assert.equal(policyHref(href, PAGE), null, href);
+  });
+});
+
+test('the en locale and look-alike paths are not caught by the live rules', () => {
   ['/en', '/en/tag/model/elroq', '/nav', '/footer', '/media-room/nav'].forEach((href) => {
     assert.equal(policyHref(href, PAGE), null, href);
   });
@@ -185,8 +193,9 @@ test('Fragment block references skip the live redirect: a locale fragment loads 
   assert.deepEqual(slashed.map((a) => a.getAttribute('href')), ['/cs/fragments/newsletter-card', '/en/fragments/newsletter-card']);
   assert.deepEqual(slashed.map((a) => a.getAttribute('target')), [null, null]);
   const page = window.document.getElementById('page');
-  assert.equal(page.getAttribute('href'), `${LIVE_ORIGIN}/cs/e-mobilita-cs/x`, 'other locale links keep the policy');
-  assert.equal(page.getAttribute('target'), '_blank');
+  // an other-locale page link stays on this site (SKODA-1001)
+  assert.equal(page.getAttribute('href'), '/cs/e-mobilita-cs/x');
+  assert.equal(page.getAttribute('target'), null);
 });
 
 test('policyHref fragment option: no live redirect, the trailing-slash rule kept (#348 review)', () => {
@@ -194,6 +203,6 @@ test('policyHref fragment option: no live redirect, the trailing-slash rule kept
   assert.equal(policyHref('/cs/fragments/newsletter-card', page, { fragment: true }), null);
   assert.deepEqual(policyHref('/cs/fragments/newsletter-card/', page, { fragment: true }), { href: '/cs/fragments/newsletter-card', newTab: false });
   assert.deepEqual(policyHref('/en/fragments/newsletter-card/?x=1', page, { fragment: true }), { href: '/en/fragments/newsletter-card?x=1', newTab: false });
-  // without the option a locale path still goes to the live site (the nav / footer rule)
-  assert.deepEqual(policyHref('/cs/fragments/newsletter-card', page), { href: `${LIVE_ORIGIN}/cs/fragments/newsletter-card`, newTab: true });
+  // without the option a locale path is a page on this site too (SKODA-1001)
+  assert.equal(policyHref('/cs/fragments/newsletter-card', page), null);
 });
