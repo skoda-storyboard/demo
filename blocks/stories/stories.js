@@ -25,7 +25,7 @@
 // event handlers, so forward references between them are safe.
 /* eslint-disable no-use-before-define */
 
-import { readBlockConfig, createOptimizedPicture } from '../../scripts/aem.js';
+import { readBlockConfig, createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders, localize, pluralText } from '../../scripts/placeholders.js';
 import { buildCardTeaser } from '../../scripts/card-teaser.js';
@@ -320,6 +320,10 @@ function cardCell(row, eager) {
 export default async function decorate(block) {
   const cfg = parseFeedConfig(block);
   const feature = readFeature(block); // read before the config rows are cleared
+  // the index request starts with the placeholders, not after them: on an archive the first
+  // card is the LCP element (SKODA-209)
+  const indexRows = loadQueryIndex(cfg.index);
+  indexRows.catch(() => {}); // handled where it is awaited below
   const STRINGS = buildStrings(await fetchPlaceholders());
   // the featured model card takes two story slots on the first page (source parity)
   const firstPage = feature ? Math.max(1, cfg.initial - FEATURE_SLOTS) : cfg.initial;
@@ -332,6 +336,9 @@ export default async function decorate(block) {
   // Skeleton.
   block.textContent = '';
   block.classList.add(Number(cfg.columns) ? `stories-cols-${Number(cfg.columns)}` : 'stories-featured');
+  // Media Room pages (the authored `section` metadata, as the header reads it) end the archive
+  // grid 48px under its pager, as the source's Media Room archives do (SKODA-209)
+  if (getMetadata('section') === 'media-room') block.classList.add('stories-media-room');
   // the card is optional, authored content: whatever goes wrong building it, the feed still renders
   let featureCell = null;
   try {
@@ -377,7 +384,7 @@ export default async function decorate(block) {
   // Load + filter the index (self-contained; degrades to empty/error state).
   let scoped = [];
   try {
-    const rows = await loadQueryIndex(cfg.index);
+    const rows = await indexRows;
     scoped = scopeFeedRows(rows, cfg);
   } catch (e) {
     status.textContent = STRINGS.loadError;
@@ -416,6 +423,9 @@ export default async function decorate(block) {
     if (countEl) renderCount(countEl, shownRows.length, all.length);
 
     // Load-more: dropped (not disabled) when the slice is exhausted (stories.md §5).
+    // Archives that needed paging retain the source's empty wrapper at exhaustion;
+    // an initially fitting archive and the home feed never gain that band.
+    loadMoreWrap.classList.toggle('is-paginated', cfg.count && all.length > firstPage);
     loadMoreWrap.textContent = '';
     if (shownRows.length < all.length) {
       const btn = document.createElement('button');
