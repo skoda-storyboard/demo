@@ -148,6 +148,24 @@ with archive heights also stepping at **576**.
   ~970px by the `.container{max-width:990px}` wrapper.
 - Capture note: DevTools floored at ~500px; the <768 state was captured at 500. A true 375 check needs
   device emulation (follow-up).
+- **Fixed-height bands: image sized for the cover crop (#480).** The `page` band (240px, image scale
+  1.02) and the `archive` band (184 / 224 / 240px) cover a fixed height. A wide panorama is therefore
+  drawn much wider than the viewport: the newsletter's 5.23 : 1 image is 1281px across a 390px phone,
+  and eMobility's 5.21 : 1 is 959px. EDS's generic picture (750w below 600px, 2000w above) stretched it
+  up to 1.71× at DPR 1.
+  - `hero-image.js` (`coverSources`) gives those two bands one WebP `<source>` plus the `<img>` with
+    width candidates `750 / 1080 / 1440 / 1920 / 2560` below the master, plus the master itself, and a
+    `sizes` equal to the drawn width: `max(viewport × scale, band height × scale × aspect)` per band
+    step. The browser picks the file for its viewport, DPR and zoom.
+  - Measured on `/en/newsletter`, `/en/contacts`, `/en/category/emobility` and `/en/tag/model/peaq`
+    at 390–1440, DPR 1 and 2 and 390 at 175% zoom, real decoded pixels:
+    - no stretch at DPR 1 (it was 1.09–1.71 on phones);
+    - at DPR 2 the master itself is served where the need exceeds it, so any remaining stretch is the
+      master's limit (the newsletter master in DA is 1920px, the source's 2237px);
+    - at most one ladder step of overshoot;
+    - band, image and title boxes unchanged (24 / 24 cases).
+
+  The story and overlay heroes keep the generic picture.
 
 ## 5. Interaction states
 
