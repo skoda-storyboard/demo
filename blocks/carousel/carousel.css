@@ -140,11 +140,12 @@
   line-height: var(--media-card-date-row);
 }
 
+/* the 10px under the title is margin, not padding: the clip is the padding box, so padding would
+   show the top of a third line under the two clamped ones (#466). The slot stays 46px. */
 .carousel.media .carousel-caption .card-teaser-title {
   display: -webkit-box;
   min-height: calc(var(--media-card-title-line) * 2);
-  margin: 0;
-  padding-bottom: var(--media-card-pad);
+  margin: 0 0 var(--media-card-pad);
   overflow: hidden;
   font-size: var(--media-card-title-size);
   font-weight: var(--weight-regular);
