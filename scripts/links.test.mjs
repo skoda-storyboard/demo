@@ -51,8 +51,26 @@ test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
   [
     '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/',
-    '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
+    '/en/documents/what-are-your-rights/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
+});
+
+test('the migrated documents stay on the demo, in the tab, as Contacts and Copyright (SKODA-843)', () => {
+  const CONSENT = '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing';
+  [
+    ['/en/documents/', '/en/documents'],
+    [`${CONSENT}/`, CONSENT],
+    ['/en/documents/cookies/', '/en/documents/cookies'],
+    ['/en/documents/cookies', null],
+  ].forEach(([href, demo]) => {
+    assert.deepEqual(policyHref(href, PAGE), demo && { href: demo, newTab: false }, href);
+  });
+  // the absolute live consent link (the newsletter forms') stays on the demo too, as Copyright
+  assert.deepEqual(policyHref(`${LIVE_ORIGIN}${CONSENT}/`, PAGE), { href: CONSENT, newTab: false });
+  assert.deepEqual(policyHref(`${LIVE_ORIGIN}/en/documents/what-are-your-rights/`, PAGE).newTab, true);
+  // a longer slug that only starts like a migrated one still goes live
+  const near = '/en/documents/cookies-old/';
+  assert.deepEqual(policyHref(near, PAGE), { href: `${LIVE_ORIGIN}${near}`, newTab: true });
 });
 
 test('"Manage subscription" goes to the live page in the same tab, as on the source (SKODA-308)', () => {
@@ -86,6 +104,20 @@ test('the media cart page is the demo\'s own (SKODA-505b): it stays in the tab',
     policyHref(`${LIVE_ORIGIN}/en/media-cart/`, PAGE),
     { href: '/en/media-cart', newTab: false },
     'a chrome link to the live cart page comes to the demo page',
+  );
+});
+
+test('Company → Newsletter opens the migrated page in the same tab (SKODA-845, #457 review)', () => {
+  assert.deepEqual(
+    policyHref(`${LIVE_ORIGIN}/en/newsletter/`, PAGE),
+    { href: '/en/newsletter', newTab: false },
+    'the authored live link in the Media Room nav comes to the demo page',
+  );
+  assert.deepEqual(policyHref('/en/newsletter/', PAGE), { href: '/en/newsletter', newTab: false });
+  assert.deepEqual(
+    policyHref(`${LIVE_ORIGIN}/en/newsletter-settings/`, PAGE),
+    { href: `${LIVE_ORIGIN}/en/newsletter-settings/`, newTab: false },
+    '"Manage subscription" still goes to live',
   );
 });
 

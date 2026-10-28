@@ -32,18 +32,18 @@ if (JSDOM) {
 }
 
 const row = (src, caption = '') => `<div><div><picture><img src="${src}" alt="Alt ${src}"></picture></div><div>${caption}</div></div>`;
-const slider = (rows) => {
+const slider = async (rows) => {
   const block = document.createElement('div');
   block.className = 'gallery slider';
   block.innerHTML = rows.join('');
   document.querySelector('main').append(block);
-  decorate(block);
+  await decorate(block);
   return block;
 };
 const realSlides = (block) => [...block.querySelectorAll('.gallery-slide:not(.is-clone)')];
 
-test('an authored description renders under the image, inside its slide', { skip }, () => {
-  const block = slider([
+test('an authored description renders under the image, inside its slide', { skip }, async () => {
+  const block = await slider([
     row('a.jpg', '<p>Škoda Octavia Combi Laurin &amp; Klement</p>'),
     row('b.jpg', '<p>Škoda Octavia Long</p>'),
   ]);
@@ -59,31 +59,31 @@ test('an authored description renders under the image, inside its slide', { skip
   ]);
 });
 
-test('an empty caption cell adds no caption element (no gap on Epiq)', { skip }, () => {
-  const block = slider([row('a.jpg'), row('b.jpg', '   '), row('c.jpg', '<p>Only this one</p>')]);
+test('an empty caption cell adds no caption element (no gap on Epiq)', { skip }, async () => {
+  const block = await slider([row('a.jpg'), row('b.jpg', '   '), row('c.jpg', '<p>Only this one</p>')]);
   const captions = realSlides(block).map((s) => s.querySelector('.gallery-slide-caption'));
   assert.equal(captions[0], null);
   assert.equal(captions[1], null);
   assert.equal(captions[2].textContent.trim(), 'Only this one');
 });
 
-test('the wrap-around clones carry the same caption as their slide', { skip }, () => {
-  const block = slider([row('a.jpg', '<p>First</p>'), row('b.jpg', '<p>Last</p>')]);
+test('the wrap-around clones carry the same caption as their slide', { skip }, async () => {
+  const block = await slider([row('a.jpg', '<p>First</p>'), row('b.jpg', '<p>Last</p>')]);
   const clones = [...block.querySelectorAll('.gallery-slide.is-clone')];
   assert.equal(clones.length, 2);
   assert.deepEqual(clones.map((c) => c.querySelector('.gallery-slide-caption')?.textContent.trim()), ['Last', 'First']);
 });
 
 // --- controls: the source's arrows and dots only, and no autoplay (#361 QA, PR #456 review) --
-test('a looping slider has the source\'s arrows and dots and no pause / play button', { skip }, () => {
-  const block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
+test('a looping slider has the source\'s arrows and dots and no pause / play button', { skip }, async () => {
+  const block = await slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
   assert.equal(block.querySelector('.gallery-slider-pause'), null, 'no pause control (#361 QA)');
   const controls = [...block.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'));
   assert.deepEqual(controls, ['Previous image', 'Next image', 'Go to image 1', 'Go to image 2', 'Go to image 3']);
 });
 
 // SKODA-819 / WCAG 2.2.2: with no visible pause / resume control the slider must not move by itself
-test('a looping slider never autoplays: no rotation timer, the first slide stays current', { skip }, () => {
+test('a looping slider never autoplays: no rotation timer, the first slide stays current', { skip }, async () => {
   const { setTimeout: realTimeout, setInterval: realInterval, IntersectionObserver: RealIO } = window;
   const delays = [];
   const observed = [];
@@ -97,7 +97,7 @@ test('a looping slider never autoplays: no rotation timer, the first slide stays
   Object.defineProperty(document, 'hidden', { value: false, configurable: true });
   let block;
   try {
-    block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
+    block = await slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
     observed.forEach(([cb, el]) => cb([{ isIntersecting: true, target: el }]));
   } finally {
     window.setTimeout = realTimeout;
@@ -111,7 +111,7 @@ test('a looping slider never autoplays: no rotation timer, the first slide stays
   assert.equal(current(), 0);
 });
 
-test('a single-image slider has no autoplay and no pause control', { skip }, () => {
-  const block = slider([row('a.jpg')]);
+test('a single-image slider has no autoplay and no pause control', { skip }, async () => {
+  const block = await slider([row('a.jpg')]);
   assert.equal(block.querySelector('.gallery-slider-pause'), null);
 });

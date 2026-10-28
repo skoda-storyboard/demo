@@ -1,3 +1,4 @@
+/* global globalThis */
 /*
  * Newsletter stub tests (SKODA-305, UI-only Subscribe form).
  * Run: node --test blocks/newsletter-stub/newsletter-stub.test.mjs
@@ -342,4 +343,49 @@ test('keys are case-insensitive and malformed rows are skipped', () => {
   <div><div>orphan</div></div>
 </div>`);
   assert.equal(block.querySelector('button').textContent, 'Odebírat');
+});
+
+test('a form built while the locale sheet loads takes its texts when it arrives; authored rows stay (PR #496 review)', async (t) => {
+  const { clearPlaceholdersCache, fetchPlaceholders } = await import('../../scripts/placeholders.js');
+  const realFetch = globalThis.fetch;
+  const realWindow = globalThis.window;
+  t.after(() => {
+    globalThis.fetch = realFetch;
+    globalThis.window = realWindow;
+    clearPlaceholdersCache();
+  });
+  // a Czech page (the mini DOM has no window: placeholders.js reads the locale from its path)
+  globalThis.window = { ...(realWindow || {}), location: { pathname: '/cs/e-mobilita-cs/x' } };
+  clearPlaceholdersCache();
+  let arrive;
+  const sheet = new Promise((resolve) => { arrive = resolve; });
+  globalThis.fetch = (url) => (String(url) === '/cs/placeholders.json'
+    ? sheet
+    : Promise.resolve({ ok: false, json: async () => ({}) }));
+  fetchPlaceholders(); // the page starts the sheet before the blocks (scripts.js)
+
+  // a valid empty table, and one with an authored button: both built before the sheet is in
+  const empty = build('<div class="newsletter-stub topbar"></div>');
+  const authored = build('<div class="newsletter-stub"><div><div>button</div><div>Odebírat</div></div></div>');
+  const form = empty.querySelector('form');
+  assert.equal(form.querySelector('.newsletter-stub-label').textContent, 'Email address', 'English while loading');
+
+  arrive({
+    ok: true,
+    json: async () => ({
+      data: [
+        { Key: 'newsletterLabel', Text: 'E-mailová adresa' },
+        { Key: 'newsletterPlaceholder', Text: 'Zadejte svůj e-mail' },
+        { Key: 'newsletterButton', Text: 'Přihlásit' },
+      ],
+    }),
+  });
+  await fetchPlaceholders();
+  await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+  assert.equal(form.querySelector('.newsletter-stub-label').textContent, 'E-mailová adresa');
+  assert.equal(form.querySelector('input[type=email]').getAttribute('placeholder'), 'Zadejte svůj e-mail');
+  assert.deepEqual([...form.querySelectorAll('button')].map((b) => b.textContent), ['Přihlásit', 'Přihlásit'], 'both topbar submits');
+  assert.equal(authored.querySelector('button').textContent, 'Odebírat', 'an authored row is never replaced');
+  assert.equal(authored.querySelector('.newsletter-stub-label').textContent, 'E-mailová adresa', 'its missing rows still refresh');
 });

@@ -44,13 +44,17 @@ function el(tag) {
 globalThis.document = {
   currentScript: { src: 'http://localhost/scripts/scripts.js' },
   createElement: (tag) => el(tag),
+  // the media panel's label text nodes (it relabels them when the locale sheet loads)
+  createTextNode: (data) => ({
+    nodeType: 3, nodeValue: String(data), children: [], get textContent() { return this.nodeValue; },
+  }),
   querySelector: () => null,
   addEventListener: () => {},
 };
 
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
-  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS,
+  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS, blockStylesReady, sectionHeadingText,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -151,6 +155,21 @@ test('selectRows filters by category and sorts newest-first', () => {
   const cfg = parseConfig(cfgBlock([['template', 'press_release'], ['category', 'emobility'], ['limit', '10']]));
   const out = selectRows(rows, cfg);
   assert.deepEqual(out.map((r) => r.title), ['Elroq', 'Enyaq']); // newest first
+});
+
+test('selectRows: `categories` + a facet pick the newsletters of one plant (SKODA-845)', () => {
+  const plant = [
+    { path: '/en/press-releases/kvasiny-newsletter-3', title: 'K3', template: 'press_release', date: '2026-09-25', categories: 'newsletter', company: 'kvasiny' },
+    { path: '/en/press-releases/vrchlabi-newsletter-3', title: 'V3', template: 'press_release', date: '2026-09-25', categories: 'newsletter', company: 'vrchlabi' },
+    { path: '/en/press-releases/kvasiny-newsletter-2', title: 'K2', template: 'press_release', date: '2026-06-12', categories: 'newsletter', company: 'kvasiny' },
+    // the same plant, not a newsletter (the source's Octavia production release)
+    { path: '/en/press-releases/octavia-in-kvasiny', title: 'Octavia', template: 'press_release', date: '2026-10-01', categories: '', company: 'kvasiny, production' },
+    // a story in the same category never joins a press_release rail
+    { path: '/en/stories/kvasiny-story', title: 'Story', template: 'story', date: '2026-10-02', categories: 'newsletter', company: 'kvasiny' },
+  ];
+  const cfg = parseConfig(cfgBlock([['template', 'press_release'], ['categories', 'newsletter'], ['company', 'kvasiny']]));
+  assert.deepEqual(cfg.categories, ['newsletter']);
+  assert.deepEqual(selectRows(plant, cfg).map((r) => r.title), ['K3', 'K2']);
 });
 
 test('selectRows honours limit (slice)', () => {

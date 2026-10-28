@@ -3,6 +3,26 @@ body.press-kit {
   --pk-gutter: var(--spacing-l);
   --pk-chapters-height: 44px;
   --pk-chapters-layer: 5;
+
+  /* the Chapters bar and menu (SKODA-805, the source's .chapter-nav measured 2026-10-26) */
+  --pk-icon-font: skoda-bnr-icons;
+  --pk-chapters-text-top: 20px;
+  --pk-chapters-line: 22.5px;
+  --pk-chapters-caret-gap: 4px;
+
+  /* the source labels' surrounding whitespace renders as one space after ← and before ⌄
+     (5px at 20px: the SKODA Next space advance) */
+  --pk-chapters-word-gap: 0.25em;
+  --pk-chapters-underline-width: 66px;
+  --pk-chapters-underline-gap: 4.375px;
+  --pk-chapters-menu-gap: 24px;
+  --pk-chapters-menu-overhang: 15px;
+  --pk-chapters-item-line: 18px;
+  --pk-chapters-item-pad: 13px 24px 10px; /* a 41px row */
+
+  /* stuck at the top, the source's fixed bar adds 8px above and a 24px white band below */
+  --pk-chapters-stuck-top: 8px;
+  --pk-chapters-stuck-bottom: 24px;
   --pk-sidebar-inset: var(--spacing-xxl);
   --pk-article-top: 32px;
   --pk-date-size: 11px;
@@ -206,19 +226,120 @@ body.press-kit .section.press-kit-chapters {
   background: var(--background-color);
 }
 
-body.press-kit .press-kit-chapters-nav button {
+/* Stuck (press-kit.js sets is-stuck), the bar is the source's fixed .chapter-nav (PR #503 review,
+   measured 2026-10-27 at 1280 / 375): text 8px lower, a 76.3px white band across the viewport and
+   the menu opening at its bottom. Nothing is laid out again (no layout shift): the row moves by a
+   translate, and the band is painted (border-image, which doesn't widen the page) past the bar's
+   box, with a layer under the row that takes the clicks on the white below it. */
+body.press-kit .section.press-kit-chapters.is-stuck {
+  border-image: linear-gradient(var(--background-color) 0 0) fill 0 / /
+    0 100vw calc(var(--pk-chapters-stuck-top) + var(--pk-chapters-stuck-bottom));
+}
+
+body.press-kit .section.press-kit-chapters.is-stuck::after {
+  content: "";
+  position: absolute;
+  inset: 100% 0 auto;
+  z-index: -1;
+  height: calc(var(--pk-chapters-stuck-top) + var(--pk-chapters-stuck-bottom));
+}
+
+/* The bar as the source draws it (SKODA-805, measured 2026-10-26 at 375 – 1440): "← Introduction"
+   (the hub) on the left, "Chapters ⌄" on the right, both 20 / 22.5 / 500, their text on the bar's
+   bottom (20px top inset). The row spans the 1248 content cap with the 10px page gutter below it
+   and none once the cap leaves room: clamp() keeps the text 10px in until the cap, then on its edge. */
+body.press-kit .press-kit-chapters-nav {
+  --pk-chapters-inset: clamp(0px, calc(var(--page-gutter) - (100vw - var(--content-max-width)) / 2), var(--page-gutter));
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   min-height: var(--pk-chapters-height);
+  margin-inline: calc(-1 * var(--page-gutter)); /* out of the section's gutter, to its edge… */
+  padding-inline: var(--pk-chapters-inset); /* …then in by the fluid inset */
+}
+
+/* stuck, the row sits 8px lower, as the source's (see `.is-stuck` above) */
+body.press-kit .section.press-kit-chapters.is-stuck .press-kit-chapters-nav {
+  translate: 0 var(--pk-chapters-stuck-top);
+}
+
+body.press-kit .press-kit-chapters-nav > .press-kit-chapters-intro,
+body.press-kit .press-kit-chapters-nav > button {
+  margin: 0;
   border: 0;
+  padding: var(--pk-chapters-text-top) 0 0;
   background: none;
   color: var(--text-color);
+  font-family: inherit;
+  font-size: var(--body-font-size-lead);
+  font-weight: var(--weight-medium);
+  line-height: var(--pk-chapters-line);
+  text-decoration: none;
   cursor: pointer;
 }
 
+/* the source's icon-font glyphs: ← before Introduction, ⌄ after Chapters */
+body.press-kit .press-kit-chapters-intro::before,
+body.press-kit .press-kit-chapters-nav > button::after {
+  font-family: var(--pk-icon-font);
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+body.press-kit .press-kit-chapters-intro::before {
+  content: "\e003"; /* browsers without CSS alt text (Firefox < 128) keep the glyph */
+  content: "\e003" / "";
+  margin-inline-end: var(--pk-chapters-word-gap);
+}
+
+body.press-kit .press-kit-chapters-nav > button {
+  position: relative;
+  margin-inline-start: auto; /* stays right when there's no Introduction link */
+}
+
+body.press-kit .press-kit-chapters-nav > button::after {
+  content: "\e007";
+  content: "\e007" / "";
+  margin-inline-start: calc(var(--pk-chapters-word-gap) + var(--pk-chapters-caret-gap));
+  font-size: var(--body-font-size-m);
+}
+
+/* the open menu's 66 × 2 ink line under the word, just below the bar */
+body.press-kit .press-kit-chapters-nav > button::before {
+  content: "";
+  position: absolute;
+
+  /* under the text line, wherever the button's box ends; centred on the word and its space */
+  inset-block-start: calc(var(--pk-chapters-text-top) + var(--pk-chapters-line) + var(--pk-chapters-underline-gap));
+  inset-inline-start: calc((100% - var(--body-font-size-m) - var(--pk-chapters-caret-gap)) / 2);
+  width: var(--pk-chapters-underline-width);
+  height: 2px;
+  background: var(--text-color);
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+body.press-kit .press-kit-chapters-nav > button[aria-expanded="true"]::before {
+  opacity: 1;
+}
+
+/* the menu: a white panel 24px under the bar, as wide as its longest title (273px on Peaq, 706 on
+   Motorsport, whose titles carry line breaks) but never past the viewport's gutter; right-aligned
+   with the toggle (15px past it once the content cap leaves room, as the source's); 41px rows of
+   16 / 18 / 500 inset 24px */
 body.press-kit .press-kit-chapters-nav ul {
+  position: absolute;
+  inset-block-start: calc(100% + var(--pk-chapters-menu-gap));
+  inset-inline-end: calc(var(--pk-chapters-inset) - clamp(0px, calc((100vw - var(--content-max-width)) / 2 - 1px), var(--pk-chapters-menu-overhang)));
+  width: max-content;
+  max-width: calc(100vw - var(--page-gutter));
   list-style: none;
   margin: 0;
-  padding: var(--spacing-m);
+  padding: 0;
   background: var(--background-color);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 15%);
 }
 
 body.press-kit .press-kit-chapters-nav ul[hidden],
@@ -226,13 +347,19 @@ body.press-kit .downloads-items > li[hidden] {
   display: none;
 }
 
-body.press-kit .press-kit-chapters-nav li a {
-  display: block;
-  padding-block: var(--spacing-xs);
+/* the current chapter carries aria-current only: the source marks it no differently */
+body.press-kit .press-kit-chapters-nav li {
+  margin: 0;
 }
 
-body.press-kit .press-kit-chapters-nav a[aria-current="page"] {
-  font-weight: var(--weight-semibold);
+body.press-kit .press-kit-chapters-nav li a {
+  display: block;
+  padding: var(--pk-chapters-item-pad);
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: var(--pk-chapters-item-line);
+  text-decoration: none;
 }
 
 body.press-kit .press-kit-chapters-nav button:focus-visible,
@@ -403,6 +530,86 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
+/* Related Press Releases band: most kit pages end in it, after the Media Box when they have one
+   (measured on the Peaq FAQ and Battery chapters, 2026-10-27, 375 – 1440). In a Media Box's place
+   on a page without one; 72px over the header, 60 under the cards; the header is the press
+   release's: the heading and
+   the grey "Based on tags" line left, the "All" ghost pill right, centred on them; 20px to the
+   cards. The heading is the kit's band title, 20/25 up to 768, 26/32.5 above. */
+body.press-kit main > .section.related {
+  margin-block: var(--pk-band-gap) var(--spacing-m);
+  padding-block: var(--pk-band-padding-top) var(--media-box-padding-bottom);
+}
+
+/* after a Media Box (a chapter with both bands) only that band's 16px white strip parts them */
+body.press-kit main > .section.media-box + .section.related {
+  margin-block-start: 0;
+}
+
+body.press-kit .section.related .default-content-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.press-kit .section.related .default-content-wrapper > :not(.button-container) {
+  grid-column: 1;
+  margin: 0;
+}
+
+body.press-kit .section.related .default-content-wrapper > :is(h2, h3) {
+  font-size: var(--media-box-title-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+}
+
+body.press-kit .section.related .default-content-wrapper > p {
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+body.press-kit .section.related .default-content-wrapper > .button-container {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+
+/* source .btn-ghost-compact: a 36px pill (8px + 16/16 + 8px, 2px border), 32px sides, 1px
+   tracking; hover fills #f1f1f1 */
+body.press-kit .section.related .button-container a.button {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: var(--spacing-xs) calc(2 * var(--spacing-m));
+  border: 2px solid var(--pr-ghost-color);
+  border-radius: var(--pill-radius);
+  background: var(--background-color);
+  color: var(--pr-ghost-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 1px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+body.press-kit .section.related .button-container a.button:hover,
+body.press-kit .section.related .button-container a.button:focus-visible {
+  background: var(--skoda-grey-50);
+  color: var(--pr-ghost-color);
+  text-decoration: none;
+}
+
+/* the kit's cards keep two title lines ending in "…" (the press release's keep one): 20/24 up
+   to 768, 18/21.6 above */
+body.press-kit .section.related .story-rail.press .card-teaser-title {
+  -webkit-line-clamp: 2;
+  max-height: 2.4em;
+  font-size: var(--related-band-card-title-compact);
+}
+
 /* A Videos chapter's clip title, right before its clip: the source authors each one centred at
    18pt (24px) in its light h2 (Peaq, Epiq and Classic Days Videos). The box starts 64px under
    the clip before (past its 8px + 36px toolbar), and its clip follows 16px on. */
@@ -441,6 +648,17 @@ body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wr
 
   body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
     font-size: var(--heading-font-size-story-h3);
+  }
+
+  body.press-kit .section.related .story-rail.press .card-teaser-title {
+    font-size: var(--heading-font-size-s);
+  }
+
+  /* after a Media Box the source's dotdotdot leaves one line from 769 (two below), as on the press
+     releases' band (measured on the Peaq Battery and Classic Days 645 chapters, 769 – 1440) */
+  body.press-kit main:has(> .section.media-box) .section.related .story-rail.press .card-teaser-title {
+    -webkit-line-clamp: 1;
+    max-height: 1.2em;
   }
 
 }
@@ -597,6 +815,12 @@ body.press-kit .section.body-column .accordion {
   margin-block-end: var(--paragraph-gap);
 }
 
+/* ...but an FAQ column ends on its last question: the source's toggle row has no margin under it
+   (the column's 10px row inset and 60px margin follow) */
+body.press-kit .section.body-column > .accordion-wrapper:last-child > .accordion {
+  margin-block-end: 0;
+}
+
 /* Toggles that open the body (a kit's FAQ chapter) keep the source row cell's 10px above the
    first question: title → first trigger 26px at 1280, 28 at 768 (PR #263 review). After other
    content the source gap is already met by the rhythm above (40px on first glimpse / Elroq). */
@@ -675,7 +899,8 @@ body.press-kit .section.body-column .columns.callout {
     max-width: calc((100% + 2 * var(--page-gutter)) * 2 / 3 - 2 * var(--page-gutter));
   }
 
-  body.press-kit main > .section.media-box {
+  body.press-kit main > .section.media-box,
+  body.press-kit main > .section.related {
     box-shadow: 0 0 0 100vmax var(--dark-color);
     clip-path: inset(0 -100vmax);
   }

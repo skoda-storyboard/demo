@@ -383,6 +383,16 @@ test('count row: an authored `count` row overrides the grid default', () => {
   assert.equal(parseFeedConfig(configBlock({ ...archiveCfg, count: '' })).count, true, 'blank cell keeps the default');
 });
 
+// --- archive end spacing (SKODA-209): 16px, 48px on a Media Room page ------------------------
+test('the archive section ends 16px under the pager, 48px (tokens) on a Media Room page', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./stories.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = (sel) => css.match(new RegExp(`${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`))?.[1] || '';
+  const base = 'main > .section.stories-container:last-child:has(.stories.has-count';
+  assert.match(rule(`${base})`), /margin-block-end:\s*var\(--spacing-m\)/);
+  assert.match(rule(`${base}.stories-media-room)`), /margin-block-end:\s*calc\(var\(--spacing-xl\) \+ var\(--spacing-xs\)\)/);
+});
+
 test('renderCount reads "6 / N", then "12 / N" after Load more', () => {
   const countEl = document.createElement('div');
   const read = () => countEl.children.map((s) => `${s.className}=${s.textContent}`);

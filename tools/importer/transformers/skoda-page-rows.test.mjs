@@ -44,12 +44,12 @@ const FIXTURE = new URL('../../../test/fixtures/page-base/copyright.html', impor
 
 // the three hooks, the importer's order (the importer drops <style> between preprocess and
 // transform)
-function run(html) {
+function run(html, template = {}) {
   const { document } = new JSDOM(html).window;
-  transform('preprocess', document.body, { document });
+  transform('preprocess', document.body, { document, template });
   document.querySelectorAll('style').forEach((s) => s.remove());
-  transform('beforeTransform', document.body, { document });
-  transform('afterTransform', document.body, { document });
+  transform('beforeTransform', document.body, { document, template });
+  transform('afterTransform', document.body, { document, template });
   return document;
 }
 const styles = (doc) => [...doc.querySelectorAll('table')].map((t) => t.rows[1].cells[1].textContent);
@@ -89,8 +89,15 @@ test('a row wrapped in .panel-row-style still counts; a page with no rows is one
 
   const { document } = new JSDOM('<main><article class="page"><div class="entry-content"><p>plain</p></div></article></main>').window;
   ['preprocess', 'beforeTransform', 'afterTransform'].forEach((hook) => transform(hook, document.body, { document }));
-  assert.deepEqual(styles(document), ['page-body']);
+  // no rows, no widget: no widget's 10px above the first line (SKODA-843)
+  assert.deepEqual(styles(document), ['page-body, plain']);
   assert.equal(document.querySelector('.entry-content').previousElementSibling.tagName, 'TABLE', 'it opens the body');
+});
+
+test('an empty body (a title-only page such as /en/impressum) gets no page-body section (SKODA-843)', { skip }, () => {
+  const { document } = new JSDOM('<main><article class="page"><div class="entry-content"> \u00a0 </div></article></main>').window;
+  ['preprocess', 'beforeTransform', 'afterTransform'].forEach((hook) => transform(hook, document.body, { document }));
+  assert.deepEqual(styles(document), []);
 });
 
 test('no article: nothing happens', { skip }, () => {
@@ -105,4 +112,16 @@ test('two layouts in one style (a nested builder first): the article\'s widths s
     + '/* Layout 3 */ #pgc-3-0-0, #pgc-3-0-1 { width:50% } @media (max-width:780px){ #pgc-3-0-0 { width:100% } }';
   const doc = run(page(css, `<div id="pg-3-0" class="panel-grid">${cell('pgc-3-0-0', '<p>half</p>')}${cell('pgc-3-0-1', '')}</div>`));
   assert.deepEqual(styles(doc), ['page-body, half']);
+});
+
+test('each further widget of a one-cell row is its own section, as each source widget starts 10px down (SKODA-843)', { skip }, () => {
+  const widget = (html) => `<div class="so-panel widget"><div class="textwidget">${html}</div></div>`;
+  const html = page('', `<div id="pg-1-0" class="panel-grid">${cell('pgc-1-0-0', widget('<p>first</p>') + widget('<h4>Second</h4>') + widget(' '))}</div>`);
+  const doc = run(html, { splitWidgets: true });
+  assert.deepEqual(styles(doc), ['page-body', 'page-body']);
+  assert.ok(doc.querySelector('hr'), 'a section break before the second widget');
+  // opt-in (import-page-base): the company importer places its widgets itself (#843 review)
+  const company = run(html, { name: 'company-page' });
+  assert.deepEqual(styles(company), ['page-body'], 'one section per row without the opt-in');
+  assert.equal(company.querySelector('hr'), null);
 });

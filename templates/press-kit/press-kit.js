@@ -1,3 +1,5 @@
+import { applyLocalized, fillText } from '../../scripts/placeholders.js';
+
 function sourceLinks(main) {
   main.querySelectorAll('a[href]').forEach((link) => {
     if (!/^https?:\/\/(?:www\.)?skoda-storyboard\.com\//i.test(link.href)) return;
@@ -13,7 +15,19 @@ function header(main) {
   h1?.closest('.section').classList.add('press-kit-header');
 }
 
-function chapters(main) {
+// the Chapters bar's link back to the kit's hub, as the source labels it
+const INTRODUCTION = 'Introduction';
+
+// The bar is sticky; once it is held at the top it takes the source's fixed-bar spacing
+// (press-kit.css `.is-stuck`). Held means its top edge sits in the 1px the root margin cuts off.
+function stuckState(section) {
+  if (typeof IntersectionObserver === 'undefined') return;
+  new IntersectionObserver(([entry]) => {
+    section.classList.toggle('is-stuck', entry.intersectionRatio < 1 && entry.boundingClientRect.top < 1);
+  }, { rootMargin: '-1px 0px 0px 0px', threshold: [1] }).observe(section);
+}
+
+function chapters(main, relabel = []) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
   if (!list) return;
@@ -28,12 +42,33 @@ function chapters(main) {
       link.setAttribute('aria-current', 'page');
     }
   });
+  // The source's bar shows "← Introduction" on the left: the way back to the kit's hub, which DA
+  // keeps as the menu's first entry (the parent page). The menu itself lists the chapters only
+  // (SKODA-805, measured 2026-10-26).
+  const parent = here.slice(0, here.lastIndexOf('/'));
+  const hub = [...list.querySelectorAll('a[href]')]
+    .find((link) => link.origin === origin && link.pathname.replace(/\/$/, '') === parent);
+  let intro = null;
+  if (hub) {
+    intro = document.createElement('a');
+    intro.className = 'press-kit-chapters-intro';
+    intro.href = hub.getAttribute('href');
+    ['target', 'rel'].forEach((attr) => { if (hub.hasAttribute(attr)) intro.setAttribute(attr, hub.getAttribute(attr)); });
+    intro.textContent = INTRODUCTION;
+    // the menu's first chapter is also "Introduction": the accessible name adds the kit (its
+    // DA label), still starting with the visible text (WCAG 2.5.3)
+    const kit = hub.textContent.trim();
+    if (kit && kit !== INTRODUCTION) intro.setAttribute('aria-label', `${INTRODUCTION}: ${kit}`);
+    hub.closest('li')?.remove();
+  }
   const nav = document.createElement('nav');
   nav.className = 'press-kit-chapters-nav';
-  nav.setAttribute('aria-label', 'Chapters');
   const button = document.createElement('button');
   button.type = 'button';
-  button.textContent = 'Chapters';
+  relabel.push((labels) => {
+    nav.setAttribute('aria-label', labels.chapters);
+    button.textContent = labels.chapters;
+  });
   button.setAttribute('aria-controls', 'chapters-links');
   button.setAttribute('aria-expanded', 'false');
   list.id = 'chapters-links';
@@ -54,7 +89,9 @@ function chapters(main) {
     button.focus();
   });
   list.replaceWith(nav);
+  if (intro) nav.append(intro);
   nav.append(button, list);
+  stuckState(section);
 }
 
 /*
@@ -66,6 +103,20 @@ function chapters(main) {
 function mediaBox(main) {
   const section = main.querySelector('.section.media-box');
   if (section?.querySelector('.downloads')) section.id = 'media-box';
+}
+
+// The Related Press Releases band's "All" (the import's `<p><a>All</a></p>` after the heading
+// and the "Based on tags" line) is the band's ghost pill, as on press releases; decorateButtons
+// skips it (it buttonizes bold or italic links only).
+function relatedLinks(main) {
+  main.querySelectorAll(':scope > .section.related .default-content-wrapper > p').forEach((p) => {
+    const link = p.querySelector(':scope > a[href]');
+    const onlyLink = link && p.children.length === 1
+      && p.textContent.trim() === link.textContent.trim();
+    if (!onlyLink) return;
+    p.classList.add('button-container');
+    link.classList.add('button');
+  });
 }
 
 // The sidebar preview shows 4 images; the source's "+51" pill on the last one points at the
@@ -82,15 +133,27 @@ function galleryMore(main) {
   link.closest('p').remove();
 }
 
-const LABELS = {
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `pressKit…`. The template runs before the first paint, so it builds in English and takes the
+// locale's once the memoized sheet resolves (applyLocalized; it starts loading with the page).
+export const PRESS_KIT_LABELS = {
+  chapters: 'Chapters',
   addAll: 'Add all files to the media cart',
-  addVideo: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
-  downloadVideo: (title) => (title ? `Download ${title}` : 'Download video'),
-  openVideo: (title) => (title ? `Open ${title}` : 'Open video'),
+  addVideo: 'Add to media cart',
+  addVideoNamed: 'Add to media cart: {title}',
+  downloadVideo: 'Download video',
+  downloadVideoNamed: 'Download {title}',
+  openVideo: 'Open video',
+  openVideoNamed: 'Open {title}',
+  // the source toolbar's tooltips (its `title`s); the accessible names stay the labels above
+  tipAdd: 'Add/remove this',
+  tipDownload: 'Download this',
+  tipLink: 'Link to page',
 };
+const TIP_KEYS = { add: 'tipAdd', download: 'tipDownload', link: 'tipLink' };
 
-// the source toolbar's tooltips (its `title`s); the accessible names stay the labels above
-const TOOLTIPS = { add: 'Add/remove this', download: 'Download this', link: 'Link to page' };
+/** A label with the clip's title (`…Named`), or the generic one without it. */
+const named = (labels, key, title) => (title ? fillText(labels[`${key}Named`], { title }) : labels[key]);
 
 const isImageParagraph = (el) => el?.tagName === 'P' && !!el.querySelector('img') && !el.textContent.trim();
 
@@ -196,22 +259,31 @@ function roundAction(tag, kind, label) {
   el.className = `press-kit-action ${kind}`;
   if (tag === 'button') el.type = 'button';
   el.setAttribute('aria-label', label);
-  if (TOOLTIPS[kind]) el.title = TOOLTIPS[kind];
+  if (TIP_KEYS[kind]) el.title = PRESS_KIT_LABELS[TIP_KEYS[kind]];
   return el;
 }
+
+/** The tooltip of a round action in the given labels. */
+const retip = (el, kind, labels) => { if (TIP_KEYS[kind]) el.title = labels[TIP_KEYS[kind]]; };
 
 // The sidebar's "Download Media Box" row is the source's label and a round + that adds the
 // whole Media Box to the cart (#275): it hands the click to the Media Box's own group toggle
 // (blocks/downloads) and shows that toggle's state.
-function sidebarMediaBox(main) {
+function sidebarMediaBox(main, relabel = []) {
   const link = main.querySelector('.section.sidebar .default-content-wrapper > ul > li > a[href="#media-box"]');
   const box = main.querySelector('.section.media-box');
   if (!link || !box?.querySelector('.downloads')) return;
   const label = document.createElement('span');
   label.append(...link.childNodes);
-  const add = roundAction('button', 'add', LABELS.addAll);
+  const add = roundAction('button', 'add', PRESS_KIT_LABELS.addAll);
   add.setAttribute('aria-disabled', 'true');
   const groupToggle = () => box.querySelector('.downloads-add-all');
+  // its name mirrors the Media Box toggle's (localized there) once that toggle is built; until
+  // then it is this template's own
+  relabel.push((labels) => {
+    if (!groupToggle()) add.setAttribute('aria-label', labels.addAll);
+    retip(add, 'add', labels);
+  });
   const sync = () => {
     const toggle = groupToggle();
     if (!toggle) return;
@@ -234,20 +306,28 @@ function sidebarMediaBox(main) {
 // A clip's "Download video" link becomes the source's cart toolbar under the player (#275):
 // add to cart, download, and a link to the clip itself (the source links its attachment page,
 // which has no counterpart here).
-function videoActions(main) {
+function videoActions(main, relabel = []) {
   main.querySelectorAll('.section.body-column .embed-wrapper + .default-content-wrapper > p:first-child').forEach((p) => {
     const links = p.querySelectorAll('a[href]');
     if (links.length !== 1 || !/\.mp4(?:[?#]|$)/i.test(links[0].href) || !isLinksParagraph(p)) return;
     const [file] = links;
     const embed = p.closest('.default-content-wrapper').previousElementSibling.querySelector('.embed');
     const title = embed?.querySelector(':scope > div > div:last-child a')?.textContent.trim() || '';
-    const add = roundAction('button', 'add', LABELS.addVideo(title));
+    const add = roundAction('button', 'add', named(PRESS_KIT_LABELS, 'addVideo', title));
     add.setAttribute('aria-disabled', 'true');
-    const download = roundAction('a', 'download', LABELS.downloadVideo(title));
+    const download = roundAction('a', 'download', named(PRESS_KIT_LABELS, 'downloadVideo', title));
     download.href = file.href;
     download.setAttribute('download', '');
-    const open = roundAction('a', 'link', LABELS.openVideo(title));
+    const open = roundAction('a', 'link', named(PRESS_KIT_LABELS, 'openVideo', title));
     open.href = file.href;
+    relabel.push((labels) => {
+      add.setAttribute('aria-label', named(labels, 'addVideo', title));
+      retip(add, 'add', labels);
+      download.setAttribute('aria-label', named(labels, 'downloadVideo', title));
+      retip(download, 'download', labels);
+      open.setAttribute('aria-label', named(labels, 'openVideo', title));
+      retip(open, 'link', labels);
+    });
     p.classList.add('press-kit-actions');
     p.replaceChildren(add, download, open);
     loadCart().then(({ bindCartControl }) => bindCartControl(add, { href: file.href, title }))
@@ -280,11 +360,15 @@ export default function decorate(main) {
   // A hub is a tiles page without an article body; an article may carry tiles (2nd Elroq kit).
   if (main.querySelector('.cards.tiles') && !main.querySelector('.section.body-column')) return;
   header(main);
-  chapters(main);
+  // the template's text: English now, the page locale's once the sheet resolves (SKODA-1003)
+  const relabel = [];
+  chapters(main, relabel);
   mediaBox(main);
+  relatedLinks(main);
   galleryMore(main);
   accordionMedia(main);
-  sidebarMediaBox(main);
-  videoActions(main);
+  sidebarMediaBox(main, relabel);
+  videoActions(main, relabel);
   imageLinks(main);
+  applyLocalized(PRESS_KIT_LABELS, 'pressKit', (labels) => relabel.forEach((apply) => apply(labels)));
 }

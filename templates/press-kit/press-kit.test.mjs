@@ -60,6 +60,81 @@ test('the Chapters menu marks the current chapter, not the hub or other chapters
   );
 });
 
+test('the hub becomes the bar\'s "Introduction" link before the toggle; the menu lists the chapters only (SKODA-805)', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2">Škoda Peaq – Press Kit</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/introduction">Introduction</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/exterior">Exterior</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/skoda-peaq-press-kit-2/exterior');
+  decorate(main);
+  const nav = main.querySelector('nav[aria-label="Chapters"]');
+  assert.deepEqual([...nav.children].map((el) => el.tagName), ['A', 'BUTTON', 'UL'], 'Introduction, then the toggle, then the menu');
+  const intro = nav.querySelector(':scope > a.press-kit-chapters-intro');
+  assert.equal(intro.textContent, 'Introduction');
+  assert.equal(intro.getAttribute('aria-label'), 'Introduction: Škoda Peaq – Press Kit', 'told apart from the Introduction chapter, visible text first');
+  assert.equal(new URL(intro.href).pathname, '/en/press-kits/skoda-peaq-press-kit-2', 'back to the hub');
+  assert.deepEqual([...nav.querySelectorAll('ul a')].map((a) => a.textContent), ['Introduction', 'Exterior'], 'the hub is not in the menu');
+  assert.deepEqual([...nav.querySelectorAll('ul a[aria-current="page"]')].map((a) => a.textContent), ['Exterior']);
+});
+
+test('held at the top, the Chapters bar is marked stuck; scrolled back it is not (PR #503 review)', () => {
+  const observed = [];
+  globalThis.IntersectionObserver = class {
+    constructor(callback, options) { Object.assign(this, { callback, options }); }
+
+    observe(target) { observed.push({ target, observer: this }); }
+  };
+  try {
+    const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="/en/press-kits">Kit</a></li><li><a href="/en/press-kits/kit">Exterior</a></li>
+      </ul></div></div><div class="section body-column"></div>`);
+    decorate(main);
+    const section = main.querySelector('.section.press-kit-chapters');
+    assert.equal(observed.length, 1);
+    const [{ target, observer }] = observed;
+    assert.equal(target, section);
+    assert.equal(observer.options.rootMargin, '-1px 0px 0px 0px');
+    const report = (ratio, top) => observer.callback([{ intersectionRatio: ratio, boundingClientRect: { top } }]);
+    report(1, 108);
+    assert.equal(section.classList.contains('is-stuck'), false, 'in its place under the header');
+    report(0.98, 0);
+    assert.equal(section.classList.contains('is-stuck'), true, 'held at the top');
+    report(1, 1);
+    assert.equal(section.classList.contains('is-stuck'), false, 'scrolled back');
+    report(0.5, 600);
+    assert.equal(section.classList.contains('is-stuck'), false, 'cut off at the bottom of a short window is not stuck');
+  } finally {
+    delete globalThis.IntersectionObserver;
+  }
+});
+
+test('the Related Press Releases band\'s lone "All" link becomes its ghost pill; other lines stay text', () => {
+  const main = setup(`<div class="section body-column"><div class="default-content-wrapper"><p>Answer</p></div></div>
+    <div class="section dark related"><div class="default-content-wrapper">
+      <h3>Related Press Releases</h3><p>Based on tags: 2026, Peaq</p>
+      <p><a href="/en/news?filter%5Bmodel%5D%5B0%5D=61611">All</a></p>
+    </div><div class="story-rail-wrapper"></div></div>`);
+  decorate(main);
+  const ps = main.querySelectorAll('.section.related .default-content-wrapper > p');
+  assert.equal(ps[0].classList.contains('button-container'), false, 'the tags line is not a button');
+  assert.ok(ps[1].classList.contains('button-container'));
+  assert.ok(ps[1].querySelector('a').classList.contains('button'));
+  // a body paragraph holding only a link is not touched
+  assert.equal(main.querySelector('.section.body-column .button-container'), null);
+});
+
+test('without a hub link in the menu there is no Introduction link (defensive)', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/kit/exterior">Exterior</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/kit/exterior');
+  decorate(main);
+  const nav = main.querySelector('nav[aria-label="Chapters"]');
+  assert.equal(nav.querySelector('.press-kit-chapters-intro'), null);
+  assert.deepEqual([...nav.children].map((el) => el.tagName), ['BUTTON', 'UL']);
+});
+
 test('a variant chapter (SKODA-808) is marked current in the Chapters menu, in source order', () => {
   const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
       <li><a href="#chapters-links">Chapters</a></li>
@@ -70,7 +145,8 @@ test('a variant chapter (SKODA-808) is marked current in the Chapters menu, in s
     </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out');
   decorate(main);
   const links = [...main.querySelectorAll('nav a')];
-  assert.deepEqual(links.map((a) => a.textContent), ['Škoda Peaq – Press Kit', 'Connectivity', 'Sportline', 'Frequently Asked Questions']);
+  // the hub is the bar's "Introduction" link (SKODA-805), then the chapters in source order
+  assert.deepEqual(links.map((a) => a.textContent), ['Introduction', 'Connectivity', 'Sportline', 'Frequently Asked Questions']);
   assert.deepEqual(links.filter((a) => a.getAttribute('aria-current') === 'page').map((a) => a.textContent), ['Sportline']);
 });
 

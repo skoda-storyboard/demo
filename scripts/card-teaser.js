@@ -28,6 +28,7 @@
 
 import { createOptimizedPicture } from './aem.js';
 import { cleanTitle } from './query-index.js';
+import { formatDate, localize, placeholdersNow } from './placeholders.js';
 
 // A date paragraph like "15. 9. 2026", "1.9.2026", "12/09/2026" or "2026-09-15".
 export const DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
@@ -157,12 +158,14 @@ export function decorateCardCells(li) {
 
 // --- data-driven path (query-index rows) -----------------------------------
 
-/** Format an ISO/parseable date to the source's "D. M. YYYY" (e.g. 10. 9. 2026). */
+// the card date's format (SKODA-1003): the page locale's `dateFormat` sheet row, else the
+// source's "D. M. YYYY" (10. 9. 2026), which the source uses in every language
+export const DATE_LABELS = { dateFormat: '{d}. {m}. {yyyy}' };
+
+/** Format an ISO/parseable date in the page locale's card-date format (e.g. 10. 9. 2026). */
 export function formatCardDate(value) {
-  const t = Date.parse(value);
-  if (Number.isNaN(t)) return '';
-  const d = new Date(t);
-  return `${d.getUTCDate()}. ${d.getUTCMonth() + 1}. ${d.getUTCFullYear()}`;
+  if (typeof value === 'string' && !value.trim()) return '';
+  return formatDate(value, localize(DATE_LABELS, placeholdersNow()).dateFormat);
 }
 
 /**

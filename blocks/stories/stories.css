@@ -271,8 +271,8 @@
   padding-block: var(--spacing-m); /* wrapper 16px 0 */
 }
 
-/* nothing left to load: no empty 32px band above the footer */
-.stories .stories-loadmore:empty {
+/* Only a paginated archive retains the source's 32px wrapper after exhaustion. */
+.stories .stories-loadmore:empty:not(.is-paginated) {
   display: none;
 }
 
@@ -283,6 +283,12 @@
  */
 main > .section.stories-container:last-child:has(.stories.has-count) {
   margin-block-end: var(--spacing-m);
+}
+
+/* …and 48px on a Media Room page: the source's company / crew / derivative / environment / people /
+   years tag archives are Media Room pages, whose .search-results margin-bottom is 48 (SKODA-209) */
+main > .section.stories-container:last-child:has(.stories.has-count.stories-media-room) {
+  margin-block-end: calc(var(--spacing-xl) + var(--spacing-xs));
 }
 
 main:has(.stories.has-count) {

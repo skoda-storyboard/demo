@@ -101,10 +101,14 @@
      half-width cell is half the column less its 40px gutter */
   --heading-font-size-page-h2: 40px;
   --heading-font-size-page-h3: 24px;
+  --heading-font-size-page-h4: 18px; /* the consent page's h4 (SKODA-843) */
   --page-body-inset: 20px;
   --page-body-inset-wide: 30px;
   --page-body-half-gutter: 40px;
   --page-body-top: 10px; /* the band, or the row before, → a row's first text */
+  --page-body-plain-inset: 10px; /* a body without rows (no widget padding) */
+  --page-body-button-inset: 48px; /* the source pill's side padding (ajax-loader-button) */
+  --carousel-listing-gap: var(--spacing-l); /* the band → a plant's h3; half the rail → h3 gap */
   --page-body-pull-up: 20px; /* a `pull-up` row overlaps the row before (from 768px, Contacts) */
 
   /* company logo (SKODA-810b, measured on the live /en/company-logo, 390–1440): full-width rows,
@@ -376,6 +380,15 @@ header {
    Matches the source, which keeps its footer just below the fold on short pages (SKODA-305). */
 main {
   min-height: calc(100dvh - var(--nav-height));
+}
+
+/* The generic page (its 240px title band, `Hero Image (page)`) doesn't: as the source's default
+   page template, its footer follows the content, also on a short page (SKODA-843, measured:
+   /en/impressum's footer at y348 at 1280×900, a 222px band under it at 1280×1400; /en/copyright's
+   at y1242 at 1280×1400). Its content is static, so nothing below it moves while the page loads.
+   Other `template: page` pages (the media cart, search, listings) keep the minimum (#843 review). */
+body.page:where(:has(main .hero-image.page)) main {
+  min-height: 0;
 }
 
 header .header,
@@ -1308,6 +1321,12 @@ main > .section:has(> .hero-image-wrapper > .hero-image.page) {
   margin-bottom: 0;
 }
 
+/* a generic page whose source body is empty (/en/impressum: the title only) keeps a section that
+   held only its Metadata: it takes no space, so the footer follows the title band (SKODA-843) */
+body.page:where(:has(main .hero-image.page)) main > .section:empty {
+  display: none;
+}
+
 main > .section.page-body {
   margin-block: 0;
   padding-block-start: var(--page-body-top);
@@ -1334,6 +1353,141 @@ main > .section.page-body h3 {
 
 main > .section.page-body p:not(.button-container) {
   margin: 0 0 var(--paragraph-gap);
+}
+
+/* a button (the source's `ajax-loader-button` pill, imported as a secondary button): the source's
+   outline pill, as the listings' Load more, centred as its <center> did; 20px above and below
+   (SKODA-843, /en/soon-also-in-german at 390 and 1280: its body has no rows, so no 10px) */
+main > .section.page-body > .default-content-wrapper > p.button-wrapper {
+  margin-block: var(--paragraph-gap);
+  text-align: center;
+}
+
+main > .section.page-body > .default-content-wrapper a.button.secondary {
+  padding: var(--spacing-xs) var(--page-body-button-inset);
+  border-color: var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  background-color: var(--skoda-white);
+  color: var(--text-color);
+  line-height: var(--line-height-body);
+}
+
+@media (hover: hover) {
+  main > .section.page-body > .default-content-wrapper a.button.secondary:hover {
+    background-color: var(--skoda-grey-50);
+  }
+}
+
+/* a bold link alone in its paragraph (BGC's "Learn more": the source's `<a><strong>`, which the
+   decoration makes a primary button) stays the source's text link: green, 600, in the text's
+   line and paragraph gap, measured at 390 and 1280 (SKODA-843). The source's buttons come from
+   its button widget, imported as secondary. */
+main > .section.page-body > .default-content-wrapper > p.button-wrapper:has(> a.button.primary) {
+  margin: 0 0 var(--paragraph-gap);
+  text-align: start;
+}
+
+main > .section.page-body > .default-content-wrapper a.button.primary {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--skoda-green-accent);
+  line-height: var(--line-height-body);
+  white-space: normal;
+}
+
+main > .section.page-body > .default-content-wrapper a.button.primary:hover {
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--skoda-ink);
+}
+
+/* no focus ring, as the body's text links (the PO's 2026-10-21 decision, SKODA-813) */
+main > .section.page-body > .default-content-wrapper a.button.primary:focus-visible {
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--skoda-green-accent);
+  outline: none;
+}
+
+/* lists, measured on the live /en/documents/cookies and /en/iihf/picture-guidelines (SKODA-843):
+   no margin of their own; a bulleted list keeps its 24px indent and marks each item with a
+   short dash (0.3em, a 1px rule 0.675em down), 16px under every item; a numbered list hangs its
+   numbers outside, its items with no gap */
+main > .section.page-body > .default-content-wrapper :is(ul, ol) {
+  margin: 0;
+}
+
+main > .section.page-body > .default-content-wrapper ul {
+  list-style: none;
+}
+
+main > .section.page-body > .default-content-wrapper ul > li {
+  position: relative;
+  margin-block-end: var(--spacing-m);
+}
+
+main > .section.page-body > .default-content-wrapper ul > li::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0.675em;
+  inset-inline-start: calc(-1 * var(--spacing-l));
+  inline-size: 0.3em;
+  border-block-end: 1px solid currentcolor;
+}
+
+main > .section.page-body > .default-content-wrapper ol {
+  padding-inline-start: 0;
+}
+
+main > .section.page-body > .default-content-wrapper ol > li {
+  margin-block-end: 0;
+}
+
+/* a table cell's text (`Table`, SKODA-843) has no paragraph gap: the source's cells are 7px
+   padding around a 21px line (36px rows, the live consent page) */
+main > .section.page-body .table :is(td, th) > p:not(.button-container) {
+  margin: 0;
+}
+
+/* h4, measured on the live consent page ("Sending of ŠKODA AUTO's Press Releases"): 18/22.5,
+   light, 16px to what follows (SKODA-843) */
+main > .section.page-body > .default-content-wrapper h4 {
+  margin: 0 0 var(--spacing-m);
+  font-size: var(--heading-font-size-page-h4);
+  font-weight: var(--weight-light);
+  line-height: var(--line-height-heading);
+}
+
+/* a spacer widget (`Spacer`, SKODA-843) keeps its panel's 20px gap at every width, as every
+   source widget does: 20px below 720, its 24px and the gap (44px) from 720, measured on the live
+   /en/terms-and-conditions-2. A blank line (`Spacer (line)`) is its own height. A spacer whose
+   gap is authored as the line spacer after it (the company pages, SKODA-810) adds none. */
+main > .section.page-body .spacer-wrapper:has(> .spacer:not(.line)):where(:not(:has(+ .spacer-wrapper > .spacer.line))) {
+  margin-block-end: var(--paragraph-gap);
+}
+
+/* a row of spacer widgets only (BGC's first and last rows) has no text widget, so no 10px above
+   it: the spacer's 24px and its 20px gap, the source row's 44px (PR #511 review, the live BGC at
+   390–1080). The company pages' rows, authored with their line spacer (SKODA-810), keep theirs.
+   flow-root: below 720 the spacer is hidden, and its gap must not merge with the paragraph's
+   margin before the row. */
+main > .section.page-body:has(> .spacer-wrapper):not(:has(> :not(.spacer-wrapper), .spacer.line)) {
+  display: flow-root;
+  padding-block-start: 0;
+}
+
+/* a body the source writes without SiteOrigin rows (plain post text: the competition terms) has no
+   widget, so no widget's 10px above its first line and 10px less at each side: its text at 10px
+   at every width, 26px at 1280 (`page-body, plain`, SKODA-843, the live competition terms) */
+main > .section.page-body.plain {
+  padding-block-start: 0;
+}
+
+main > .section.page-body.plain > div {
+  padding-inline: var(--page-body-plain-inset);
 }
 
 /* the source's green text link, ink on hover (no underline). A link the decoration made a button
@@ -1421,6 +1575,35 @@ main > .section.brand-assets h3 {
     margin-inline: var(--brand-assets-heading-share);
     padding-inline: var(--paragraph-gap);
   }
+}
+
+/* stylelint-enable no-descending-specificity */
+
+/* stylelint-disable no-descending-specificity -- the carousel-listing sections (the Media Room
+   Newsletter page) never meet the story or release column rules above */
+
+/* Media Room carousel listing (SKODA-845; Section Metadata `Style: carousel-listing`, one per
+   plant rail of /en/newsletter), measured on the live page (390–1440): each plant's h3 sits 24px
+   under the band and 48px under the rail before, the cards 20px under it, and the last rail ends
+   48px above the footer. Padding, not margin, so the two 24px halves add up between rails. */
+main > .section.carousel-listing {
+  margin-block: 0;
+  padding-block: var(--carousel-listing-gap);
+}
+
+main > .section.carousel-listing:last-child {
+  padding-block-end: calc(2 * var(--carousel-listing-gap));
+}
+
+main > .section.carousel-listing .default-content-wrapper h3 {
+  margin-block: 0 var(--grid-gutter);
+  margin-inline: 0;
+}
+
+/* no list-item margin under the cards: the rail is the cards' height, so its arrows sit on the
+   cards' middle, as on the source */
+main > .section.carousel-listing .story-rail .carousel-track .card-teaser {
+  margin-block-end: 0;
 }
 
 /* stylelint-enable no-descending-specificity */

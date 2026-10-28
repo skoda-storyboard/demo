@@ -1,0 +1,36 @@
+/* Table (SKODA-843), measured on the source consent page's label / value table at 390 and 1280:
+   14/21 text, each cell 7px above and below and 21px at the sides, the rows touching (collapsed,
+   no borders), 25px under the table. It never grows past its column: long words wrap. */
+.table {
+  --table-cell-pad-block: 7px;
+  --table-cell-pad-inline: 21px;
+  --table-gap-after: 25px;
+
+  margin-block-end: var(--table-gap-after);
+}
+
+.table table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.table :is(td, th) {
+  padding: var(--table-cell-pad-block) var(--table-cell-pad-inline);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table th {
+  font-weight: var(--weight-bold, 700);
+}
+
+.table :is(td, th) > :is(p, ul, ol):first-child {
+  margin-block-start: 0;
+}
+
+.table :is(td, th) > :is(p, ul, ol):last-child {
+  margin-block-end: 0;
+}

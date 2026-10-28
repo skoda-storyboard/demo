@@ -35,7 +35,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-press-kit-default.js
+  // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
     IMAGE_LIMIT: () => IMAGE_LIMIT,
@@ -44,7 +44,7 @@ var CustomImportScript = (() => {
     fragmentPath: () => fragmentPath
   });
 
-  // parsers/gallery.js
+  // tools/importer/parsers/gallery.js
   function parse(element, { document }) {
     let items = Array.from(element.querySelectorAll("article.gallery-item"));
     if (items.length === 0) items = Array.from(element.querySelectorAll(".items > .item"));
@@ -70,7 +70,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/tags.js
+  // tools/importer/parsers/tags.js
   function parse2(element, { document }) {
     const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
@@ -95,7 +95,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/series-grid.js
+  // tools/importer/parsers/series-grid.js
   function siteOriginWidths(document) {
     const widths = {};
     document.querySelectorAll("style").forEach((style) => {
@@ -113,7 +113,7 @@ var CustomImportScript = (() => {
     return widths;
   }
 
-  // parsers/press-kit-hub-tiles.js
+  // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
@@ -210,7 +210,7 @@ var CustomImportScript = (() => {
     return WebImporter.DOMUtils.createTable(rows, document);
   }
 
-  // parsers/press-kit-content.js
+  // tools/importer/parsers/press-kit-content.js
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var boldCaption = (node) => (node == null ? void 0 : node.matches("p")) && !!text(node) && text(node) === [...node.querySelectorAll("strong, b")].map(text).join(" ").trim();
   function clipTitle(document, file, attachment) {
@@ -456,7 +456,7 @@ var CustomImportScript = (() => {
     element.querySelectorAll(".sa-bnr, .media-cart-actions").forEach((node) => node.remove());
   }
 
-  // parsers/press-kit-media.js
+  // tools/importer/parsers/press-kit-media.js
   var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
   var tileDate = (item) => {
@@ -532,7 +532,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
-  // parsers/quote.js
+  // tools/importer/parsers/quote.js
   var QUOTE = "data-skoda-quote";
   var BY = "data-skoda-quote-by";
   var text3 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
@@ -671,7 +671,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
   }
 
-  // parsers/footnotes.js
+  // tools/importer/parsers/footnotes.js
   var MARK = "data-skoda-footnote";
   var NAME = "Footnotes";
   var BODY_PX = 16;
@@ -750,7 +750,7 @@ var CustomImportScript = (() => {
     p.replaceWith(table);
   }
 
-  // parsers/answer-layout.js
+  // tools/importer/parsers/answer-layout.js
   var ANSWERS = ".widget_ys-row-toggle + .widget_siteorigin-panels-builder";
   var text5 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var blank = (node) => !text5(node) && !node.querySelector("img, picture, iframe, video, a[href]");
@@ -808,7 +808,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-press-kit-default-layout.js
+  // tools/importer/transformers/skoda-press-kit-default-layout.js
   var text6 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var marker2 = (document, style) => {
     const hr = document.createElement("hr");
@@ -960,6 +960,56 @@ var CustomImportScript = (() => {
       table.replaceWith(...out);
     });
   }
+  function relatedContent(document, band) {
+    const results = band.querySelector(".search-results");
+    if (!results) return [];
+    const link = (href, value) => {
+      const a = document.createElement("a");
+      a.href = href;
+      a.textContent = value;
+      return a;
+    };
+    const rows = [["Story Rail (press)"]];
+    results.querySelectorAll("article.article-teaser").forEach((card) => {
+      const titleLink = card.querySelector(".entry-title a[href]");
+      const href = titleLink && titleLink.getAttribute("href");
+      if (!href || !text6(titleLink)) return;
+      const img = card.querySelector(".article-teaser-media img");
+      if (img) {
+        ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
+      }
+      const body = [];
+      const date = text6(card.querySelector(".entry-published"));
+      if (date) body.push(make(document, "p", date));
+      let label = text6(titleLink);
+      const alt = ((img == null ? void 0 : img.getAttribute("alt")) || "").trim();
+      const cut = label.endsWith("\u2026") && label.slice(0, -1).trim();
+      if (cut && alt.length > cut.length && alt.startsWith(cut)) label = alt;
+      const title = document.createElement("h3");
+      title.append(link(href, label));
+      body.push(title);
+      rows.push([img || "", body]);
+    });
+    if (rows.length === 1) return [];
+    const headingEl = results.querySelector(".search-results-heading");
+    const sub = text6(headingEl && headingEl.querySelector(".subheading"));
+    let heading = "Related Press Releases";
+    if (headingEl) {
+      const clone = headingEl.cloneNode(true);
+      clone.querySelectorAll(".subheading").forEach((s) => s.remove());
+      heading = text6(clone) || heading;
+    }
+    const out = [make(document, "h3", heading)];
+    if (sub) out.push(make(document, "p", sub));
+    const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
+    if (all && all.getAttribute("href")) {
+      const p = document.createElement("p");
+      p.append(link(all.getAttribute("href"), text6(all) || "All"));
+      out.push(p);
+    }
+    out.push(WebImporter.DOMUtils.createTable(rows, document));
+    return out;
+  }
   function rebuild(element, document) {
     var _a;
     if (!/\bpress_kit-template-default\b/.test(document.body.className)) {
@@ -1025,6 +1075,9 @@ var CustomImportScript = (() => {
       media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
       out.push(media);
     }
+    const relatedBand = [...article.querySelectorAll(".cover-box.dark")].find((band) => !band.querySelector(".search-results.media-box") && band.querySelector("article.article-teaser"));
+    const related = relatedBand ? relatedContent(document, relatedBand) : [];
+    if (related.length) out.push(marker2(document, "dark, full-width, related"), ...related);
     article.replaceChildren(...out);
     element.replaceChildren(article);
   }
@@ -1100,7 +1153,7 @@ var CustomImportScript = (() => {
     if (hookName === "afterTransform") finish(element, payload.document);
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -1254,6 +1307,7 @@ var CustomImportScript = (() => {
     yeti: "models",
     "yeti-outdoor": "models"
   };
+  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
   function extractCategories(document) {
     const cls = document.body && document.body.getAttribute("class") || "";
     const id = cls.match(/\bpostid-(\d+)\b/);
@@ -1373,9 +1427,11 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
-    const categories = template === "story" ? extractCategories(document) : [];
+    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
     if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -1387,7 +1443,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent2(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1501,8 +1557,15 @@ var CustomImportScript = (() => {
       marker3.replaceWith(withCaption(imageNode, caption, document));
     });
   }
+  function transform3(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1930,7 +1993,7 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform3(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
@@ -1942,10 +2005,10 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform4(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -1960,7 +2023,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // import-press-kit-default.js
+  // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   function templateFor(document, pageUrl) {
     const hub = document.querySelector(".chapter-nav .link-intro[href]");
@@ -2016,7 +2079,7 @@ var CustomImportScript = (() => {
   }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
-      transform4("preprocess", document.body, { document });
+      transform5("preprocess", document.body, { document });
       document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
@@ -2042,9 +2105,9 @@ var CustomImportScript = (() => {
         holder.append(group.el);
         parse4(group.el, payload);
         main.replaceChildren(holder);
-        normalizeImages(main, document);
-        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
         transform3("afterTransform", main, payload);
+        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+        transform4("afterTransform", main, payload);
         checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
         return [{
           element: main,
@@ -2083,9 +2146,9 @@ var CustomImportScript = (() => {
       transform("afterTransform", main, payload);
       transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template }));
       WebImporter.rules.transformBackgroundImages(main, document);
-      normalizeImages(main, document);
-      WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
+      WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+      transform4("afterTransform", main, payload);
       checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,

@@ -14,6 +14,9 @@ import heroBannerParser from './parsers/hero-banner.js';
 
 // TRANSFORMER IMPORTS
 import pageRowsTransformer from './transformers/skoda-page-rows.js';
+import pageTablesTransformer from './transformers/skoda-page-tables.js';
+import pageOffsetTransformer from './transformers/skoda-page-offset.js';
+import pageButtonsTransformer from './transformers/skoda-page-buttons.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
@@ -33,6 +36,8 @@ const PAGE_TEMPLATE = {
   urls: ['https://www.skoda-storyboard.com/en/brand-group-core-bgc/'],
   // a default, not an override: a CPT page flattened here (press-kit hub) keeps its type
   metadata: { templateDefault: 'page' },
+  // a one-cell row's further widgets are sections of their own (skoda-page-rows, SKODA-843)
+  splitWidgets: true,
   blocks: [
     { name: 'hero-banner', instances: ['div.hero'] },
   ],
@@ -62,6 +67,12 @@ const PAGE_TEMPLATE = {
 // TRANSFORMER REGISTRY — the body's sections (before the cleanup drops the layout CSS),
 // cleanup + (sections if 2+) + shared metadata (afterTransform).
 const transformers = [
+  // the body's tables as Table blocks, before the importer reads them as blocks (SKODA-843)
+  pageTablesTransformer,
+  // the spacer widgets as Spacer blocks (SKODA-843)
+  pageOffsetTransformer,
+  // the source's pill buttons as secondary buttons (SKODA-843)
+  pageButtonsTransformer,
   pageRowsTransformer,
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
@@ -103,6 +114,8 @@ export default {
     nbspTransformer('preprocess', document.body, { document });
     // mark the half-width rows while the layout CSS is still there (SKODA-813)
     pageRowsTransformer('preprocess', document.body, { document });
+    // keep the blank editor lines the importer would drop, as spacers (SKODA-843)
+    pageOffsetTransformer('preprocess', document.body, { document });
   },
 
   transform: (payload) => {

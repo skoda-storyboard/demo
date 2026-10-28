@@ -134,6 +134,8 @@ test('Epiq story: only the declared translations, same tab, named by their langu
   const en = ul.querySelector('span');
   assert.deepEqual([en.getAttribute('aria-current'), en.getAttribute('lang')], ['true', 'en']);
   const langs = [...ul.querySelectorAll('a')].map((a) => [a.getAttribute('hreflang'), a.getAttribute('lang')]);
+  // each link's `lang` is its two-letter code, as hreflang (the regional tags are the document
+  // language only: PO decision on #485)
   assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr']]);
 });
 
@@ -214,8 +216,9 @@ globalThis.Event = dom.window.Event;
 globalThis.CustomEvent = dom.window.CustomEvent;
 window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
 window.hlx = { codeBasePath: '' };
+let navHtml = NAV;
 globalThis.fetch = async (url) => (String(url).includes('/nav.plain.html')
-  ? { ok: true, status: 200, text: async () => NAV }
+  ? { ok: true, status: 200, text: async () => navHtml }
   : {
     ok: false, status: 404, text: async () => '', json: async () => ({}),
   });
@@ -297,4 +300,31 @@ test('locally (no EDS host): the page\'s own hreflang host makes its translation
   // without the self link, another host's translations are not trusted
   const noSelf = new Map([...pageHreflangs(doc)].filter(([c]) => c !== 'en'));
   assert.deepEqual(rows(buildLocaleList(localeEntries(p, doc.baseURI), 'en', doc, noSelf)).map((r) => r[0]), ['EN']);
+});
+
+// a section's own nav without a menu (SKODA-843: /sustainability/nav): topbar, brand, search
+test('header: a 3-row nav whose first row is the tab list is topbar + brand + tools, no menu', async () => {
+  navHtml = `<div><ul><li><a href="/en/">Stories</a></li><li><a href="/en/media-room/">Media Room</a></li>
+<li><a href="/en/sustainable-offices/">Sustainability</a></li></ul><p><strong>EN</strong> <a href="/cs/udrzitelne-kancelare/">CZ</a></p></div>
+<div><p><a href="/en/sustainable-offices/" title="Sustainability">Škoda Storyboard</a></p></div>
+<div><p><a href="/en/search/" title="Search">Search</a></p></div>`;
+  try {
+    const block = await renderHeader('/en/sustainable-offices');
+    assert.ok(block.querySelector('.nav-topbar .nav-section-switcher'), 'topbar');
+    assert.equal(block.querySelector('.nav-section-switcher li.active').textContent.trim(), 'Sustainability');
+    assert.ok(block.querySelector('nav .nav-brand a.nav-brand-logo[href="/en/sustainable-offices"]'), 'brand');
+    assert.ok(block.querySelector('nav .nav-tools'), 'tools');
+    assert.equal(block.querySelector('.nav-sections'), null, 'no menu');
+  } finally {
+    navHtml = NAV;
+  }
+});
+
+test('buildLocaleList: the list and new-tab names from the labels passed (the page locale)', async () => {
+  const { buildLocaleList } = await import('./header-locales.js');
+  const { document: doc } = new JSDOM('<!DOCTYPE html><html><head><link rel="alternate" hreflang="cs" href="/cs/x"><link rel="alternate" hreflang="de" href="/de/x"></head><body></body></html>', { url: 'https://demo.example/cs/x' }).window;
+  const entries = [{ code: 'cs', href: '/cs/' }, { code: 'de', href: 'https://www.skoda-media.de/' }];
+  const ul = buildLocaleList(entries, 'cs', doc, new Map([['cs', '/cs/x'], ['de', '/de/x']]), { languages: 'Jazyk', newTab: '{name} (otevře se v nové kartě)' });
+  assert.equal(ul.getAttribute('aria-label'), 'Jazyk');
+  assert.equal(ul.querySelector('a[hreflang="de"]').getAttribute('aria-label'), 'DE – Deutsch (otevře se v nové kartě)');
 });

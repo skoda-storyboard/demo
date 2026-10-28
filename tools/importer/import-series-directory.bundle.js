@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-series-directory.js
+  // tools/importer/import-series-directory.js
   var import_series_directory_exports = {};
   __export(import_series_directory_exports, {
     default: () => import_series_directory_default
   });
 
-  // parsers/series-hero.js
+  // tools/importer/parsers/series-hero.js
   var clean = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, img");
@@ -75,7 +75,7 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
-  // parsers/series-grid.js
+  // tools/importer/parsers/series-grid.js
   var TOKENS = {
     "6:1x1": "sq",
     "6:2x1": "wide",
@@ -206,7 +206,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // transformers/skoda-page-cleanup.js
+  // tools/importer/transformers/skoda-page-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -290,7 +290,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -335,7 +335,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -489,6 +489,7 @@ var CustomImportScript = (() => {
     yeti: "models",
     "yeti-outdoor": "models"
   };
+  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
   function extractCategories(document2) {
     const cls = document2.body && document2.body.getAttribute("class") || "";
     const id = cls.match(/\bpostid-(\d+)\b/);
@@ -608,9 +609,11 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
-    const categories = template === "story" ? extractCategories(document2) : [];
+    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document2) : [];
     if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -622,7 +625,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1062,7 +1065,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -1080,7 +1083,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1194,8 +1197,15 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
+  function transform6(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
-  // import-series-directory.js
+  // tools/importer/import-series-directory.js
   var parsers = {
     "series-hero": parse,
     "series-grid": parse2
@@ -1283,7 +1293,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
-      normalizeImages(main, document2);
+      transform6("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
