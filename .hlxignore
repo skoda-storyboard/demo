@@ -22,4 +22,5 @@ templates/**/*.test.mjs
 docs/ui-specs/tools/
 blocks/*/metadata.json
 tools/library/
+tools/pr-review/
 docs/client/
