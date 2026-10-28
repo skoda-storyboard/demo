@@ -1,0 +1,998 @@
+{
+ "cardsSocialNewTab": {
+  "text": "odpre se v novem zavihku",
+  "source": "draft"
+ },
+ "carouselCarousel": {
+  "text": "Vrtiljak",
+  "source": "draft"
+ },
+ "carouselGoTo": {
+  "text": "Pojdi na diapozitiv {n}",
+  "source": "draft"
+ },
+ "carouselNext": {
+  "text": "Naprej",
+  "source": "draft"
+ },
+ "carouselPrev": {
+  "text": "Nazaj",
+  "source": "draft"
+ },
+ "carouselRegion": {
+  "text": "Vrtiljak vsebine",
+  "source": "draft"
+ },
+ "clipExitFullscreen": {
+  "text": "Izhod iz celozaslonskega načina",
+  "source": "draft"
+ },
+ "clipFullscreen": {
+  "text": "Celozaslonski način",
+  "source": "draft"
+ },
+ "clipMute": {
+  "text": "Izklopi zvok",
+  "source": "draft"
+ },
+ "clipNormal": {
+  "text": "Običajna",
+  "source": "draft"
+ },
+ "clipPause": {
+  "text": "Premor",
+  "source": "draft"
+ },
+ "clipPip": {
+  "text": "Slika v sliki",
+  "source": "draft"
+ },
+ "clipPlay": {
+  "text": "Predvajaj",
+  "source": "draft"
+ },
+ "clipProgress": {
+  "text": "Potek predvajanja",
+  "source": "draft"
+ },
+ "clipSettings": {
+  "text": "Nastavitve",
+  "source": "draft"
+ },
+ "clipSpeed": {
+  "text": "Hitrost",
+  "source": "draft"
+ },
+ "clipTimeOf": {
+  "text": "{now} od {total}",
+  "source": "draft"
+ },
+ "clipUnmute": {
+  "text": "Vklopi zvok",
+  "source": "draft"
+ },
+ "clipVolume": {
+  "text": "Glasnost (spreminjajte s puščicama gor/dol)",
+  "source": "draft"
+ },
+ "clipVolumeLevel": {
+  "text": "Glasnost {pct} %",
+  "source": "draft"
+ },
+ "dateFormat": {
+  "text": "{d}. {m}. {yyyy}",
+  "source": "live"
+ },
+ "dockScrollToTop": {
+  "text": "Pomakni se na vrh",
+  "source": "live"
+ },
+ "dockShareOn": {
+  "text": "Deli na {network}",
+  "source": "draft"
+ },
+ "dockShareThisPage": {
+  "text": "Deli to stran",
+  "source": "draft"
+ },
+ "downloadsAdd": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "downloadsAddAll": {
+  "text": "Dodaj vse datoteke v medijsko košarico",
+  "source": "draft"
+ },
+ "downloadsAddNamed": {
+  "text": "Dodaj v medijsko košarico: {title}",
+  "source": "draft"
+ },
+ "downloadsAddSize": {
+  "text": "Dodaj/odstrani različico {size}",
+  "source": "draft"
+ },
+ "downloadsAddSizeNamed": {
+  "text": "Dodaj/odstrani različico {size}: {title}",
+  "source": "draft"
+ },
+ "downloadsDownload": {
+  "text": "Prenesi {name}",
+  "source": "draft"
+ },
+ "downloadsDownloadSized": {
+  "text": "Prenesi {title} ({size})",
+  "source": "draft"
+ },
+ "downloadsFile": {
+  "text": "datoteko",
+  "source": "draft"
+ },
+ "downloadsFileType": {
+  "text": "Datoteka",
+  "source": "draft"
+ },
+ "downloadsGroupAdd": {
+  "text": "Dodaj vse različice {size} v medijsko košarico",
+  "source": "draft"
+ },
+ "downloadsGroupUnavailable": {
+  "text": "Različic {size} ni mogoče dodati v medijsko košarico",
+  "source": "draft"
+ },
+ "downloadsOpen": {
+  "text": "Ogled slike {title}",
+  "source": "draft"
+ },
+ "downloadsOpenFile": {
+  "text": "Odpri {name}",
+  "source": "draft"
+ },
+ "downloadsOpenFileTyped": {
+  "text": "Odpri {name} ({type})",
+  "source": "draft"
+ },
+ "downloadsSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "downloadsSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "downloadsSizeUnavailable": {
+  "text": "Različice {size} ni mogoče dodati v medijsko košarico",
+  "source": "draft"
+ },
+ "downloadsSizes": {
+  "text": "Velikosti za prenos: {title}",
+  "source": "draft"
+ },
+ "downloadsTipAdd": {
+  "text": "Dodaj/odstrani to",
+  "source": "live"
+ },
+ "downloadsTipAddSize": {
+  "text": "Dodaj/odstrani različico {size}",
+  "source": "draft"
+ },
+ "downloadsTipDownload": {
+  "text": "Prenesi to",
+  "source": "live"
+ },
+ "downloadsTipDownloadSize": {
+  "text": "Prenesi različico {size}",
+  "source": "draft"
+ },
+ "downloadsVideoPoster": {
+  "text": "Ogled predogleda videoposnetka {title}",
+  "source": "draft"
+ },
+ "embedBuzzsprout": {
+  "text": "Epizoda podkasta na Buzzsproutu",
+  "source": "draft"
+ },
+ "embedConsentButton": {
+  "text": "Sprejmem in potrjujem",
+  "source": "draft"
+ },
+ "embedConsentText": {
+  "text": "To vsebino zagotavlja tretja oseba ({host}). Z dostopom do te zunanje vsebine in njenim ogledom potrjujete, da lahko zadevni zunanji ponudnik obdeluje osebne podatke, ter da poznate pogoje uporabe in obvestilo o zasebnosti za {host}.",
+  "source": "draft"
+ },
+ "embedFile": {
+  "text": "Videoposnetek",
+  "source": "draft"
+ },
+ "embedOther": {
+  "text": "Vdelana vsebina iz {host}",
+  "source": "draft"
+ },
+ "embedPlayVideo": {
+  "text": "Predvajaj videoposnetek: {title}",
+  "source": "draft"
+ },
+ "embedPlayYoutube": {
+  "text": "Predvajaj videoposnetek na YouTubu",
+  "source": "draft"
+ },
+ "embedSpotify": {
+  "text": "Predvajalnik Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyAlbum": {
+  "text": "Album na Spotifyju",
+  "source": "draft"
+ },
+ "embedSpotifyEpisode": {
+  "text": "Epizoda podkasta na Spotifyju",
+  "source": "draft"
+ },
+ "embedSpotifyPlaylist": {
+  "text": "Seznam predvajanja na Spotifyju",
+  "source": "draft"
+ },
+ "embedSpotifyShow": {
+  "text": "Podkast na Spotifyju",
+  "source": "draft"
+ },
+ "embedSpotifyTrack": {
+  "text": "Skladba na Spotifyju",
+  "source": "draft"
+ },
+ "embedVimeo": {
+  "text": "Videoposnetek na Vimeu",
+  "source": "draft"
+ },
+ "embedYoutube": {
+  "text": "Videoposnetek na YouTubu",
+  "source": "draft"
+ },
+ "footerAppStore": {
+  "text": "Škoda Media Room v trgovini App Store",
+  "source": "draft"
+ },
+ "footerGooglePlay": {
+  "text": "Škoda Media Room v trgovini Google Play",
+  "source": "draft"
+ },
+ "footerNav": {
+  "text": "Noga strani",
+  "source": "draft"
+ },
+ "galleryCarousel": {
+  "text": "Vrtiljak",
+  "source": "draft"
+ },
+ "galleryGoTo": {
+  "text": "Pojdi na sliko {n}",
+  "source": "draft"
+ },
+ "galleryImagesHeading": {
+  "text": "Fotografije",
+  "source": "draft"
+ },
+ "galleryMore": {
+  "text": "+{n}",
+  "source": "live"
+ },
+ "galleryMoreLabel": {
+  "text": "Prikaži še {n} slik",
+  "source": "draft"
+ },
+ "galleryMoreLabelFew": {
+  "text": "Prikaži še {n} slike",
+  "source": "draft"
+ },
+ "galleryMoreLabelOne": {
+  "text": "Prikaži še {n} sliko",
+  "source": "draft"
+ },
+ "galleryMoreLabelTwo": {
+  "text": "Prikaži še {n} sliki",
+  "source": "draft"
+ },
+ "galleryNext": {
+  "text": "Naslednja slika",
+  "source": "draft"
+ },
+ "galleryOpenGallery": {
+  "text": "Odpri galerijo, {n} slik",
+  "source": "draft"
+ },
+ "galleryOpenGalleryFew": {
+  "text": "Odpri galerijo, {n} slike",
+  "source": "draft"
+ },
+ "galleryOpenGalleryOne": {
+  "text": "Odpri galerijo, {n} slika",
+  "source": "draft"
+ },
+ "galleryOpenGalleryTwo": {
+  "text": "Odpri galerijo, {n} sliki",
+  "source": "draft"
+ },
+ "galleryOpenNamed": {
+  "text": "Odpri sliko {n}: {alt}",
+  "source": "draft"
+ },
+ "galleryOpenNumbered": {
+  "text": "Odpri sliko {n}",
+  "source": "draft"
+ },
+ "galleryPrev": {
+  "text": "Prejšnja slika",
+  "source": "draft"
+ },
+ "gallerySlide": {
+  "text": "Diapozitiv",
+  "source": "draft"
+ },
+ "gallerySlideOf": {
+  "text": "{n} od {total}",
+  "source": "draft"
+ },
+ "gallerySlider": {
+  "text": "Drsnik slik",
+  "source": "draft"
+ },
+ "headerCloseNav": {
+  "text": "Zapri navigacijo",
+  "source": "draft"
+ },
+ "headerCloseNewsletter": {
+  "text": "Zapri prijavo na e-novice",
+  "source": "draft"
+ },
+ "headerCloseSearch": {
+  "text": "Zapri iskanje",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, domača stran",
+  "source": "draft"
+ },
+ "headerLanguages": {
+  "text": "Jezik",
+  "source": "draft"
+ },
+ "headerNewTab": {
+  "text": "{name} (odpre se v novem zavihku)",
+  "source": "draft"
+ },
+ "headerOpenNav": {
+  "text": "Odpri navigacijo",
+  "source": "draft"
+ },
+ "headerScopeAll": {
+  "text": "Vse",
+  "source": "live"
+ },
+ "headerScopeImage": {
+  "text": "Fotografije",
+  "source": "live"
+ },
+ "headerScopePost": {
+  "text": "Zgodbe",
+  "source": "live"
+ },
+ "headerScopePressKit": {
+  "text": "Mape za medije",
+  "source": "live"
+ },
+ "headerScopePressRelease": {
+  "text": "Novice",
+  "source": "live"
+ },
+ "headerScopeVideo": {
+  "text": "Videoposnetki",
+  "source": "live"
+ },
+ "headerSearch": {
+  "text": "Iskanje medijev",
+  "source": "live"
+ },
+ "headerSearchIn": {
+  "text": "Išči v",
+  "source": "draft"
+ },
+ "headerSubscribe": {
+  "text": "Naročite se na naše zgodbe",
+  "source": "draft"
+ },
+ "lightboxAddTip": {
+  "text": "Dodaj/odstrani izvirno različico",
+  "source": "draft"
+ },
+ "lightboxAddToBox": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "lightboxClose": {
+  "text": "Zapri galerijo",
+  "source": "draft"
+ },
+ "lightboxCopyLink": {
+  "text": "Kopiraj povezavo do slike",
+  "source": "draft"
+ },
+ "lightboxCounterLabel": {
+  "text": "Slika {n} od {total}",
+  "source": "draft"
+ },
+ "lightboxDialog": {
+  "text": "Galerija slik",
+  "source": "draft"
+ },
+ "lightboxDownload": {
+  "text": "Prenesi sliko",
+  "source": "draft"
+ },
+ "lightboxDownloadTip": {
+  "text": "Prenesi izvirno različico",
+  "source": "draft"
+ },
+ "lightboxHideDetails": {
+  "text": "Skrij podrobnosti slike",
+  "source": "draft"
+ },
+ "lightboxLinkTip": {
+  "text": "Povezava do strani",
+  "source": "draft"
+ },
+ "lightboxNext": {
+  "text": "Naslednja slika",
+  "source": "draft"
+ },
+ "lightboxPrev": {
+  "text": "Prejšnja slika",
+  "source": "draft"
+ },
+ "lightboxShowDetails": {
+  "text": "Prikaži podrobnosti slike",
+  "source": "draft"
+ },
+ "lightboxStoryCounter": {
+  "text": "{n}/{total}",
+  "source": "live"
+ },
+ "lightboxVideo": {
+  "text": "Videopredvajalnik",
+  "source": "draft"
+ },
+ "lightboxVideoAddTip": {
+  "text": "Dodaj/odstrani to",
+  "source": "live"
+ },
+ "lightboxVideoAddToBox": {
+  "text": "Dodaj/odstrani to",
+  "source": "live"
+ },
+ "lightboxVideoCopyLink": {
+  "text": "Povezava do strani",
+  "source": "draft"
+ },
+ "lightboxVideoDownload": {
+  "text": "Prenesi to",
+  "source": "live"
+ },
+ "lightboxVideoDownloadTip": {
+  "text": "Prenesi to",
+  "source": "live"
+ },
+ "lightboxVideoLinkTip": {
+  "text": "Povezava do strani",
+  "source": "draft"
+ },
+ "listingAdvancedFilter": {
+  "text": "Napredni filter",
+  "source": "live"
+ },
+ "listingFacetBodywork": {
+  "text": "Karoserija",
+  "source": "draft"
+ },
+ "listingFacetCompany": {
+  "text": "Podjetje",
+  "source": "draft"
+ },
+ "listingFacetConcept": {
+  "text": "Koncept",
+  "source": "draft"
+ },
+ "listingFacetDerivative": {
+  "text": "Različica",
+  "source": "draft"
+ },
+ "listingFacetEnvironment": {
+  "text": "Okolje",
+  "source": "draft"
+ },
+ "listingFacetEquipment": {
+  "text": "Oprema",
+  "source": "draft"
+ },
+ "listingFacetHappening": {
+  "text": "Dogodek",
+  "source": "draft"
+ },
+ "listingFacetHistory": {
+  "text": "Zgodovina",
+  "source": "draft"
+ },
+ "listingFacetModel": {
+  "text": "Model",
+  "source": "draft"
+ },
+ "listingFacetMotorsport": {
+  "text": "Motošport",
+  "source": "draft"
+ },
+ "listingFacetSponsorship": {
+  "text": "Sponzorstvo",
+  "source": "draft"
+ },
+ "listingFacetTechnology": {
+  "text": "Tehnologija",
+  "source": "draft"
+ },
+ "listingFacetView": {
+  "text": "Notranjost/zunanjost",
+  "source": "draft"
+ },
+ "listingFacetVip": {
+  "text": "Osebnosti",
+  "source": "draft"
+ },
+ "listingFacetYears": {
+  "text": "Leto",
+  "source": "draft"
+ },
+ "listingFilters": {
+  "text": "Filtri",
+  "source": "draft"
+ },
+ "listingLoadError": {
+  "text": "Rezultatov ni bilo mogoče naložiti.",
+  "source": "draft"
+ },
+ "listingNewest": {
+  "text": "Najnovejši",
+  "source": "live"
+ },
+ "listingNoResults": {
+  "text": "Ni rezultatov – odstranite filter za več zadetkov.",
+  "source": "draft"
+ },
+ "listingOldest": {
+  "text": "Najstarejši",
+  "source": "live"
+ },
+ "listingRemoveFilter": {
+  "text": "Odstrani filter",
+  "source": "draft"
+ },
+ "loadMore": {
+  "text": "Naloži več",
+  "source": "live"
+ },
+ "loading": {
+  "text": "Nalaganje …",
+  "source": "draft"
+ },
+ "mediaAddSize": {
+  "text": "Dodaj/odstrani različico {size}",
+  "source": "draft"
+ },
+ "mediaAddToCart": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "mediaAddVideo": {
+  "text": "Dodaj/odstrani to",
+  "source": "live"
+ },
+ "mediaCartAddAll": {
+  "text": "Dodaj vse datoteke v medijsko košarico",
+  "source": "draft"
+ },
+ "mediaCartAddedSome": {
+  "text": "V medijsko košarico dodanih datotek: {added} od {total}.",
+  "source": "draft"
+ },
+ "mediaCartBadge": {
+  "text": "Medijska košarica",
+  "source": "draft"
+ },
+ "mediaCartBadgeCount": {
+  "text": "Medijska košarica, elementi: {n}",
+  "source": "draft"
+ },
+ "mediaCartBadgeCountOne": {
+  "text": "Medijska košarica, 1 element",
+  "source": "draft"
+ },
+ "mediaCartCancel": {
+  "text": "Prekliči",
+  "source": "draft"
+ },
+ "mediaCartCancelled": {
+  "text": "Prenos je bil preklican.",
+  "source": "draft"
+ },
+ "mediaCartClose": {
+  "text": "Zapri",
+  "source": "draft"
+ },
+ "mediaCartCount": {
+  "text": "Datoteke: {n} / {max} · {size}",
+  "source": "draft"
+ },
+ "mediaCartCountChanged": {
+  "text": "Elementi v medijski košarici: {n}",
+  "source": "draft"
+ },
+ "mediaCartCountChangedOne": {
+  "text": "1 element v medijski košarici",
+  "source": "draft"
+ },
+ "mediaCartDownloadFailed": {
+  "text": "Paketa ni bilo mogoče ustvariti. Poskusite znova.",
+  "source": "draft"
+ },
+ "mediaCartDownloadPackage": {
+  "text": "Prenesi paket",
+  "source": "draft"
+ },
+ "mediaCartDownloaded": {
+  "text": "Vaš paket je pripravljen.",
+  "source": "draft"
+ },
+ "mediaCartEmptyMessage": {
+  "text": "Ni prenosov",
+  "source": "draft"
+ },
+ "mediaCartEmptyPackage": {
+  "text": "Izprazni paket",
+  "source": "draft"
+ },
+ "mediaCartFailedFiles": {
+  "text": "Datoteke, ki jih ni bilo mogoče dodati v paket: {n}",
+  "source": "draft"
+ },
+ "mediaCartFailedFilesOne": {
+  "text": "1 datoteke ni bilo mogoče dodati v paket:",
+  "source": "draft"
+ },
+ "mediaCartHeading": {
+  "text": "Vaši prenosi",
+  "source": "draft"
+ },
+ "mediaCartKindDocument": {
+  "text": "Dokumenti",
+  "source": "draft"
+ },
+ "mediaCartKindImage": {
+  "text": "Slike",
+  "source": "draft"
+ },
+ "mediaCartKindOther": {
+  "text": "Druge datoteke",
+  "source": "draft"
+ },
+ "mediaCartKindVideo": {
+  "text": "Videoposnetki",
+  "source": "draft"
+ },
+ "mediaCartLimitBanner": {
+  "text": "Paket za prenos lahko vsebuje največ {max} datotek (skupaj {size}). Večji izbor prenesite v več paketih.",
+  "source": "draft"
+ },
+ "mediaCartLimitBytes": {
+  "text": "Ta datoteka ne gre v paket: paket za prenos ima lahko največ {size}.",
+  "source": "draft"
+ },
+ "mediaCartLimitItems": {
+  "text": "Vaš paket je poln: vsebuje lahko največ {max} datotek. Prenesite ga ali izpraznite, če želite dodati več.",
+  "source": "draft"
+ },
+ "mediaCartNetwork": {
+  "text": "Datoteke ni bilo mogoče dodati v medijsko košarico. Poskusite znova.",
+  "source": "draft"
+ },
+ "mediaCartPreparing": {
+  "text": "Pripravljamo vaš paket: {done} od {total} datotek",
+  "source": "draft"
+ },
+ "mediaCartRemove": {
+  "text": "Odstrani {title} iz medijske košarice",
+  "source": "draft"
+ },
+ "mediaCartSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "mediaCartSkippedLimitBytes": {
+  "text": "Datoteke, ki ne gredo v paket: {n}. Paket za prenos ima lahko največ {size}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedLimitBytesOne": {
+  "text": "1 datoteka ne gre v paket: paket za prenos ima lahko največ {size}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetwork": {
+  "text": "Datoteke, ki jih ni bilo mogoče dodati v medijsko košarico: {n}. Poskusite znova.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetworkOne": {
+  "text": "1 datoteke ni bilo mogoče dodati v medijsko košarico. Poskusite znova.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolved": {
+  "text": "Datoteke, ki jih ni mogoče dodati v medijsko košarico: {n}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolvedOne": {
+  "text": "1 datoteke ni mogoče dodati v medijsko košarico.",
+  "source": "draft"
+ },
+ "mediaCartStorage": {
+  "text": "Medijske košarice ni bilo mogoče shraniti v tem brskalniku.",
+  "source": "draft"
+ },
+ "mediaCartUnresolved": {
+  "text": "Te datoteke ni mogoče dodati v medijsko košarico.",
+  "source": "draft"
+ },
+ "mediaDownload": {
+  "text": "Prenesi",
+  "source": "draft"
+ },
+ "mediaDownloadSize": {
+  "text": "Prenesi različico {size}",
+  "source": "draft"
+ },
+ "mediaDownloadVideo": {
+  "text": "Prenesi to",
+  "source": "live"
+ },
+ "mediaPanelAudioFormat": {
+  "text": "Zvočni format",
+  "source": "live"
+ },
+ "mediaPanelBitrate": {
+  "text": "Bitna hitrost",
+  "source": "live"
+ },
+ "mediaPanelDimensions": {
+  "text": "Dimenzije",
+  "source": "live"
+ },
+ "mediaPanelFileSize": {
+  "text": "Velikost datoteke",
+  "source": "live"
+ },
+ "mediaPanelFileType": {
+  "text": "Vrsta datoteke",
+  "source": "live"
+ },
+ "mediaPanelLength": {
+  "text": "Dolžina",
+  "source": "live"
+ },
+ "mediaPanelPublished": {
+  "text": "Objavljeno",
+  "source": "live"
+ },
+ "mediaPanelRelatedArticle": {
+  "text": "Povezani članek",
+  "source": "draft"
+ },
+ "mediaSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "mediaSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "modelNav": {
+  "text": "Na tej strani",
+  "source": "draft"
+ },
+ "newsletterButton": {
+  "text": "Naročite se",
+  "source": "live"
+ },
+ "newsletterConsentError": {
+  "text": "Pred nadaljevanjem sprejmite pogoje.",
+  "source": "draft"
+ },
+ "newsletterError": {
+  "text": "Vnesite veljaven e-poštni naslov.",
+  "source": "draft"
+ },
+ "newsletterLabel": {
+  "text": "E-poštni naslov",
+  "source": "draft"
+ },
+ "newsletterMessage": {
+  "text": "Prijava na e-novice še ni na voljo",
+  "source": "draft"
+ },
+ "newsletterPlaceholder": {
+  "text": "Vnesite svoj e-poštni naslov",
+  "source": "live"
+ },
+ "pressKitAddAll": {
+  "text": "Dodaj vse datoteke v medijsko košarico",
+  "source": "draft"
+ },
+ "pressKitAddVideo": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "pressKitAddVideoNamed": {
+  "text": "Dodaj v medijsko košarico: {title}",
+  "source": "draft"
+ },
+ "pressKitChapters": {
+  "text": "Poglavja",
+  "source": "draft"
+ },
+ "pressKitDownloadVideo": {
+  "text": "Prenesi videoposnetek",
+  "source": "draft"
+ },
+ "pressKitDownloadVideoNamed": {
+  "text": "Prenesi {title}",
+  "source": "draft"
+ },
+ "pressKitOpenVideo": {
+  "text": "Odpri videoposnetek",
+  "source": "draft"
+ },
+ "pressKitOpenVideoNamed": {
+  "text": "Odpri {title}",
+  "source": "draft"
+ },
+ "pressKitTipAdd": {
+  "text": "Dodaj/odstrani to",
+  "source": "live"
+ },
+ "pressKitTipDownload": {
+  "text": "Prenesi to",
+  "source": "live"
+ },
+ "pressKitTipLink": {
+  "text": "Povezava do strani",
+  "source": "draft"
+ },
+ "pressReleaseAddAllMediaBox": {
+  "text": "Dodaj vse datoteke iz media boxa v medijsko košarico",
+  "source": "draft"
+ },
+ "pressReleaseAdditionalInfo": {
+  "text": "Dodatne informacije",
+  "source": "draft"
+ },
+ "promoCarousel": {
+  "text": "Vrtiljak",
+  "source": "draft"
+ },
+ "promoFeaturedStories": {
+  "text": "Izbrane zgodbe",
+  "source": "draft"
+ },
+ "promoFeaturedStorySlides": {
+  "text": "Diapozitivi izbranih zgodb",
+  "source": "draft"
+ },
+ "promoGoToStory": {
+  "text": "Pojdi na izbrano zgodbo {number}",
+  "source": "draft"
+ },
+ "promoPauseRotation": {
+  "text": "Ustavi menjavanje",
+  "source": "draft"
+ },
+ "promoResumeRotation": {
+  "text": "Nadaljuj menjavanje",
+  "source": "draft"
+ },
+ "promoUnavailable": {
+  "text": "Izbrane zgodbe niso na voljo",
+  "source": "draft"
+ },
+ "searchLoadError": {
+  "text": "Indeksa iskanja ni bilo mogoče naložiti.",
+  "source": "draft"
+ },
+ "searchNoResults": {
+  "text": "Ni rezultatov za »%q«.",
+  "source": "draft"
+ },
+ "searchPrompt": {
+  "text": "Vnesite iskalni niz.",
+  "source": "draft"
+ },
+ "searchResultsCount": {
+  "text": "Rezultati za »%q«: %d",
+  "source": "draft"
+ },
+ "searchResultsOne": {
+  "text": "1 rezultat za »%q«",
+  "source": "draft"
+ },
+ "showLess": {
+  "text": "Prikaži manj",
+  "source": "draft"
+ },
+ "showMore": {
+  "text": "Prikaži več",
+  "source": "draft"
+ },
+ "skipToContent": {
+  "text": "Preskoči na vsebino",
+  "source": "draft"
+ },
+ "storiesLoadError": {
+  "text": "Rezultatov ni bilo mogoče naložiti.",
+  "source": "draft"
+ },
+ "storiesNewTab": {
+  "text": "odpre se v novem zavihku",
+  "source": "draft"
+ },
+ "storiesNoResults": {
+  "text": "Tu še ni ničesar.",
+  "source": "draft"
+ },
+ "storiesResultsShown": {
+  "text": "Prikazanih {n} zgodb",
+  "source": "draft"
+ },
+ "storiesResultsShownFew": {
+  "text": "Prikazane {n} zgodbe",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "Prikazana {n} zgodba",
+  "source": "draft"
+ },
+ "storiesResultsShownTwo": {
+  "text": "Prikazani {n} zgodbi",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Dodaj v medijsko košarico",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Prenesi izvirnik",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Prenesi videoposnetek",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Prikaži vse",
+  "source": "draft"
+ },
+ "suggestDateFormat": {
+  "text": "{dd}. {mm}. {yyyy}",
+  "source": "live"
+ },
+ "suggestPressKit": {
+  "text": "Mape za medije",
+  "source": "live"
+ },
+ "suggestPressRelease": {
+  "text": "Novice",
+  "source": "live"
+ },
+ "suggestStory": {
+  "text": "Zgodbe",
+  "source": "live"
+ }
+}

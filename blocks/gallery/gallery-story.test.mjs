@@ -46,12 +46,12 @@ const { default: decorate, storyStrip } = await import('./gallery.js');
 
 // --- storyStrip: the images after the lead, at most 4 --------------------------
 
-test('storyStrip: the lead is never repeated; 5 images → images 2-5', () => {
+test('storyStrip: the lead is never repeated; 5 images → images 2-5', async () => {
   assert.deepEqual(storyStrip(5), [1, 2, 3, 4]);
   assert.deepEqual(storyStrip(3), [1, 2]);
 });
 
-test('storyStrip: 1 or 0 images → no strip; more than 5 → still 4 thumbs', () => {
+test('storyStrip: 1 or 0 images → no strip; more than 5 → still 4 thumbs', async () => {
   assert.deepEqual(storyStrip(1), []);
   assert.deepEqual(storyStrip(0), []);
   assert.deepEqual(storyStrip(9), [1, 2, 3, 4]);
@@ -61,12 +61,12 @@ test('storyStrip: 1 or 0 images → no strip; more than 5 → still 4 thumbs', (
 // --- decorate(): rendered shape + lightbox wiring -------------------------------
 
 const row = (i, caption = '') => `<div><div><picture><img src="/media_${i}.jpg" alt="Image ${i}"></picture></div><div>${caption}</div></div>`;
-const story = (count, caption = () => '') => {
+const story = async (count, caption = () => '') => {
   const block = document.createElement('div');
   block.className = 'gallery story';
   block.innerHTML = Array.from({ length: count }, (_, i) => row(i + 1, caption(i + 1))).join('');
   document.querySelector('main').append(block);
-  decorate(block);
+  await decorate(block);
   return block;
 };
 const lead = (block) => block.querySelector('.gallery-story-lead');
@@ -77,8 +77,8 @@ const key = (k, shiftKey = false) => document.dispatchEvent(
   new window.KeyboardEvent('keydown', { key: k, shiftKey, cancelable: true }),
 );
 
-test('5 rows render the lead + a badge and a strip of images 2-5', { skip }, () => {
-  const block = story(5);
+test('5 rows render the lead + a badge and a strip of images 2-5', { skip }, async () => {
+  const block = await story(5);
   assert.equal(lead(block).tagName, 'BUTTON');
   assert.equal(lead(block).getAttribute('aria-label'), 'Open gallery, 5 images');
   assert.equal(lead(block).querySelector('img').alt, 'Image 1');
@@ -90,8 +90,8 @@ test('5 rows render the lead + a badge and a strip of images 2-5', { skip }, () 
   assert.equal(block.querySelector('.gallery-main, .gallery-thumbs, .gallery-preview-grid'), null);
 });
 
-test('the lead opens image 1, thumb k opens image k + 1; next wraps 5/5 → 1/5', { skip }, () => {
-  const block = story(5);
+test('the lead opens image 1, thumb k opens image k + 1; next wraps 5/5 → 1/5', { skip }, async () => {
+  const block = await story(5);
   lead(block).focus();
   lead(block).click();
   assert.equal(overlay(block).hidden, false);
@@ -114,8 +114,8 @@ test('the lead opens image 1, thumb k opens image k + 1; next wraps 5/5 → 1/5'
   assert.equal(document.activeElement, thumbs(block)[2]);
 });
 
-test('the dialog is labelled by the story title; no media-cart actions or tag chips', { skip }, () => {
-  const block = story(3, (i) => (i === 1 ? '<p>2026 · Favorit</p>' : ''));
+test('the dialog is labelled by the story title; no media-cart actions or tag chips', { skip }, async () => {
+  const block = await story(3, (i) => (i === 1 ? '<p>2026 · Favorit</p>' : ''));
   lead(block).click();
   const dialog = overlay(block);
   assert.equal(dialog.getAttribute('role'), 'dialog');
@@ -127,9 +127,9 @@ test('the dialog is labelled by the story title; no media-cart actions or tag ch
   key('Escape');
 });
 
-test('two galleries on a page: separate sets and no shared ids', { skip }, () => {
-  const a = story(5);
-  const b = story(3);
+test('two galleries on a page: separate sets and no shared ids', { skip }, async () => {
+  const a = await story(5);
+  const b = await story(3);
   thumbs(b)[1].click();
   assert.equal(overlay(a).hidden, true, 'the other gallery stays closed');
   assert.equal(count(b), '3/3');
@@ -140,8 +140,8 @@ test('two galleries on a page: separate sets and no shared ids', { skip }, () =>
   assert.equal(new Set(ids).size, ids.length, 'ids are unique');
 });
 
-test('the focus trap includes an authored caption link', { skip }, () => {
-  const block = story(2, (i) => (i === 1 ? '<p>See <a href="/en/emobility">more</a></p>' : ''));
+test('the focus trap includes an authored caption link', { skip }, async () => {
+  const block = await story(2, (i) => (i === 1 ? '<p>See <a href="/en/emobility">more</a></p>' : ''));
   const link = () => block.querySelector('.gallery-lightbox-caption a');
   const arrows = () => [...block.querySelectorAll('.gallery-lightbox-prev, .gallery-lightbox-next')];
   // jsdom has no layout: report every control as rendered except the two arrows, so
@@ -165,8 +165,8 @@ test('the focus trap includes an authored caption link', { skip }, () => {
   }
 });
 
-test('changing image from a focused caption link keeps focus inside the dialog', { skip }, () => {
-  const block = story(3, (i) => (i === 1 ? '<p>See <a href="/en/emobility">more</a></p>' : ''));
+test('changing image from a focused caption link keeps focus inside the dialog', { skip }, async () => {
+  const block = await story(3, (i) => (i === 1 ? '<p>See <a href="/en/emobility">more</a></p>' : ''));
   lead(block).click();
   const link = block.querySelector('.gallery-lightbox-caption a');
   link.focus();
@@ -184,12 +184,12 @@ test('changing image from a focused caption link keeps focus inside the dialog',
   key('Escape');
 });
 
-test('a single image: no strip, opens without prev/next; no rows leave it empty', { skip }, () => {
-  const one = story(1);
+test('a single image: no strip, opens without prev/next; no rows leave it empty', { skip }, async () => {
+  const one = await story(1);
   assert.equal(one.querySelector('.gallery-story-strip'), null);
   lead(one).click();
   assert.equal(one.querySelector('.gallery-lightbox-controls').hidden, true);
   key('Escape');
-  const none = story(0);
+  const none = await story(0);
   assert.equal(none.children.length, 0);
 });

@@ -44,6 +44,10 @@ function el(tag) {
 globalThis.document = {
   currentScript: { src: 'http://localhost/scripts/scripts.js' },
   createElement: (tag) => el(tag),
+  // the media panel's label text nodes (it relabels them when the locale sheet loads)
+  createTextNode: (data) => ({
+    nodeType: 3, nodeValue: String(data), children: [], get textContent() { return this.nodeValue; },
+  }),
   querySelector: () => null,
   addEventListener: () => {},
 };

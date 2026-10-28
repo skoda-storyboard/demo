@@ -45,17 +45,17 @@ const { default: decorate, previewPlan } = await import('./gallery.js');
 
 // --- previewPlan: at most 4 thumbs, "+N" for the hidden rest -------------------
 
-test('previewPlan: up to 4 images show them all, no pill', () => {
+test('previewPlan: up to 4 images show them all, no pill', async () => {
   [0, 1, 2, 3, 4].forEach((n) => {
     assert.deepEqual(previewPlan(n), { shown: n, more: 0, moreIndex: -1 });
   });
 });
 
-test('previewPlan: 6 images show 4 thumbs and "+2", the pill opens the 5th', () => {
+test('previewPlan: 6 images show 4 thumbs and "+2", the pill opens the 5th', async () => {
   assert.deepEqual(previewPlan(6), { shown: 4, more: 2, moreIndex: 4 });
 });
 
-test('previewPlan: 5 images → "+1"; the cap is configurable', () => {
+test('previewPlan: 5 images → "+1"; the cap is configurable', async () => {
   assert.deepEqual(previewPlan(5), { shown: 4, more: 1, moreIndex: 4 });
   assert.deepEqual(previewPlan(5, 2), { shown: 2, more: 3, moreIndex: 2 });
 });
@@ -63,12 +63,12 @@ test('previewPlan: 5 images → "+1"; the cap is configurable', () => {
 // --- decorate(): rendered shape + lightbox wiring -------------------------------
 
 const row = (i, caption = '') => `<div><div><picture><img src="/media_${i}.jpg" alt="Image ${i}"></picture></div><div>${caption}</div></div>`;
-const preview = (count, caption = (i) => `Caption ${i}`) => {
+const preview = async (count, caption = (i) => `Caption ${i}`) => {
   const block = document.createElement('div');
   block.className = 'gallery preview';
   block.innerHTML = Array.from({ length: count }, (_, i) => row(i + 1, caption(i + 1))).join('');
   document.querySelector('main').append(block);
-  decorate(block);
+  await decorate(block);
   return block;
 };
 const thumbs = (block) => [...block.querySelectorAll('.gallery-preview-thumb')];
@@ -76,8 +76,8 @@ const pill = (block) => block.querySelector('.gallery-preview-more');
 const overlay = (block) => block.querySelector('.gallery-overlay');
 const esc = () => document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
 
-test('6 rows render 4 thumbs and a "+2" pill on the 4th, no main stage', { skip }, () => {
-  const block = preview(6);
+test('6 rows render 4 thumbs and a "+2" pill on the 4th, no main stage', { skip }, async () => {
+  const block = await preview(6);
   assert.equal(thumbs(block).length, 4);
   assert.equal(block.querySelector('.gallery-main, .gallery-thumbs, .gallery-thumbs-heading'), null);
   assert.equal(pill(block).textContent, '+2');
@@ -85,20 +85,20 @@ test('6 rows render 4 thumbs and a "+2" pill on the 4th, no main stage', { skip 
   assert.equal(pill(block).closest('li'), thumbs(block)[3].closest('li'));
 });
 
-test('4 rows (the M1 maximum) render 4 thumbs and no pill', { skip }, () => {
-  const block = preview(4);
+test('4 rows (the M1 maximum) render 4 thumbs and no pill', { skip }, async () => {
+  const block = await preview(4);
   assert.equal(thumbs(block).length, 4);
   assert.equal(pill(block), null);
 });
 
-test('4 rows with an outside "+51" (press-kit Media Box) render the pill as a link to it', { skip }, () => {
+test('4 rows with an outside "+51" (press-kit Media Box) render the pill as a link to it', { skip }, async () => {
   const block = document.createElement('div');
   block.className = 'gallery preview';
   block.dataset.moreCount = '51';
   block.dataset.moreHref = '#media-box';
   block.innerHTML = Array.from({ length: 4 }, (_, i) => row(i + 1)).join('');
   document.querySelector('main').append(block);
-  decorate(block);
+  await decorate(block);
   assert.equal(thumbs(block).length, 4);
   assert.equal(pill(block).tagName, 'A');
   assert.equal(pill(block).getAttribute('href'), '#media-box');
@@ -107,8 +107,8 @@ test('4 rows with an outside "+51" (press-kit Media Box) render the pill as a li
   assert.equal(pill(block).closest('li'), thumbs(block)[3].closest('li'));
 });
 
-test('thumbs are labelled buttons; captions are not rendered on the page', { skip }, () => {
-  const block = preview(3);
+test('thumbs are labelled buttons; captions are not rendered on the page', { skip }, async () => {
+  const block = await preview(3);
   thumbs(block).forEach((btn, i) => {
     assert.equal(btn.tagName, 'BUTTON');
     assert.equal(btn.type, 'button');
@@ -117,8 +117,8 @@ test('thumbs are labelled buttons; captions are not rendered on the page', { ski
   assert.equal(block.querySelector('.gallery-preview-grid').textContent.includes('Caption'), false);
 });
 
-test('every thumb opens the lightbox at its image; Escape closes and returns focus', { skip }, () => {
-  const block = preview(6);
+test('every thumb opens the lightbox at its image; Escape closes and returns focus', { skip }, async () => {
+  const block = await preview(6);
   thumbs(block).forEach((btn, i) => {
     btn.focus();
     btn.click();
@@ -131,8 +131,8 @@ test('every thumb opens the lightbox at its image; Escape closes and returns foc
   });
 });
 
-test('the pill opens the lightbox at the 5th image, navigable to the 6th', { skip }, () => {
-  const block = preview(6);
+test('the pill opens the lightbox at the 5th image, navigable to the 6th', { skip }, async () => {
+  const block = await preview(6);
   pill(block).click();
   assert.equal(overlay(block).hidden, false);
   assert.equal(block.querySelector('.gallery-lightbox-count').textContent, '5 / 6');
@@ -142,17 +142,17 @@ test('the pill opens the lightbox at the 5th image, navigable to the 6th', { ski
   assert.equal(document.activeElement, pill(block));
 });
 
-test('a single image opens without prev/next; no rows leave the block empty', { skip }, () => {
-  const one = preview(1);
+test('a single image opens without prev/next; no rows leave the block empty', { skip }, async () => {
+  const one = await preview(1);
   thumbs(one)[0].click();
   assert.equal(one.querySelector('.gallery-lightbox-controls').hidden, true);
   esc();
-  const none = preview(0);
+  const none = await preview(0);
   assert.equal(none.children.length, 0);
 });
 
-test('phones: the details toggle opens the caption panel; Escape closes it before the lightbox', { skip }, () => {
-  const block = preview(3);
+test('phones: the details toggle opens the caption panel; Escape closes it before the lightbox', { skip }, async () => {
+  const block = await preview(3);
   thumbs(block)[0].click();
   const btn = block.querySelector('.gallery-lightbox-details');
   const caption = block.querySelector('.gallery-lightbox-caption');
@@ -174,12 +174,27 @@ test('phones: the details toggle opens the caption panel; Escape closes it befor
   assert.equal(btn.getAttribute('aria-expanded'), 'false', 'every open starts image first');
 });
 
-test('the toggle is hidden for an image without a caption; overlays get unique ids', { skip }, () => {
-  const a = preview(2, () => '');
-  const b = preview(2);
+test('the toggle is hidden for an image without a caption; overlays get unique ids', { skip }, async () => {
+  const a = await preview(2, () => '');
+  const b = await preview(2);
   thumbs(a)[0].click();
   assert.equal(a.querySelector('.gallery-lightbox-details').hidden, true);
   esc();
   const ids = [a, b].map((blk) => blk.querySelector('.gallery-lightbox-caption').id);
   assert.notEqual(ids[0], ids[1]);
+});
+
+// --- control text per locale (SKODA-1003) -------------------------------------------------------
+test('galleryText: English as before; a Czech sheet translates, with its plural forms', { skip }, async () => {
+  const { galleryText } = await import('./gallery.js');
+  const en = galleryText();
+  assert.deepEqual([en.open(3), en.openNamed(2, 'Front'), en.openNamed(2, ''), en.moreLabel(1), en.moreLabel(51), en.openGallery(1), en.openGallery(5)], [
+    'Open image 3', 'Open image 2: Front', 'Open image 2', 'Show 1 more image', 'Show 51 more images',
+    'Open gallery, 1 image', 'Open gallery, 5 images']);
+  assert.deepEqual([en.slideOf(1, 4), en.goTo(2), en.more(7), en.carousel, en.slide], ['1 of 4', 'Go to image 2', '+7', 'carousel', 'slide']);
+  const cs = galleryText({
+    galleryPrev: 'Předchozí obrázek', galleryMoreLabel: 'Zobrazit dalších {n} obrázků', galleryMoreLabelOne: 'Zobrazit další {n} obrázek', galleryMoreLabelFew: 'Zobrazit další {n} obrázky',
+  });
+  assert.equal(cs.prev, 'Předchozí obrázek');
+  assert.equal(cs.next, 'Next image', 'a missing key stays English');
 });

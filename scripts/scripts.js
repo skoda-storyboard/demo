@@ -22,6 +22,7 @@ import { addNewsletterCard } from './story-newsletter.js';
 import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geometry.js';
 import { readDropCapRow, decorateDropCap } from './drop-cap.js';
 import { readBoxRow, decorateBox } from './section-box.js';
+import htmlLang from './locale-tags.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -389,15 +390,8 @@ function prioritizeLeadImage(main) {
   lead.setAttribute('fetchpriority', 'high');
 }
 
-// "Skip to content" per locale tree (the html lang set in loadEager)
-const SKIP_LINK_LABELS = {
-  en: 'Skip to content',
-  cs: 'Přeskočit na obsah',
-  de: 'Zum Inhalt springen',
-  sk: 'Preskočiť na obsah',
-  sr: 'Preskoči na sadržaj',
-  sl: 'Preskoči na vsebino',
-};
+// the skip link's text, English until the page locale's sheet resolves (SKODA-1003)
+export const SKIP_LINK_LABELS = { skipToContent: 'Skip to content' };
 
 /**
  * The first focusable element: a link past the header's ~30 tab stops to the page content (WCAG
@@ -412,7 +406,7 @@ function addSkipLink(main) {
   const link = document.createElement('a');
   link.className = 'skip-link';
   link.href = `#${main.id}`;
-  link.textContent = SKIP_LINK_LABELS[document.documentElement.lang] || SKIP_LINK_LABELS.en;
+  link.textContent = SKIP_LINK_LABELS.skipToContent;
   document.body.prepend(link);
 }
 
@@ -423,7 +417,15 @@ function addSkipLink(main) {
 async function loadEager(doc) {
   // the page language is its locale tree (SKODA-303a: the /cs/… translations are Czech)
   const locale = window.location.pathname.split('/')[1]?.toLowerCase();
-  document.documentElement.lang = ['cs', 'de', 'sk', 'sr', 'sl'].includes(locale) ? locale : 'en';
+  const code = ['cs', 'de', 'sk', 'sr', 'sl'].includes(locale) ? locale : 'en';
+  document.documentElement.lang = htmlLang(code);
+  // the UI text sheet starts loading with the page (not awaited), so the blocks that wait for it
+  // rarely do (SKODA-1003); the result is memoized, a failure is the English defaults
+  import('./placeholders.js').then(({ fetchPlaceholders, localize }) => fetchPlaceholders()
+    .then((ph) => {
+      const link = document.querySelector('.skip-link');
+      if (link) link.textContent = localize(SKIP_LINK_LABELS, ph).skipToContent;
+    })).catch(() => {});
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {

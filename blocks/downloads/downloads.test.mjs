@@ -1110,3 +1110,26 @@ test('a 3-wide story gallery keeps the group\'s size pills; only the per-photo d
   // no narrow-only top padding: the group sits 4px in, like the 4-wide one, and the grid 72px in
   assert.equal(ruleFor(rules, narrow), undefined);
 });
+
+// --- control text per locale (SKODA-1003) -------------------------------------------------------
+test('downloadsText: the English text is the old one, case by case; a sheet translates it', async () => {
+  const { downloadsText } = await import('./downloads.js');
+  const old = {
+    download: (title, size) => `Download ${title || size || 'file'}${title && size ? ` (${size})` : ''}`,
+    openFile: (title, type) => `Open ${title || 'file'}${type ? ` (${type})` : ''}`,
+    add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+    addSize: (size, title) => `Add/remove ${size} version${title ? `: ${title}` : ''}`,
+  };
+  const en = downloadsText();
+  [['T', 'S'], ['T', ''], ['', 'S'], ['', ''], [undefined, undefined]].forEach(([a, b]) => {
+    assert.equal(en.download(a, b), old.download(a, b));
+    assert.equal(en.openFile(a, b), old.openFile(a, b));
+    assert.equal(en.add(a), old.add(a));
+    assert.equal(en.addSize(b, a), old.addSize(b, a));
+  });
+  assert.equal(en.groupAdd(en.sizeOriginal), 'Add all Original versions to the media cart');
+  assert.deepEqual([en.more, en.less, en.tipAdd, en.tipDownload], ['Show more', 'Show less', 'Add/remove this', 'Download this']);
+  // the Czech sheet: the source's tooltips; a missing key stays English
+  const cs = downloadsText({ downloadsTipAdd: 'Přidat/odebrat soubor', downloadsTipDownload: 'Stáhnout soubor', showMore: 'Zobrazit více' });
+  assert.deepEqual([cs.tipAdd, cs.tipDownload, cs.more, cs.less], ['Přidat/odebrat soubor', 'Stáhnout soubor', 'Zobrazit více', 'Show less']);
+});

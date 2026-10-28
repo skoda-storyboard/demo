@@ -1,0 +1,986 @@
+{
+ "cardsSocialNewTab": {
+  "text": "otvorí sa na novej karte",
+  "source": "draft"
+ },
+ "carouselCarousel": {
+  "text": "Karusel",
+  "source": "draft"
+ },
+ "carouselGoTo": {
+  "text": "Prejsť na snímku {n}",
+  "source": "draft"
+ },
+ "carouselNext": {
+  "text": "Ďalej",
+  "source": "draft"
+ },
+ "carouselPrev": {
+  "text": "Späť",
+  "source": "draft"
+ },
+ "carouselRegion": {
+  "text": "Karusel obsahu",
+  "source": "draft"
+ },
+ "clipExitFullscreen": {
+  "text": "Ukončiť režim celej obrazovky",
+  "source": "draft"
+ },
+ "clipFullscreen": {
+  "text": "Celá obrazovka",
+  "source": "draft"
+ },
+ "clipMute": {
+  "text": "Stlmiť zvuk",
+  "source": "draft"
+ },
+ "clipNormal": {
+  "text": "Normálna",
+  "source": "draft"
+ },
+ "clipPause": {
+  "text": "Pozastaviť",
+  "source": "draft"
+ },
+ "clipPip": {
+  "text": "Obraz v obraze",
+  "source": "draft"
+ },
+ "clipPlay": {
+  "text": "Prehrať",
+  "source": "draft"
+ },
+ "clipProgress": {
+  "text": "Priebeh prehrávania",
+  "source": "draft"
+ },
+ "clipSettings": {
+  "text": "Nastavenia",
+  "source": "draft"
+ },
+ "clipSpeed": {
+  "text": "Rýchlosť",
+  "source": "draft"
+ },
+ "clipTimeOf": {
+  "text": "{now} z {total}",
+  "source": "draft"
+ },
+ "clipUnmute": {
+  "text": "Zapnúť zvuk",
+  "source": "draft"
+ },
+ "clipVolume": {
+  "text": "Hlasitosť (meňte šípkami hore/dole)",
+  "source": "draft"
+ },
+ "clipVolumeLevel": {
+  "text": "Hlasitosť {pct} %",
+  "source": "draft"
+ },
+ "dateFormat": {
+  "text": "{d}. {m}. {yyyy}",
+  "source": "live"
+ },
+ "dockScrollToTop": {
+  "text": "Prejsť na začiatok",
+  "source": "live"
+ },
+ "dockShareOn": {
+  "text": "Zdieľať na {network}",
+  "source": "draft"
+ },
+ "dockShareThisPage": {
+  "text": "Zdieľať túto stránku",
+  "source": "draft"
+ },
+ "downloadsAdd": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "downloadsAddAll": {
+  "text": "Pridať všetky súbory do mediálneho košíka",
+  "source": "draft"
+ },
+ "downloadsAddNamed": {
+  "text": "Pridať do mediálneho košíka: {title}",
+  "source": "draft"
+ },
+ "downloadsAddSize": {
+  "text": "Pridať/odstrániť verziu {size}",
+  "source": "draft"
+ },
+ "downloadsAddSizeNamed": {
+  "text": "Pridať/odstrániť verziu {size}: {title}",
+  "source": "draft"
+ },
+ "downloadsDownload": {
+  "text": "Stiahnuť {name}",
+  "source": "draft"
+ },
+ "downloadsDownloadSized": {
+  "text": "Stiahnuť {title} ({size})",
+  "source": "draft"
+ },
+ "downloadsFile": {
+  "text": "súbor",
+  "source": "draft"
+ },
+ "downloadsFileType": {
+  "text": "Súbor",
+  "source": "draft"
+ },
+ "downloadsGroupAdd": {
+  "text": "Pridať všetky verzie {size} do mediálneho košíka",
+  "source": "draft"
+ },
+ "downloadsGroupUnavailable": {
+  "text": "Verzie {size} nie je možné pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "downloadsOpen": {
+  "text": "Zobraziť obrázok {title}",
+  "source": "draft"
+ },
+ "downloadsOpenFile": {
+  "text": "Otvoriť {name}",
+  "source": "draft"
+ },
+ "downloadsOpenFileTyped": {
+  "text": "Otvoriť {name} ({type})",
+  "source": "draft"
+ },
+ "downloadsSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "downloadsSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "downloadsSizeUnavailable": {
+  "text": "Verziu {size} nie je možné pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "downloadsSizes": {
+  "text": "Veľkosti na stiahnutie: {title}",
+  "source": "draft"
+ },
+ "downloadsTipAdd": {
+  "text": "Pridať/odstrániť",
+  "source": "draft"
+ },
+ "downloadsTipAddSize": {
+  "text": "Pridať/odstrániť verziu {size}",
+  "source": "draft"
+ },
+ "downloadsTipDownload": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "downloadsTipDownloadSize": {
+  "text": "Stiahnuť verziu {size}",
+  "source": "draft"
+ },
+ "downloadsVideoPoster": {
+  "text": "Zobraziť náhľad videa {title}",
+  "source": "draft"
+ },
+ "embedBuzzsprout": {
+  "text": "Epizóda podcastu na Buzzsprout",
+  "source": "draft"
+ },
+ "embedConsentButton": {
+  "text": "Súhlasím",
+  "source": "draft"
+ },
+ "embedConsentText": {
+  "text": "Tento obsah poskytuje tretia strana ({host}). Prístupom k tomuto externému obsahu a jeho zobrazením beriete na vedomie, že príslušný externý poskytovateľ môže spracúvať osobné údaje, a potvrdzujete, že poznáte podmienky používania a zásady ochrany osobných údajov {host}.",
+  "source": "draft"
+ },
+ "embedFile": {
+  "text": "Video",
+  "source": "draft"
+ },
+ "embedOther": {
+  "text": "Vložený obsah z {host}",
+  "source": "draft"
+ },
+ "embedPlayVideo": {
+  "text": "Prehrať video: {title}",
+  "source": "draft"
+ },
+ "embedPlayYoutube": {
+  "text": "Prehrať video na YouTube",
+  "source": "draft"
+ },
+ "embedSpotify": {
+  "text": "Prehrávač Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyAlbum": {
+  "text": "Album na Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyEpisode": {
+  "text": "Epizóda podcastu na Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyPlaylist": {
+  "text": "Playlist na Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyShow": {
+  "text": "Podcast na Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyTrack": {
+  "text": "Skladba na Spotify",
+  "source": "draft"
+ },
+ "embedVimeo": {
+  "text": "Video na Vimeo",
+  "source": "draft"
+ },
+ "embedYoutube": {
+  "text": "Video na YouTube",
+  "source": "draft"
+ },
+ "footerAppStore": {
+  "text": "Škoda Media Room v App Store",
+  "source": "draft"
+ },
+ "footerGooglePlay": {
+  "text": "Škoda Media Room na Google Play",
+  "source": "draft"
+ },
+ "footerNav": {
+  "text": "Päta stránky",
+  "source": "draft"
+ },
+ "galleryCarousel": {
+  "text": "Karusel",
+  "source": "draft"
+ },
+ "galleryGoTo": {
+  "text": "Prejsť na obrázok {n}",
+  "source": "draft"
+ },
+ "galleryImagesHeading": {
+  "text": "Obrázky",
+  "source": "draft"
+ },
+ "galleryMore": {
+  "text": "+{n}",
+  "source": "live"
+ },
+ "galleryMoreLabel": {
+  "text": "Zobraziť ďalších {n} obrázkov",
+  "source": "draft"
+ },
+ "galleryMoreLabelFew": {
+  "text": "Zobraziť ďalšie {n} obrázky",
+  "source": "draft"
+ },
+ "galleryMoreLabelOne": {
+  "text": "Zobraziť ďalší {n} obrázok",
+  "source": "draft"
+ },
+ "galleryNext": {
+  "text": "Ďalší obrázok",
+  "source": "draft"
+ },
+ "galleryOpenGallery": {
+  "text": "Otvoriť galériu, {n} obrázkov",
+  "source": "draft"
+ },
+ "galleryOpenGalleryFew": {
+  "text": "Otvoriť galériu, {n} obrázky",
+  "source": "draft"
+ },
+ "galleryOpenGalleryOne": {
+  "text": "Otvoriť galériu, {n} obrázok",
+  "source": "draft"
+ },
+ "galleryOpenNamed": {
+  "text": "Otvoriť obrázok {n}: {alt}",
+  "source": "draft"
+ },
+ "galleryOpenNumbered": {
+  "text": "Otvoriť obrázok {n}",
+  "source": "draft"
+ },
+ "galleryPrev": {
+  "text": "Predchádzajúci obrázok",
+  "source": "draft"
+ },
+ "gallerySlide": {
+  "text": "Snímka",
+  "source": "draft"
+ },
+ "gallerySlideOf": {
+  "text": "{n} z {total}",
+  "source": "draft"
+ },
+ "gallerySlider": {
+  "text": "Posúvač obrázkov",
+  "source": "draft"
+ },
+ "headerCloseNav": {
+  "text": "Zavrieť navigáciu",
+  "source": "draft"
+ },
+ "headerCloseNewsletter": {
+  "text": "Zavrieť prihlásenie na odber noviniek",
+  "source": "draft"
+ },
+ "headerCloseSearch": {
+  "text": "Zavrieť vyhľadávanie",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, domovská stránka",
+  "source": "draft"
+ },
+ "headerLanguages": {
+  "text": "Jazyk",
+  "source": "draft"
+ },
+ "headerNewTab": {
+  "text": "{name} (otvorí sa na novej karte)",
+  "source": "draft"
+ },
+ "headerOpenNav": {
+  "text": "Otvoriť navigáciu",
+  "source": "draft"
+ },
+ "headerScopeAll": {
+  "text": "Všetko",
+  "source": "live"
+ },
+ "headerScopeImage": {
+  "text": "Obrázky",
+  "source": "live"
+ },
+ "headerScopePost": {
+  "text": "Príbehy",
+  "source": "live"
+ },
+ "headerScopePressKit": {
+  "text": "Pre médiá",
+  "source": "live"
+ },
+ "headerScopePressRelease": {
+  "text": "Novinky",
+  "source": "live"
+ },
+ "headerScopeVideo": {
+  "text": "Videá",
+  "source": "live"
+ },
+ "headerSearch": {
+  "text": "Hľadať médiá",
+  "source": "live"
+ },
+ "headerSearchIn": {
+  "text": "Hľadať v",
+  "source": "draft"
+ },
+ "headerSubscribe": {
+  "text": "Odber noviniek",
+  "source": "live"
+ },
+ "lightboxAddTip": {
+  "text": "Pridať/odstrániť originálnu verziu",
+  "source": "draft"
+ },
+ "lightboxAddToBox": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "lightboxClose": {
+  "text": "Zavrieť galériu",
+  "source": "draft"
+ },
+ "lightboxCopyLink": {
+  "text": "Kopírovať odkaz na obrázok",
+  "source": "draft"
+ },
+ "lightboxCounterLabel": {
+  "text": "Obrázok {n} z {total}",
+  "source": "draft"
+ },
+ "lightboxDialog": {
+  "text": "Galéria obrázkov",
+  "source": "draft"
+ },
+ "lightboxDownload": {
+  "text": "Stiahnuť obrázok",
+  "source": "draft"
+ },
+ "lightboxDownloadTip": {
+  "text": "Stiahnuť originálnu verziu",
+  "source": "draft"
+ },
+ "lightboxHideDetails": {
+  "text": "Skryť podrobnosti obrázka",
+  "source": "draft"
+ },
+ "lightboxLinkTip": {
+  "text": "Odkaz na stránku",
+  "source": "draft"
+ },
+ "lightboxNext": {
+  "text": "Ďalší obrázok",
+  "source": "draft"
+ },
+ "lightboxPrev": {
+  "text": "Predchádzajúci obrázok",
+  "source": "draft"
+ },
+ "lightboxShowDetails": {
+  "text": "Zobraziť podrobnosti obrázka",
+  "source": "draft"
+ },
+ "lightboxStoryCounter": {
+  "text": "{n}/{total}",
+  "source": "live"
+ },
+ "lightboxVideo": {
+  "text": "Prehrávač videa",
+  "source": "draft"
+ },
+ "lightboxVideoAddTip": {
+  "text": "Pridať/odstrániť",
+  "source": "draft"
+ },
+ "lightboxVideoAddToBox": {
+  "text": "Pridať/odstrániť",
+  "source": "draft"
+ },
+ "lightboxVideoCopyLink": {
+  "text": "Odkaz na stránku",
+  "source": "draft"
+ },
+ "lightboxVideoDownload": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "lightboxVideoDownloadTip": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "lightboxVideoLinkTip": {
+  "text": "Odkaz na stránku",
+  "source": "draft"
+ },
+ "listingAdvancedFilter": {
+  "text": "Rozšírený filter",
+  "source": "live"
+ },
+ "listingFacetBodywork": {
+  "text": "Karoséria",
+  "source": "draft"
+ },
+ "listingFacetCompany": {
+  "text": "Spoločnosť",
+  "source": "draft"
+ },
+ "listingFacetConcept": {
+  "text": "Koncept",
+  "source": "draft"
+ },
+ "listingFacetDerivative": {
+  "text": "Verzia",
+  "source": "draft"
+ },
+ "listingFacetEnvironment": {
+  "text": "Životné prostredie",
+  "source": "draft"
+ },
+ "listingFacetEquipment": {
+  "text": "Výbava",
+  "source": "draft"
+ },
+ "listingFacetHappening": {
+  "text": "Udalosť",
+  "source": "draft"
+ },
+ "listingFacetHistory": {
+  "text": "História",
+  "source": "draft"
+ },
+ "listingFacetModel": {
+  "text": "Model",
+  "source": "draft"
+ },
+ "listingFacetMotorsport": {
+  "text": "Motoršport",
+  "source": "draft"
+ },
+ "listingFacetSponsorship": {
+  "text": "Sponzorstvo",
+  "source": "draft"
+ },
+ "listingFacetTechnology": {
+  "text": "Technológie",
+  "source": "draft"
+ },
+ "listingFacetView": {
+  "text": "Interiér/exteriér",
+  "source": "draft"
+ },
+ "listingFacetVip": {
+  "text": "Osobnosti",
+  "source": "draft"
+ },
+ "listingFacetYears": {
+  "text": "Rok",
+  "source": "draft"
+ },
+ "listingFilters": {
+  "text": "Filtre",
+  "source": "draft"
+ },
+ "listingLoadError": {
+  "text": "Výsledky sa nepodarilo načítať.",
+  "source": "draft"
+ },
+ "listingNewest": {
+  "text": "Najnovšie",
+  "source": "live"
+ },
+ "listingNoResults": {
+  "text": "Žiadne výsledky – odstráňte filter a zobrazte viac.",
+  "source": "draft"
+ },
+ "listingOldest": {
+  "text": "Najstaršie",
+  "source": "live"
+ },
+ "listingRemoveFilter": {
+  "text": "Odstrániť filter",
+  "source": "draft"
+ },
+ "loadMore": {
+  "text": "Načítať viac",
+  "source": "live"
+ },
+ "loading": {
+  "text": "Načítava sa…",
+  "source": "draft"
+ },
+ "mediaAddSize": {
+  "text": "Pridať/odstrániť verziu {size}",
+  "source": "draft"
+ },
+ "mediaAddToCart": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "mediaAddVideo": {
+  "text": "Pridať/odstrániť",
+  "source": "draft"
+ },
+ "mediaCartAddAll": {
+  "text": "Pridať všetky súbory do mediálneho košíka",
+  "source": "draft"
+ },
+ "mediaCartAddedSome": {
+  "text": "Do mediálneho košíka pridané súbory: {added} z {total}.",
+  "source": "draft"
+ },
+ "mediaCartBadge": {
+  "text": "Mediálny košík",
+  "source": "draft"
+ },
+ "mediaCartBadgeCount": {
+  "text": "Mediálny košík, položky: {n}",
+  "source": "draft"
+ },
+ "mediaCartBadgeCountOne": {
+  "text": "Mediálny košík, 1 položka",
+  "source": "draft"
+ },
+ "mediaCartCancel": {
+  "text": "Zrušiť",
+  "source": "draft"
+ },
+ "mediaCartCancelled": {
+  "text": "Sťahovanie bolo zrušené.",
+  "source": "draft"
+ },
+ "mediaCartClose": {
+  "text": "Zavrieť",
+  "source": "draft"
+ },
+ "mediaCartCount": {
+  "text": "{n} / {max} súborov · {size}",
+  "source": "draft"
+ },
+ "mediaCartCountChanged": {
+  "text": "Položky v mediálnom košíku: {n}",
+  "source": "draft"
+ },
+ "mediaCartCountChangedOne": {
+  "text": "1 položka v mediálnom košíku",
+  "source": "draft"
+ },
+ "mediaCartDownloadFailed": {
+  "text": "Balík sa nepodarilo vytvoriť. Skúste to znova.",
+  "source": "draft"
+ },
+ "mediaCartDownloadPackage": {
+  "text": "Stiahnuť balík",
+  "source": "draft"
+ },
+ "mediaCartDownloaded": {
+  "text": "Váš balík je pripravený.",
+  "source": "draft"
+ },
+ "mediaCartEmptyMessage": {
+  "text": "Žiadne súbory na stiahnutie",
+  "source": "draft"
+ },
+ "mediaCartEmptyPackage": {
+  "text": "Vyprázdniť balík",
+  "source": "draft"
+ },
+ "mediaCartFailedFiles": {
+  "text": "Súbory, ktoré sa nepodarilo pridať do balíka: {n}",
+  "source": "draft"
+ },
+ "mediaCartFailedFilesOne": {
+  "text": "1 súbor sa nepodarilo pridať do balíka:",
+  "source": "draft"
+ },
+ "mediaCartHeading": {
+  "text": "Vaše súbory na stiahnutie",
+  "source": "draft"
+ },
+ "mediaCartKindDocument": {
+  "text": "Dokumenty",
+  "source": "draft"
+ },
+ "mediaCartKindImage": {
+  "text": "Obrázky",
+  "source": "draft"
+ },
+ "mediaCartKindOther": {
+  "text": "Ďalšie súbory",
+  "source": "draft"
+ },
+ "mediaCartKindVideo": {
+  "text": "Videá",
+  "source": "draft"
+ },
+ "mediaCartLimitBanner": {
+  "text": "Balík na stiahnutie môže obsahovať najviac {max} súborov (spolu {size}). Väčší výber si stiahnite vo viacerých balíkoch.",
+  "source": "draft"
+ },
+ "mediaCartLimitBytes": {
+  "text": "Tento súbor sa nezmestí: balík na stiahnutie môže mať najviac {size}.",
+  "source": "draft"
+ },
+ "mediaCartLimitItems": {
+  "text": "Váš balík je plný: môže obsahovať najviac {max} súborov. Stiahnite ho alebo vyprázdnite a pridajte ďalšie.",
+  "source": "draft"
+ },
+ "mediaCartNetwork": {
+  "text": "Súbor sa nepodarilo pridať do mediálneho košíka. Skúste to znova.",
+  "source": "draft"
+ },
+ "mediaCartPreparing": {
+  "text": "Pripravuje sa váš balík: {done} z {total} súborov",
+  "source": "draft"
+ },
+ "mediaCartRemove": {
+  "text": "Odstrániť {title} z mediálneho košíka",
+  "source": "draft"
+ },
+ "mediaCartSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "mediaCartSkippedLimitBytes": {
+  "text": "Súbory, ktoré sa nezmestia: {n}. Balík na stiahnutie môže mať najviac {size}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedLimitBytesOne": {
+  "text": "1 súbor sa nezmestí: balík na stiahnutie môže mať najviac {size}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetwork": {
+  "text": "Súbory, ktoré sa nepodarilo pridať do mediálneho košíka: {n}. Skúste to znova.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetworkOne": {
+  "text": "1 súbor sa nepodarilo pridať do mediálneho košíka. Skúste to znova.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolved": {
+  "text": "Súbory, ktoré nie je možné pridať do mediálneho košíka: {n}.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolvedOne": {
+  "text": "1 súbor nie je možné pridať do mediálneho košíka.",
+  "source": "draft"
+ },
+ "mediaCartStorage": {
+  "text": "Mediálny košík sa v tomto prehliadači nepodarilo uložiť.",
+  "source": "draft"
+ },
+ "mediaCartUnresolved": {
+  "text": "Tento súbor nie je možné pridať do mediálneho košíka.",
+  "source": "draft"
+ },
+ "mediaDownload": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "mediaDownloadSize": {
+  "text": "Stiahnuť verziu {size}",
+  "source": "draft"
+ },
+ "mediaDownloadVideo": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "mediaPanelAudioFormat": {
+  "text": "Zvukový formát",
+  "source": "draft"
+ },
+ "mediaPanelBitrate": {
+  "text": "Dátový tok",
+  "source": "draft"
+ },
+ "mediaPanelDimensions": {
+  "text": "Rozmery",
+  "source": "draft"
+ },
+ "mediaPanelFileSize": {
+  "text": "Veľkosť súboru",
+  "source": "draft"
+ },
+ "mediaPanelFileType": {
+  "text": "Typ súboru",
+  "source": "draft"
+ },
+ "mediaPanelLength": {
+  "text": "Dĺžka",
+  "source": "draft"
+ },
+ "mediaPanelPublished": {
+  "text": "Publikované",
+  "source": "draft"
+ },
+ "mediaPanelRelatedArticle": {
+  "text": "Súvisiaci článok",
+  "source": "draft"
+ },
+ "mediaSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "mediaSizeOriginal": {
+  "text": "Original",
+  "source": "draft"
+ },
+ "modelNav": {
+  "text": "Na tejto stránke",
+  "source": "draft"
+ },
+ "newsletterButton": {
+  "text": "Odoslať",
+  "source": "live"
+ },
+ "newsletterConsentError": {
+  "text": "Pred pokračovaním prijmite podmienky.",
+  "source": "draft"
+ },
+ "newsletterError": {
+  "text": "Zadajte platnú e-mailovú adresu.",
+  "source": "draft"
+ },
+ "newsletterLabel": {
+  "text": "E-mailová adresa",
+  "source": "draft"
+ },
+ "newsletterMessage": {
+  "text": "Prihlásenie na odber noviniek zatiaľ nie je dostupné",
+  "source": "draft"
+ },
+ "newsletterPlaceholder": {
+  "text": "Zadajte emailovú adresu",
+  "source": "live"
+ },
+ "pressKitAddAll": {
+  "text": "Pridať všetky súbory do mediálneho košíka",
+  "source": "draft"
+ },
+ "pressKitAddVideo": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "pressKitAddVideoNamed": {
+  "text": "Pridať do mediálneho košíka: {title}",
+  "source": "draft"
+ },
+ "pressKitChapters": {
+  "text": "Kapitoly",
+  "source": "draft"
+ },
+ "pressKitDownloadVideo": {
+  "text": "Stiahnuť video",
+  "source": "draft"
+ },
+ "pressKitDownloadVideoNamed": {
+  "text": "Stiahnuť {title}",
+  "source": "draft"
+ },
+ "pressKitOpenVideo": {
+  "text": "Otvoriť video",
+  "source": "draft"
+ },
+ "pressKitOpenVideoNamed": {
+  "text": "Otvoriť {title}",
+  "source": "draft"
+ },
+ "pressKitTipAdd": {
+  "text": "Pridať/odstrániť",
+  "source": "draft"
+ },
+ "pressKitTipDownload": {
+  "text": "Stiahnuť",
+  "source": "draft"
+ },
+ "pressKitTipLink": {
+  "text": "Odkaz na stránku",
+  "source": "draft"
+ },
+ "pressReleaseAddAllMediaBox": {
+  "text": "Pridať všetky súbory z media boxu do mediálneho košíka",
+  "source": "draft"
+ },
+ "pressReleaseAdditionalInfo": {
+  "text": "Ďalšie informácie",
+  "source": "draft"
+ },
+ "promoCarousel": {
+  "text": "Karusel",
+  "source": "draft"
+ },
+ "promoFeaturedStories": {
+  "text": "Vybrané príbehy",
+  "source": "draft"
+ },
+ "promoFeaturedStorySlides": {
+  "text": "Snímky vybraných príbehov",
+  "source": "draft"
+ },
+ "promoGoToStory": {
+  "text": "Prejsť na vybraný príbeh {number}",
+  "source": "draft"
+ },
+ "promoPauseRotation": {
+  "text": "Pozastaviť striedanie",
+  "source": "draft"
+ },
+ "promoResumeRotation": {
+  "text": "Pokračovať v striedaní",
+  "source": "draft"
+ },
+ "promoUnavailable": {
+  "text": "Vybrané príbehy nie sú dostupné",
+  "source": "draft"
+ },
+ "searchLoadError": {
+  "text": "Index vyhľadávania sa nepodarilo načítať.",
+  "source": "draft"
+ },
+ "searchNoResults": {
+  "text": "Žiadne výsledky pre „%q“.",
+  "source": "draft"
+ },
+ "searchPrompt": {
+  "text": "Zadajte hľadaný výraz.",
+  "source": "draft"
+ },
+ "searchResultsCount": {
+  "text": "Výsledky pre „%q“: %d",
+  "source": "draft"
+ },
+ "searchResultsOne": {
+  "text": "1 výsledok pre „%q“",
+  "source": "draft"
+ },
+ "showLess": {
+  "text": "Zobraziť menej",
+  "source": "draft"
+ },
+ "showMore": {
+  "text": "Zobraziť viac",
+  "source": "draft"
+ },
+ "skipToContent": {
+  "text": "Preskočiť na obsah",
+  "source": "draft"
+ },
+ "storiesLoadError": {
+  "text": "Výsledky sa nepodarilo načítať.",
+  "source": "draft"
+ },
+ "storiesNewTab": {
+  "text": "otvorí sa na novej karte",
+  "source": "draft"
+ },
+ "storiesNoResults": {
+  "text": "Zatiaľ tu nič nie je.",
+  "source": "draft"
+ },
+ "storiesResultsShown": {
+  "text": "Zobrazených {n} príbehov",
+  "source": "draft"
+ },
+ "storiesResultsShownFew": {
+  "text": "Zobrazené {n} príbehy",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "Zobrazený {n} príbeh",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Pridať do mediálneho košíka",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Stiahnuť originál",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Stiahnuť video",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Zobraziť všetko",
+  "source": "draft"
+ },
+ "suggestDateFormat": {
+  "text": "{dd}. {mm}. {yyyy}",
+  "source": "live"
+ },
+ "suggestPressKit": {
+  "text": "Pre médiá",
+  "source": "live"
+ },
+ "suggestPressRelease": {
+  "text": "Novinky",
+  "source": "live"
+ },
+ "suggestStory": {
+  "text": "Príbehy",
+  "source": "live"
+ }
+}

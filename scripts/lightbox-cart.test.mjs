@@ -156,3 +156,12 @@ test('pageHeading: the page title with its authored line breaks read as spaces',
   assert.equal(pageHeading(), '');
   main.innerHTML = before;
 });
+
+// --- text per locale (SKODA-1003) ---------------------------------------------------------------
+test('lightboxText: English by default; the sheet translates names, the counter and a clip\'s names', async () => {
+  const { lightboxText } = await import('./lightbox.js');
+  const en = lightboxText();
+  assert.deepEqual([en.prev, en.counterLabel(2, 9), en.storyCounter(2, 9), en.clip.addToBox], ['Previous image', 'Image 2 of 9', '2/9', 'Add/remove this']);
+  const cs = lightboxText({ lightboxPrev: 'Předchozí obrázek', lightboxCounterLabel: 'Obrázek {n} z {total}', lightboxVideoAddToBox: 'Přidat/odebrat soubor' });
+  assert.deepEqual([cs.prev, cs.counterLabel(2, 9), cs.clip.addToBox, cs.next], ['Předchozí obrázek', 'Obrázek 2 z 9', 'Přidat/odebrat soubor', 'Next image']);
+});

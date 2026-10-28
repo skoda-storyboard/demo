@@ -20,20 +20,26 @@
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
  *   clip     true: a clip shown as its poster; with `video`, its actions take the source
- *            player's names and tooltips, an image's take the colorbox's (LABELS)
- *   labels   per-item overrides of those names (LABELS keys)
+ *            player's names and tooltips, an image's take the colorbox's (LIGHTBOX_LABELS)
+ *   labels   per-item overrides of those names (LIGHTBOX_LABELS keys)
  *
  * Options: { story, title } = the story gallery chrome (`Gallery (story)`, SKODA-216): a
  * title bar (the dialog's name), an "N/total" counter, no action buttons, tag chips or
  * phone details toggle (the caption shows in the bottom band), and authored caption
  * links inside the focus trap. Without options nothing changes.
  *
- * i18n: all control text lives in LABELS (the single translation point, SKODA-1003).
+ * i18n: all control text lives in LIGHTBOX_LABELS, read per locale (SKODA-1003). The lightbox
+ * builds with English and takes the page locale's text when the memoized sheet resolves, before
+ * it can be opened in practice (every string is a name, a tooltip or the counter).
  */
 
 import { loadCSS } from './aem.js';
+import { fetchPlaceholders, localize, fillText } from './placeholders.js';
+import { META_CLASS, RELATED_CLASS, relabelMediaPanel } from './media-panel.js';
 
-const LABELS = {
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `lightbox…` ({n}, {total} filled in), a clip's as `lightboxVideo…`.
+export const LIGHTBOX_LABELS = {
   dialog: 'Image gallery',
   prev: 'Previous image',
   next: 'Next image',
@@ -43,9 +49,9 @@ const LABELS = {
   hideDetails: 'Hide image details',
   video: 'Video player',
   // the visible counter reads "N / total" (the total in grey); the aria-live label is the long form
-  counterLabel: (n, total) => `Image ${n} of ${total}`,
+  counterLabel: 'Image {n} of {total}',
   // story galleries (SKODA-216): "1/5", no spaces, one colour (the live .sb-gallery counter)
-  storyCounter: (n, total) => `${n}/${total}`,
+  storyCounter: '{n}/{total}',
   // detail-panel action buttons (Media-Room style)
   addToBox: 'Add to media box',
   download: 'Download image',
@@ -58,7 +64,7 @@ const LABELS = {
 
 // a clip's names and tooltips (a `video` item, or a `clip` shown as its poster): the source
 // video player's titles
-const VIDEO_LABELS = {
+export const LIGHTBOX_VIDEO_LABELS = {
   addToBox: 'Add/remove this',
   download: 'Download this',
   copyLink: 'Link to page',
@@ -66,6 +72,20 @@ const VIDEO_LABELS = {
   downloadTip: 'Download this',
   linkTip: 'Link to page',
 };
+
+/**
+ * The lightbox text in the page locale (English per missing key).
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ */
+export function lightboxText(ph = {}) {
+  const t = localize(LIGHTBOX_LABELS, ph, 'lightbox');
+  return {
+    ...t,
+    counterLabel: (n, total) => fillText(t.counterLabel, { n, total }),
+    storyCounter: (n, total) => fillText(t.storyCounter, { n, total }),
+    clip: localize(LIGHTBOX_VIDEO_LABELS, ph, 'lightboxVideo'),
+  };
+}
 
 const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -95,6 +115,7 @@ let overlayCount = 0;
 export function decorateTags(caption) {
   const p = [...caption.querySelectorAll('p')].find((el) => (
     el.textContent.includes('·')
+    && !el.matches(`.${META_CLASS}, .${RELATED_CLASS}`)
     && !/file type|file size|dimensions|published/i.test(el.textContent)
     && !/related article/i.test(el.textContent)
     && !el.querySelector('a')
@@ -121,11 +142,12 @@ export function decorateTags(caption) {
  */
 export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   loadCSS(`${window.hlx?.codeBasePath || ''}/styles/lightbox.css`);
+  let text = lightboxText();
   const overlay = document.createElement('div');
   overlay.className = 'gallery-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', LABELS.dialog);
+  overlay.setAttribute('aria-label', text.dialog);
   overlay.hidden = true;
   if (REDUCED_MOTION) overlay.classList.add('reduced-motion');
 
@@ -136,7 +158,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
   closeBtn.className = 'gallery-lightbox-close';
-  closeBtn.setAttribute('aria-label', LABELS.close);
+  closeBtn.setAttribute('aria-label', text.close);
 
   // story: the gallery title (the story title, source data-title) left of the close
   const heading = story && title ? document.createElement('h2') : null;
@@ -196,17 +218,17 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   const addBtn = document.createElement('button');
   addBtn.type = 'button';
   addBtn.className = 'gallery-lightbox-action';
-  addBtn.setAttribute('aria-label', LABELS.addToBox);
+  addBtn.setAttribute('aria-label', text.addToBox);
   addBtn.classList.add('add');
   const downloadBtn = document.createElement('a');
   downloadBtn.className = 'gallery-lightbox-action';
-  downloadBtn.setAttribute('aria-label', LABELS.download);
+  downloadBtn.setAttribute('aria-label', text.download);
   downloadBtn.setAttribute('download', '');
   downloadBtn.classList.add('download');
   const linkBtn = document.createElement('button');
   linkBtn.type = 'button';
   linkBtn.className = 'gallery-lightbox-action';
-  linkBtn.setAttribute('aria-label', LABELS.copyLink);
+  linkBtn.setAttribute('aria-label', text.copyLink);
   linkBtn.classList.add('link');
   actions.append(addBtn, downloadBtn, linkBtn);
   // one add button per overlay, re-pointed at each item's original (SKODA-505a). The media
@@ -236,12 +258,12 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
   prevBtn.className = 'gallery-lightbox-prev';
-  prevBtn.setAttribute('aria-label', LABELS.prev);
+  prevBtn.setAttribute('aria-label', text.prev);
 
   const nextBtn = document.createElement('button');
   nextBtn.type = 'button';
   nextBtn.className = 'gallery-lightbox-next';
-  nextBtn.setAttribute('aria-label', LABELS.next);
+  nextBtn.setAttribute('aria-label', text.next);
 
   controls.append(counter, prevBtn, nextBtn);
 
@@ -252,7 +274,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   const setDetails = (show) => {
     overlay.classList.toggle('is-details-open', show);
     detailsBtn.setAttribute('aria-expanded', String(show));
-    detailsBtn.setAttribute('aria-label', show ? LABELS.hideDetails : LABELS.showDetails);
+    detailsBtn.setAttribute('aria-label', show ? text.hideDetails : text.showDetails);
   };
   setDetails(false);
   host.append(overlay);
@@ -281,6 +303,39 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     player.hidden = true;
   };
 
+  // the item's action names and tooltips (a clip's are the source player's), else the image's
+  let named = null;
+  const nameActions = (item) => {
+    named = item;
+    const clipNames = item.video || item.clip ? text.clip : {};
+    const names = { ...text, ...clipNames, ...(item.labels || {}) };
+    addBtn.setAttribute('aria-label', names.addToBox);
+    downloadBtn.setAttribute('aria-label', names.download);
+    linkBtn.setAttribute('aria-label', names.copyLink);
+    addBtn.title = names.addTip;
+    downloadBtn.title = names.downloadTip;
+    linkBtn.title = names.linkTip;
+  };
+
+  // the page locale's text, once the memoized sheet resolves (the lightbox builds in English)
+  fetchPlaceholders().then((ph) => {
+    text = lightboxText(ph);
+    overlay.setAttribute('aria-label', text.dialog);
+    closeBtn.setAttribute('aria-label', text.close);
+    prevBtn.setAttribute('aria-label', text.prev);
+    nextBtn.setAttribute('aria-label', text.next);
+    setDetails(overlay.classList.contains('is-details-open'));
+    if (named) nameActions(named);
+    // the shown caption is a copy of the item's: its media-panel labels too (PR #496 review),
+    // in place, so a playing video and the reader's focus stay where they are
+    relabelMediaPanel(stageCaption, ph);
+    // an open lightbox: its counter's name and the player's fallback name too
+    if (!overlay.hidden && items.length) {
+      counter.setAttribute('aria-label', text.counterLabel(current + 1, items.length));
+      if (player && !player.hidden && !items[current]?.alt) player.title = text.video;
+    }
+  }).catch(() => { /* the English text stays */ });
+
   const render = (index) => {
     // the caption is rebuilt below: if focus is on one of its links or actions, it would
     // fall to <body>, outside the dialog (SKODA-216 review), so remember it and the direction
@@ -299,7 +354,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       stageImg.hidden = true;
       imageFrame.classList.remove('is-loading');
       const frame = videoPlayer();
-      frame.title = item.alt || LABELS.video;
+      frame.title = item.alt || text.video;
       frame.src = item.video;
       frame.hidden = false;
     } else {
@@ -333,15 +388,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     } else if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
-      // per-item names and tooltips (a clip's are the source player's) and tab, else the image's
-      const clipNames = item.video || item.clip ? VIDEO_LABELS : {};
-      const names = { ...LABELS, ...clipNames, ...(item.labels || {}) };
-      addBtn.setAttribute('aria-label', names.addToBox);
-      downloadBtn.setAttribute('aria-label', names.download);
-      linkBtn.setAttribute('aria-label', names.copyLink);
-      addBtn.title = names.addTip;
-      downloadBtn.title = names.downloadTip;
-      linkBtn.title = names.linkTip;
+      nameActions(item);
       if (item.downloadTarget) downloadBtn.target = item.downloadTarget;
       else downloadBtn.removeAttribute('target');
       // `actions: false` (content images): the source panel keeps an empty actions row
@@ -349,10 +396,10 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       if (item.cartId) addBtn.dataset.id = item.cartId;
       else delete addBtn.dataset.id;
       bindCart(item);
-      // insert before the first "File type…"/metadata paragraph if present,
-      // otherwise fall back to the end of the panel
+      // insert before the file-metadata paragraph if present (marked by media-panel.js in any
+      // language; an authored caption's English "File type…"), otherwise at the end of the panel
       const paras = [...stageCaption.querySelectorAll('p')];
-      const meta = paras.find((p) => /file type/i.test(p.textContent));
+      const meta = paras.find((p) => p.classList.contains(META_CLASS) || /file type/i.test(p.textContent));
       if (meta) stageCaption.insertBefore(actions, meta);
       else stageCaption.append(actions);
       // render the tags paragraph ("2026 · Peaq") as individual chips
@@ -371,8 +418,8 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       else (forward ? nextBtn : prevBtn).focus();
     }
     if (story) {
-      counter.textContent = LABELS.storyCounter(current + 1, items.length);
-      counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
+      counter.textContent = text.storyCounter(current + 1, items.length);
+      counter.setAttribute('aria-label', text.counterLabel(current + 1, items.length));
       return;
     }
     // "1 / 20": the total (with its separator) in grey, as the source counter
@@ -383,7 +430,7 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     total.className = 'gallery-lightbox-total';
     total.append(sep, String(items.length));
     counter.replaceChildren(String(current + 1), total);
-    counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
+    counter.setAttribute('aria-label', text.counterLabel(current + 1, items.length));
   };
 
   // story: authored caption links are part of the trap too (SKODA-216), and its arrows
