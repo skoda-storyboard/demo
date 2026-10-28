@@ -261,6 +261,20 @@ body.press-release main > .section.body-column:is(.highlight-grey, .highlight-da
   padding-inline: 0;
 }
 
+/* Body text links, the perex's included (#386; live .entry-content a, measured 2026-10-27 on 4
+   releases): the source's green, no underline, ink when hovered, as the story's prose links
+   (styles.css). The focus ring stays (the source has none). The highlight boxes keep their own
+   link colour, and buttons theirs. */
+body.press-release main > .section.body-column:not(.highlight-dark, .highlight-grey) :is(.default-content-wrapper, .columns) a:any-link:not(.button) {
+  color: var(--skoda-green-accent);
+  text-decoration: none;
+}
+
+body.press-release main > .section.body-column:not(.highlight-dark, .highlight-grey) :is(.default-content-wrapper, .columns) a:any-link:not(.button):hover {
+  color: var(--skoda-ink);
+  text-decoration: none;
+}
+
 /* Sidebar tag rows sit 24px apart, as on the source (inline-block <li>s on a 24px line): no
    flex row gap, and not the global 8px list-item margin. */
 body.press-release .section.sidebar .tags .tags-list {
