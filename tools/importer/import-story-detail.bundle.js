@@ -2487,6 +2487,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document2) : [];

@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-carousel-listing.js
+  // tools/importer/import-carousel-listing.js
   var import_carousel_listing_exports = {};
   __export(import_carousel_listing_exports, {
     default: () => import_carousel_listing_default
   });
 
-  // parsers/hero-banner.js
+  // tools/importer/parsers/hero-banner.js
   function parse(element, { document }) {
     const img = element.querySelector(".hero-image img, .image-wrapper img, img");
     const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
@@ -75,7 +75,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // parsers/carousel-listing.js
+  // tools/importer/parsers/carousel-listing.js
   var TERMS = [
     ["category", "categories"],
     ["company", "company"]
@@ -131,7 +131,7 @@ var CustomImportScript = (() => {
     element.replaceWith(hr, h3, table, sectionMetadata);
   }
 
-  // transformers/skoda-page-cleanup.js
+  // tools/importer/transformers/skoda-page-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -215,7 +215,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -489,6 +489,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
@@ -503,7 +505,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -943,7 +945,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform4(hookName, element, payload) {
@@ -961,7 +963,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // import-carousel-listing.js
+  // tools/importer/import-carousel-listing.js
   var parsers = {
     "hero-banner": parse,
     "carousel-listing": parse2

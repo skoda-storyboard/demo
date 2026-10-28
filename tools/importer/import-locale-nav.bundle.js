@@ -36,6 +36,7 @@ var CustomImportScript = (() => {
     if (href.startsWith("#")) return href;
     try {
       const url = new URL(href, "https://www.skoda-storyboard.com");
+      if (/^#s_[ac]id=/.test(url.hash)) url.hash = "";
       if (LIVE_HOST.test(url.hostname)) return `${url.pathname}${url.search}${url.hash}`;
       return url.href;
     } catch (e) {

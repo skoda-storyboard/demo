@@ -35,7 +35,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-videos-listing.js
+  // tools/importer/import-videos-listing.js
   var import_videos_listing_exports = {};
   __export(import_videos_listing_exports, {
     default: () => import_videos_listing_default
@@ -112,7 +112,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // transformers/skoda-listing-cleanup.js
+  // tools/importer/transformers/skoda-listing-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -160,7 +160,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -205,7 +205,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -479,6 +479,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document2) : [];
@@ -493,7 +495,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -933,7 +935,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -951,7 +953,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1073,7 +1075,7 @@ var CustomImportScript = (() => {
     normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
   }
 
-  // import-videos-listing.js
+  // tools/importer/import-videos-listing.js
   var parsers = {
     listing: parse
   };

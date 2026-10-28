@@ -881,9 +881,10 @@ header nav .nav-search .search-suggest-meta {
     padding-left: var(--nav-logo-inset);
   }
 
-  /* desktop nav is never the full-height drawer even when aria-expanded is set */
+  /* desktop nav is never the full-height drawer even when aria-expanded is set; it keeps its
+     64px row, also without a menu (the logo centred in it: /sustainability/nav, SKODA-843) */
   header nav[aria-expanded='true'] {
-    min-height: unset;
+    min-height: var(--nav-main-height);
     overflow: visible;
   }
 

@@ -34,6 +34,8 @@ export function authoredHref(href) {
   if (href.startsWith('#')) return href; // in-page controls (#subscribe, #newsletter)
   try {
     const url = new URL(href, 'https://www.skoda-storyboard.com');
+    // the source's per-request analytics fragments (#s_aid= / #s_cid=) rotate on every fetch
+    if (/^#s_[ac]id=/.test(url.hash)) url.hash = '';
     if (LIVE_HOST.test(url.hostname)) return `${url.pathname}${url.search}${url.hash}`;
     return url.href;
   } catch (e) {
@@ -141,6 +143,57 @@ export function buildNav(document, locale) {
   return root;
 }
 
+/**
+ * A section's own nav (SKODA-843: `/sustainability/nav`, the Sustainable Offices header): 3
+ * sections, topbar --- brand --- search, no menu. The topbar keeps every source tab (Stories |
+ * Media Room | Sustainability) and the source's own locale links (EN, CZ to the Czech page).
+ * The source points its Sustainability tab and logo at `/en/?page_id=320705`, a 404 on live:
+ * such a link becomes `page`, the page the header was read from.
+ */
+export function buildSectionNav(document, page) {
+  const root = document.createElement('div');
+  const pageHref = (href) => (/[?&]page_id=/.test(href || '') ? page : href);
+  const switcher = document.createElement('ul');
+  document.querySelectorAll('.topbar .section-nav a').forEach((a) => {
+    const li = document.createElement('li');
+    li.append(link(document, pageHref(a.getAttribute('href')), text(a)));
+    switcher.append(li);
+  });
+  // the header tells this 3-row nav by its tab list (header.js): without tabs DA would drop the
+  // empty list and the header would read the topbar as the brand row (#843 review)
+  if (!switcher.children.length) throw new Error('buildSectionNav: the source topbar has no section tabs');
+  root.append(switcher);
+  const lang = document.querySelector('.topbar .lang-links');
+  if (lang) {
+    const locales = document.createElement('p');
+    // the current language is a <span> on the source, which the import may already have dropped
+    if (![...lang.children].some((el) => !el.matches('a'))) {
+      const strong = document.createElement('strong');
+      strong.textContent = (page.split('/')[1] || 'en').toUpperCase();
+      locales.append(strong);
+    }
+    [...lang.children].forEach((el) => {
+      if (locales.childNodes.length) locales.append(' ');
+      if (el.matches('a')) {
+        locales.append(link(document, el.getAttribute('href'), text(el).toUpperCase()));
+      } else {
+        const strong = document.createElement('strong');
+        strong.textContent = text(el).toUpperCase();
+        locales.append(strong);
+      }
+    });
+    root.append(locales);
+  }
+  root.append(document.createElement('hr'));
+  const logo = document.querySelector('header a.logo');
+  root.append(para(document, link(document, pageHref(logo ? logo.getAttribute('href') : page), 'Škoda Storyboard', logo?.getAttribute('title') || 'Škoda Storyboard')));
+  root.append(document.createElement('hr'));
+  const form = document.querySelector('.search-bar form.search-form');
+  const label = (document.querySelector('.search-bar input[type="search"]') || {}).placeholder || 'Search';
+  root.append(para(document, link(document, form ? form.getAttribute('action') : '/en/search', label, label)));
+  return root;
+}
+
 /** `/{locale}/nav-newsletter`: the Newsletter Stub (topbar) rows, as `/nav-newsletter`. */
 export function buildNewsletter(document, locale, { message } = {}) {
   const form = document.querySelector('.topbar__dropdown__newsletter form');
@@ -198,10 +251,13 @@ export function buildFooter(document) {
   ));
   root.append(para(document, ...badges), para(document, ...socials));
   root.append(document.createElement('hr'));
-  // 2) menu (the repeated parent headings dropped, no Newsletter item, as /footer)
+  // 2) menu (the repeated parent headings dropped, no Newsletter item, as /footer); a footer
+  // without one (the Sustainable Offices page, SKODA-843) has 2 sections
   const menu = footer.querySelector('.footer-nav ul.menu');
-  if (menu) root.append(menuList(document, menu, { keepHeading: false, newsletter: false }));
-  root.append(document.createElement('hr'));
+  if (menu) {
+    root.append(menuList(document, menu, { keepHeading: false, newsletter: false }));
+    root.append(document.createElement('hr'));
+  }
   // 3) the notice with its links, ©, feeds
   const notice = footer.querySelector('.copyright-text p');
   if (notice) {

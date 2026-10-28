@@ -23,6 +23,7 @@
   --skoda-grey-200: #e6e6e6;
   --skoda-grey-500: #7c7d7e;
   --skoda-grey-800: #353535;
+  --skoda-grey-850: #303132; /* the Sustainable Offices band cards (SKODA-843) */
   --skoda-grey-border: #dadada;
 
   /* form primitives (SKODA-305 footer Subscribe form; measured on the live Media Room footer).
