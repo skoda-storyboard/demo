@@ -14,6 +14,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 
 let JSDOM = null;
 try {
@@ -112,24 +113,37 @@ function sectionsOf(element) {
   });
 }
 const cache = {};
-function importPage(key, edit) {
-  if (cache[key] && !edit) return cache[key];
+function importPage(key, edit, script = importer) {
+  const cacheable = !edit && script === importer;
+  if (cache[key] && cacheable) return cache[key];
   const slug = PAGES[key] || AUDIT[key];
   const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug}.html`), 'utf8'), { url: `${SRC}/${slug}/` });
   if (edit) edit(dom.window.document);
   globalThis.document = dom.window.document;
   globalThis.window = dom.window;
-  importer.preprocess({ document: dom.window.document });
+  script.preprocess({ document: dom.window.document });
   helixPreProcess(dom.window.document);
-  const [{ element }] = importer.transform({
+  const [{ element }] = script.transform({
     document: dom.window.document,
     url: `${SRC}/${slug}/`,
     params: { originalURL: `${SRC}/${slug}/` },
   });
   const result = { element, sections: sectionsOf(element) };
-  if (!edit) cache[key] = result;
+  if (cacheable) cache[key] = result;
   return result;
 }
+
+test('the committed bundle matches source output, including Tags on every M1 release', { skip }, () => {
+  const code = readFileSync(new URL('./import-press-release.bundle.js', import.meta.url), 'utf8');
+  const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
+    WebImporter: globalThis.WebImporter, console, URL,
+  });
+  Object.keys(PAGES).forEach((key) => {
+    const { element } = importPage(key, undefined, bundled);
+    assert.equal(element.outerHTML, importPage(key).element.outerHTML, key);
+    assert.ok([...element.querySelectorAll('table')].some((table) => blockName(table) === 'Tags'), `${key}: Tags block`);
+  });
+});
 
 const rowsOf = (table) => [...table.querySelectorAll('tr')].slice(1);
 const find = (sections, name) => sections.flatMap((s) => s.nodes).find((n) => n.tagName === 'TABLE' && blockName(n) === name);
@@ -550,4 +564,3 @@ test('#274: the FAQ keeps the blank line after its bold opener (a <br> closing t
   assert.equal(strong.nextSibling?.nodeName, 'BR');
   assert.equal(strong.nextSibling?.nextSibling?.nodeName, 'BR');
 });
-

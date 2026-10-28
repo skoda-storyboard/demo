@@ -41,7 +41,7 @@ var CustomImportScript = (() => {
     default: () => import_press_release_default
   });
 
-  // tools/importer/parsers/gallery.js
+  // parsers/gallery.js
   function parse(element, { document: document2 }) {
     let items = Array.from(element.querySelectorAll("article.gallery-item"));
     if (items.length === 0) items = Array.from(element.querySelectorAll(".items > .item"));
@@ -67,7 +67,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // tools/importer/parsers/tags.js
+  // parsers/tags.js
   function parse2(element, { document: document2 }) {
     const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
@@ -1584,6 +1584,13 @@ var CustomImportScript = (() => {
       marker2.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
+  function transform6(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-press-release.js
   var parsers = {
@@ -1691,7 +1698,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
-      normalizeImages(main, document2);
+      transform6("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

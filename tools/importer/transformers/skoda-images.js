@@ -2,6 +2,13 @@
  * Normalize images after block parsing and before WebImporter serializes the page.
  * Block-table cells become divs in DA; default-content images must already be
  * direct div children for the media bus to create responsive pictures.
+ *
+ * A transformer like the others (`transform(hookName, element, payload)`, SKODA-509), but
+ * the importers call it themselves at the end of `afterTransform`, after the shared
+ * transformers and `rules.transformBackgroundImages` and before `rules.adjustImageUrls`,
+ * not from their `transformers` list: it must see the page every other step has built.
+ * The default export is the file's only export: the transformer validator loads it as a classic
+ * script, where any other `export` is a syntax error.
  */
 function hasContent(node) {
   return [...node.childNodes].some((child) => child.nodeType === 1
@@ -67,7 +74,7 @@ const text = (value) => (value || '').replace(/\s+/g, ' ').trim();
  * Never the file name. Other empty alts stay empty (a decorative image next to its own text).
  * @returns {string} the alt, or '' when the image isn't a lone linked image or nothing fits
  */
-export function linkedImageAlt(img, root) {
+function linkedImageAlt(img, root) {
   const link = img.closest('a');
   if (!link || link.querySelectorAll('img').length !== 1 || text(link.textContent)) return '';
   const caption = editorialCaption(img) || editorialCaption(img.closest('[data-caption]'));
@@ -79,7 +86,7 @@ export function linkedImageAlt(img, root) {
   return text(caption) || titled || heading || text(root.ownerDocument.querySelector('h1')?.textContent);
 }
 
-export default function normalizeImages(root, document = root.ownerDocument) {
+function normalizeImages(root, document = root.ownerDocument) {
   root.querySelectorAll('img').forEach((img) => {
     if (!img.hasAttribute('alt') || !img.getAttribute('alt').trim()) {
       const backfill = linkedImageAlt(img, root);
@@ -147,4 +154,18 @@ export default function normalizeImages(root, document = root.ownerDocument) {
     const imageNode = imageContainer(img, document, linkedImage ? link : null);
     marker.replaceWith(withCaption(imageNode, caption, document));
   });
+}
+
+/**
+ * The transformer hook: normalizes the page's images on `afterTransform`; other hooks are a no-op.
+ * @param {string} hookName the import stage
+ * @param {Element} element the page root (`main`)
+ * @param {{document?: Document}} payload the importer payload
+ */
+export default function transform(hookName, element, payload) {
+  if (typeof hookName !== 'string') {
+    throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+  }
+  if (hookName !== 'afterTransform') return;
+  normalizeImages(element, payload?.document || element.ownerDocument);
 }
