@@ -177,6 +177,11 @@ All rows: `measured (source-url · selector · viewport) → token`. `LANDING` =
 
 ## 7. EDS target
 
+> **As built (SKODA-805a / 805b / 805c, D-1 = A; confirmed 2026-10-26):** a kit is the source's **hub page plus
+> one page per chapter**, not the single stacked page sketched below. The hub is `Hero Image (overlay)` + the
+> `Cards (overlay, tiles)` mosaic; each chapter is a story-detail-style two-column page whose Chapters bar
+> (`templates/press-kit/press-kit.js`) is described in §9. The rest of this section is kept as the original sketch.
+
 **One press-kit page per kit** (EDS-native): section metadata `template=press-kit`. Structure:
 `hero-image` (overlay) → optional chapter **overview tile grid** (`cards-overlay`, links to in-page
 anchors) → the ordered narrative sections as **default-content** (heading + rich text + inline media) →
@@ -221,18 +226,20 @@ block carries the facets. A `Section Metadata` `Style: press-kit-chapter` marks 
 
 ## 8. Open decisions + recommended default
 
-- **Fixed vs conditional sections, RESOLVED → optional/conditional (superset).** Evidence: on the live
+- **Fixed vs conditional sections, RESOLVED → optional/conditional (superset).** *Confirmed 2026-10-26 by the
+  ticket owner (SKODA-805 "Decisions").* Evidence: on the live
   Peaq kit every chapter is an **independently authored tile + sub-page** (`article.article-teaser` →
   distinct `postid-*`), not a required field of one record. A combustion kit that lacks "Battery and
   powertrain variants" would simply omit that tile/section with no structural break. Recommend authoring
   the sequence as an **ordered superset of optional sections keyed by heading**; the template renders the
   ones present, in canonical order. (Assumption to confirm with business, but the source structure proves
   omission is native.)
-- **Landing model:** source uses a tiles landing + per-chapter sub-pages. Recommend the EDS-native
+- **Landing model:** *Decided 2026-10-26: hub + chapter pages, as the source (D-1 = A); the single-page
+  recommendation that follows is superseded.* Source uses a tiles landing + per-chapter sub-pages. Recommend the EDS-native
   **single page with stacked sections + a chapter overview tile grid + sticky chapter-nav** (one URL per
   kit, anchors per chapter) rather than porting the WP sub-page tree, simpler authoring, one Metadata
   record, better for import (assumption to confirm).
-- **Header metadata display:** source header prints title + perex only; model/bodywork/category/date live
+- **Header metadata display:** *Decided 2026-10-26: title + perex only.* Source header prints title + perex only; model/bodywork/category/date live
   as metadata (feed facets). Recommend keeping the header visual to title + perex, exposing date/model as
   optional caption meta if the client wants it printed (assumption to confirm).
 - **New/reused tokens:** reuse `--hero-vh: 61.8vh`, `--heading-font-size-hero: 48px`, `--weight-light: 300`,
@@ -244,23 +251,44 @@ block carries the facets. A `Section Metadata` `Style: press-kit-chapter` marks 
 
 Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expected / actual.
 
-- [ ] Header: overlay hero `.hero-image` = **`61.8vh`** box @≥768 / **16:9 width box** (`56.25%`) @≤767,
+- [x] Header: overlay hero `.hero-image` = **`61.8vh`** box @≥768 / **16:9 width box** (`56.25%`) @≤767,
       scrim present; title `48px / weight 300 / #fff` @≥768, `28px` @≤767; perex `20px / weight 600 / #fff`.
-- [ ] Section order: rendered chapters follow **Introduction → Exterior → Interior → Battery/powertrain →
+- [x] Section order: rendered chapters follow **Introduction → Exterior → Interior → Battery/powertrain →
       Safety → Connectivity → [variant] → [FAQ] → [Texts → Infographics → Technical data → Images → Videos]**.
-- [ ] Omission: a missing chapter (e.g. Battery/powertrain) leaves **no empty heading, no layout gap**.
-- [ ] Tile grid: `.press-kit-overview` / multi-column flex-wrap @≥800 (source measured 3/5/5 rows: first
+- [x] Omission: a missing chapter (e.g. Battery/powertrain) leaves **no empty heading, no layout gap**.
+- [x] Tile grid: `.press-kit-overview` / multi-column flex-wrap @≥800 (source measured 3/5/5 rows: first
       two `ratio-2x1` feature tiles, rest `1:1` squares) / `1 across` full-width @≤780; overlay title
       `16px / 18px / weight 500 / #fff`.
-- [ ] Chapter-nav: full-width `44px` "Chapters" nav; affixes to top on scroll; anchor links reach each
-      section; keyboard operable + `aria-expanded`.
-- [ ] Sub-section rich text: `p` = `16px / 24px / weight 400 / #161718`, `margin-bottom 20px`
+- [x] Chapter-nav (measured on the source's `.chapter-nav`, 2026-10-26): a sticky 44px bar with "← Introduction"
+      (the hub; `\e003` + a space, 20 / 22.5 / 500) left and "Chapters ⌄" (a space, 4px, `\e007` 16px) right, both
+      with a 20px top inset; 10px page inset up to the 1248 cap, then on its edge. Open: a 66 × 2 ink line under
+      "Chapters"; the menu is white, `0 3px 8px rgb(0 0 0 / 15%)`, 24px under the bar, max-content wide (capped at
+      the viewport less 10px), right-aligned with the toggle (+15px once the cap leaves room), 41px rows of
+      16 / 18 / 500 inset 24 / 12, the chapters only. `nav` labelled "Chapters", `button aria-expanded`, Escape
+      closes and returns focus. *(Motorsport's titles carry `<br>`s the import drops: its menu is wider until
+      re-imported, #498.)*
+      **Stuck** (scrolled past the header; the source's `.chapter-nav.affix`, `position: fixed`, padding
+      `8px 0 24px`, measured 2026-10-27 at 1280 / 375 on all 4 kits): a white band 76.3 tall across the viewport,
+      the bar's text 8px lower (y 27 vs 19 just before it sticks) and the menu opening at y 76.3. The bar stays
+      sticky; `.is-stuck` moves the row by a translate and paints the band, so the page under it doesn't move
+      (no layout shift; the source's affix shifts it, 0.03–0.05).
+- [x] Related Press Releases band (measured on the Peaq FAQ, 2026-10-27, 375 – 1440): most kit pages end in the
+      source's dark `.cover-box` band (58 of 79 chapters), after the Media Box when they have one (a 16px white
+      strip between them), else in its place. 72px over the header, 60 under the cards, 16 to the footer; full
+      width (the Media Box band's bleed). Header as the press release's: the h3 (20/25 up to 768, 26/32.5 above), the "Based on tags" line
+      (16/32/600 `#c4c6c7`) and the "All" ghost pill (91 × 36) right, 20px to the cards. Cards: `Story Rail
+      (press)`, its 90 / 45 / 30% cells and arrows, titles two lines ending in "…" (20/24 up to 768, 18/21.6
+      above), one line from 769 after a Media Box (the source's dotdotdot result, as on press releases). Next / a card / All behave as the source (the source's cart +
+      is `display: none`). An FAQ column ends on its last question (no accordion margin under it).
+- [x] Sub-section rich text: `p` = `16px / 24px / weight 400 / #161718`, `margin-bottom 20px`
       (parity with story-detail.md, no delta); sub-page title `h1` `26px / weight 600`.
-- [ ] Metadata: block carries `template/model/bodywork/category/date`; passes lint; surfaces the kit under
+- [x] Metadata: block carries `template/model/bodywork/category/date`; passes lint; surfaces the kit under
       the correct listing facets.
-- [ ] A11y: single `<h1>`; h2→h3 no skips; one tab stop per tile; non-empty `alt`; chapter-nav is a labeled
+- [x] A11y: single `<h1>`; h2→h3 no skips; one tab stop per tile; non-empty `alt`; chapter-nav is a labeled
       `<nav>` with a `<button aria-expanded>`; `:focus-visible` throughout; hero title contrast ≥ 4.5:1.
-- [ ] Visual diff vs source at 1280/1024/768/mobile ≤ 2% per-pixel (excluding image content).
+- [x] ~~Visual diff vs source at 1280/1024/768/mobile ≤ 2% per-pixel (excluding image content).~~ Measured geometry
+      instead (decision 2026-10-26): hero, tiles, prose, outline and the Chapters bar equal to the source at
+      375 – 1440 (SKODA-805 "Phase A").
 
 ## 10. Reference screenshots
 
