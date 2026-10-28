@@ -193,14 +193,16 @@ export default function decorate(block) {
       picture.append(img.cloneNode(true));
     }
 
+    // the fixed-height bands draw the image wider than the viewport: size it for that crop. First,
+    // while the image is still lazy: made eager before, Chrome starts the authored 750w file, then
+    // aborts it, and Lighthouse counts that request against the LCP (#480 review)
+    const band = (isPage && COVER_BANDS.page) || (isArchive && COVER_BANDS.archive);
+    if (band) sizeForCover(picture, band, authored);
     const heroImg = picture.querySelector('img');
     heroImg.setAttribute('fetchpriority', 'high'); // LCP element
     heroImg.setAttribute('loading', 'eager');
     heroImg.setAttribute('width', width);
     heroImg.setAttribute('height', height);
-    // the fixed-height bands draw the image wider than the viewport: size it for that crop
-    const band = (isPage && COVER_BANDS.page) || (isArchive && COVER_BANDS.archive);
-    if (band) sizeForCover(picture, band, authored);
 
     media = document.createElement('div');
     media.className = 'hero-image-media';

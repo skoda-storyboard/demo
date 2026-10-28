@@ -285,6 +285,17 @@ test('bands without the master size or a media-bus image, and the story / overla
   });
 });
 
+test('the band image gets its crop srcset while still lazy, so no authored 750w request starts first', async () => {
+  const hero = block('archive', `<div><div>${MEDIA_PICTURE('2500', '480')}</div></div>`);
+  const changes = [];
+  const observer = new window.MutationObserver((records) => records.forEach((r) => changes.push(r.attributeName)));
+  observer.observe(hero.querySelector('img'), { attributeFilter: ['srcset', 'loading'] });
+  decorate(hero);
+  await Promise.resolve();
+  observer.disconnect();
+  assert.deepEqual(changes, ['srcset', 'loading']);
+});
+
 test('a master no wider than the phone cap gets one source for every width', () => {
   const hero = block('page', `<div><div>${MEDIA_PICTURE('1280', '246')}</div></div>`);
   decorate(hero);
