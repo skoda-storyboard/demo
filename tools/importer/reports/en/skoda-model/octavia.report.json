@@ -1,0 +1,20 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/en/skoda-model/octavia/",
+  "path": "en/skoda-model/octavia",
+  "timestamp": "2026-10-28T06:43:07.209Z",
+  "title": "Octavia - Škoda Storyboard",
+  "template": "model-page",
+  "blocks": [
+    "hero",
+    "key-facts",
+    "spec-table",
+    "story-rail",
+    "story-rail",
+    "story-rail",
+    "story-rail",
+    "story-rail",
+    "story-rail",
+    "in-page-nav"
+  ]
+}

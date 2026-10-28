@@ -240,3 +240,40 @@ test('a thumbnail-width rendition is never substituted for a body image', async 
     assert.match(lowered.changes[0].to, /big-272x182\.jpg$/);
   }, { '/big-272x182.jpg': 8 });
 });
+
+test('a source image recorded as dead on live is stripped from the body, not blocked (SKODA-843)', async () => {
+  await fixture(async (base) => {
+    const dead = new URL('/dead-icon.jpg', base).href;
+    const result = await conditionInlineMedia('<h2>Heading</h2><p><img src="/dead-icon.jpg" alt=""> Text</p>', { ...opts(base), deadSources: new Set([dead]) });
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.changes[0].action, 'strip-dead');
+    assert.doesNotMatch(result.html, /dead-icon/);
+    assert.match(result.html, /Text/, 'the text beside it stays');
+    // not on the list: still blocked
+    const other = await conditionInlineMedia('<p><img src="/dead-icon.jpg"></p>', opts(base));
+    assert.match(other.errors[0], /missing or empty/);
+  }, { '/dead-icon.jpg': { status: 403 } });
+});
+
+test('a dead source image as the page\'s share image drops the Metadata Image row only', async () => {
+  await fixture(async (base) => {
+    const dead = new URL('/dead-icon.jpg', base).href;
+    const html = '<div class="metadata"><div><div>Title</div><div>T</div></div><div><div>Image</div><div><picture><img src="/dead-icon.jpg" alt=""></picture></div></div></div>';
+    const result = await conditionInlineMedia(html, { ...opts(base), deadSources: new Set([dead]) });
+    assert.deepEqual(result.errors, []);
+    assert.doesNotMatch(result.html, /Image/);
+    assert.match(result.html, /Title/, 'the other metadata rows stay');
+  }, { '/dead-icon.jpg': { status: 403 } });
+});
+
+test('a dead source referenced only by a picture <source> or srcset is stripped too (#843 review)', async () => {
+  await fixture(async (base) => {
+    const dead = new URL('/dead-icon.jpg', base).href;
+    const html = '<p><picture><source srcset="/dead-icon.jpg"><img src="/dead-icon.jpg?w=750" srcset="/dead-icon.jpg 2x" alt=""></picture> Text</p>';
+    const result = await conditionInlineMedia(html, { ...opts(base), deadSources: new Set([dead]) });
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.changes[0]?.action, 'strip-dead');
+    assert.doesNotMatch(result.html, /dead-icon/);
+    assert.match(result.html, /Text/);
+  }, { '/dead-icon.jpg': { status: 403 }, '/dead-icon.jpg?w=750': { status: 403 } });
+});

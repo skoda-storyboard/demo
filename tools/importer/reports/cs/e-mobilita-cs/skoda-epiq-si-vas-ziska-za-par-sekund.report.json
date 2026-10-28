@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/",
+  "path": "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+  "timestamp": "2026-10-23T05:52:36.186Z",
+  "title": "Škoda Epiq si vás získá za pár sekund - Škoda Storyboard",
+  "template": "story-detail",
+  "blocks": [
+    "story-hero",
+    "story-flatten",
+    "story-flatten",
+    "story-flatten",
+    "downloads"
+  ]
+}

@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-page-base.js
+  // tools/importer/import-page-base.js
   var import_page_base_exports = {};
   __export(import_page_base_exports, {
     default: () => import_page_base_default
   });
 
-  // parsers/hero-banner.js
+  // tools/importer/parsers/hero-banner.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .image-wrapper img, img");
     const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
@@ -75,7 +75,7 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // transformers/skoda-page-rows.js
+  // tools/importer/transformers/skoda-page-rows.js
   var MARK = "data-skoda-page-body";
   var HALF_ROW = "data-skoda-half-row";
   var BODY = "page-body";
@@ -136,16 +136,26 @@ var CustomImportScript = (() => {
       if (!article) return;
       const rows = rowsOf(article);
       if (!rows.length) {
-        (article.querySelector(".entry-content") || article).setAttribute(MARK, BODY);
+        const body = article.querySelector(".entry-content") || article;
+        if (isFilled(body)) body.setAttribute(MARK, `${BODY}, plain`);
         return;
       }
       rows.forEach((row, i) => {
+        var _a;
         const half = row.getAttribute(HALF_ROW);
         let style = BODY;
         if (half !== null) style = half ? `${HALF}, ${half}` : HALF;
         row.removeAttribute(HALF_ROW);
         if (i > 0) row.before(doc.createElement("hr"));
         row.setAttribute(MARK, style);
+        if (!((_a = payload == null ? void 0 : payload.template) == null ? void 0 : _a.splitWidgets)) return;
+        const cells = cellsOf(row);
+        if (cells.length !== 1) return;
+        const widgets = [...cells[0].querySelectorAll(":scope > .so-panel, :scope > div > .so-panel")].filter((panel) => isFilled(panel));
+        widgets.slice(1).forEach((panel) => {
+          panel.before(doc.createElement("hr"));
+          panel.setAttribute(MARK, style);
+        });
       });
     }
     if (hookName === "afterTransform") {
@@ -157,9 +167,138 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-page-cleanup.js
-  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  // tools/importer/transformers/skoda-page-tables.js
+  var DONE = "data-skoda-table";
+  var hasContent = (el) => !!el.textContent.replace(/[\s\u00a0]/g, "") || !!el.querySelector("img, picture, a[href]");
+  function toBlock(table, document2) {
+    const rows = [...table.rows].filter((row) => [...row.cells].some(hasContent));
+    if (!rows.length) return null;
+    const span = (cell) => Math.max(1, Number.parseInt(cell.getAttribute("colspan"), 10) || 1);
+    const columns = (row) => [...row.cells].reduce((n, cell) => n + span(cell), 0);
+    const width = Math.max(...rows.map(columns));
+    const header = [...rows[0].cells].every((cell) => cell.tagName === "TH");
+    const cells = rows.map((row) => {
+      const out = [];
+      [...row.cells].forEach((cell) => {
+        const div = document2.createElement("div");
+        div.append(...cell.childNodes);
+        out.push(div, ...Array.from({ length: span(cell) - 1 }, () => document2.createElement("div")));
+      });
+      while (out.length < width) out.push(document2.createElement("div"));
+      return out;
+    });
+    const block = WebImporter.DOMUtils.createTable([[header ? "Table (header)" : "Table"], ...cells], document2);
+    block.setAttribute(DONE, "");
+    return block;
+  }
   function transform2(hookName, element, payload) {
+    if (hookName !== "beforeTransform") return;
+    const doc = (payload == null ? void 0 : payload.document) || element.ownerDocument;
+    [...element.querySelectorAll(`table:not([${DONE}])`)].reverse().forEach((table) => {
+      if (table.closest(`[${DONE}]`)) return;
+      const block = toBlock(table, doc);
+      if (block) table.replaceWith(block);
+      else table.remove();
+    });
+  }
+
+  // tools/importer/transformers/skoda-page-offset.js
+  var BLANK = "data-skoda-blank-line";
+  var TRAILING = "data-skoda-trailing-line";
+  var LINE_PX = 24;
+  var BLANK_PARAGRAPH_PX = 44;
+  var isBlank = (p) => !p.querySelector("img, picture, iframe, video, table, a[href]") && p.textContent.includes("\xA0") && !p.textContent.replace(/[\s\u00a0]/g, "");
+  var SPACER_EM_PX = 24;
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var VISIBLE = /[^\s\u00a0]/;
+  function keepIndent(block, doc) {
+    if (!VISIBLE.test(block.textContent)) return;
+    const walker = doc.createTreeWalker(
+      block,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      node.nodeValue = node.nodeValue.replace(/\u00a0/g, NBSP_PLACEHOLDER);
+    }
+  }
+  function heightOf(panel) {
+    var _a;
+    const value = (((_a = panel.querySelector('[style*="padding-top"]')) == null ? void 0 : _a.getAttribute("style")) || "").match(/padding-top:\s*([\d.]+)(em|px)/i);
+    if (!value) return 0;
+    const n = parseFloat(value[1]);
+    return Math.round(value[2].toLowerCase() === "em" ? n * SPACER_EM_PX : n);
+  }
+  function transform3(hookName, element, payload) {
+    const doc = (payload == null ? void 0 : payload.document) || element.ownerDocument;
+    if (hookName === "preprocess") {
+      element.querySelectorAll(".entry-content p").forEach((p) => {
+        if (p.closest("table")) return;
+        if (isBlank(p)) {
+          p.setAttribute(BLANK, "");
+          p.textContent = "blank line";
+          return;
+        }
+        const tail = [...p.childNodes].reverse();
+        const ws = tail.findIndex((n) => !(n.nodeType === 3 && !n.nodeValue.replace(/[\s\u00a0]/g, "")));
+        const br = ws >= 0 ? tail[ws] : null;
+        const blankText = tail.slice(0, Math.max(ws, 0)).map((n) => n.nodeValue).join("");
+        if ((br == null ? void 0 : br.nodeName) === "BR" && ws > 0 && blankText.includes("\xA0")) {
+          tail.slice(0, ws + 1).forEach((n) => n.remove());
+          p.setAttribute(TRAILING, "");
+        }
+        keepIndent(p, doc);
+      });
+      element.querySelectorAll(".entry-content :is(h1, h2, h3, h4, h5, h6, li)").forEach((block) => keepIndent(block, doc));
+      return;
+    }
+    if (hookName !== "beforeTransform") return;
+    const line = (px) => WebImporter.DOMUtils.createTable([["Spacer (line)"], [`${px}px`]], doc);
+    element.querySelectorAll(`p[${BLANK}]`).forEach((p) => {
+      if (p.closest("table")) p.remove();
+      else p.replaceWith(line(BLANK_PARAGRAPH_PX));
+    });
+    element.querySelectorAll(`p[${TRAILING}]`).forEach((p) => {
+      p.removeAttribute(TRAILING);
+      p.after(line(LINE_PX));
+    });
+    element.querySelectorAll(".so-panel.widget_skoda-offset").forEach((panel) => {
+      const height = heightOf(panel);
+      if (!height) {
+        panel.remove();
+        return;
+      }
+      panel.replaceWith(WebImporter.DOMUtils.createTable([["Spacer"], [`${height}px`]], doc));
+    });
+  }
+
+  // tools/importer/transformers/skoda-page-buttons.js
+  function transform4(hookName, element, payload) {
+    if (hookName !== "beforeTransform") return;
+    const doc = (payload == null ? void 0 : payload.document) || element.ownerDocument;
+    element.querySelectorAll("a.ajax-loader-button[href]").forEach((link) => {
+      const text = link.textContent.replace(/\s+/g, " ").trim();
+      if (!text) return;
+      const a = doc.createElement("a");
+      a.href = link.getAttribute("href");
+      a.textContent = text;
+      const em = doc.createElement("em");
+      em.append(a);
+      const holder = link.parentElement;
+      const only = holder && holder !== element && holder.matches("center, p") && holder.textContent.replace(/\s+/g, " ").trim() === text;
+      if (!only && (holder == null ? void 0 : holder.closest("p"))) {
+        link.replaceWith(em);
+        return;
+      }
+      const p = doc.createElement("p");
+      p.append(em);
+      (only ? holder : link).replaceWith(p);
+    });
+  }
+
+  // tools/importer/transformers/skoda-page-cleanup.js
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function transform5(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
       WebImporter.DOMUtils.remove(element, [
         // Site header / nav / language switcher / search overlay chrome
@@ -241,7 +380,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -252,7 +391,7 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function transform3(hookName, element, payload) {
+  function transform6(hookName, element, payload) {
     const sections = payload && payload.template && payload.template.sections || [];
     if (sections.length < 2) return;
     if (hookName === "beforeTransform") {
@@ -286,7 +425,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -534,7 +673,7 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function transform4(hookName, element, payload) {
+  function transform7(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     if (hasMetadataBlock(element)) return;
     const { document: document2, url, params } = payload;
@@ -560,6 +699,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document2) : [];
@@ -574,7 +715,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -587,6 +728,9 @@ var CustomImportScript = (() => {
     "/cs/tiskove-zpravy",
     "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en",
+    "/en/board-of-management",
+    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions",
+    "/en/brand-group-core-bgc",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -602,6 +746,12 @@ var CustomImportScript = (() => {
     "/en/category/skoda-world/heritage",
     "/en/category/skoda-world/innovation-and-technology",
     "/en/category/skoda-world/responsibility",
+    "/en/company-logo",
+    "/en/contacts",
+    "/en/copyright",
+    "/en/documents",
+    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing",
+    "/en/documents/cookies",
     "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
     "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
     "/en/emobility/a-true-czech-from-spain",
@@ -645,7 +795,15 @@ var CustomImportScript = (() => {
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
+    "/en/iihf/lv/picture-guidelines",
+    "/en/iihf/lv/terms-and-conditions",
+    "/en/iihf/picture-guidelines",
+    "/en/iihf/ru/gdpr",
+    "/en/iihf/ru/picture-guidelines",
+    "/en/iihf/ru/terms-and-conditions",
+    "/en/iihf/terms-and-conditions",
     "/en/images",
+    "/en/impressum",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
@@ -690,6 +848,8 @@ var CustomImportScript = (() => {
     "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
     "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
+    "/en/newsletter",
+    "/en/newsletter-terms-and-conditions",
     "/en/press-kits",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
@@ -899,8 +1059,10 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
+    "/en/server-status",
     "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
     "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
+    "/en/skoda-media-services-application",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -970,6 +1132,8 @@ var CustomImportScript = (() => {
     "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
     "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/en/soon-also-in-german",
+    "/en/sustainable-offices",
     "/en/tag/company/design",
     "/en/tag/company/production",
     "/en/tag/crew/electro-vehicle",
@@ -996,6 +1160,7 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
+    "/en/terms-and-conditions-2",
     "/en/videos",
     "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
     "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
@@ -1011,6 +1176,15 @@ var CustomImportScript = (() => {
     "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
     "/cs/tiskove-zpravy",
     "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+    "/en/board-of-management",
+    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions",
+    "/en/brand-group-core-bgc",
+    "/en/company-logo",
+    "/en/contacts",
+    "/en/copyright",
+    "/en/documents",
+    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing",
+    "/en/documents/cookies",
     "/en/emobility/a-true-czech-from-spain",
     "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
@@ -1030,6 +1204,14 @@ var CustomImportScript = (() => {
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
+    "/en/iihf/lv/picture-guidelines",
+    "/en/iihf/lv/terms-and-conditions",
+    "/en/iihf/picture-guidelines",
+    "/en/iihf/ru/gdpr",
+    "/en/iihf/ru/picture-guidelines",
+    "/en/iihf/ru/terms-and-conditions",
+    "/en/iihf/terms-and-conditions",
+    "/en/impressum",
     "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
     "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models",
     "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
@@ -1064,6 +1246,8 @@ var CustomImportScript = (() => {
     "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
     "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
+    "/en/newsletter",
+    "/en/newsletter-terms-and-conditions",
     "/en/press-kits",
     "/en/press-kits/design-and-technology-update-for-the-skoda-fabia",
     "/en/press-kits/enyaq-world-premiere",
@@ -1128,7 +1312,9 @@ var CustomImportScript = (() => {
     "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard",
     "/en/search",
     "/en/series-2",
+    "/en/server-status",
     "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
+    "/en/skoda-media-services-application",
     "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
     "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
     "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes",
@@ -1162,6 +1348,9 @@ var CustomImportScript = (() => {
     "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes",
     "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
     "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/en/soon-also-in-german",
+    "/en/sustainable-offices",
+    "/en/terms-and-conditions-2",
     "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
     "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
   ];
@@ -1223,7 +1412,7 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform5(hookName, element, payload) {
+  function transform8(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
@@ -1235,10 +1424,10 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
-  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER2 = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform6(hookName, element, payload) {
+  function transform9(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -1248,12 +1437,12 @@ var CustomImportScript = (() => {
     );
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.nodeValue.includes("\xA0")) {
-        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER2.repeat(run.length));
       }
     }
   }
 
-  // import-page-base.js
+  // tools/importer/import-page-base.js
   var parsers = {
     "hero-banner": parse
   };
@@ -1263,6 +1452,8 @@ var CustomImportScript = (() => {
     urls: ["https://www.skoda-storyboard.com/en/brand-group-core-bgc/"],
     // a default, not an override: a CPT page flattened here (press-kit hub) keeps its type
     metadata: { templateDefault: "page" },
+    // a one-cell row's further widgets are sections of their own (skoda-page-rows, SKODA-843)
+    splitWidgets: true,
     blocks: [
       { name: "hero-banner", instances: ["div.hero"] }
     ],
@@ -1293,11 +1484,17 @@ var CustomImportScript = (() => {
     ]
   };
   var transformers = [
-    transform,
+    // the body's tables as Table blocks, before the importer reads them as blocks (SKODA-843)
     transform2,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform3] : [],
+    // the spacer widgets as Spacer blocks (SKODA-843)
+    transform3,
+    // the source's pill buttons as secondary buttons (SKODA-843)
     transform4,
-    transform5
+    transform,
+    transform5,
+    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform6] : [],
+    transform7,
+    transform8
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
@@ -1327,8 +1524,9 @@ var CustomImportScript = (() => {
   }
   var import_page_base_default = {
     preprocess: ({ document: document2 }) => {
-      transform6("preprocess", document2.body, { document: document2 });
+      transform9("preprocess", document2.body, { document: document2 });
       transform("preprocess", document2.body, { document: document2 });
+      transform3("preprocess", document2.body, { document: document2 });
     },
     transform: (payload) => {
       const { document: document2, url, params } = payload;

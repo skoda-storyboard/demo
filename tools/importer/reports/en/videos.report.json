@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/en/videos/",
+  "path": "en/videos",
+  "timestamp": "2026-10-28T05:24:07.065Z",
+  "title": "Videos - Škoda Storyboard",
+  "template": "videos-listing",
+  "blocks": [
+    "listing"
+  ]
+}

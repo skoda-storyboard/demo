@@ -1,0 +1,10 @@
+https://main--demo--skoda-storyboard.aem.page/cs/media-room/nav
+https://main--demo--skoda-storyboard.aem.page/cs/media-room/footer
+https://main--demo--skoda-storyboard.aem.page/de/media-room/nav
+https://main--demo--skoda-storyboard.aem.page/de/media-room/footer
+https://main--demo--skoda-storyboard.aem.page/sk/media-room/nav
+https://main--demo--skoda-storyboard.aem.page/sk/media-room/footer
+https://main--demo--skoda-storyboard.aem.page/sr/media-room/nav
+https://main--demo--skoda-storyboard.aem.page/sr/media-room/footer
+https://main--demo--skoda-storyboard.aem.page/sl/media-room/nav
+https://main--demo--skoda-storyboard.aem.page/sl/media-room/footer

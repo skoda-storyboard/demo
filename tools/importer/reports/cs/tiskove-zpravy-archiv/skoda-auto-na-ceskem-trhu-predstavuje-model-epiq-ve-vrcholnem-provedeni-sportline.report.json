@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/tiskove-zpravy-archiv/skoda-auto-na-ceskem-trhu-predstavuje-model-epiq-ve-vrcholnem-provedeni-sportline/",
+  "path": "cs/tiskove-zpravy-archiv/skoda-auto-na-ceskem-trhu-predstavuje-model-epiq-ve-vrcholnem-provedeni-sportline",
+  "timestamp": "2026-10-22T12:32:21.222Z",
+  "title": "Škoda Auto na českém trhu představuje model Epiq ve vrcholném provedení Sportline - Škoda Storyboard",
+  "template": "press-release",
+  "blocks": [
+    "gallery",
+    "tags",
+    "downloads",
+    "quote"
+  ]
+}

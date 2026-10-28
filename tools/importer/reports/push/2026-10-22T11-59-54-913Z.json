@@ -1,0 +1,97 @@
+{
+  "run": "2026-10-22T11:59:54.913Z",
+  "args": {
+    "list": "/backups/skoda-storyboard/demo/repo/.migration/cache-1001/paths-footers.txt",
+    "stages": [
+      "push",
+      "preview"
+    ],
+    "dryRun": false,
+    "force": false,
+    "publishFragments": false,
+    "approveHold": [],
+    "maxImageBytes": 10485760,
+    "minImageEdge": 768,
+    "ref": "main"
+  },
+  "summary": {
+    "blocked-binary": 3
+  },
+  "fragments": [
+    {
+      "path": "/nav",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/footer",
+      "preview": 200,
+      "live": 200,
+      "ok": true
+    },
+    {
+      "path": "/de/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sk/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    },
+    {
+      "path": "/sr/nav",
+      "preview": 200,
+      "live": 404,
+      "ok": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "/de/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/de/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/de/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf",
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf; unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+    },
+    {
+      "path": "/sk/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sk/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sk/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-cs-cz-260.pdf"
+    },
+    {
+      "path": "/sr/footer",
+      "preview": "https://main--demo--skoda-storyboard.aem.page/sr/footer",
+      "live": "https://main--demo--skoda-storyboard.aem.live/sr/footer",
+      "binaries": {
+        "count": 0,
+        "rewrites": 0,
+        "errors": [
+          "unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+        ]
+      },
+      "action": "blocked-binary",
+      "error": "Binary gate: unverified document link: https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-en-com-004.pdf"
+    }
+  ]
+}

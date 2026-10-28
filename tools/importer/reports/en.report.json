@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/en/",
+  "path": "en",
+  "timestamp": "2026-10-28T06:42:49.315Z",
+  "title": "Škoda Storyboard",
+  "template": "home-sto",
+  "blocks": [
+    "promo-box",
+    "home-stories",
+    "home-rail",
+    "home-rail",
+    "home-rail",
+    "home-rail",
+    "home-rail",
+    "home-rail"
+  ]
+}

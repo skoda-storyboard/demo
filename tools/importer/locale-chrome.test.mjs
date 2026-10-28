@@ -9,7 +9,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import {
-  localeOfUrl, authoredHref, buildNav, buildNewsletter, buildFooter, siteWideLocaleHref,
+  localeOfUrl, authoredHref, buildNav, buildNewsletter, buildFooter, buildSectionNav,
+  siteWideLocaleHref,
 } from './locale-chrome.js';
 
 const LIVE = 'https://www.skoda-storyboard.com';
@@ -199,7 +200,7 @@ test('buildNav: a topbar without Subscribe (DE / SK / SR on the source) authors 
 });
 
 test('a language menu link stays on the site only when its target is migrated (SKODA-1001)', async () => {
-  const { default: links } = await import('./transformers/skoda-links.js');
+  const { default: linksTransformer } = await import('./transformers/skoda-links.js');
   const { document } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: `${LIVE}/cs/x/` }).window;
   const nav = document.createElement('div');
   [
@@ -208,7 +209,7 @@ test('a language menu link stays on the site only when its target is migrated (S
     '/en/', // the English home
     '#subscribe',
   ].forEach((href) => nav.append(Object.assign(document.createElement('a'), { href: authoredHref(href) })));
-  links('afterTransform', nav, { document });
+  linksTransformer('afterTransform', nav, { document });
   assert.deepEqual([...nav.querySelectorAll('a')].map((a) => a.getAttribute('href')), [
     '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund',
     `${LIVE}/cs/category/modely-cs/`,
@@ -258,4 +259,61 @@ test('buildFooter: the Media Room newsletter intro, beside a direct or a nested 
   } finally {
     delete globalThis.WebImporter;
   }
+});
+
+// the Sustainable Offices header (SKODA-843): 3 tabs, its own locale links, no menu
+const SECTION = `<header class="header">
+  <div class="topbar"><ul class="section-nav">
+    <li><a href="${LIVE}/en/">Stories</a></li><li><a href="${LIVE}/en/media-room/">Media Room</a></li>
+    <li class="active"><a href="${LIVE}/en/?page_id=320705">Sustainability</a></li></ul>
+    <div class="right-section"><div class="lang-links"> <span>en</span> <a href="${LIVE}/cs/udrzitelne-kancelare/">CZ</a> </div></div></div>
+  <div class="brand"><a class="logo" href="${LIVE}/en/?page_id=320705" title="Sustainability"><svg></svg></a></div>
+  <nav class="topnav"><div class="search-bar"><form class="search-form" action="${LIVE}/en/search/"><input type="search" placeholder="Search"></form></div></nav>
+</header>`;
+
+// the builder keeps source links absolute; the importer's link rule (skoda-links, run by
+// import-sustainability-nav.js as by the locale chrome importers) puts the demo pages on the demo
+test('buildSectionNav: topbar (every tab, the source locale links) --- brand --- search; a page_id link is the page', async () => {
+  const { default: linksTransformer } = await import('./transformers/skoda-links.js');
+  const d = new JSDOM(`<!DOCTYPE html><html><body>${SECTION}</body></html>`, { url: `${LIVE}/en/sustainable-offices/` }).window.document;
+  const nav = buildSectionNav(d, '/en/sustainable-offices/');
+  const [built, builtBrand] = sections(nav);
+  assert.deepEqual(links(built[0]), [`Stories=${LIVE}/en/`, `Media Room=${LIVE}/en/media-room/`, `Sustainability=${LIVE}/en/sustainable-offices/`]);
+  assert.deepEqual(links(builtBrand[0]), [`Škoda Storyboard=${LIVE}/en/sustainable-offices/`], 'the page_id logo link is the page');
+  linksTransformer('afterTransform', nav, { document: d });
+  const s = sections(nav);
+  assert.equal(s.length, 3);
+  const [topbar, brand, search] = s;
+  assert.deepEqual(links(topbar[0]), ['Stories=/en', 'Media Room=/en/media-room', 'Sustainability=/en/sustainable-offices']);
+  // the Czech page is not migrated: it stays on the live site
+  assert.equal(topbar[1].innerHTML, `<strong>EN</strong> <a href="${LIVE}/cs/udrzitelne-kancelare/">CZ</a>`);
+  assert.deepEqual(links(brand[0]), ['Škoda Storyboard=/en/sustainable-offices']);
+  assert.equal(brand[0].querySelector('a').title, 'Sustainability');
+  assert.deepEqual(links(search[0]), ['Search=/en/search']);
+});
+
+test('buildFooter: a footer without a menu has 2 sections (icons, legal)', () => {
+  const d = doc();
+  d.querySelector('.footer-nav').remove();
+  const s = sections(buildFooter(d));
+  assert.equal(s.length, 2);
+  assert.equal(s[1][1].textContent, '© Škoda Auto a.s. 2026');
+});
+
+test('buildSectionNav: without the source current-language marker, the page locale is it', () => {
+  const d = new JSDOM(`<!DOCTYPE html><html><body>${SECTION}</body></html>`).window.document;
+  d.querySelector('.lang-links span').remove();
+  const [topbar] = sections(buildSectionNav(d, '/en/sustainable-offices/'));
+  assert.equal(topbar[1].innerHTML, `<strong>EN</strong> <a href="${LIVE}/cs/udrzitelne-kancelare/">CZ</a>`);
+});
+
+test('authoredHref: the source analytics fragment goes, other fragments stay', () => {
+  assert.equal(authoredHref('https://www.facebook.com/skodaglobal/#s_aid=abc_004_0'), 'https://www.facebook.com/skodaglobal/');
+  assert.equal(authoredHref(`${LIVE}/en/contacts/#corporate`), `${LIVE}/en/contacts/#corporate`);
+});
+
+test('buildSectionNav: a source topbar without tabs is an error, not a nav the header misreads', () => {
+  const d = new JSDOM(`<!DOCTYPE html><html><body>${SECTION}</body></html>`).window.document;
+  d.querySelectorAll('.section-nav li').forEach((li) => li.remove());
+  assert.throws(() => buildSectionNav(d, '/en/sustainable-offices/'), /no section tabs/);
 });

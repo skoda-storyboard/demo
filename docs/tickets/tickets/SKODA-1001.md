@@ -133,3 +133,15 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
 - **Note (out of scope, already on `main`):** `tools/i18n/ui-text.test.mjs` "the registry names every label
   object" fails on `main` since #483 + #496: `blocks/exec-bio/exec-bio.js` `LABELS` (Board of Management) is not
   in `REGISTRY`. Its fix needs the sheet keys and the 5 translations.
+- **Merge with `main` after #511 (SKODA-843, 2026-10-28):** `locale-chrome.js` keeps both: #511's
+  analytics-fragment strip and 2-section footer (no menu), this branch's absolute live links and the Media Room
+  footer widgets. Under this branch's link rule the builders' links stay absolute and the importer's `skoda-links`
+  pass decides, so the Sustainable Offices chrome importers (`import-sustainability-nav.js` / `-footer.js`) now run
+  it too, as the locale chrome importers do. The link allowlist is refreshed (`npm run import:allowlist --
+  --refresh-published`): it adds the 24 pages migrated since (the 17 SKODA-843 pages and Sustainable Offices, the 4
+  company pages, `/en/newsletter`). Import output: the locale nav / footer, model page, images listing and
+  Sustainable Offices page are byte-identical; the Sustainable Offices nav keeps its tabs, logo and search on the
+  demo (`/en`, `/en/media-room`, `/en/sustainable-offices`, `/en/search`), its CZ link (not migrated) and the
+  footer's RSS feeds go to the live site, its Copyright stays on the demo. The press-release and press-kit
+  "Media contacts" link is now `/en/contacts` (a demo page; two importer tests updated). All 25 SKODA-843 / 810a
+  pages equal `main` at 390 / 768 / 1280 on the merged code.

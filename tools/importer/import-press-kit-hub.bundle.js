@@ -32,7 +32,7 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-press-kit-hub.js
+  // tools/importer/import-press-kit-hub.js
   var import_press_kit_hub_exports = {};
   __export(import_press_kit_hub_exports, {
     YEAR_TERMS: () => YEAR_TERMS,
@@ -41,7 +41,7 @@ var CustomImportScript = (() => {
     sourceFacets: () => sourceFacets
   });
 
-  // parsers/press-kit-hub-hero.js
+  // tools/importer/parsers/press-kit-hub-hero.js
   function parseHero(hero, document) {
     const image = hero.querySelector(".hero-image img");
     const title = hero.querySelector(".hero-caption h1");
@@ -69,7 +69,7 @@ var CustomImportScript = (() => {
     ], document);
   }
 
-  // parsers/series-grid.js
+  // tools/importer/parsers/series-grid.js
   function siteOriginWidths(document) {
     const widths = {};
     document.querySelectorAll("style").forEach((style) => {
@@ -87,7 +87,7 @@ var CustomImportScript = (() => {
     return widths;
   }
 
-  // parsers/press-kit-hub-tiles.js
+  // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
@@ -184,7 +184,7 @@ var CustomImportScript = (() => {
     return WebImporter.DOMUtils.createTable(rows, document);
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -458,6 +458,8 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.nav) meta.nav = overrides.nav;
+    if (overrides.footer) meta.footer = overrides.footer;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
@@ -472,7 +474,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -485,6 +487,9 @@ var CustomImportScript = (() => {
     "/cs/tiskove-zpravy",
     "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en",
+    "/en/board-of-management",
+    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions",
+    "/en/brand-group-core-bgc",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -500,6 +505,12 @@ var CustomImportScript = (() => {
     "/en/category/skoda-world/heritage",
     "/en/category/skoda-world/innovation-and-technology",
     "/en/category/skoda-world/responsibility",
+    "/en/company-logo",
+    "/en/contacts",
+    "/en/copyright",
+    "/en/documents",
+    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing",
+    "/en/documents/cookies",
     "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
     "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
     "/en/emobility/a-true-czech-from-spain",
@@ -543,7 +554,15 @@ var CustomImportScript = (() => {
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
+    "/en/iihf/lv/picture-guidelines",
+    "/en/iihf/lv/terms-and-conditions",
+    "/en/iihf/picture-guidelines",
+    "/en/iihf/ru/gdpr",
+    "/en/iihf/ru/picture-guidelines",
+    "/en/iihf/ru/terms-and-conditions",
+    "/en/iihf/terms-and-conditions",
     "/en/images",
+    "/en/impressum",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
@@ -588,6 +607,8 @@ var CustomImportScript = (() => {
     "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
     "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
+    "/en/newsletter",
+    "/en/newsletter-terms-and-conditions",
     "/en/press-kits",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
@@ -797,8 +818,10 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
+    "/en/server-status",
     "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
     "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
+    "/en/skoda-media-services-application",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -868,6 +891,8 @@ var CustomImportScript = (() => {
     "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
     "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/en/soon-also-in-german",
+    "/en/sustainable-offices",
     "/en/tag/company/design",
     "/en/tag/company/production",
     "/en/tag/crew/electro-vehicle",
@@ -894,6 +919,7 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
+    "/en/terms-and-conditions-2",
     "/en/videos",
     "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
     "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
@@ -909,6 +935,15 @@ var CustomImportScript = (() => {
     "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
     "/cs/tiskove-zpravy",
     "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+    "/en/board-of-management",
+    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions",
+    "/en/brand-group-core-bgc",
+    "/en/company-logo",
+    "/en/contacts",
+    "/en/copyright",
+    "/en/documents",
+    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing",
+    "/en/documents/cookies",
     "/en/emobility/a-true-czech-from-spain",
     "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
@@ -928,6 +963,14 @@ var CustomImportScript = (() => {
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
+    "/en/iihf/lv/picture-guidelines",
+    "/en/iihf/lv/terms-and-conditions",
+    "/en/iihf/picture-guidelines",
+    "/en/iihf/ru/gdpr",
+    "/en/iihf/ru/picture-guidelines",
+    "/en/iihf/ru/terms-and-conditions",
+    "/en/iihf/terms-and-conditions",
+    "/en/impressum",
     "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
     "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models",
     "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
@@ -962,6 +1005,8 @@ var CustomImportScript = (() => {
     "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
     "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
+    "/en/newsletter",
+    "/en/newsletter-terms-and-conditions",
     "/en/press-kits",
     "/en/press-kits/design-and-technology-update-for-the-skoda-fabia",
     "/en/press-kits/enyaq-world-premiere",
@@ -1026,7 +1071,9 @@ var CustomImportScript = (() => {
     "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard",
     "/en/search",
     "/en/series-2",
+    "/en/server-status",
     "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
+    "/en/skoda-media-services-application",
     "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
     "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
     "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes",
@@ -1060,6 +1107,9 @@ var CustomImportScript = (() => {
     "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes",
     "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
     "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/en/soon-also-in-german",
+    "/en/sustainable-offices",
+    "/en/terms-and-conditions-2",
     "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
     "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
   ];
@@ -1133,7 +1183,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1255,7 +1305,7 @@ var CustomImportScript = (() => {
     normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
   }
 
-  // import-press-kit-hub.js
+  // tools/importer/import-press-kit-hub.js
   var FACETS2 = [
     "model",
     "bodywork",

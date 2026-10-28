@@ -11,7 +11,7 @@
  * `Style: page-body, half`. Its right cell, when it holds an empty widget rather than none
  * (the copyright's first one), still takes the widget's 10px on phones, where SiteOrigin
  * stacks the cells and hides only an empty cell: `empty-cell`. A body without rows is one
- * `page-body` section.
+ * `page-body` section, or none when it is empty.
  *
  * preprocess (the untouched page: the importer drops <style>, which holds the cell widths,
  * before transform): each half-width row is marked. beforeTransform: an <hr> before every
@@ -97,7 +97,11 @@ export default function transform(hookName, element, payload) {
     if (!article) return;
     const rows = rowsOf(article);
     if (!rows.length) {
-      (article.querySelector('.entry-content') || article).setAttribute(MARK, BODY);
+      // an empty body (the source's /en/impressum: a title only) gets no section, so nothing
+      // sits between the title band and the footer, as on the source (SKODA-843)
+      const body = article.querySelector('.entry-content') || article;
+      // no rows means no widget: no widget's 10px above the first line (`plain`)
+      if (isFilled(body)) body.setAttribute(MARK, `${BODY}, plain`);
       return;
     }
     rows.forEach((row, i) => {
@@ -107,6 +111,19 @@ export default function transform(hookName, element, payload) {
       row.removeAttribute(HALF_ROW);
       if (i > 0) row.before(doc.createElement('hr'));
       row.setAttribute(MARK, style);
+      // each further widget of a one-cell row is its own section: every source widget starts
+      // 10px down (its style's 10px padding, SKODA-843: the consent page's "Sending of …"
+      // h4 widget under the row's first text widget). Opt-in (`template.splitWidgets`): the
+      // company pages place their widgets themselves (skoda-company-people, #843 review)
+      if (!payload?.template?.splitWidgets) return;
+      const cells = cellsOf(row);
+      if (cells.length !== 1) return;
+      const widgets = [...cells[0].querySelectorAll(':scope > .so-panel, :scope > div > .so-panel')]
+        .filter((panel) => isFilled(panel));
+      widgets.slice(1).forEach((panel) => {
+        panel.before(doc.createElement('hr'));
+        panel.setAttribute(MARK, style);
+      });
     });
   }
 

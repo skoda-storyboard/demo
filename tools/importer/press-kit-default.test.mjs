@@ -239,7 +239,8 @@ test('first glimpse preserves six inline downloads, two linked banners and both 
   assert.deepEqual([...menu.querySelectorAll(':scope > li > a[href]'),
     ...page.querySelectorAll('article.press_kit > p > a[href="#media-box"]')]
     .map((a) => [txt(a), a.getAttribute('href')]), [
-    ['Media contacts', 'https://www.skoda-storyboard.com/en/contacts/'],
+    // Contacts is a demo page (SKODA-810a; the link allowlist since the 2026-10-28 refresh)
+    ['Media contacts', '/en/contacts'],
     ['Download Media Box', '#media-box'],
     ['+51', '#media-box'],
   ]);

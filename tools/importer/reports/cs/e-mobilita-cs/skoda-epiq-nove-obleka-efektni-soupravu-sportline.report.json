@@ -1,0 +1,15 @@
+{
+  "status": "success",
+  "url": "https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline/",
+  "path": "cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
+  "timestamp": "2026-10-23T05:52:19.694Z",
+  "title": "Škoda Epiq nově obléká efektní soupravu Sportline - Škoda Storyboard",
+  "template": "story-detail",
+  "blocks": [
+    "story-hero",
+    "story-flatten",
+    "story-flatten",
+    "story-flatten",
+    "downloads"
+  ]
+}

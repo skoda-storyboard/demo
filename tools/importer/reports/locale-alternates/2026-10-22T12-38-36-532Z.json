@@ -1,0 +1,2311 @@
+{
+  "generated": "2026-10-22T12:38:36.532Z",
+  "stage": "live",
+  "origin": "https://main--demo--skoda-storyboard.aem.live",
+  "pages": 415,
+  "rows": [
+    {
+      "URL": "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:cs": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:de": "https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:sk": "https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:sr": "https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+    },
+    {
+      "URL": "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:cs": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:de": "https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:sk": "https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:sr": "https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+    },
+    {
+      "URL": "/en",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en"
+    },
+    {
+      "URL": "/en/category/classic-cars",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/classic-cars"
+    },
+    {
+      "URL": "/en/category/concepts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/concepts"
+    },
+    {
+      "URL": "/en/category/corporate-life",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/corporate-life"
+    },
+    {
+      "URL": "/en/category/emobility",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/emobility"
+    },
+    {
+      "URL": "/en/category/lifestyle",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle"
+    },
+    {
+      "URL": "/en/category/lifestyle/adventures",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle/adventures"
+    },
+    {
+      "URL": "/en/category/lifestyle/people",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle/people"
+    },
+    {
+      "URL": "/en/category/lifestyle/sports",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle/sports"
+    },
+    {
+      "URL": "/en/category/models",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/models"
+    },
+    {
+      "URL": "/en/category/skoda-world",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world"
+    },
+    {
+      "URL": "/en/category/skoda-world/design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world/design"
+    },
+    {
+      "URL": "/en/category/skoda-world/heritage",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world/heritage"
+    },
+    {
+      "URL": "/en/category/skoda-world/innovation-and-technology",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world/innovation-and-technology"
+    },
+    {
+      "URL": "/en/category/skoda-world/responsibility",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world/responsibility"
+    },
+    {
+      "URL": "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france"
+    },
+    {
+      "URL": "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca"
+    },
+    {
+      "URL": "/en/emobility/a-true-czech-from-spain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/a-true-czech-from-spain"
+    },
+    {
+      "URL": "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries"
+    },
+    {
+      "URL": "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/before-an-electric-car-starts-up-for-the-first-time"
+    },
+    {
+      "URL": "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq"
+    },
+    {
+      "URL": "/en/emobility/camouflage-to-get-you-hooked",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/camouflage-to-get-you-hooked"
+    },
+    {
+      "URL": "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee"
+    },
+    {
+      "URL": "/en/emobility/come-and-play-skoda-is-heading-to-milan",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/come-and-play-skoda-is-heading-to-milan"
+    },
+    {
+      "URL": "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical"
+    },
+    {
+      "URL": "/en/emobility/discover-the-countryside-around-zell-am-see",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/discover-the-countryside-around-zell-am-see"
+    },
+    {
+      "URL": "/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv"
+    },
+    {
+      "URL": "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint"
+    },
+    {
+      "URL": "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all"
+    },
+    {
+      "URL": "/en/emobility/enyaq-coupe-respectline-a-celebration-of-uniqueness",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/enyaq-coupe-respectline-a-celebration-of-uniqueness"
+    },
+    {
+      "URL": "/en/emobility/enyaq-rs-race-rally-technology-plus-sustainability",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/enyaq-rs-race-rally-technology-plus-sustainability"
+    },
+    {
+      "URL": "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv"
+    },
+    {
+      "URL": "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak"
+    },
+    {
+      "URL": "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/how-was-the-elroq-made-not-in-the-usual-way"
+    },
+    {
+      "URL": "/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq"
+    },
+    {
+      "URL": "/en/emobility/meet-peaq-safe-and-comfortable",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-peaq-safe-and-comfortable"
+    },
+    {
+      "URL": "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics"
+    },
+    {
+      "URL": "/en/emobility/meet-the-peaq-comfort-just-like-at-home",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-comfort-just-like-at-home"
+    },
+    {
+      "URL": "/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls"
+    },
+    {
+      "URL": "/en/emobility/meet-the-peaq-spacious-inside-and-out",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-spacious-inside-and-out"
+    },
+    {
+      "URL": "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan"
+    },
+    {
+      "URL": "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia"
+    },
+    {
+      "URL": "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
+    },
+    {
+      "URL": "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq"
+    },
+    {
+      "URL": "/en/emobility/skoda-elroq-and-a-happy-family",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-elroq-and-a-happy-family"
+    },
+    {
+      "URL": "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-elroq-premiere-light-cube-camera-action"
+    },
+    {
+      "URL": "/en/emobility/skoda-enyaq-coupe-iv-will-get-you-in-60-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-enyaq-coupe-iv-will-get-you-in-60-seconds"
+    },
+    {
+      "URL": "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+    },
+    {
+      "URL": "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:cs": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:de": "https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:sk": "https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:sr": "https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+    },
+    {
+      "URL": "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-peaq-unparalleled-space-and-comfort"
+    },
+    {
+      "URL": "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq"
+    },
+    {
+      "URL": "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq"
+    },
+    {
+      "URL": "/en/emobility/teaser",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/teaser"
+    },
+    {
+      "URL": "/en/emobility/the-little-prince-van-gogh-and-lavender-scent",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/the-little-prince-van-gogh-and-lavender-scent"
+    },
+    {
+      "URL": "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/the-skoda-peaq-will-win-you-over-fast"
+    },
+    {
+      "URL": "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere"
+    },
+    {
+      "URL": "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live"
+    },
+    {
+      "URL": "/en/emobility/whats-behind-epiq-design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/whats-behind-epiq-design"
+    },
+    {
+      "URL": "/en/images",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/images"
+    },
+    {
+      "URL": "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague"
+    },
+    {
+      "URL": "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon"
+    },
+    {
+      "URL": "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving"
+    },
+    {
+      "URL": "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans"
+    },
+    {
+      "URL": "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/exploring-the-magnificent-alps-in-rs-models"
+    },
+    {
+      "URL": "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool"
+    },
+    {
+      "URL": "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling"
+    },
+    {
+      "URL": "/en/lifestyle/how-to-take-the-best-picture-of-a-car-follow-a-pros-advice",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/how-to-take-the-best-picture-of-a-car-follow-a-pros-advice"
+    },
+    {
+      "URL": "/en/lifestyle/into-the-freezing-water-with-the-iceman",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/into-the-freezing-water-with-the-iceman"
+    },
+    {
+      "URL": "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como"
+    },
+    {
+      "URL": "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/ouninpohja-finlands-roller-coaster-stage"
+    },
+    {
+      "URL": "/en/lifestyle/road-trip-in-asturias-from-beaches-to-high-peaks",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/road-trip-in-asturias-from-beaches-to-high-peaks"
+    },
+    {
+      "URL": "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/rs-four-ways-which-one-will-you-choose"
+    },
+    {
+      "URL": "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones"
+    },
+    {
+      "URL": "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona"
+    },
+    {
+      "URL": "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-skatepark-tricks-in-marseille",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/cycling/miss-peaches-on-the-road-skatepark-tricks-in-marseille"
+    },
+    {
+      "URL": "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-whitewater-in-switzerland",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/cycling/miss-peaches-on-the-road-whitewater-in-switzerland"
+    },
+    {
+      "URL": "/en/lifestyle/sports/hockey/this-years-skoda-ice-hockey-team-line-up",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/hockey/this-years-skoda-ice-hockey-team-line-up"
+    },
+    {
+      "URL": "/en/lifestyle/sports/miss-peaches-on-the-road-downhill-biking-in-champery-switzerland",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/miss-peaches-on-the-road-downhill-biking-in-champery-switzerland"
+    },
+    {
+      "URL": "/en/lifestyle/sports/miss-peaches-on-the-road-surfing-in-san-sebastian",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/sports/miss-peaches-on-the-road-surfing-in-san-sebastian"
+    },
+    {
+      "URL": "/en/lifestyle/the-best-of-storyboard-pucks-wheels-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/the-best-of-storyboard-pucks-wheels-seconds"
+    },
+    {
+      "URL": "/en/lifestyle/this-years-skoda-auto-hockey-team-line-up",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/this-years-skoda-auto-hockey-team-line-up"
+    },
+    {
+      "URL": "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road"
+    },
+    {
+      "URL": "/en/media-cart",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/media-cart"
+    },
+    {
+      "URL": "/en/media-room",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/media-room"
+    },
+    {
+      "URL": "/en/models/discovering-the-full-power-of-a-skoda-4x4",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/discovering-the-full-power-of-a-skoda-4x4"
+    },
+    {
+      "URL": "/en/models/enyaq-rs-race-an-electric-coupe-on-steroids",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/enyaq-rs-race-an-electric-coupe-on-steroids"
+    },
+    {
+      "URL": "/en/models/first-glimpse-of-skodas-new-suv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/first-glimpse-of-skodas-new-suv"
+    },
+    {
+      "URL": "/en/models/kamiq/first-sketches-of-the-skoda-kamiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/kamiq/first-sketches-of-the-skoda-kamiq"
+    },
+    {
+      "URL": "/en/models/kamiq/skodas-new-suv-christened-the-kamiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/kamiq/skodas-new-suv-christened-the-kamiq"
+    },
+    {
+      "URL": "/en/models/kamiq/the-skoda-kamiq-your-travel-buddy-for-urban-adventuring",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/kamiq/the-skoda-kamiq-your-travel-buddy-for-urban-adventuring"
+    },
+    {
+      "URL": "/en/models/karoq/first-sketches-of-the-new-skoda-karoq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/karoq/first-sketches-of-the-new-skoda-karoq"
+    },
+    {
+      "URL": "/en/models/meet-the-skoda-kodiaq-sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/meet-the-skoda-kodiaq-sportline"
+    },
+    {
+      "URL": "/en/models/millionth-skoda-suv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/millionth-skoda-suv"
+    },
+    {
+      "URL": "/en/models/number-of-the-month-140",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/number-of-the-month-140"
+    },
+    {
+      "URL": "/en/models/scala/number-of-the-month-40",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/scala/number-of-the-month-40"
+    },
+    {
+      "URL": "/en/models/scala/welcome-the-skoda-scala",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/scala/welcome-the-skoda-scala"
+    },
+    {
+      "URL": "/en/models/skoda-4x4-your-best-bet-in-the-snow",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/skoda-4x4-your-best-bet-in-the-snow"
+    },
+    {
+      "URL": "/en/models/skoda-elroq-through-designers-eyes",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/skoda-elroq-through-designers-eyes"
+    },
+    {
+      "URL": "/en/models/skoda-world-premieres-in-geneva",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/skoda-world-premieres-in-geneva"
+    },
+    {
+      "URL": "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment"
+    },
+    {
+      "URL": "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you"
+    },
+    {
+      "URL": "/en/news",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/news"
+    },
+    {
+      "URL": "/en/press-kits",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/images"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
+    },
+    {
+      "URL": "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
+    },
+    {
+      "URL": "/en/press-kits/4x4-winter-experience-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/4x4-winter-experience-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/images",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/images"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-museum"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/texts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/texts"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary"
+    },
+    {
+      "URL": "/en/press-kits/classic-days-2026-press-kit/videos",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/classic-days-2026-press-kit/videos"
+    },
+    {
+      "URL": "/en/press-kits/design-and-technology-update-for-the-skoda-fabia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/design-and-technology-update-for-the-skoda-fabia"
+    },
+    {
+      "URL": "/en/press-kits/enyaq-world-premiere",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/enyaq-world-premiere"
+    },
+    {
+      "URL": "/en/press-kits/lets-explore-albania-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/lets-explore-albania-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/new-skoda-enyaq-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/new-skoda-enyaq-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/press-kit-skoda-at-the-iaa-2019"
+    },
+    {
+      "URL": "/en/press-kits/skoda-at-the-2018-geneva-motor-show",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-at-the-2018-geneva-motor-show"
+    },
+    {
+      "URL": "/en/press-kits/skoda-at-the-2018-paris-motor-show",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-at-the-2018-paris-motor-show"
+    },
+    {
+      "URL": "/en/press-kits/skoda-auto-at-auto-shanghai-2019-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-auto-at-auto-shanghai-2019-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-elroq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-elroq-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-enyaq-iv-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-enyaq-iv-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/images",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/images"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/infographics",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/infographics"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/technical-data",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/technical-data"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/texts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/texts"
+    },
+    {
+      "URL": "/en/press-kits/skoda-epiq-press-kit-2/videos",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/videos"
+    },
+    {
+      "URL": "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
+    },
+    {
+      "URL": "/en/press-kits/skoda-fabia-covered-drive-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-fabia-covered-drive-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-fabia-monte-carlo-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-fabia-monte-carlo-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-fabia-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-fabia-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-iv-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-iv-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-kamiq-gt-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-kamiq-gt-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-kamiq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-kamiq-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-karoq-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-karoq-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-kodiaq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-kodiaq-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-kodiaq-rs-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-kodiaq-rs-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-octavia-rs-skoda-octavia-combi-rs-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-octavia-rs-skoda-octavia-combi-rs-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/images",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/images"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/infographics",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/infographics"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/technical-data",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/technical-data"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/texts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/texts"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+    },
+    {
+      "URL": "/en/press-kits/skoda-peaq-press-kit-2/videos",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/videos"
+    },
+    {
+      "URL": "/en/press-kits/skoda-rs-driving-experience-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-rs-driving-experience-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-rs-experience-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-rs-experience-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-scala",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-scala"
+    },
+    {
+      "URL": "/en/press-kits/skoda-scala-and-skoda-kamiq-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-scala-and-skoda-kamiq-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-scala-and-skoda-kamiq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-scala-and-skoda-kamiq-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-superb-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-superb-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/skoda-vision-o-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-vision-o-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
+    },
+    {
+      "URL": "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-all-new-skoda-kodiaq-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-all-new-skoda-superb-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-all-new-skoda-superb-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-all-skoda-superb-press-kit-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-all-skoda-superb-press-kit-2"
+    },
+    {
+      "URL": "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-enyaq-coupe-iv-covered-drive-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-enyaq-coupe-iv-covered-drive-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-enyaq-coupe-iv-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-enyaq-coupe-iv-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-enyaq-coupe-iv-world-premiere-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-enyaq-coupe-iv-world-premiere-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-enyaq-rs-iv-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-enyaq-rs-iv-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-fabia-media-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-fabia-media-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-karoq-world-premiere-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-karoq-world-premiere-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-kodiaq-dynamic-press-launch-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-kodiaq-dynamic-press-launch-press-kit"
+    },
+    {
+      "URL": "/en/press-kits/the-new-skoda-kodiaq-press-kit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-kits/the-new-skoda-kodiaq-press-kit"
+    },
+    {
+      "URL": "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design"
+    },
+    {
+      "URL": "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production"
+    },
+    {
+      "URL": "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs"
+    },
+    {
+      "URL": "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles"
+    },
+    {
+      "URL": "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification"
+    },
+    {
+      "URL": "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-1-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-1-2026"
+    },
+    {
+      "URL": "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026"
+    },
+    {
+      "URL": "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-1-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-1-2026"
+    },
+    {
+      "URL": "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026"
+    },
+    {
+      "URL": "/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online"
+    },
+    {
+      "URL": "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education"
+    },
+    {
+      "URL": "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq"
+    },
+    {
+      "URL": "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand"
+    },
+    {
+      "URL": "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-unveils-updated-slavia-in-india"
+    },
+    {
+      "URL": "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show"
+    },
+    {
+      "URL": "/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling"
+    },
+    {
+      "URL": "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport"
+    },
+    {
+      "URL": "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-kvasiny-newsletter-2-2026"
+    },
+    {
+      "URL": "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain"
+    },
+    {
+      "URL": "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category"
+    },
+    {
+      "URL": "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain"
+    },
+    {
+      "URL": "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
+    },
+    {
+      "URL": "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq"
+    },
+    {
+      "URL": "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions"
+    },
+    {
+      "URL": "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq"
+    },
+    {
+      "URL": "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq"
+    },
+    {
+      "URL": "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept"
+    },
+    {
+      "URL": "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence"
+    },
+    {
+      "URL": "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-vrchlabi-newsletter-2-2026"
+    },
+    {
+      "URL": "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
+    },
+    {
+      "URL": "/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities"
+    },
+    {
+      "URL": "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design"
+    },
+    {
+      "URL": "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+    },
+    {
+      "URL": "/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores"
+    },
+    {
+      "URL": "/en/press-releases/the-updated-octavia-now-with-all-wheel-drive",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/the-updated-octavia-now-with-all-wheel-drive"
+    },
+    {
+      "URL": "/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs"
+    },
+    {
+      "URL": "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available"
+    },
+    {
+      "URL": "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich"
+    },
+    {
+      "URL": "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard"
+    },
+    {
+      "URL": "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france"
+    },
+    {
+      "URL": "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard"
+    },
+    {
+      "URL": "/en/search",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/search"
+    },
+    {
+      "URL": "/en/series-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series-2"
+    },
+    {
+      "URL": "/en/series/125-years-of-motorsport",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/125-years-of-motorsport"
+    },
+    {
+      "URL": "/en/series/130-years",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/130-years"
+    },
+    {
+      "URL": "/en/series/60-seconds-walkaround",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/60-seconds-walkaround"
+    },
+    {
+      "URL": "/en/series/back-to-the-past",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/back-to-the-past"
+    },
+    {
+      "URL": "/en/series/czech-footprint",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/czech-footprint"
+    },
+    {
+      "URL": "/en/series/evolution-of-parts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/evolution-of-parts"
+    },
+    {
+      "URL": "/en/series/hidden-helpers",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/hidden-helpers"
+    },
+    {
+      "URL": "/en/series/minutes-from-car-production",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/minutes-from-car-production"
+    },
+    {
+      "URL": "/en/series/my-life-my-car",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/my-life-my-car"
+    },
+    {
+      "URL": "/en/series/road-trip",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/road-trip"
+    },
+    {
+      "URL": "/en/series/roads-places",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/roads-places"
+    },
+    {
+      "URL": "/en/series/sustainable-mobility",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/sustainable-mobility"
+    },
+    {
+      "URL": "/en/series/unexpected-jobs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/unexpected-jobs"
+    },
+    {
+      "URL": "/en/series/unknown-parts",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/unknown-parts"
+    },
+    {
+      "URL": "/en/series/winter-tips",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/series/winter-tips"
+    },
+    {
+      "URL": "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features"
+    },
+    {
+      "URL": "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how"
+    },
+    {
+      "URL": "/en/skoda-model/elroq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/elroq"
+    },
+    {
+      "URL": "/en/skoda-model/elroq/elroq-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/elroq/elroq-rs"
+    },
+    {
+      "URL": "/en/skoda-model/elroq/elroq-sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/elroq/elroq-sportline"
+    },
+    {
+      "URL": "/en/skoda-model/enyaq-iv-2",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/enyaq-iv-2"
+    },
+    {
+      "URL": "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv"
+    },
+    {
+      "URL": "/en/skoda-model/enyaq-iv-2/enyaq-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/enyaq-iv-2/enyaq-rs"
+    },
+    {
+      "URL": "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv"
+    },
+    {
+      "URL": "/en/skoda-model/epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq"
+    },
+    {
+      "URL": "/en/skoda-model/kamiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/kamiq"
+    },
+    {
+      "URL": "/en/skoda-model/karoq-6",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/karoq-6"
+    },
+    {
+      "URL": "/en/skoda-model/karoq-6/karoq-sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/karoq-6/karoq-sportline"
+    },
+    {
+      "URL": "/en/skoda-model/new-fabia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-fabia"
+    },
+    {
+      "URL": "/en/skoda-model/new-kodiaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-kodiaq"
+    },
+    {
+      "URL": "/en/skoda-model/new-kodiaq/kodiaq-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-kodiaq/kodiaq-rs"
+    },
+    {
+      "URL": "/en/skoda-model/new-kodiaq/new-kodiaq-iv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-kodiaq/new-kodiaq-iv"
+    },
+    {
+      "URL": "/en/skoda-model/new-kodiaq/new-kodiaq-sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-kodiaq/new-kodiaq-sportline"
+    },
+    {
+      "URL": "/en/skoda-model/new-superb",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb"
+    },
+    {
+      "URL": "/en/skoda-model/new-superb/new-superb-iv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb/new-superb-iv"
+    },
+    {
+      "URL": "/en/skoda-model/octavia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/octavia"
+    },
+    {
+      "URL": "/en/skoda-model/octavia/octavia-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/octavia/octavia-rs"
+    },
+    {
+      "URL": "/en/skoda-model/octavia/octavia-sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/octavia/octavia-sportline"
+    },
+    {
+      "URL": "/en/skoda-model/peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/peaq"
+    },
+    {
+      "URL": "/en/skoda-model/scala",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-model/scala"
+    },
+    {
+      "URL": "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum"
+    },
+    {
+      "URL": "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites"
+    },
+    {
+      "URL": "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it"
+    },
+    {
+      "URL": "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute"
+    },
+    {
+      "URL": "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes"
+    },
+    {
+      "URL": "/en/skoda-world/cars-that-are-safe-for-pedestrians-as-well",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/cars-that-are-safe-for-pedestrians-as-well"
+    },
+    {
+      "URL": "/en/skoda-world/children-painted-cars-for-medical-clowns",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/children-painted-cars-for-medical-clowns"
+    },
+    {
+      "URL": "/en/skoda-world/clever-luggage-solutions-for-your-boot",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/clever-luggage-solutions-for-your-boot"
+    },
+    {
+      "URL": "/en/skoda-world/coca-cola-and-skoda-more-than-30-years-together",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/coca-cola-and-skoda-more-than-30-years-together"
+    },
+    {
+      "URL": "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car"
+    },
+    {
+      "URL": "/en/skoda-world/drive-like-a-champion-on-tarmac-gravel-or-snow",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/drive-like-a-champion-on-tarmac-gravel-or-snow"
+    },
+    {
+      "URL": "/en/skoda-world/enhanced-superb-iv-delivers-200-kw-of-power",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/enhanced-superb-iv-delivers-200-kw-of-power"
+    },
+    {
+      "URL": "/en/skoda-world/enter-the-world-of-skoda-in-frankfurt",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/enter-the-world-of-skoda-in-frankfurt"
+    },
+    {
+      "URL": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
+    },
+    {
+      "URL": "/en/skoda-world/first-sketches-of-the-new-kodiaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/first-sketches-of-the-new-kodiaq"
+    },
+    {
+      "URL": "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories"
+    },
+    {
+      "URL": "/en/skoda-world/here-it-comes-the-skoda-elroq-a-compact-electric-suv",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/here-it-comes-the-skoda-elroq-a-compact-electric-suv"
+    },
+    {
+      "URL": "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/how-the-skoda-octavia-reached-365-km-h"
+    },
+    {
+      "URL": "/en/skoda-world/how-to-get-a-kodiaq-into-a-metro-station",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/how-to-get-a-kodiaq-into-a-metro-station"
+    },
+    {
+      "URL": "/en/skoda-world/innovation-and-technology/enyaq-rs-race-an-electric-drive-with-motorsport-dna",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/innovation-and-technology/enyaq-rs-race-an-electric-drive-with-motorsport-dna"
+    },
+    {
+      "URL": "/en/skoda-world/kamiq-karoq-kodiaq-great-choices-for-the-city-and-countryside",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/kamiq-karoq-kodiaq-great-choices-for-the-city-and-countryside"
+    },
+    {
+      "URL": "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years"
+    },
+    {
+      "URL": "/en/skoda-world/klaus-drives-on-the-ice-with-a-rally-champion",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/klaus-drives-on-the-ice-with-a-rally-champion"
+    },
+    {
+      "URL": "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france"
+    },
+    {
+      "URL": "/en/skoda-world/life-with-a-plug-in-hybrid-a-versatile-companion",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/life-with-a-plug-in-hybrid-a-versatile-companion"
+    },
+    {
+      "URL": "/en/skoda-world/making-driving-easier-how-cruise-control-works",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/making-driving-easier-how-cruise-control-works"
+    },
+    {
+      "URL": "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain"
+    },
+    {
+      "URL": "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs"
+    },
+    {
+      "URL": "/en/skoda-world/peaq-inside-a-designblok",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/peaq-inside-a-designblok"
+    },
+    {
+      "URL": "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details"
+    },
+    {
+      "URL": "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition"
+    },
+    {
+      "URL": "/en/skoda-world/rally-champion-fuel-efficiency-record-holder",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/rally-champion-fuel-efficiency-record-holder"
+    },
+    {
+      "URL": "/en/skoda-world/rally-champion-presents-the-rs-family",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/rally-champion-presents-the-rs-family"
+    },
+    {
+      "URL": "/en/skoda-world/rs-models-skodas-true-sporting-spirit",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/rs-models-skodas-true-sporting-spirit"
+    },
+    {
+      "URL": "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator"
+    },
+    {
+      "URL": "/en/skoda-world/skoda-kodiaq-will-get-you-in-60-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/skoda-kodiaq-will-get-you-in-60-seconds"
+    },
+    {
+      "URL": "/en/skoda-world/skoda-octavia-rs-how-it-has-evolved",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/skoda-octavia-rs-how-it-has-evolved"
+    },
+    {
+      "URL": "/en/skoda-world/sliding-into-the-record-books",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/sliding-into-the-record-books"
+    },
+    {
+      "URL": "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/sportline-models-dynamic-elegance-for-every-day"
+    },
+    {
+      "URL": "/en/skoda-world/the-approach-of-the-keyless-age",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-approach-of-the-keyless-age"
+    },
+    {
+      "URL": "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres"
+    },
+    {
+      "URL": "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes"
+    },
+    {
+      "URL": "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour"
+    },
+    {
+      "URL": "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-skoda-stand-in-paris-360-tour"
+    },
+    {
+      "URL": "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too"
+    },
+    {
+      "URL": "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion"
+    },
+    {
+      "URL": "/en/tag/company/design",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/company/design"
+    },
+    {
+      "URL": "/en/tag/company/production",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/company/production"
+    },
+    {
+      "URL": "/en/tag/crew/electro-vehicle",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/crew/electro-vehicle"
+    },
+    {
+      "URL": "/en/tag/crew/electromobility",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/crew/electromobility"
+    },
+    {
+      "URL": "/en/tag/crew/emobility",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/crew/emobility"
+    },
+    {
+      "URL": "/en/tag/crew/technology",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/crew/technology"
+    },
+    {
+      "URL": "/en/tag/derivative/sportline",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/derivative/sportline"
+    },
+    {
+      "URL": "/en/tag/environment/greenfuture",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/environment/greenfuture"
+    },
+    {
+      "URL": "/en/tag/environment/sustainability",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/environment/sustainability"
+    },
+    {
+      "URL": "/en/tag/model/elroq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/elroq"
+    },
+    {
+      "URL": "/en/tag/model/enyaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/enyaq"
+    },
+    {
+      "URL": "/en/tag/model/epiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/epiq"
+    },
+    {
+      "URL": "/en/tag/model/fabia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/fabia"
+    },
+    {
+      "URL": "/en/tag/model/kamiq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/kamiq"
+    },
+    {
+      "URL": "/en/tag/model/karoq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/karoq"
+    },
+    {
+      "URL": "/en/tag/model/kodiaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/kodiaq"
+    },
+    {
+      "URL": "/en/tag/model/kylaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/kylaq"
+    },
+    {
+      "URL": "/en/tag/model/octavia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/octavia"
+    },
+    {
+      "URL": "/en/tag/model/peaq",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/peaq"
+    },
+    {
+      "URL": "/en/tag/model/scala",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/scala"
+    },
+    {
+      "URL": "/en/tag/model/slavia",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/slavia"
+    },
+    {
+      "URL": "/en/tag/model/superb",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/model/superb"
+    },
+    {
+      "URL": "/en/tag/people/stefani",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/people/stefani"
+    },
+    {
+      "URL": "/en/tag/years/2024",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/years/2024"
+    },
+    {
+      "URL": "/en/tag/years/2025",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/years/2025"
+    },
+    {
+      "URL": "/en/tag/years/2026",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/tag/years/2026"
+    },
+    {
+      "URL": "/en/videos",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/videos"
+    },
+    {
+      "URL": "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:cs": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:de": "https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:sk": "https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:sr": "https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+    },
+    {
+      "URL": "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:en": "https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:cs": "https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:de": "https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+      "hreflang:sk": "https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+      "hreflang:sr": "https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+    }
+  ],
+  "skipped": [
+    "/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic: own hreflang is https://www.skoda-storyboard.com/en/models/kodiaq/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/",
+    "/en/press-kits/skoda-citigo-iv-skoda-superb-iv-press-kit: source 404",
+    "/en/test/listing-demo: source 404"
+  ],
+  "translatedPages": [
+    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+    "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+  ],
+  "notMigratedTranslations": 1131,
+  "chrome": [
+    {
+      "URL": "/cs/**",
+      "nav": "/cs/nav",
+      "footer": "/cs/footer"
+    },
+    {
+      "URL": "/de/**",
+      "nav": "/de/nav",
+      "footer": "/de/footer"
+    },
+    {
+      "URL": "/sk/**",
+      "nav": "/sk/nav",
+      "footer": "/sk/footer"
+    },
+    {
+      "URL": "/sr/**",
+      "nav": "/sr/nav",
+      "footer": "/sr/footer"
+    },
+    {
+      "URL": "/sl/**",
+      "nav": "/sl/nav",
+      "footer": "/sl/footer"
+    },
+    {
+      "URL": "/cs/media-room",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/media-room/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-zpravy",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-zpravy/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-mapy",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-mapy/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/foto",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/foto/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/video",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/video/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/kontakty/kosik",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/kontakty/kosik/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/kontakty",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/kontakty/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/hledat",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/hledat/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/newsletter",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/newsletter/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-zpravy-archiv",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/tiskove-zpravy-archiv/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/skoda-model",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/cs/skoda-model/**",
+      "nav": "/cs/media-room/nav",
+      "footer": "/cs/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/media-room",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/media-room/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemitteilungen",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemitteilungen/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemappen",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemappen/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/fotos",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/fotos/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/videos",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/videos/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/media-kart",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/media-kart/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/kontakte",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/kontakte/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/suche",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/suche/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemitteilungen-archive",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemitteilungen-archive/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemappe",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/pressemappe/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/skoda-model",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/de/skoda-model/**",
+      "nav": "/de/media-room/nav",
+      "footer": "/de/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/media-room",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/media-room/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacove-spravy",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacove-spravy/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacove-mapy",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacove-mapy/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/fotografie",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/fotografie/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/video",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/video/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/kosik",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/kosik/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/kontakty",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/kontakty/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/hladat",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/hladat/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacova-sprava",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/tlacova-sprava/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/press-kit",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/press-kit/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/skoda-model",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sk/skoda-model/**",
+      "nav": "/sk/media-room/nav",
+      "footer": "/sk/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/media-room",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/media-room/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/news",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/news/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-kits",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-kits/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/fotografije",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/fotografije/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/video",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/video/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/media-package",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/media-package/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/kontakti",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/kontakti/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/pretraga",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/pretraga/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-release",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-release/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-kit",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sr/press-kit/**",
+      "nav": "/sr/media-room/nav",
+      "footer": "/sr/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/media-room",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/media-room/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/slike",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/slike/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/videoposnetki",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/videoposnetki/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/medijski-paket",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/medijski-paket/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/kontakti",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/kontakti/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/isci",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/isci/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/press-release",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    },
+    {
+      "URL": "/sl/press-release/**",
+      "nav": "/sl/media-room/nav",
+      "footer": "/sl/media-room/footer",
+      "section": "media-room"
+    }
+  ],
+  "pushed": {
+    "rows": 551,
+    "preview": true
+  }
+}
