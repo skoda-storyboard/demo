@@ -66,14 +66,21 @@ CS pages, 10:36 GMT).
   - the DE (4), SR (6) and SL (3) Media Room fragments vs the source Media Room pages (no migrated page uses them
     yet);
   - the SK Media Room fragment dropped the source's one model under the `#` "Modely" heading (Fabia, a search
-    filter link): `menuList` kept a sub-list only with two items or more. Fixed: a single sub-item is dropped only
-    when it repeats its label (same link or name), as "eMobilita"'s does; regression test in
-    `locale-chrome.test.mjs`. Re-imported, the other 19 fragments are unchanged (`/sl/media-room/footer` also loses
-    an empty middle section DA kept from its 22 Oct push, the 2-section footer of #511; not from this fix).
+    filter link): `menuList` kept a sub-list only with two items or more. Fixed, narrowly (#542 review): a nav `#`
+    heading keeps its one sub-item when that item is not the heading again; every other single sub-item stays out,
+    as before. Tests in `locale-chrome.test.mjs` for both sides. Re-imported, the other 19 fragments are unchanged:
+    their links equal live's (the footers differ only in serialization, icons and `&amp;`). `/sl/media-room/footer`
+    also loses an empty middle section DA kept from its 22 Oct push, the 2-section footer of #511, not from this fix.
+  - Rendered by the header (local fragment, 1280 and 390): "Modely" opens a one-item dropdown / drawer list with
+    "Fabia", the same markup, type and behaviour as the CS Media Room "Modely" (click, Enter, Tab into the list,
+    Escape closes and keeps the focus, outside click closes, `aria-expanded` follows). The link is the source's
+    search filter, in a new tab by link policy D-3 (b), as the CS models are. axe on the header: only the language
+    row's contrast at desktop, known (#403) and on live too.
 - **AC3, cross-locale check:** `npm run import:chrome-check` (`tools/importer/check-locale-chrome.mjs`, tests in
   `check-locale-chrome.test.mjs`) reads the 20 fragments and fails on a link into another locale's tree (English
   included) outside the language switcher, and on an in-site link that does not resolve after the runtime link
-  policy. On live: no findings. Without its exceptions it reports the 8 source links below (the check is not blind
+  policy (#542 review: the switcher is exempt by position, not by target; only the site's own hosts count; a
+  redirect is followed one hop; errors and 429s are retried). On live: no findings. Without its exceptions it reports the 8 source links below (the check is not blind
   to them).
 - **AC4:** the live CS Media Room page (`/cs/tiskove-zpravy`) shows the CS Media Room menu, equal to the source's.
 

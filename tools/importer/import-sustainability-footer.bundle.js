@@ -76,13 +76,12 @@ var CustomImportScript = (() => {
         if (prev && prev.href === sub.href && prev.label === sub.label) return;
         subs.push(sub);
       });
-      let labelHref = "";
-      if (!/^#?$/.test(href)) labelHref = authoredHref(href);
-      else if (!keepHeading && subs.length) labelHref = subs[0].href;
-      item.append(para(document, labelHref ? link(document, /^#?$/.test(href) ? labelHref : href, text(top)) : text(top)));
+      if (!/^#?$/.test(href)) item.append(para(document, link(document, href, text(top))));
+      else if (!keepHeading && subs.length) item.append(para(document, link(document, subs[0].href, text(top))));
+      else item.append(para(document, text(top)));
       const kept = subs.filter((s, i) => keepHeading || !(s.heading || i === 0 && s.href === authoredHref(href)));
-      const repeatsParent = kept.length === 1 && (labelHref && kept[0].href === labelHref || kept[0].label === text(top));
-      if (kept.length && !repeatsParent) {
+      const singleHeadingItem = keepHeading && /^#?$/.test(href) && subs.length === 1 && kept.length === 1 && kept[0].label !== text(top);
+      if (subs.length > 1 && kept.length || singleHeadingItem) {
         const subList = document.createElement("ul");
         kept.forEach((s) => {
           const subItem = document.createElement("li");
