@@ -108,6 +108,21 @@ class MetadataTests(unittest.TestCase):
         self.assertIn("avoid stale or duplicate posts", prompt)
         self.assertIn("obtain fresh permission before posting", prompt)
 
+    def test_review_only_prompt_prohibits_fixes_and_codebase_changes(self):
+        prompt = launcher.review_prompt(pr(), Path("/checkout"), Path("/evidence"))
+        self.assertIn("This session is strictly review-only.", prompt)
+        self.assertIn("Do not fix findings or create, edit,\ndelete or rename any files", prompt)
+        self.assertIn("source, tests, configuration,\nlockfiles and generated files", prompt)
+        self.assertIn("Do not run auto-fix tools, formatters, code\ngenerators", prompt)
+        self.assertIn("or project dependency installation", prompt)
+        self.assertIn("Do not checkout branches, commit,\nstash, reset or revert changes", prompt)
+        self.assertIn("Permission to post feedback never authorizes\ncode changes", prompt)
+        self.assertIn("implementation requires a separate task", prompt)
+        self.assertIn("only checks that do not rewrite the codebase", prompt)
+        self.assertIn("blocked rather than modifying anything to make it run", prompt)
+        self.assertNotIn("Do not modify code, install project dependencies or execute package scripts\n"
+                         "without approval", prompt)
+
     def test_clean_review_recommends_approval_only_after_verified_checks(self):
         prompt = launcher.review_prompt(pr(), Path("/checkout"), Path("/evidence"))
         self.assertIn("If no issues are found, explicitly say so", prompt)
@@ -116,6 +131,54 @@ class MetadataTests(unittest.TestCase):
         self.assertIn("recommend not approving yet", prompt)
         self.assertIn("never\napprove or merge automatically", prompt)
         self.assertIn("explicit permission before submitting\nan approval review", prompt)
+
+    def test_prompt_distinguishes_routine_and_sensitive_actions(self):
+        prompt = launcher.review_prompt(pr(), Path("/checkout"), Path("/evidence"))
+        self.assertIn("Do not ask again for those routine actions", prompt)
+        self.assertIn("Keep /permissions in manual\nmode", prompt)
+        self.assertIn("Non-allowlisted tools still need approval", prompt)
+        self.assertIn("Arbitrary JavaScript via evaluate_script", prompt)
+        self.assertIn("not admin pages, account changes, purchases or persistent\nform submissions", prompt)
+        self.assertIn("A tool approval is not permission to post GitHub\nfeedback", prompt)
+
+
+class PermissionTests(unittest.TestCase):
+    def test_allowlist_is_scoped_to_named_tools_not_whole_servers(self):
+        args = launcher.permission_arguments("pr-review-chrome")
+        allowed = {arg.removeprefix("--allow-tool=") for arg in args
+                   if arg.startswith("--allow-tool=")}
+        for rule in (
+            "shell(git diff)", "shell(gh pr checks)",
+            "pr-review-chrome(get_css_styles)", "pr-review-chrome(click)",
+            "github-mcp-server(pull_request_read)",
+        ):
+            self.assertIn(rule, allowed)
+        for rule in (
+            "shell", "shell(git:*)", "shell(gh:*)", "shell(gh api)", "shell(curl)",
+            "shell(bash)", "shell(python3)", "shell(node)", "shell(npm)",
+            "pr-review-chrome", "pr-review-chrome(evaluate_script)",
+            "pr-review-chrome(upload_file)", "github-mcp-server",
+            "shell(gh pr review)", "shell(gh pr comment)", "shell(gh issue create)",
+        ):
+            self.assertNotIn(rule, allowed)
+        for flag in ("--allow-all", "--allow-all-tools", "--allow-all-paths",
+                     "--allow-all-urls", "--assisted-approval", "--yolo"):
+            self.assertNotIn(flag, args)
+        self.assertEqual({arg for arg in args if arg.startswith("--allow-url=")}, {
+            "--allow-url=https://github.com", "--allow-url=https://api.github.com",
+        })
+
+    def test_editing_and_common_git_mutations_are_denied(self):
+        args = launcher.permission_arguments("pr-review-chrome")
+        for rule in ("write", "shell(git push)", "shell(git reset)", "shell(git config)",
+                     "shell(git checkout)", "pr-review-chrome(lighthouse_audit)"):
+            self.assertIn("--deny-tool=" + rule, args)
+            self.assertNotIn("--allow-tool=" + rule, args)
+        allowed = {arg.removeprefix("--allow-tool=") for arg in args
+                   if arg.startswith("--allow-tool=")}
+        denied = {arg.removeprefix("--deny-tool=") for arg in args
+                  if arg.startswith("--deny-tool=")}
+        self.assertFalse(allowed & denied)
 
 
 class McpTests(unittest.TestCase):
@@ -135,6 +198,8 @@ class McpTests(unittest.TestCase):
         self.assertIn("--isolated", browser["args"])
         self.assertNotIn("--autoConnect", browser["args"])
         self.assertNotIn("--allow-all", args)
+        self.assertIn("--allow-tool=pr-review-chrome-isolated(get_css_styles)", args)
+        self.assertNotIn("--allow-tool=chrome-devtools(get_css_styles)", args)
 
     def test_missing_github_or_unknown_schema_fails(self):
         for listing in ({"mcpServers": []}, {"mcpServers": {}}, {}):
@@ -243,7 +308,7 @@ class LaunchTests(unittest.TestCase):
             "--repo", str(repo), "https://github.com/skoda-storyboard/demo/pull/123",
         ] + (extra or [])
         help_text = "--name --session-id --interactive --mode --add-dir --additional-mcp-config " \
-                    "--disable-mcp-server --enable-mcp-server"
+                    "--disable-mcp-server --enable-mcp-server --allow-tool --deny-tool --allow-url"
         with patch.object(launcher.sys, "platform", "darwin"), \
                 patch.object(launcher.shutil, "which", side_effect=lambda name: "/bin/" + name), \
                 patch.object(launcher, "command", side_effect=[str(repo), help_text]), \
@@ -348,6 +413,7 @@ class TerminalTests(unittest.TestCase):
                 self.assertEqual(launcher.run_session(manifest), 7)
             environment = popen.call_args.kwargs["env"]
             self.assertEqual(environment["COPILOT_ALLOW_ALL"], "false")
+            self.assertEqual(environment["COPILOT_ASSISTED_APPROVAL"], "false")
             self.assertEqual(environment["COPILOT_HOME"], "/custom/copilot")
             self.assertIs(signal.getsignal(signal.SIGINT), previous_sigint)
             self.assertEqual(json.loads(manifest.with_name("status.json").read_text()),

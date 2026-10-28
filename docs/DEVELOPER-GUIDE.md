@@ -181,8 +181,9 @@ own Chrome DevTools MCP process using `--isolated`.
 
 Requirements: Python 3.9+, Git, authenticated `gh` and Copilot CLI, Node/npm (`npx`),
 and Google Chrome. Run `copilot login` / `gh auth login` first if needed. The CLI
-must support `--additional-mcp-config`, `--enable-mcp-server` and
-`copilot mcp list --json` (verified with 1.0.104). No pip packages are needed.
+must support `--additional-mcp-config`, `--enable-mcp-server`, `--allow-tool`,
+`--deny-tool`, `--allow-url` and `copilot mcp list --json` (verified with 1.0.105).
+No pip packages are needed.
 
 ```bash
 # Replace the example URLs with open PRs from this repository.
@@ -228,9 +229,46 @@ One-time macOS Automation permission (your launching app controlling Terminal),
 Copilot login, folder trust and tool approvals may need confirmation. Check
 `/permissions` is **manual** and `/ide` is not connected to the other PR's workspace.
 Existing saved approvals/settings are not reset: this is not a read-only sandbox.
-Do not use allow-all mode for untrusted PRs. Review prompts prohibit code changes,
-dependency installation, publishing and GitHub writes without approval. Environment-
-only tokens are not copied into launcher files or new Terminal windows; use stored
+The launcher adds a per-session **allowlist**, not allow-all or AI-assisted approval:
+
+- Selected Git reads (`status`, `diff`, `show`, `log`, `rev-parse`, `ls-files`,
+  `ls-tree`, `grep`, `merge-base`) and GitHub CLI reads (`pr view/diff/checks`,
+  `issue view`, `run view`, `repo view`) are pre-approved.
+- Selected Chrome tools for navigation, viewport changes, CSS/DOM inspection,
+  screenshots, hover/click/key/fill interactions and console/network inspection
+  are pre-approved for the isolated review server only.
+- Named GitHub MCP read tools are pre-approved; GitHub writes are not.
+- Native file-writing tools and common Git mutations are explicitly denied.
+  Supporting screenshots/downloads still use the external evidence directory;
+  native write denials do not constrain MCP or shell filesystem access.
+- Arbitrary `evaluate_script` JavaScript, uploads, unknown commands/tools, package
+  scripts and GitHub writes remain approval-gated. Unfamiliar actions may still
+  prompt even when harmless: a strict allowlist cannot identify every safe action.
+  There is no blanket approval for `gh api`, `curl`, shells, interpreters or servers.
+- Only GitHub/API HTTPS URLs are pre-approved by this policy. Other URL/path,
+  folder-trust and organization-policy confirmations may still appear.
+
+The runner disables inherited allow-all and assisted-approval environment flags,
+but does not clear persisted approvals or change global settings. Keep permission
+mode manual; if your saved default is assisted/allow-all, change it to manual
+before reviewing. On resumed sessions, inspect their saved approvals as well.
+CLI command rules match command stems, not all argument semantics; Chrome clicks
+can affect remote state. The prompt limits routine browser actions to PR
+origin/preview testing, requires confirmation for sensitive interactions, and
+forbids accessing secrets or unrelated systems. These rules are not OS sandboxing,
+network isolation or a guarantee that only dangerous actions will prompt. Use a
+container/VM and least-privilege credentials for untrusted PR execution.
+
+Do not use allow-all mode for untrusted PRs. Review sessions must not fix findings
+or create, edit, delete or rename codebase files (including tests, configuration,
+lockfiles and generated files). Auto-fix tools, formatters, code generators,
+project dependency installation and Git-changing operations are prohibited.
+Only checks that leave the codebase unchanged are allowed; inspect package scripts
+and obtain approval before running them. Checks needing missing dependencies or
+codebase changes remain blocked. Implementation belongs in a separate task;
+permission to post feedback never authorizes a code change in a review session.
+Publishing and GitHub writes still require approval. Environment-only tokens
+are not copied into launcher files or new Terminal windows; use stored
 logins. `COPILOT_HOME`, when set, is preserved without copying its contents.
 
 Review findings appear in the terminal, ordered by P0/P1/P2/P3 priority, with
