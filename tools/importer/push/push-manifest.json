@@ -101,6 +101,16 @@
       "pushedAt": "2026-10-27T05:46:42.264Z",
       "previewedHash": "801bdaff21515fd55fbd8b11d5b9091a52979b88963977179d1a98387fcf9879"
     },
+    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions": {
+      "hash": "7bfed37834ea2c33fa5e87181bfe23f85a055f3f8e0f1ae7aa0562950c58ae65",
+      "pushedAt": "2026-10-26T15:02:29.559Z",
+      "previewedHash": "7bfed37834ea2c33fa5e87181bfe23f85a055f3f8e0f1ae7aa0562950c58ae65"
+    },
+    "/en/brand-group-core-bgc": {
+      "hash": "d06580fa06c8c888f0964f4f5e9f149db75a980ab6da62d21e6a5f11aa9655b7",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "d06580fa06c8c888f0964f4f5e9f149db75a980ab6da62d21e6a5f11aa9655b7"
+    },
     "/en/category/classic-cars": {
       "hash": "b41148386a72b1615dc0b9fd6b85cd03785f8169cc79ef3b7125c8d0a79cd3c5",
       "pushedAt": "2026-10-07T08:47:25.538Z",
@@ -190,6 +200,21 @@
       "hash": "23ed62d3a6d8595dfa2020ed860916cd710a7f35a46d4b15e90dc248558a8bda",
       "pushedAt": "2026-10-21T08:17:33.024Z",
       "previewedHash": "23ed62d3a6d8595dfa2020ed860916cd710a7f35a46d4b15e90dc248558a8bda"
+    },
+    "/en/documents": {
+      "hash": "dea9ea06afb0c642f7b17d7e4523d3b1e882903bcecdc626e3f9cdbf7d7d9929",
+      "pushedAt": "2026-10-26T13:21:45.307Z",
+      "previewedHash": "dea9ea06afb0c642f7b17d7e4523d3b1e882903bcecdc626e3f9cdbf7d7d9929"
+    },
+    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing": {
+      "hash": "b0234eb755cf81ec231b68db116b175cb37a95c8204d0ce1c6479bf8c4c2a880",
+      "pushedAt": "2026-10-26T15:02:29.559Z",
+      "previewedHash": "b0234eb755cf81ec231b68db116b175cb37a95c8204d0ce1c6479bf8c4c2a880"
+    },
+    "/en/documents/cookies": {
+      "hash": "6cf2ce5f796a856e519953d840aa9b54cba75d04d380ea654cb84026c9c03558",
+      "pushedAt": "2026-10-26T15:02:29.559Z",
+      "previewedHash": "6cf2ce5f796a856e519953d840aa9b54cba75d04d380ea654cb84026c9c03558"
     },
     "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france": {
       "hash": "d34389e04192e314ddafd0c1ee2b336e045690e09244b29f1b70fa6e405c134d",
@@ -410,10 +435,50 @@
       "pushedAt": "2026-10-11T18:51:32.544Z",
       "previewedHash": "d38fe19a4ba14b37e615a24250b642a29fc3c8c5bafb178c249ca73072a90e79"
     },
+    "/en/iihf/lv/picture-guidelines": {
+      "hash": "0b3ec0211bcdc4e870e5ebe9384831a9f5689a23681ef77e381f12bd313264e5",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "0b3ec0211bcdc4e870e5ebe9384831a9f5689a23681ef77e381f12bd313264e5"
+    },
+    "/en/iihf/lv/terms-and-conditions": {
+      "hash": "cd24f069ab460082d204473a515dd5f360a2dbca939fd88d0f6c79e0aeae05ce",
+      "pushedAt": "2026-10-26T15:02:29.559Z",
+      "previewedHash": "cd24f069ab460082d204473a515dd5f360a2dbca939fd88d0f6c79e0aeae05ce"
+    },
+    "/en/iihf/picture-guidelines": {
+      "hash": "19b6be89af8fb7b47e9c198a94cf23862924cd7a7c552619c3a9b9f7e6d9696a",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "19b6be89af8fb7b47e9c198a94cf23862924cd7a7c552619c3a9b9f7e6d9696a"
+    },
+    "/en/iihf/ru/gdpr": {
+      "hash": "c2b3182562f331827352dcf4e8c52c2483bb119f725d09333c7e9f7d2f6e3834",
+      "pushedAt": "2026-10-26T14:50:00.051Z",
+      "previewedHash": "c2b3182562f331827352dcf4e8c52c2483bb119f725d09333c7e9f7d2f6e3834"
+    },
+    "/en/iihf/ru/picture-guidelines": {
+      "hash": "54eb992a69f080ad95eb470a1b33e712d2c8a40ccb3ec6a6820056f0ae3aeea8",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "54eb992a69f080ad95eb470a1b33e712d2c8a40ccb3ec6a6820056f0ae3aeea8"
+    },
+    "/en/iihf/ru/terms-and-conditions": {
+      "hash": "587a5f270f386008cce9f79be4e5b3cffbc30426f61826e981d733f275eba500",
+      "pushedAt": "2026-10-26T15:02:29.559Z",
+      "previewedHash": "587a5f270f386008cce9f79be4e5b3cffbc30426f61826e981d733f275eba500"
+    },
+    "/en/iihf/terms-and-conditions": {
+      "hash": "e9cfa1e4898d17c4912fa3e636ef1ed167b037395ab83731aadd1e8b9bf7d3cf",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "e9cfa1e4898d17c4912fa3e636ef1ed167b037395ab83731aadd1e8b9bf7d3cf"
+    },
     "/en/images": {
       "hash": "87922472b62e16720d051040a09941cca3e4df6c7d669ee0ce28e4d10913aacb",
       "pushedAt": "2026-10-14T13:06:13.889Z",
       "previewedHash": "87922472b62e16720d051040a09941cca3e4df6c7d669ee0ce28e4d10913aacb"
+    },
+    "/en/impressum": {
+      "hash": "830f21cd2f117ac1b5ba7c2a18002aec40d7ad61bb396154b1cb7f740c2614d1",
+      "pushedAt": "2026-10-26T13:21:45.307Z",
+      "previewedHash": "830f21cd2f117ac1b5ba7c2a18002aec40d7ad61bb396154b1cb7f740c2614d1"
     },
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague": {
       "hash": "335fd9e446d24efe1481f0f295fbf8ab322d8aac7f3e8e900dc884e5a4748ff9",
@@ -639,6 +704,11 @@
       "hash": "0ced392c2ba0bbecfed6b469dd0ead090f4d40f9fb04ec8ec769987b80a7a370",
       "pushedAt": "2026-10-22T06:39:34.532Z",
       "previewedHash": "0ced392c2ba0bbecfed6b469dd0ead090f4d40f9fb04ec8ec769987b80a7a370"
+    },
+    "/en/newsletter-terms-and-conditions": {
+      "hash": "01c807668f6f71b2856c2f95918ec21e412b6aa4694d3e714f6647bc5f052fbf",
+      "pushedAt": "2026-10-26T14:14:42.316Z",
+      "previewedHash": "01c807668f6f71b2856c2f95918ec21e412b6aa4694d3e714f6647bc5f052fbf"
     },
     "/en/press-kits": {
       "hash": "407e03a79a7f9413da1b3ad49ffd23f2050f4591cd2a60b9eb9b82729ce7e4ad",
@@ -1675,6 +1745,11 @@
       "pushedAt": "2026-09-27T21:14:15.709Z",
       "previewedHash": "2fd951c05b22e787f444af9055cf6c579ca719c0798c5850ef396e2a6160adbe"
     },
+    "/en/server-status": {
+      "hash": "67f0eeb8bb622c30adc4ebe90aa9853a6621448c3e556662eb8cc44c72efabd7",
+      "pushedAt": "2026-10-26T13:21:45.307Z",
+      "previewedHash": "67f0eeb8bb622c30adc4ebe90aa9853a6621448c3e556662eb8cc44c72efabd7"
+    },
     "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features": {
       "hash": "adfc67390561d2c425c6089cca9d53193d6653fabe55562942059a759c09bc4f",
       "pushedAt": "2026-10-21T11:05:19.301Z",
@@ -2034,6 +2109,16 @@
       "pushedAt": "2026-10-21T11:05:19.301Z",
       "previewedHash": "e322cc650de97c80f435737cab6af7f8cebaae812ef51f301a62eef7e94e3d4d"
     },
+    "/en/soon-also-in-german": {
+      "hash": "01f794820b87715915aff6e676ec577f28a275ae139eb194f6dc3fa1e43a2ff7",
+      "pushedAt": "2026-10-26T14:26:59.963Z",
+      "previewedHash": "01f794820b87715915aff6e676ec577f28a275ae139eb194f6dc3fa1e43a2ff7"
+    },
+    "/en/sustainable-offices": {
+      "hash": "bb96af2c11dc55cbad53aa8ec858228aacb9a7da8974f4397440398fc4b31b1a",
+      "pushedAt": "2026-10-27T04:13:45.442Z",
+      "previewedHash": "bb96af2c11dc55cbad53aa8ec858228aacb9a7da8974f4397440398fc4b31b1a"
+    },
     "/en/tag/company/design": {
       "hash": "8aea0ccb1f1d322de137aa5444606e61f3af5e35ee6692183e42b6ed333135ed",
       "pushedAt": "2026-10-05T11:06:18.514Z",
@@ -2164,6 +2249,11 @@
       "pushedAt": "2026-10-05T11:06:18.514Z",
       "previewedHash": "07f4d5f54a6d3c448593ebeb895c698ab34584388e63dae125caf5135f6ae529"
     },
+    "/en/terms-and-conditions-2": {
+      "hash": "e395b76e9984e3a1fc8f534b22ca426210460656606d10f393d92125e7ab16e8",
+      "pushedAt": "2026-10-26T13:27:02.944Z",
+      "previewedHash": "e395b76e9984e3a1fc8f534b22ca426210460656606d10f393d92125e7ab16e8"
+    },
     "/en/videos": {
       "hash": "e970b291164062014aa04a062b307a8f3b1e2530472b3a03e53821dfc8e016a4",
       "pushedAt": "2026-10-14T13:06:13.889Z",
@@ -2195,9 +2285,9 @@
       "previewedHash": "3f73fac73a4f34494ab3a10c63bcdcb49818f8814ae014411d016ba134207591"
     },
     "/sk/media-room/footer": {
-      "hash": "8a3344d9106e49135c11d6762a590a18492126bcf616302446de495914f01e32",
-      "pushedAt": "2026-10-22T12:23:56.315Z",
-      "previewedHash": "8a3344d9106e49135c11d6762a590a18492126bcf616302446de495914f01e32"
+      "hash": "0c72fa73fc0d4fe2da30ec12ba59a46b396508310060d2d08a38b4bb3d7f74d2",
+      "pushedAt": "2026-10-28T09:22:01.082Z",
+      "previewedHash": "0c72fa73fc0d4fe2da30ec12ba59a46b396508310060d2d08a38b4bb3d7f74d2"
     },
     "/sk/media-room/nav": {
       "hash": "85514eb0250c4ba50467a53a16e69e9e52ccbfcace24b984d818887b5631d425",
@@ -2268,96 +2358,6 @@
       "hash": "f50141fa1d549bc180d0379cbbbb9d9b9959ea903dcdfe0b9860f6543c0f4412",
       "pushedAt": "2026-10-22T11:39:45.708Z",
       "previewedHash": "f50141fa1d549bc180d0379cbbbb9d9b9959ea903dcdfe0b9860f6543c0f4412"
-    },
-    "/en/botas-x-skoda-guess-where-are-we-competition-terms-conditions": {
-      "hash": "7bfed37834ea2c33fa5e87181bfe23f85a055f3f8e0f1ae7aa0562950c58ae65",
-      "pushedAt": "2026-10-26T15:02:29.559Z",
-      "previewedHash": "7bfed37834ea2c33fa5e87181bfe23f85a055f3f8e0f1ae7aa0562950c58ae65"
-    },
-    "/en/brand-group-core-bgc": {
-      "hash": "d06580fa06c8c888f0964f4f5e9f149db75a980ab6da62d21e6a5f11aa9655b7",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "d06580fa06c8c888f0964f4f5e9f149db75a980ab6da62d21e6a5f11aa9655b7"
-    },
-    "/en/documents": {
-      "hash": "dea9ea06afb0c642f7b17d7e4523d3b1e882903bcecdc626e3f9cdbf7d7d9929",
-      "pushedAt": "2026-10-26T13:21:45.307Z",
-      "previewedHash": "dea9ea06afb0c642f7b17d7e4523d3b1e882903bcecdc626e3f9cdbf7d7d9929"
-    },
-    "/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing": {
-      "hash": "b0234eb755cf81ec231b68db116b175cb37a95c8204d0ce1c6479bf8c4c2a880",
-      "pushedAt": "2026-10-26T15:02:29.559Z",
-      "previewedHash": "b0234eb755cf81ec231b68db116b175cb37a95c8204d0ce1c6479bf8c4c2a880"
-    },
-    "/en/documents/cookies": {
-      "hash": "6cf2ce5f796a856e519953d840aa9b54cba75d04d380ea654cb84026c9c03558",
-      "pushedAt": "2026-10-26T15:02:29.559Z",
-      "previewedHash": "6cf2ce5f796a856e519953d840aa9b54cba75d04d380ea654cb84026c9c03558"
-    },
-    "/en/iihf/lv/picture-guidelines": {
-      "hash": "0b3ec0211bcdc4e870e5ebe9384831a9f5689a23681ef77e381f12bd313264e5",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "0b3ec0211bcdc4e870e5ebe9384831a9f5689a23681ef77e381f12bd313264e5"
-    },
-    "/en/iihf/lv/terms-and-conditions": {
-      "hash": "cd24f069ab460082d204473a515dd5f360a2dbca939fd88d0f6c79e0aeae05ce",
-      "pushedAt": "2026-10-26T15:02:29.559Z",
-      "previewedHash": "cd24f069ab460082d204473a515dd5f360a2dbca939fd88d0f6c79e0aeae05ce"
-    },
-    "/en/iihf/picture-guidelines": {
-      "hash": "19b6be89af8fb7b47e9c198a94cf23862924cd7a7c552619c3a9b9f7e6d9696a",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "19b6be89af8fb7b47e9c198a94cf23862924cd7a7c552619c3a9b9f7e6d9696a"
-    },
-    "/en/iihf/ru/gdpr": {
-      "hash": "c2b3182562f331827352dcf4e8c52c2483bb119f725d09333c7e9f7d2f6e3834",
-      "pushedAt": "2026-10-26T14:50:00.051Z",
-      "previewedHash": "c2b3182562f331827352dcf4e8c52c2483bb119f725d09333c7e9f7d2f6e3834"
-    },
-    "/en/iihf/ru/picture-guidelines": {
-      "hash": "54eb992a69f080ad95eb470a1b33e712d2c8a40ccb3ec6a6820056f0ae3aeea8",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "54eb992a69f080ad95eb470a1b33e712d2c8a40ccb3ec6a6820056f0ae3aeea8"
-    },
-    "/en/iihf/ru/terms-and-conditions": {
-      "hash": "587a5f270f386008cce9f79be4e5b3cffbc30426f61826e981d733f275eba500",
-      "pushedAt": "2026-10-26T15:02:29.559Z",
-      "previewedHash": "587a5f270f386008cce9f79be4e5b3cffbc30426f61826e981d733f275eba500"
-    },
-    "/en/iihf/terms-and-conditions": {
-      "hash": "e9cfa1e4898d17c4912fa3e636ef1ed167b037395ab83731aadd1e8b9bf7d3cf",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "e9cfa1e4898d17c4912fa3e636ef1ed167b037395ab83731aadd1e8b9bf7d3cf"
-    },
-    "/en/impressum": {
-      "hash": "830f21cd2f117ac1b5ba7c2a18002aec40d7ad61bb396154b1cb7f740c2614d1",
-      "pushedAt": "2026-10-26T13:21:45.307Z",
-      "previewedHash": "830f21cd2f117ac1b5ba7c2a18002aec40d7ad61bb396154b1cb7f740c2614d1"
-    },
-    "/en/newsletter-terms-and-conditions": {
-      "hash": "01c807668f6f71b2856c2f95918ec21e412b6aa4694d3e714f6647bc5f052fbf",
-      "pushedAt": "2026-10-26T14:14:42.316Z",
-      "previewedHash": "01c807668f6f71b2856c2f95918ec21e412b6aa4694d3e714f6647bc5f052fbf"
-    },
-    "/en/server-status": {
-      "hash": "67f0eeb8bb622c30adc4ebe90aa9853a6621448c3e556662eb8cc44c72efabd7",
-      "pushedAt": "2026-10-26T13:21:45.307Z",
-      "previewedHash": "67f0eeb8bb622c30adc4ebe90aa9853a6621448c3e556662eb8cc44c72efabd7"
-    },
-    "/en/soon-also-in-german": {
-      "hash": "01f794820b87715915aff6e676ec577f28a275ae139eb194f6dc3fa1e43a2ff7",
-      "pushedAt": "2026-10-26T14:26:59.963Z",
-      "previewedHash": "01f794820b87715915aff6e676ec577f28a275ae139eb194f6dc3fa1e43a2ff7"
-    },
-    "/en/sustainable-offices": {
-      "hash": "bb96af2c11dc55cbad53aa8ec858228aacb9a7da8974f4397440398fc4b31b1a",
-      "pushedAt": "2026-10-27T04:13:45.442Z",
-      "previewedHash": "bb96af2c11dc55cbad53aa8ec858228aacb9a7da8974f4397440398fc4b31b1a"
-    },
-    "/en/terms-and-conditions-2": {
-      "hash": "e395b76e9984e3a1fc8f534b22ca426210460656606d10f393d92125e7ab16e8",
-      "pushedAt": "2026-10-26T13:27:02.944Z",
-      "previewedHash": "e395b76e9984e3a1fc8f534b22ca426210460656606d10f393d92125e7ab16e8"
     }
   }
 }
