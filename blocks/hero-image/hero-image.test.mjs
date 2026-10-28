@@ -229,7 +229,7 @@ const MEDIA_PICTURE = (width = '1920', height = '367') => `<picture>
   <img loading="lazy" alt="Newsletter" src="./media_13b1a03a384ab3594ed8247ad3d6e2d69aefd343e.png?width=750&format=png&optimize=medium"${width ? ` width="${width}"` : ''}${height ? ` height="${height}"` : ''}>
 </picture>`;
 
-test('page band: the same picture and img, one WebP source + an img srcset sized for the crop, still the eager LCP', () => {
+test('page band: the same picture and img, WebP sources + an img srcset sized for the crop, still the eager LCP', () => {
   const hero = block('page', `<div><div>${MEDIA_PICTURE()}</div></div><div><div><h1>Newsletter</h1></div></div>`);
   const img = hero.querySelector('img');
   const picture = hero.querySelector('picture');
@@ -237,12 +237,15 @@ test('page band: the same picture and img, one WebP source + an img srcset sized
   assert.equal(hero.querySelector('.hero-image-media picture'), picture, 'the authored picture stays');
   assert.equal(hero.querySelector('.hero-image-media img'), img, 'the authored img stays');
   const sources = [...picture.querySelectorAll('source')];
-  assert.equal(sources.length, 1);
-  assert.equal(sources[0].type, 'image/webp');
-  assert.equal(sources[0].getAttribute('sizes'), '(min-width: 1256px) 102vw, 1281px');
-  assert.equal(sources[0].getAttribute('media'), null);
-  assert.deepEqual(sources[0].getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]), ['750w', '1080w', '1440w', '1920w']);
-  assert.match(sources[0].getAttribute('srcset'), /^\/en\/media_13b1a03a384ab3594ed8247ad3d6e2d69aefd343e\.png\?width=750&format=webply&optimize=medium 750w/);
+  const widths = (s) => s.getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]);
+  assert.equal(sources.length, 2, 'a phone source, then the full one');
+  assert.ok(sources.every((s) => s.type === 'image/webp' && s.getAttribute('sizes') === '(min-width: 1256px) 102vw, 1281px'));
+  // phones get at most the source's 1440px (COVER_PHONE): the card LCP on the archives (#480 review)
+  assert.equal(sources[0].getAttribute('media'), '(width < 768px)');
+  assert.deepEqual(widths(sources[0]), ['750w', '1080w', '1440w']);
+  assert.equal(sources[1].getAttribute('media'), null);
+  assert.deepEqual(widths(sources[1]), ['750w', '1080w', '1440w', '1920w']);
+  assert.match(sources[1].getAttribute('srcset'), /^\/en\/media_13b1a03a384ab3594ed8247ad3d6e2d69aefd343e\.png\?width=750&format=webply&optimize=medium 750w/);
   assert.match(img.getAttribute('srcset'), /\?width=1920&format=png&optimize=medium 1920w$/);
   assert.equal(img.getAttribute('sizes'), '(min-width: 1256px) 102vw, 1281px');
   assert.equal(img.getAttribute('fetchpriority'), 'high');
@@ -274,4 +277,13 @@ test('bands without the master size or a media-bus image, and the story / overla
     decorate(hero);
     assert.deepEqual(sourcesOf(hero), was, `${variant || 'story'}: unchanged`);
   });
+});
+
+test('a master no wider than the phone cap gets one source for every width', () => {
+  const hero = block('page', `<div><div>${MEDIA_PICTURE('1280', '246')}</div></div>`);
+  decorate(hero);
+  const sources = [...hero.querySelectorAll('source')];
+  assert.equal(sources.length, 1);
+  assert.equal(sources[0].getAttribute('media'), null);
+  assert.deepEqual(sources[0].getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]), ['750w', '1080w', '1280w']);
 });

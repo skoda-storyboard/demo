@@ -51,6 +51,11 @@ export const COVER_BANDS = {
 };
 // rendition widths offered below the master; the master itself is always the largest candidate
 export const COVER_WIDTHS = [750, 1080, 1440, 1920, 2560];
+// On phones (below 768px) the band offers at most 1440px, the source's own phone rendition: a
+// 1920w+ file on a DPR 2–3 phone sharpens the band a little more but weighs ~70% more, and on the
+// archives (whose LCP element is the first story card) it delayed the card by ~550ms (#480 review:
+// mobile PSI 88 on /en/category/emobility, 244 vs 141 KB). DPR 1 phones still get the exact need.
+export const COVER_PHONE = { below: 768, maxWidth: 1440 };
 
 /**
  * The `sizes` and width candidates for an image covering a fixed-height band: per band step the
@@ -105,12 +110,22 @@ function sizeForCover(picture, band, { width, height }) {
   const cover = coverSources({ width, height, ...band });
   if (!cover) return;
   const candidate = (format) => (w) => `${url.pathname}?width=${w}&format=${format}&optimize=medium ${w}w`;
-  const source = document.createElement('source');
-  source.type = 'image/webp';
-  source.srcset = cover.widths.map(candidate('webply')).join(', ');
-  source.sizes = cover.sizes;
+  const webp = (widths, media) => {
+    const source = document.createElement('source');
+    source.type = 'image/webp';
+    if (media) source.media = media;
+    source.srcset = widths.map(candidate('webply')).join(', ');
+    source.sizes = cover.sizes;
+    return source;
+  };
   picture.querySelectorAll('source').forEach((s) => s.remove());
-  picture.prepend(source);
+  // phones first (the first matching source wins): the widths up to COVER_PHONE.maxWidth
+  const phone = cover.widths.filter((w) => w <= COVER_PHONE.maxWidth);
+  if (phone.length < cover.widths.length) {
+    picture.prepend(webp(phone, `(width < ${COVER_PHONE.below}px)`), webp(cover.widths));
+  } else {
+    picture.prepend(webp(cover.widths));
+  }
   const format = ext === 'jpeg' ? 'jpg' : ext;
   img.srcset = cover.widths.map(candidate(format)).join(', ');
   img.sizes = cover.sizes;
