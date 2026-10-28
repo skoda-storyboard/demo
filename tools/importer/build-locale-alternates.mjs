@@ -171,6 +171,11 @@ const isGenerated = (column) => column === 'alternates' || isHreflang(column);
  * replaced by the new ones, sorted by URL. The custom `alternates` column is dropped
  * (#299 review: native hreflang only), and every row gets every column (an empty cell never
  * overwrites in bulk metadata), the hreflang ones last in the switcher's order.
+ * Bulk metadata applies the rows top to bottom (a later row wins), so the rows keep their place:
+ * a chrome row no run refreshes stays where it is, and a refreshed scope's new rows take its old
+ * rows' place (#485 review: moving the kept `/de/**` row below `/de/special` overrode that page's
+ * own nav). Only a scope new to the sheet is added: after the sheet, or for a locale that already
+ * has the other family, next to it, its `/{locale}/**` row always before its Media Room rows.
  * @param {object} sheet the DA sheet JSON ({ data: [...] })
  * @param {Array<object>} rows `{ URL, 'hreflang:en': …, … }`
  * @param {Array<object>} [extra] curated rows to ensure (e.g. chromeRows())
@@ -188,20 +193,45 @@ export function mergeSheet(sheet, rows, extra = []) {
   // replaced only by a run that brings that locale and family (`--chrome`, `--chrome-media-room`);
   // every other locale's and family's rows stay (#485 review: a Czech Media Room refresh kept
   // nothing of German or of either Storyboard row)
-  const refreshed = new Set(extra.map(chromeScope).filter(Boolean));
-  const curated = data.filter((r) => !generated(r) && !chromeScope(r)).map(shape);
-  // the chrome rows, kept and new, as one block: per locale its `/{locale}/**` row first, then its
-  // Media Room rows, which must come later to override it (also when only one family is refreshed)
-  const chrome = [
-    ...data.filter((r) => !generated(r) && chromeScope(r) && !refreshed.has(chromeScope(r))),
-    ...extra.filter(chromeScope),
-  ];
-  const locales = [...new Set(chrome.map((r) => chromeScope(r).split(':')[0]))];
-  const ordered = locales.flatMap((code) => ['storyboard', 'media-room']
-    .flatMap((family) => chrome.filter((r) => chromeScope(r) === `${code}:${family}`)));
-  const ensured = [...ordered, ...extra.filter((r) => !chromeScope(r))].map(shape);
-  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL)).map(shape);
-  const merged = [...curated, ...ensured, ...added];
+  const fresh = new Map();
+  extra.filter(chromeScope).forEach((r) => {
+    const scope = chromeScope(r);
+    if (!fresh.has(scope)) fresh.set(scope, []);
+    fresh.get(scope).push(r);
+  });
+  // the sheet in its order: a refreshed scope's new rows at its first old row, its other old rows
+  // gone; every other row (curated, or chrome no run refreshes) where it was
+  const placed = new Set();
+  const kept = [];
+  data.forEach((r) => {
+    if (generated(r)) return;
+    const scope = chromeScope(r);
+    if (!scope || !fresh.has(scope)) {
+      kept.push(r);
+      return;
+    }
+    if (placed.has(scope)) return;
+    placed.add(scope);
+    kept.push(...fresh.get(scope));
+  });
+  // a scope new to the sheet: a Storyboard row goes before its locale's Media Room rows, Media Room
+  // rows right after their locale's Storyboard row (so they override it, and the rows after them
+  // still override both); a locale without either is added after the sheet, Storyboard first
+  const indexOf = (scope) => kept.findIndex((r) => chromeScope(r) === scope);
+  const appended = [];
+  const newScopes = [...fresh.keys()].filter((scope) => !placed.has(scope));
+  const locales = [...new Set(newScopes.map((scope) => scope.split(':')[0]))];
+  locales.forEach((code) => ['storyboard', 'media-room'].forEach((family) => {
+    const scope = `${code}:${family}`;
+    if (!newScopes.includes(scope)) return;
+    const other = indexOf(`${code}:${family === 'storyboard' ? 'media-room' : 'storyboard'}`);
+    if (other < 0) appended.push(...fresh.get(scope));
+    else if (family === 'storyboard') kept.splice(other, 0, ...fresh.get(scope));
+    else kept.splice(other + 1, 0, ...fresh.get(scope));
+  }));
+  const ensured = [...appended, ...extra.filter((r) => !chromeScope(r))];
+  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL));
+  const merged = [...kept, ...ensured, ...added].map(shape);
   return {
     ...sheet, total: merged.length, offset: 0, limit: merged.length, data: merged, ':type': 'sheet',
   };
