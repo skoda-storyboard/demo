@@ -87,6 +87,19 @@ test('buildNav: the 4 sections of /nav (topbar, brand, menu, search), in the loc
   assert.deepEqual(links(search[0]), ['Vyhledat=https://www.skoda-storyboard.com/cs/hledat/']);
 });
 
+// SKODA-1006: the Slovak Media Room's `#` Modely heading lists one model, Fabia, on the source
+test('buildNav: a `#` heading with one real sub-item keeps it; one that repeats it does not', () => {
+  const d = doc();
+  d.querySelector('nav.topnav ul').insertAdjacentHTML('afterbegin', `<li><a href="#">Modely&nbsp;</a><ul class="sub-menu">
+    <li><a href="${LIVE}/sk/hladat/?filter%5Bmodel%5D%5B%5D=fabia-sk">Fabia</a></li></ul></li>
+    <li><a href="${LIVE}/sk/foto/">Foto</a><ul class="sub-menu"><li><a href="${LIVE}/sk/foto/">Foto</a></li></ul></li>`);
+  const [, , menu] = sections(buildNav(d, 'sk'));
+  const [models, photos] = [...menu[0].children];
+  assert.equal(models.querySelector(':scope > p').textContent, 'Modely', 'a text heading');
+  assert.deepEqual(links(models.querySelector(':scope > ul')), [`Fabia=${LIVE}/sk/hladat/?filter%5Bmodel%5D%5B%5D=fabia-sk`]);
+  assert.equal(photos.querySelector(':scope > ul'), null, 'a sub-item that repeats its heading adds nothing');
+});
+
 test('buildNewsletter: the Newsletter Stub (topbar) rows of /nav-newsletter', () => {
   globalThis.WebImporter = {
     DOMUtils: {

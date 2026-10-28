@@ -109,11 +109,17 @@ function menuList(document, source, { keepHeading, newsletter }) {
     // a `#` parent (the German Modelle / Lifestyle) is a text heading in the nav. In the footer it
     // links to its first link, as the source's phone footer does; the footer block hides it once
     // the columns open, where that link shows first (footer-sections.js, SKODA-1001)
-    if (!/^#?$/.test(href)) item.append(para(document, link(document, href, text(top))));
-    else if (!keepHeading && subs.length) item.append(para(document, link(document, subs[0].href, text(top))));
-    else item.append(para(document, text(top)));
+    // the label's own link: its href, a footer `#` parent's first link, or none (a text heading)
+    let labelHref = '';
+    if (!/^#?$/.test(href)) labelHref = authoredHref(href);
+    else if (!keepHeading && subs.length) labelHref = subs[0].href;
+    item.append(para(document, labelHref ? link(document, /^#?$/.test(href) ? labelHref : href, text(top)) : text(top)));
     const kept = subs.filter((s, i) => keepHeading || !(s.heading || (i === 0 && s.href === authoredHref(href))));
-    if (subs.length > 1 && kept.length) {
+    // one sub-item that only repeats its label (same link or name) adds nothing; a real one stays
+    // (the Slovak Media Room's Modely heading and its one model, Fabia, SKODA-1006)
+    const repeatsParent = kept.length === 1
+      && ((labelHref && kept[0].href === labelHref) || kept[0].label === text(top));
+    if (kept.length && !repeatsParent) {
       const subList = document.createElement('ul');
       kept.forEach((s) => {
         const subItem = document.createElement('li');
