@@ -1,0 +1,129 @@
+/* Tech data check + picker (SKODA-852): DA plugin iframes, not site pages */
+:root {
+  --td-text: #2c2c2c;
+  --td-muted: #6e6e6e;
+  --td-line: #e1e1e1;
+  --td-accent: #3b63fb;
+  --td-pass: #007a4d;
+  --td-warn: #b35c00;
+  --td-fail: #d31510;
+  --td-gap: 0.75rem;
+}
+
+body {
+  margin: 0;
+  color: var(--td-text);
+  font: 14px/1.45 adobe-clean, "Source Sans Pro", system-ui, sans-serif;
+}
+
+.tech-data-plugin {
+  padding: var(--td-gap);
+  max-inline-size: 60rem;
+}
+
+.tech-data-plugin h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+
+.tech-data-muted {
+  color: var(--td-muted);
+}
+
+.tech-data-error {
+  color: var(--td-fail);
+}
+
+.tech-data-status:empty {
+  display: none;
+}
+
+.tech-data-check {
+  border-block-start: 1px solid var(--td-line);
+  padding-block: var(--td-gap);
+}
+
+.tech-data-check h2 {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tech-data-check p,
+.tech-data-check ul {
+  margin: 0.25rem 0 0;
+}
+
+.tech-data-badge {
+  border-radius: 1rem;
+  padding: 0 0.5rem;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.is-pass .tech-data-badge { background: var(--td-pass); }
+.is-warn .tech-data-badge { background: var(--td-warn); }
+.is-fail .tech-data-badge { background: var(--td-fail); }
+
+.tech-data-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-block-start: 1px solid var(--td-line);
+  padding-block-start: var(--td-gap);
+}
+
+.tech-data-button {
+  border: 2px solid var(--td-accent);
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--td-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tech-data-values .tech-data-button {
+  background: #fff;
+  color: var(--td-accent);
+}
+
+.tech-data-button:disabled {
+  border-color: var(--td-line);
+  background: #f5f5f5;
+  color: var(--td-muted);
+  cursor: default;
+}
+
+.tech-data-button:focus-visible {
+  outline: 2px solid var(--td-text);
+  outline-offset: 2px;
+}
+
+.tech-data-values {
+  inline-size: 100%;
+  margin-block-start: var(--td-gap);
+  border-collapse: collapse;
+}
+
+.tech-data-values caption {
+  text-align: start;
+  font-weight: 700;
+}
+
+.tech-data-values th,
+.tech-data-values td {
+  border-block-end: 1px solid var(--td-line);
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  text-align: start;
+  vertical-align: top;
+  font-weight: 400;
+}
+
+.tech-data-note {
+  display: block;
+}

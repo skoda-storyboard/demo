@@ -23,6 +23,7 @@ import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geome
 import { readDropCapRow, decorateDropCap } from './drop-cap.js';
 import { readBoxRow, decorateBox } from './section-box.js';
 import htmlLang from './locale-tags.js';
+import decorateTechValues from './tech-values.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -334,6 +335,7 @@ async function loadTemplate(main) {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  decorateTechValues(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);

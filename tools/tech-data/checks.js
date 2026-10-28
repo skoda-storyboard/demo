@@ -4,8 +4,8 @@
  * and the audit, covered by checks.test.mjs.
  */
 import {
-  decodeEntities, escapeHtml, flat, hasDecimalComma, modelsForPath, parseFigure,
-  parseTechDataHref, sameFigure, techDataHref, textOf, valuesOfModels,
+  decodeEntities, escapeHtml, flat, hasDecimalComma, linkHtml, modelsForPath, parseFigure,
+  parseTechDataHref, sameFigure, textOf, valuesOfModels,
 } from './tech-data.js';
 
 const METADATA_OPEN_RE = /^<div\b[^>]*\bclass="(?:section-)?metadata"/i;
@@ -344,8 +344,6 @@ export function runChecks({ html, path, sheet }) {
   }));
 }
 
-const linkTo = (row) => `<a href="${techDataHref(row.key)}">${escapeHtml(row.display)}</a>`;
-
 function rewriteLinks(html, sheet, changes) {
   return html.replace(ANCHOR_RE, (all, before, href, after, inner) => {
     const binding = parseTechDataHref(href);
@@ -365,7 +363,7 @@ function rewriteCells(html, sheet, models, { mismatched, matching }, changes) {
     const isSame = sameFigure(textOf(value), row.display);
     if ((isSame && !matching) || (!isSame && !mismatched)) return all;
     changes.push({ what: textOf(label), from: textOf(value), to: row.display });
-    return `${open}${linkTo(row)}${middle}${label}${close}`;
+    return `${open}${linkHtml(row)}${middle}${label}${close}`;
   });
 }
 
@@ -389,7 +387,7 @@ function linkProse(html, rows, changes) {
         const row = officialFor({ text: decodeEntities(all) }, rows);
         if (!row) return all;
         changes.push({ what: row.key, from: flat(decodeEntities(all)), to: row.display });
-        return linkTo(row);
+        return linkHtml(row);
       });
     });
   });

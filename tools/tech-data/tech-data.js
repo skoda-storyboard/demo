@@ -61,6 +61,21 @@ export function parseTechDataHref(href) {
 
 export const techDataHref = (key) => `${TECH_DATA_SHEET}#${key}`;
 
+/** The linked value for a sheet row, as the picker inserts it and the checks write it. */
+export const linkHtml = (row) => `<a href="${techDataHref(row.key)}">${escapeHtml(row.display)}</a>`;
+
+/** How the model pages label each sheet field (the picker shows these). */
+export const FIELD_LABELS = {
+  power: 'Maximum performance',
+  torque: 'Maximum torque',
+  topSpeed: 'Maximum speed',
+  acceleration: 'Acceleration 0 – 100 km/h',
+  boot: 'Boot capacity',
+  dcCharging: 'Charging time (DC, 10 – 80%)',
+  range: 'Range (WLTP)',
+  consumption: 'Consumption (WLTP)',
+};
+
 // "5,4" is a decimal comma; "2,965" (three digits after the comma) is a thousands separator
 function toNumber(token) {
   const t = token.replace(/\s/g, '');
