@@ -31,6 +31,9 @@ client governs, so tags can be added or renamed with **no code change**:
     sponsorship, vip`.
   - `slug` = the value within that facet.
   - `label` = the display text (and the visible pill text).
+- **One vocabulary (SKODA-841):** the same sheet labels the pills an empty Tags block derives from the page's
+  facet metadata (`scripts/tag-links.js`). `tools/importer/build-tag-vocabulary.mjs` extends it with every term the
+  migrated pages and the index use (168 rows on 2026-10-27); its own rows are kept.
 - **Emitted href:** `/en/tag/<taxonomy>/<slug>/` (e.g. `model`/`epiq` → `/en/tag/model/epiq/`),
   the two-segment tag-archive pattern from `docs/ui-specs/tags.md` (SKODA-205, §3/§7).
 - **Fallback:** if the sheet can't be fetched (offline / restricted / not yet published), the

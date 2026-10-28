@@ -46,5 +46,9 @@ both from code, so the library changes when a block does.
 - The story template still carries the newsletter card. SKODA-840 replaces it with one fragment.
 - The fixed icons in the templates (newsletter, WhatsApp, PDF and share banners) still point at the origin CDN, like
   every migrated page (AR-01).
+- **Page panel pick lists (SKODA-841):** with `content/config/tags.json` present (the vocabulary sheet's local copy,
+  from `tools/importer/build-tag-vocabulary.mjs`), `blocks.json` gets a second tab, `options`: Experience Workspace
+  block options for `metadata` (the 15 facets and `tags` as `multi` pick lists, `template` as a single choice). Pass
+  `--vocabulary <file>` for another copy. Without the file the sheet keeps one tab.
 - The `Tags` block in the templates is empty, so it shows the page's `tags` metadata. SKODA-841 makes the metadata the
   single place to enter tags.

@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  facetTokens, scopeRows, filterRows, sortRows, paginate,
+  facetTokens, scopeRows, filterRows, matchesTags, sortRows, paginate,
   distinctFacetValues, decodeState, encodeState, selectedCount,
 } from './listing-logic.mjs';
 
@@ -140,4 +140,19 @@ test('encodeState clears a removed facet but keeps unrelated params', () => {
 test('selectedCount reports selections per facet', () => {
   assert.equal(selectedCount({ model: ['a', 'b'] }, 'model'), 2);
   assert.equal(selectedCount({}, 'model'), 0);
+});
+
+// SKODA-841: a feed's `tag` matches the `tags` column or any facet column
+test('matchesTags: a slug in `tags` or in any facet column (comma string or array), whole tokens, any case', () => {
+  const peaq = { tags: ['2026', 'peaq'], model: 'peaq', years: '2026' };
+  const facetsOnly = { model: 'elroq, enyaq', technology: 'electromobility' };
+  const crewOnly = { tags: 'emobility, 2025' };
+  assert.equal(matchesTags(peaq, ['peaq']), true);
+  assert.equal(matchesTags(facetsOnly, ['Enyaq']), true, 'facet column, no `tags` row');
+  assert.equal(matchesTags(facetsOnly, ['electromobility']), true);
+  assert.equal(matchesTags(crewOnly, ['emobility']), true, 'non-facet terms stay in `tags`');
+  assert.equal(matchesTags(facetsOnly, ['elr']), false, 'whole tokens only');
+  assert.equal(matchesTags(facetsOnly, ['peaq', 'enyaq']), true, 'any of the slugs');
+  assert.equal(matchesTags({ category: 'peaq' }, ['peaq']), false, 'category is no tag');
+  assert.equal(matchesTags(facetsOnly, []), true, 'no tag: no filter');
 });

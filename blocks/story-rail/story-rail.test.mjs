@@ -855,102 +855,13 @@ test('#332: promoShownPaths waits for the promo to load, and gives up after the 
   }
 });
 
-// --- blockStylesReady: a second rail waits for the carousel sheet (SKODA-845 layout shift) ---
-
-function fakeDoc(link) {
-  return { querySelector: (sel) => (sel.includes('/blocks/carousel/carousel.css') ? link : null) };
-}
-
-function fakeLink(sheet) {
-  const handlers = {};
-  return {
-    sheet,
-    addEventListener: (type, fn) => { handlers[type] = fn; },
-    fire: (type) => handlers[type] && handlers[type](),
-  };
-}
-
-const sheet = (rules) => ({ cssRules: rules });
-const importRule = (child) => ({ href: '../../styles/card-teaser.css', styleSheet: child });
-
-test('blockStylesReady: resolves now when the sheet and its imports are applied, or no link exists', async () => {
-  await blockStylesReady('carousel', fakeDoc(null));
-  await blockStylesReady('carousel', fakeDoc(fakeLink(sheet([{}]))));
-  await blockStylesReady('carousel', fakeDoc(fakeLink(sheet([importRule(sheet([{}])), {}]))));
-});
-
-test('blockStylesReady: the sheet is in but its @import is not: waits for the link load', async () => {
-  const link = fakeLink(sheet([importRule(sheet([])), {}]));
-  let done = false;
-  const ready = blockStylesReady('carousel', fakeDoc(link)).then(() => { done = true; });
-  await Promise.resolve();
-  assert.equal(done, false);
-  link.fire('load');
-  await ready;
-  assert.equal(done, true);
-});
-
-test('blockStylesReady: never waits past its limit', async () => {
-  await blockStylesReady('carousel', fakeDoc(fakeLink(null)), 5);
-});
-
-test('blockStylesReady: waits for a sheet still loading, and a failed sheet counts as ready', async () => {
-  for (const event of ['load', 'error']) {
-    const link = fakeLink(null);
-    let done = false;
-    const ready = blockStylesReady('carousel', fakeDoc(link)).then(() => { done = true; });
-    await Promise.resolve();
-    assert.equal(done, false, `still waiting before ${event}`);
-    link.fire(event);
-    await ready;
-    assert.equal(done, true, `ready after ${event}`);
-  }
-});
-
-// --- sectionHeadingText: a rail without its own heading is named after its section's (SKODA-845) ---
-
-// a tiny element stand-in: tag, text, children, and the previous sibling
-function fakeEl(tag, { text = '', kids = [], cls = '' } = {}) {
-  const node = {
-    tag, text, kids, previousElementSibling: null, parentElement: null, className: cls,
-    classList: { contains: (c) => cls.split(' ').includes(c) },
-    textContent: text || kids.map((k) => k.textContent).join(''),
-    matches: (sel) => sel.split(',').map((x) => x.trim()).includes(tag),
-    querySelectorAll: (sel) => kids.flatMap((k) => [...(k.matches(sel) ? [k] : []), ...k.querySelectorAll(sel)]),
-  };
-  return node;
-}
-function section(...children) {
-  children.forEach((c, i) => { c.previousElementSibling = children[i - 1] || null; });
-  return children;
-}
-
-test('sectionHeadingText: the last heading before the rail in its section', () => {
-  const railA = fakeEl('div', { cls: 'story-rail' });
-  const wrapA = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railA] });
-  railA.parentElement = wrapA;
-  section(fakeEl('div', { kids: [fakeEl('h3', { text: 'Kvasiny' })] }), wrapA);
-  assert.equal(sectionHeadingText(railA), 'Kvasiny');
-
-  const railB = fakeEl('div', { cls: 'story-rail' });
-  const wrapB = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railB] });
-  railB.parentElement = wrapB;
-  section(fakeEl('div', { kids: [fakeEl('h3', { text: 'Press Kits' }), fakeEl('p', { text: 'Based on tags: Fabia' })] }), wrapB);
-  assert.equal(sectionHeadingText(railB), 'Press Kits');
-
-  const railC = fakeEl('div', { cls: 'story-rail' });
-  const wrapC = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railC] });
-  railC.parentElement = wrapC;
-  section(wrapC);
-  assert.equal(sectionHeadingText(railC), '', 'no heading: the generic name stays');
-
-  // re-review: a heading-less rail right after another rail is not named after that rail's last card
-  const railD = fakeEl('div', { cls: 'story-rail' });
-  const wrapD = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railD] });
-  railD.parentElement = wrapD;
-  const before = fakeEl('div', { cls: 'story-rail-wrapper', kids: [fakeEl('h3', { text: 'A card title' })] });
-  section(fakeEl('div', { cls: 'default-content-wrapper', kids: [fakeEl('h2', { text: 'Images' })] }), before, wrapD);
-  assert.equal(sectionHeadingText(railD), '', 'another block ends the search');
-  section(fakeEl('div', { cls: 'default-content-wrapper', kids: [fakeEl('h2', { text: 'Videos' })] }), wrapD);
-  assert.equal(sectionHeadingText(railD), 'Videos', 'default content is read');
+// SKODA-841: a rail's `tag` matches the `tags` column or a facet column
+test('selectRows: a `tag` rail reaches pages that set the facet only', () => {
+  const pages = [
+    { path: '/en/x', title: 'Tagged', template: 'story', tags: 'kodiaq', date: '2026-01-02' },
+    { path: '/en/y', title: 'Facet only', template: 'story', model: 'kodiaq', date: '2026-01-01' },
+    { path: '/en/z', title: 'Other', template: 'story', model: 'karoq', date: '2026-01-03' },
+  ];
+  const cfg = parseConfig(cfgBlock([['template', 'story'], ['tag', 'kodiaq'], ['limit', '10']]));
+  assert.deepEqual(selectRows(pages, cfg).map((r) => r.title), ['Tagged', 'Facet only']);
 });

@@ -36,7 +36,7 @@ import { feedLightboxItem } from '../../scripts/media-lightbox.js';
 import { decorateLinks } from '../../scripts/links.js';
 import { fetchPlaceholders, localize, placeholdersNow } from '../../scripts/placeholders.js';
 import {
-  scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
+  scopeRows, filterRows, matchesTags, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
 
 // UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
@@ -156,6 +156,8 @@ export function selectRows(all, cfg) {
   if (cfg.categories?.length) active.categories = cfg.categories;
   if (cfg.tag.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
+  // a `tag` matches the `tags` column or any facet column (SKODA-841)
+  if (cfg.tag.length) scoped = scoped.filter((row) => matchesTags(row, cfg.tag));
   if (cfg.exclude.length) {
     scoped = scoped.filter((r) => !cfg.exclude.some((s) => String(r.path || '').includes(s)));
   }

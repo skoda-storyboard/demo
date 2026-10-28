@@ -8,13 +8,15 @@
  * `/en/tag/<taxonomy>/<slug>/` or listing facet `/en/news/?filter[…]`) stay aligned with the
  * SKODA-401 query-index facet taxonomy.
  *
- * METADATA FALLBACK (SKODA-401): when the block is authored with NO tag entries,
- * it falls back to the page's tags metadata — `getMetadata('article:tag')`, which
- * (because it contains ':') returns all <meta property="article:tag"> contents
- * joined with ', '. Each becomes a static label pill. This lets any imported page
- * that carries the standard comma-separated `tags` Metadata row (→ article:tag)
- * render its tags without the author re-listing them in the block. Authored tags
- * always win; the fallback only fires for an otherwise-empty block.
+ * TAGS ENTERED ONCE (SKODA-841): when the block is authored with NO tag entries, its pills come
+ * from the page's metadata: one per facet value (`model`, `years`, …) and per `tags` value of a
+ * non-facet vocabulary taxonomy (`crew`, `people`), labelled and linked as the source does
+ * (scripts/tag-links.js: the `/config/tags.json` vocabulary, blocks/tags/tag-terms.json, the
+ * index's tag archives). Authors then set the metadata only; an empty `Tags` table marks where
+ * the pills go. Authored tags always win.
+ * Last resort (SKODA-401): with nothing derivable, the `tags` metadata —
+ * `getMetadata('article:tag')`, all <meta property="article:tag"> contents joined with ', ' — as
+ * static label pills.
  *
  * Variants (extra classes on the block, read defensively):
  *   - (default)        grey→ink per-article label pill.
@@ -24,8 +26,30 @@
  */
 
 import { getMetadata } from '../../scripts/aem.js';
+import { loadQueryIndex } from '../../scripts/query-index.js';
+import {
+  derivedTags, loadVocabulary, loadTerms, archivePaths,
+} from '../../scripts/tag-links.js';
+import { INDEX_FACETS } from '../listing/listing-logic.mjs';
 
-export default function decorate(block) {
+/**
+ * The page's pills from its metadata (SKODA-841). The index only decides whether an archive link
+ * stays on the site; without it every archive link points at the source, which is still correct.
+ * @returns {Promise<{label: string, href: string}[]>}
+ */
+async function metadataTags() {
+  const facets = Object.fromEntries(INDEX_FACETS.map((facet) => [facet, getMetadata(facet)]));
+  const page = { template: getMetadata('template'), facets, tags: getMetadata('article:tag') };
+  if (!Object.values(facets).some(Boolean) && !page.tags) return [];
+  const [vocabulary, terms, rows] = await Promise.all([
+    loadVocabulary(),
+    loadTerms(),
+    loadQueryIndex().catch(() => []),
+  ]);
+  return derivedTags(page, { vocabulary, terms, archives: archivePaths(rows) });
+}
+
+export default async function decorate(block) {
   const isChips = block.classList.contains('chips');
 
   const ul = document.createElement('ul');
@@ -84,9 +108,19 @@ export default function decorate(block) {
     });
   });
 
-  // Fallback: no authored tags → derive from page metadata (article:tag).
-  // Metadata tags are bare slugs (no per-tag taxonomy), so they render as static
-  // labels — matching the spec's static-label path.
+  // No authored tags → the metadata's pills (SKODA-841).
+  if (!ul.children.length) {
+    let derived = [];
+    try {
+      derived = await metadataTags();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('tags: could not derive the tags from the metadata', e);
+    }
+    derived.forEach(({ label, href }) => addTag(label, { href }));
+  }
+
+  // Last resort: bare `tags` slugs (no taxonomy to link), as static labels.
   if (!ul.children.length) {
     getMetadata('article:tag')
       .split(',')
