@@ -1,7 +1,8 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import iconsReady from '../../scripts/icons-ready.js';
-import decorateFooterSections from './footer-sections.js';
+import decorateFooterSections, { FOOTER_LABELS } from './footer-sections.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
 
 /**
  * loads and decorates the footer
@@ -24,7 +25,9 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
 
-  decorateFooterSections(footer);
+  // the landmark and badge names in the page locale (SKODA-1003); the sheet is memoized
+  const labels = localize(FOOTER_LABELS, await fetchPlaceholders(), 'footer');
+  decorateFooterSections(footer, window.location.origin, { labels });
 
   block.append(footer);
   decorateIcons(block);

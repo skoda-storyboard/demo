@@ -24,6 +24,7 @@
 import {
   decorateCardCells, optimizeImages, wireCardLink,
 } from '../../scripts/card-teaser.js';
+import { applyLocalized, fillText } from '../../scripts/placeholders.js';
 
 // A pointer must travel this far (px) before we treat the gesture as a drag and
 // suppress the post-drag click (so a small wobble on a tap still navigates).
@@ -147,6 +148,23 @@ const prefersReducedMotion = () => window.matchMedia
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /*
+ * Where the track should scroll so a card that took keyboard focus is fully in view (exported for
+ * tests): its start at the track's start inset (a snap position; the browser clamps the last
+ * cards), or null when the whole card already shows. The browser scrolls only when the focused
+ * element itself is hidden, and a card's title link starts 16px inside the card, so a card one
+ * step off-screen would keep its focus ring out of view (WCAG 2.4.11, SKODA-845).
+ * Positions are in the track's scroll coordinates.
+ */
+export function focusScrollLeft({
+  cellLeft = 0, cellWidth = 0, scrollLeft = 0, clientWidth = 0, inset = 0,
+} = {}) {
+  const viewStart = scrollLeft + inset;
+  const viewEnd = scrollLeft + clientWidth - inset;
+  if (cellLeft >= viewStart - 1 && cellLeft + cellWidth <= viewEnd + 1) return null;
+  return Math.max(0, cellLeft - inset);
+}
+
+/*
  * Pure arrow-state decision (exported so tests exercise the production logic,
  * not a copy). prev hides at the left end, next at the right end, both hide when
  * the whole rail fits. Tolerant of sub-pixel scrollLeft (±1px).
@@ -224,21 +242,31 @@ function makeArrow(dir, label) {
   return btn;
 }
 
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `carousel…`. All of them are names (no visible words), so they are applied once the memoized
+// sheet resolves (applyLocalized) and the block stays synchronous.
+export const CAROUSEL_LABELS = {
+  // a standalone authored carousel's region name (story-rail passes its heading)
+  region: 'Content carousel',
+  carousel: 'carousel',
+  prev: 'Previous',
+  next: 'Next',
+  goTo: 'Go to slide {n}',
+};
+
 export default function decorate(block) {
   const hasDots = block.classList.contains('dots');
   const track = buildCards(block);
 
   // region semantics: name the rail from the label story-rail passes (or a
   // generic fallback for a standalone authored carousel).
-  const label = block.getAttribute('aria-label') || 'Content carousel';
+  const ownLabel = block.getAttribute('aria-label');
   block.setAttribute('role', 'region');
-  block.setAttribute('aria-roledescription', 'carousel');
-  block.setAttribute('aria-label', label);
 
   const viewport = document.createElement('div');
   viewport.className = 'carousel-viewport';
-  const prev = makeArrow('prev', 'Previous');
-  const next = makeArrow('next', 'Next');
+  const prev = makeArrow('prev', CAROUSEL_LABELS.prev);
+  const next = makeArrow('next', CAROUSEL_LABELS.next);
   viewport.append(prev, track, next);
 
   const dotsNav = document.createElement('div');
@@ -247,6 +275,16 @@ export default function decorate(block) {
 
   block.replaceChildren(viewport);
   if (hasDots) block.append(dotsNav);
+
+  let labels = CAROUSEL_LABELS;
+  applyLocalized(CAROUSEL_LABELS, 'carousel', (text) => {
+    labels = text;
+    block.setAttribute('aria-roledescription', text.carousel);
+    block.setAttribute('aria-label', ownLabel || text.region);
+    prev.setAttribute('aria-label', text.prev);
+    next.setAttribute('aria-label', text.next);
+    [...dotsNav.children].forEach((dot, i) => dot.setAttribute('aria-label', fillText(text.goTo, { n: i + 1 })));
+  });
 
   // ---- arrow / dot state (rAF-gated; recomputed on scroll + resize) ----------
   let rafId = 0;
@@ -272,7 +310,7 @@ export default function decorate(block) {
           const dot = document.createElement('button');
           dot.type = 'button';
           dot.className = 'carousel-dot';
-          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.setAttribute('aria-label', fillText(labels.goTo, { n: i + 1 }));
           // last dot targets the reachable maximum so it can actually select;
           // interior dots page by clientWidth.
           dot.addEventListener('click', () => track.scrollTo({
@@ -305,6 +343,24 @@ export default function decorate(block) {
   }
   prev.addEventListener('click', () => scrollByPage(-1));
   next.addEventListener('click', () => scrollByPage(1));
+
+  // keyboard focus on a card that is only partly in view: bring the whole card in (not a mouse
+  // press, which focuses the link too and would fight a drag)
+  track.addEventListener('focusin', (e) => {
+    if (!e.target.matches(':focus-visible')) return;
+    const cell = [...track.children].find((c) => c.contains(e.target));
+    if (!cell) return;
+    const t = track.getBoundingClientRect();
+    const c = cell.getBoundingClientRect();
+    const left = focusScrollLeft({
+      cellLeft: c.left - t.left + track.scrollLeft,
+      cellWidth: c.width,
+      scrollLeft: track.scrollLeft,
+      clientWidth: track.clientWidth,
+      inset: parseFloat(getComputedStyle(track).scrollPaddingInlineStart) || 0,
+    });
+    if (left !== null) track.scrollTo({ left, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  });
 
   track.addEventListener('scroll', scheduleSync, { passive: true });
   if (window.ResizeObserver) {

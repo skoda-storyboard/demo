@@ -218,6 +218,7 @@ export const SECTION_STYLES = [
   ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
   ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
   ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
+  ['carousel-listing', 'One plant rail of the Media Room Newsletter page: its heading and an index-driven Story Rail, 24px under the band (48px between rails).'],
   ['brand-assets', 'Company logo rows across the whole page: a group heading (h3, in the middle half from 781px, 100px under the row before, 50 at the top of the page) or a row of Brand Asset tiles.'],
   ['brand-assets, framed', 'A Brand Asset row the source frames 70px in on every side (the company logo page\'s last row).'],
   ['page-body, pull-up', 'A row pulled 20px up into the one before from 768px wide (the Contacts rows under a group heading); combine with half where needed.'],

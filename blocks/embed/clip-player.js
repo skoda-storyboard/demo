@@ -14,7 +14,11 @@
  * Styles: embed.css (`.embed.vimeo`).
  */
 
-const LABELS = {
+import { fetchPlaceholders, localize, fillText } from '../../scripts/placeholders.js';
+
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `clip…`; the player builds in English and takes the locale's once the memoized sheet resolves
+export const CLIP_LABELS = {
   play: 'Play',
   pause: 'Pause',
   mute: 'Mute',
@@ -27,9 +31,22 @@ const LABELS = {
   exitFullscreen: 'Exit full screen',
   progress: 'Progress Bar',
   volume: 'Volume (use up/down arrow keys to change)',
-  volumeLevel: (pct) => `${pct}% volume`,
-  timeOf: (now, total) => `${now} of ${total}`,
+  volumeLevel: '{pct}% volume',
+  timeOf: '{now} of {total}',
 };
+
+/**
+ * The player's text in the page locale (English per missing key), as the functions it calls.
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ */
+export function clipText(ph = {}) {
+  const t = localize(CLIP_LABELS, ph, 'clip');
+  return {
+    ...t,
+    volumeLevel: (pct) => fillText(t.volumeLevel, { pct }),
+    timeOf: (now, total) => fillText(t.timeOf, { now, total }),
+  };
+}
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 // the progress bar's keys: arrows step 5s, Page Up / Down a tenth, Home / End the ends
@@ -109,11 +126,12 @@ function setControl(button, label, glyph) {
 export default function clipPlayer(wrapper, video) {
   video.removeAttribute('controls');
   wrapper.classList.add('clip');
+  let text = clipText();
 
   const bar = document.createElement('div');
   bar.className = 'clip-bar';
 
-  const play = control('clip-play', LABELS.play, 'play');
+  const play = control('clip-play', text.play, 'play');
 
   const panel = document.createElement('div');
   panel.className = 'clip-panel';
@@ -139,12 +157,12 @@ export default function clipPlayer(wrapper, video) {
   seek.max = '0';
   seek.step = 'any';
   seek.value = '0';
-  seek.setAttribute('aria-label', LABELS.progress);
+  seek.setAttribute('aria-label', text.progress);
   progress.append(track, time, seek);
 
   const buttons = document.createElement('div');
   buttons.className = 'clip-buttons';
-  const volume = control('clip-volume', LABELS.mute, 'volume');
+  const volume = control('clip-volume', text.mute, 'volume');
   // the source's vertical volume slider over the button: a role=slider, as the source's (a
   // vertical native range is still uneven across browsers), drawn as a 4×72 track with its
   // fill and an 8px handle
@@ -154,7 +172,7 @@ export default function clipPlayer(wrapper, video) {
   slider.className = 'clip-volume-slider';
   slider.tabIndex = 0;
   slider.setAttribute('role', 'slider');
-  slider.setAttribute('aria-label', LABELS.volume);
+  slider.setAttribute('aria-label', text.volume);
   slider.setAttribute('aria-orientation', 'vertical');
   slider.setAttribute('aria-valuemin', '0');
   slider.setAttribute('aria-valuemax', '100');
@@ -167,11 +185,11 @@ export default function clipPlayer(wrapper, video) {
   sliderBar.append(sliderFill, sliderHandle);
   slider.append(sliderBar);
   volumeControl.append(volume, slider);
-  const settings = control('clip-settings', LABELS.settings, 'settings');
+  const settings = control('clip-settings', text.settings, 'settings');
   settings.setAttribute('aria-haspopup', 'true');
   settings.setAttribute('aria-expanded', 'false');
-  const pip = control('clip-pip', LABELS.pip, 'pip');
-  const full = control('clip-fullscreen', LABELS.fullscreen, 'fullscreen');
+  const pip = control('clip-pip', text.pip, 'pip');
+  const full = control('clip-fullscreen', text.fullscreen, 'fullscreen');
   // only what the browser can do
   pip.hidden = !(document.pictureInPictureEnabled && video.requestPictureInPicture);
   full.hidden = !(wrapper.requestFullscreen || video.webkitEnterFullscreen);
@@ -183,13 +201,13 @@ export default function clipPlayer(wrapper, video) {
   menu.hidden = true;
   const menuTitle = document.createElement('p');
   menuTitle.className = 'clip-menu-title';
-  menuTitle.textContent = LABELS.speed;
+  menuTitle.textContent = text.speed;
   menu.append(menuTitle);
   const speedButtons = SPEEDS.map((rate) => {
     const option = document.createElement('button');
     option.type = 'button';
     option.className = 'clip-menu-option';
-    option.textContent = rate === 1 ? LABELS.normal : String(rate);
+    option.textContent = rate === 1 ? text.normal : String(rate);
     option.setAttribute('aria-pressed', String(rate === 1));
     option.addEventListener('click', () => {
       video.playbackRate = rate;
@@ -219,7 +237,7 @@ export default function clipPlayer(wrapper, video) {
     progress.style.setProperty('--clip-share', String(share));
     seek.max = String(total);
     seek.value = String(now);
-    seek.setAttribute('aria-valuetext', LABELS.timeOf(timecode(now), timecode(total)));
+    seek.setAttribute('aria-valuetext', text.timeOf(timecode(now), timecode(total)));
   };
 
   // the controls' hiding (`is-idle`), once the clip has played: with a mouse whenever the
@@ -258,7 +276,7 @@ export default function clipPlayer(wrapper, video) {
 
   const syncPlay = () => {
     const paused = video.paused || video.ended;
-    setControl(play, paused ? LABELS.play : LABELS.pause, paused ? 'play' : 'pause');
+    setControl(play, paused ? text.play : text.pause, paused ? 'play' : 'pause');
     wrapper.classList.toggle('is-playing', !paused);
     // the pointer restarts the idle fade (a click on Play does); the play event, which may come
     // a while later once the clip has buffered, doesn't
@@ -273,10 +291,10 @@ export default function clipPlayer(wrapper, video) {
   };
   const syncVolume = () => {
     const off = video.muted || video.volume === 0;
-    setControl(volume, off ? LABELS.unmute : LABELS.mute, off ? 'muted' : 'volume');
+    setControl(volume, off ? text.unmute : text.mute, off ? 'muted' : 'volume');
     const now = level();
     slider.setAttribute('aria-valuenow', String(now));
-    slider.setAttribute('aria-valuetext', LABELS.volumeLevel(now));
+    slider.setAttribute('aria-valuetext', text.volumeLevel(now));
     slider.style.setProperty('--clip-volume', String(now / 100));
   };
 
@@ -370,7 +388,7 @@ export default function clipPlayer(wrapper, video) {
   });
   document.addEventListener('fullscreenchange', () => {
     const on = document.fullscreenElement === wrapper;
-    setControl(full, on ? LABELS.exitFullscreen : LABELS.fullscreen, 'fullscreen');
+    setControl(full, on ? text.exitFullscreen : text.fullscreen, 'fullscreen');
   });
   seek.addEventListener('keydown', (e) => {
     const total = duration();
@@ -427,6 +445,20 @@ export default function clipPlayer(wrapper, video) {
   syncPlay();
   syncVolume();
   show();
-}
 
-export { LABELS as CLIP_LABELS };
+  // the page locale's text, once the memoized sheet resolves (SKODA-1003)
+  fetchPlaceholders().then((ph) => {
+    text = clipText(ph);
+    seek.setAttribute('aria-label', text.progress);
+    slider.setAttribute('aria-label', text.volume);
+    setControl(settings, text.settings, 'settings');
+    setControl(pip, text.pip, 'pip');
+    menuTitle.textContent = text.speed;
+    speedButtons[SPEEDS.indexOf(1)].textContent = text.normal;
+    const fullOn = document.fullscreenElement === wrapper;
+    setControl(full, fullOn ? text.exitFullscreen : text.fullscreen, 'fullscreen');
+    render();
+    syncPlay();
+    syncVolume();
+  }).catch(() => { /* the English text stays */ });
+}

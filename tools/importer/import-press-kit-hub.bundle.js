@@ -338,6 +338,7 @@ var CustomImportScript = (() => {
     yeti: "models",
     "yeti-outdoor": "models"
   };
+  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
   function extractCategories(document) {
     const cls = document.body && document.body.getAttribute("class") || "";
     const id = cls.match(/\bpostid-(\d+)\b/);
@@ -459,7 +460,7 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
-    const categories = template === "story" ? extractCategories(document) : [];
+    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
     if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -1025,6 +1026,13 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document));
     });
   }
+  function transform3(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-press-kit-hub.js
   var FACETS2 = [
@@ -1217,7 +1225,7 @@ var CustomImportScript = (() => {
       transform("afterTransform", main, payload);
       transform2("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document);
-      normalizeImages(main, document);
+      transform3("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const pathname = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       return [{

@@ -62,7 +62,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
 | `media-cart` | – | – (an empty block: authored cells are ignored; it renders the device's cart, the cart page `/{lang}/media-cart`, SKODA-505b) |
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
-| `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
+| `story-rail` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band; `categories` since SKODA-845, as the `stories` block reads it) |
 | `tags` | `chips` | – |
 | `timeline` | `black` (the black year pills), `large` (18pt titles), `xl` (24pt model lines) | – (SKODA-815; see `timeline` below) |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
@@ -476,6 +476,21 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/copyright/`): `page-body` (the h2 row), `page-body, half, empty-cell`, then 3 × `page-body,
   half`. Equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every text box, the band, the footer gap).
 
+### `carousel-listing`
+- **Status:** `pinned` (2026-10-22) · **Ticket:** SKODA-845 · **Fallback:** readable (the heading and the rail
+  with the default section spacing) · **Styles:** `carousel-listing`
+- **Emitted by:** `parsers/carousel-listing.js` (`import-carousel-listing`, the Media Room Newsletter page,
+  `template-carousel-listing`). One section per source carousel: a break, the plant's h3, a `Story Rail`
+  config table, then its `Section Metadata`.
+- **Shape:** `Story Rail` with `template: press_release` and what every teaser of the source carousel shares:
+  `categories: <category-* slug>` and `company: <company-* slug>` (term-id classes skipped). A carousel whose
+  teasers share neither is dropped (a rail without a filter would list every press release).
+- **Runtime (styles.css):** each h3 24px under the band and 48px under the rail before, the cards 20px under
+  it, the last rail 48px above the footer; no list-item margin under the cards. The rail is the landing
+  page's wide news rail (`story-rail-wide`, SKODA-827): 90 / 45 / 30% cells, 20px apart.
+- **Example** (`/en/newsletter/`): Kvasiny (`categories: newsletter`, `company: kvasiny`), Vrchlabí
+  (`company: vrchlabi`). Equal to the source at 390 / 768 / 992 / 1280 / 1440 (SKODA-845).
+
 ### `brand-assets`
 - **Status:** `pinned` (2026-10-23) · **Ticket:** SKODA-810b · **Fallback:** readable (unstyled tiles under
   the headings) · **Styles:** `brand-assets`, `brand-assets, framed`
@@ -497,6 +512,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Form: bulk metadata, not importer output** (309 amendment). The 16 MR-side URLs (5 press releases, **5 model pages**, 4 press kits, Images, Videos) get `nav` / `footer` from `metadata.json` rows for the MR path globs. Those rows are activated only once both MR fragments return 200 on preview and live. The importers emit nothing, and the push tool's fragment check requires the fragments to be live before publishing.
 - **Rows** (SKODA-309, 2026-09-28): every row sets `nav: /media-room/nav`, `footer: /media-room/footer` and `section: media-room`. `header-switcher.js` uses `section` to activate the Media Room tab; the Media Room header also gets a lighter topbar.
   - Patterns: `/en/press-releases/**`, `/en/press-kits/**`, `/en/skoda-model/**`, `/en/skodapedia/**`, plus an exact row and a `/**` row each for `/en/news`, `/en/images`, `/en/videos`, `/en/media-room`, `/en/contacts`, `/en/search` and `/en/newsletter` (the SKODA-305 footer list).
+  - **Tag archives (SKODA-209, 2026-10-22):** an exact row and a `/**` row each for `/en/tag/company`, `/en/tag/crew`,
+    `/en/tag/derivative`, `/en/tag/environment`, `/en/tag/people` and `/en/tag/years`. On the source these taxonomies'
+    archives are Media Room pages (`body.media-room`, MR nav and footer); model tags and categories are Storyboard.
+    The Stories grid ends 48px under its pager on a `section: media-room` page (16 elsewhere), as the source does.
   - The rows don't overlap each other and none matches a Storyboard page. Page-level metadata still wins over the bulk rows (aem.live bulk metadata).
   - **Exception (SKODA-810, 2026-10-26):** the company importer (`import-company-page.js`) writes the same three rows as page metadata for a source page on the Media Room template (`body.media-room`): `/en/contacts`, `/en/board-of-management` and `/en/skoda-media-services-application`. No bulk row matches the last two, and the values are identical to the bulk rows. The company logo (`template-custom-full-width`) keeps the Storyboard chrome.
 - **Fragment check:** `fragmentPaths()` reads the preview and live `/metadata.json` rows whose pattern matches a pushed page (`bulkPatternMatches`). So an MR batch requires `/media-room/nav` and `/media-room/footer` to be live, and Storyboard batches don't.

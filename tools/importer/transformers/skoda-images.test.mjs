@@ -2,8 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
-import normalizeImages from './skoda-images.js';
+import transform from './skoda-images.js';
 import flattenStory from '../parsers/story-flatten.js';
+
+// the importers' call (SKODA-509): the transformer hook on `afterTransform`
+const normalizeImages = (root, document) => transform('afterTransform', root, document ? { document } : {});
 
 function normalize(html) {
   const doc = new JSDOM(`<main>${html}</main>`).window.document;
@@ -144,4 +147,65 @@ test('reports empty and missing alt separately without fabricating either', () =
   }
   assert.match(seen[0], /empty alt: a.jpg/);
   assert.match(seen[1], /missing alt: b.jpg/);
+});
+
+// --- the transformer hook signature (SKODA-509) ----------------------------------------------
+test('the hook acts on afterTransform only: other hooks leave the page untouched', () => {
+  const html = '<p>Before <img src="a.jpg" alt="A" data-caption="Caption"> after</p>';
+  ['beforeTransform', 'preprocess', 'transform', ''].forEach((hook) => {
+    const doc = new JSDOM(`<main>${html}</main>`).window.document;
+    const main = doc.querySelector('main');
+    transform(hook, main, { document: doc });
+    assert.equal(main.innerHTML, html, `${hook}: no change`);
+  });
+  const doc = new JSDOM(`<main>${html}</main>`).window.document;
+  transform('afterTransform', doc.querySelector('main'), { document: doc });
+  assert.ok(doc.querySelector('main > figure > div > img'), 'afterTransform: the image is lifted into a figure');
+});
+
+test('rejects the old normalizeImages(main, document) signature before changing the page', () => {
+  const html = '<h1>Classic Days</h1><p><a href="/a.jpg"><img src="a.jpg" alt=""></a></p>';
+  const doc = new JSDOM(`<main>${html}</main>`).window.document;
+  const main = doc.querySelector('main');
+  assert.throws(() => transform(main, doc), {
+    name: 'TypeError',
+    message: "skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).",
+  });
+  assert.equal(main.innerHTML, html, 'the invalid call does not partially normalize images');
+  transform('afterTransform', main, { document: doc });
+  assert.equal(main.querySelector('a > div > img').getAttribute('alt'), 'Classic Days');
+});
+
+test('rejects other non-string hook names instead of silently skipping normalization', () => {
+  const main = new JSDOM('<main></main>').window.document.querySelector('main');
+  [undefined, null, 0, false, {}, []].forEach((hook) => {
+    assert.throws(() => transform(hook, main), TypeError);
+  });
+});
+
+test('the hook builds with payload.document, or the element\'s own document without one', () => {
+  const html = '<p>Before <img src="a.jpg" alt="A" data-caption="Caption"> after</p>';
+  const doc = new JSDOM(`<main>${html}</main>`).window.document;
+  const created = [];
+  const payloadDoc = new Proxy(doc, {
+    get(target, key) {
+      const value = Reflect.get(target, key);
+      if (key === 'createElement') return (tag) => { created.push(tag); return target.createElement(tag); };
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+  });
+  transform('afterTransform', doc.querySelector('main'), { document: payloadDoc });
+  assert.ok(created.includes('figure'), 'the figure is created through payload.document');
+  const own = new JSDOM(`<main>${html}</main>`).window.document;
+  transform('afterTransform', own.querySelector('main'), {});
+  transform('afterTransform', own.querySelector('main')); // no payload at all
+  assert.equal(own.querySelectorAll('main figure').length, 1, 'ownerDocument fallback, idempotent on a second run');
+});
+
+test('skoda-images.js exports only the hook, as the transformer validator requires', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const src = (await readFile(new URL('./skoda-images.js', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(src, /^export default function transform\(hookName, element, payload\)/m);
+  assert.deepEqual(src.match(/^[ \t]*export\b.*$/gm), ['export default function transform(hookName, element, payload) {']);
+  assert.doesNotMatch(src, /^[ \t]*import\b/m, 'no imports either: a classic script can\'t have them');
 });

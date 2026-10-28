@@ -1307,6 +1307,7 @@ var CustomImportScript = (() => {
     yeti: "models",
     "yeti-outdoor": "models"
   };
+  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
   function extractCategories(document) {
     const cls = document.body && document.body.getAttribute("class") || "";
     const id = cls.match(/\bpostid-(\d+)\b/);
@@ -1428,7 +1429,7 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
-    const categories = template === "story" ? extractCategories(document) : [];
+    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
     if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -1553,6 +1554,13 @@ var CustomImportScript = (() => {
       const imageNode = imageContainer(img, document, linkedImage ? link : null);
       marker3.replaceWith(withCaption(imageNode, caption, document));
     });
+  }
+  function transform3(hookName, element, payload) {
+    if (typeof hookName !== "string") {
+      throw new TypeError("skoda-images: expected a string hookName; use imagesTransformer('afterTransform', main, payload).");
+    }
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
   }
 
   // transformers/skoda-links.js
@@ -1983,7 +1991,7 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform3(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
@@ -1998,7 +2006,7 @@ var CustomImportScript = (() => {
   // transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform4(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -2069,7 +2077,7 @@ var CustomImportScript = (() => {
   }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
-      transform4("preprocess", document.body, { document });
+      transform5("preprocess", document.body, { document });
       document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
@@ -2095,9 +2103,9 @@ var CustomImportScript = (() => {
         holder.append(group.el);
         parse4(group.el, payload);
         main.replaceChildren(holder);
-        normalizeImages(main, document);
-        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
         transform3("afterTransform", main, payload);
+        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+        transform4("afterTransform", main, payload);
         checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
         return [{
           element: main,
@@ -2136,9 +2144,9 @@ var CustomImportScript = (() => {
       transform("afterTransform", main, payload);
       transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template }));
       WebImporter.rules.transformBackgroundImages(main, document);
-      normalizeImages(main, document);
-      WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
+      WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+      transform4("afterTransform", main, payload);
       checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,

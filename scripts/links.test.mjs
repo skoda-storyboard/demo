@@ -89,6 +89,20 @@ test('the media cart page is the demo\'s own (SKODA-505b): it stays in the tab',
   );
 });
 
+test('Company → Newsletter opens the migrated page in the same tab (SKODA-845, #457 review)', () => {
+  assert.deepEqual(
+    policyHref(`${LIVE_ORIGIN}/en/newsletter/`, PAGE),
+    { href: '/en/newsletter', newTab: false },
+    'the authored live link in the Media Room nav comes to the demo page',
+  );
+  assert.deepEqual(policyHref('/en/newsletter/', PAGE), { href: '/en/newsletter', newTab: false });
+  assert.deepEqual(
+    policyHref(`${LIVE_ORIGIN}/en/newsletter-settings/`, PAGE),
+    { href: `${LIVE_ORIGIN}/en/newsletter-settings/`, newTab: false },
+    '"Manage subscription" still goes to live',
+  );
+});
+
 test('source-only downloads go to the live site', () => {
   const href = '/direct-download/2026/08/01_Skoda_Slavia_Monte_Carlo_9ae70a7b.jpg';
   assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true });

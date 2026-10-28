@@ -15,6 +15,7 @@
  */
 
 import { wireImageLinks } from '../../scripts/media-lightbox.js';
+import { applyLocalized } from '../../scripts/placeholders.js';
 
 // heading id (importer slug) → section role, nav icon (icons/model-*.svg) and the source's
 // anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land). The RS
@@ -167,6 +168,9 @@ function decorateSections(main) {
   });
 }
 
+// UI text (SKODA-1003): the sticky nav's name, read from the page locale's sheet as `modelNav`
+export const MODEL_LABELS = { nav: 'On this page' };
+
 /** Turn the importer's same-page link list into the sticky icon nav. */
 function decorateNav(main) {
   const list = [...main.querySelectorAll(':scope > .section > .default-content-wrapper > ul')]
@@ -175,7 +179,7 @@ function decorateNav(main) {
   const section = list.closest('.section');
   const nav = document.createElement('nav');
   nav.className = 'model-nav';
-  nav.setAttribute('aria-label', 'On this page');
+  applyLocalized(MODEL_LABELS, 'model', (text) => nav.setAttribute('aria-label', text.nav));
   list.className = 'model-nav-list';
 
   [...list.querySelectorAll(':scope > li')].forEach((li) => {

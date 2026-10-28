@@ -45,11 +45,13 @@ test('withCategoryAncestors: each slug then its parent chain, de-duped', () => {
   assert.deepEqual(withCategoryAncestors([]), []);
 });
 
-test('pickCategories: story pages only, comma-joined', () => {
+test('pickCategories: stories and press releases, comma-joined', () => {
   assert.equal(pickCategories({ template: 'story', postClass: CAMOUFLAGE }), 'design, skoda-world, elroq, models, emobility, sustainability');
   assert.equal(pickCategories({ template: 'story', postClass: CYCLING }), 'cycling, sports, lifestyle');
-  // a press kit carries category-* classes too, but only stories get the row
+  // a press kit carries category-* classes too, but only stories and press releases get the row
   assert.equal(pickCategories({ template: 'press_kit', postClass: 'press_kit hentry category-octavia category-press-kits' }), '');
+  // a plant newsletter (SKODA-845): its own category, a root term
+  assert.equal(pickCategories({ template: 'press_release', postClass: 'post-445274 press_release type-press_release hentry category-newsletter company-kvasiny years-61572' }), 'newsletter');
   assert.equal(pickCategories({ template: 'story', postClass: '' }), '', 'no post article → no row');
   assert.equal(pickCategories(), '');
 });

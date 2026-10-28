@@ -1,4 +1,14 @@
 import { getMetadata } from '../../scripts/aem.js';
+import { applyLocalized } from '../../scripts/placeholders.js';
+
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `pressRelease…`; the template runs before the first paint, so they follow once the memoized
+// sheet resolves (applyLocalized)
+export const PRESS_RELEASE_LABELS = {
+  // the sidebar's name when it has no heading
+  additionalInfo: 'Additional info',
+  addAllMediaBox: 'Add all Media Box files to the media cart',
+};
 
 // The source date format: "2. 9. 2026" (day. month. year, no leading zeros).
 const DATE_RE = /^\s*(\d{1,2})\.\s?(\d{1,2})\.\s?(\d{4})\s*$/;
@@ -63,7 +73,9 @@ function decorateBody(section) {
 function decorateSidebar(section) {
   if (!section) return;
   const aside = document.createElement('aside');
-  aside.setAttribute('aria-label', section.querySelector('h3')?.textContent.trim() || 'Additional info');
+  const heading = section.querySelector('h3')?.textContent.trim();
+  if (heading) aside.setAttribute('aria-label', heading);
+  else aside.dataset.unnamed = 'true'; // named in the page locale by decorate
   aside.append(...section.children);
   section.append(aside);
 }
@@ -116,7 +128,7 @@ function decorateSidebarLinks(section, mediaBox) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'press-release-add-all';
-    button.setAttribute('aria-label', 'Add all Media Box files to the media cart');
+    button.setAttribute('aria-label', PRESS_RELEASE_LABELS.addAllMediaBox);
     button.addEventListener('click', () => {
       const addAll = mediaBox.querySelector('.downloads-add-all[data-wired]');
       if (addAll && button.getAttribute('aria-disabled') !== 'true') addAll.click();
@@ -159,4 +171,8 @@ export default function decorate(main) {
   const mediaBox = main.querySelector(':scope > .section.media-box');
   if (mediaBox && !document.getElementById('media-box')) mediaBox.id = 'media-box';
   decorateSidebarLinks(sidebar, mediaBox);
+  applyLocalized(PRESS_RELEASE_LABELS, 'pressRelease', (labels) => {
+    main.querySelectorAll('aside[data-unnamed]').forEach((aside) => aside.setAttribute('aria-label', labels.additionalInfo));
+    main.querySelectorAll('.press-release-add-all').forEach((btn) => btn.setAttribute('aria-label', labels.addAllMediaBox));
+  });
 }

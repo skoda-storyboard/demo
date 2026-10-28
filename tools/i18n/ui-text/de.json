@@ -1,0 +1,974 @@
+{
+ "cardsSocialNewTab": {
+  "text": "öffnet in einem neuen Tab",
+  "source": "draft"
+ },
+ "carouselCarousel": {
+  "text": "Karussell",
+  "source": "draft"
+ },
+ "carouselGoTo": {
+  "text": "Zu Folie {n} springen",
+  "source": "draft"
+ },
+ "carouselNext": {
+  "text": "Weiter",
+  "source": "draft"
+ },
+ "carouselPrev": {
+  "text": "Zurück",
+  "source": "draft"
+ },
+ "carouselRegion": {
+  "text": "Inhaltskarussell",
+  "source": "draft"
+ },
+ "clipExitFullscreen": {
+  "text": "Vollbild beenden",
+  "source": "draft"
+ },
+ "clipFullscreen": {
+  "text": "Vollbild",
+  "source": "draft"
+ },
+ "clipMute": {
+  "text": "Stummschalten",
+  "source": "draft"
+ },
+ "clipNormal": {
+  "text": "Normal",
+  "source": "draft"
+ },
+ "clipPause": {
+  "text": "Pause",
+  "source": "draft"
+ },
+ "clipPip": {
+  "text": "Bild-in-Bild",
+  "source": "draft"
+ },
+ "clipPlay": {
+  "text": "Abspielen",
+  "source": "draft"
+ },
+ "clipProgress": {
+  "text": "Fortschrittsleiste",
+  "source": "draft"
+ },
+ "clipSettings": {
+  "text": "Einstellungen",
+  "source": "draft"
+ },
+ "clipSpeed": {
+  "text": "Geschwindigkeit",
+  "source": "draft"
+ },
+ "clipTimeOf": {
+  "text": "{now} von {total}",
+  "source": "draft"
+ },
+ "clipUnmute": {
+  "text": "Ton einschalten",
+  "source": "draft"
+ },
+ "clipVolume": {
+  "text": "Lautstärke (mit den Pfeiltasten nach oben/unten ändern)",
+  "source": "draft"
+ },
+ "clipVolumeLevel": {
+  "text": "{pct} % Lautstärke",
+  "source": "draft"
+ },
+ "dateFormat": {
+  "text": "{d}. {m}. {yyyy}",
+  "source": "live"
+ },
+ "dockScrollToTop": {
+  "text": "Nach oben scrollen",
+  "source": "live"
+ },
+ "dockShareOn": {
+  "text": "Auf {network} teilen",
+  "source": "draft"
+ },
+ "dockShareThisPage": {
+  "text": "Diese Seite teilen",
+  "source": "draft"
+ },
+ "downloadsAdd": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "downloadsAddAll": {
+  "text": "Alle Dateien zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "downloadsAddNamed": {
+  "text": "Zum Medienkorb hinzufügen: {title}",
+  "source": "draft"
+ },
+ "downloadsAddSize": {
+  "text": "Hinzufügen/Löschen {size} Version",
+  "source": "draft"
+ },
+ "downloadsAddSizeNamed": {
+  "text": "Hinzufügen/Löschen {size} Version: {title}",
+  "source": "draft"
+ },
+ "downloadsDownload": {
+  "text": "{name} herunterladen",
+  "source": "draft"
+ },
+ "downloadsDownloadSized": {
+  "text": "{title} herunterladen ({size})",
+  "source": "draft"
+ },
+ "downloadsFile": {
+  "text": "Datei",
+  "source": "draft"
+ },
+ "downloadsFileType": {
+  "text": "Datei",
+  "source": "draft"
+ },
+ "downloadsGroupAdd": {
+  "text": "Alle Versionen in {size} zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "downloadsGroupUnavailable": {
+  "text": "Versionen in {size} können nicht zum Medienkorb hinzugefügt werden",
+  "source": "draft"
+ },
+ "downloadsOpen": {
+  "text": "Bild {title} ansehen",
+  "source": "draft"
+ },
+ "downloadsOpenFile": {
+  "text": "{name} öffnen",
+  "source": "draft"
+ },
+ "downloadsOpenFileTyped": {
+  "text": "{name} öffnen ({type})",
+  "source": "draft"
+ },
+ "downloadsSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "downloadsSizeOriginal": {
+  "text": "Original",
+  "source": "live"
+ },
+ "downloadsSizeUnavailable": {
+  "text": "Version {size} kann nicht zum Medienkorb hinzugefügt werden",
+  "source": "draft"
+ },
+ "downloadsSizes": {
+  "text": "Downloadgrößen für {title}",
+  "source": "draft"
+ },
+ "downloadsTipAdd": {
+  "text": "Hinzufügen/Löschen dies",
+  "source": "live"
+ },
+ "downloadsTipAddSize": {
+  "text": "Hinzufügen/Löschen {size} Version",
+  "source": "live"
+ },
+ "downloadsTipDownload": {
+  "text": "Download dies",
+  "source": "live"
+ },
+ "downloadsTipDownloadSize": {
+  "text": "Download {size} Version",
+  "source": "live"
+ },
+ "downloadsVideoPoster": {
+  "text": "Videovorschau {title} ansehen",
+  "source": "draft"
+ },
+ "embedBuzzsprout": {
+  "text": "Podcast-Folge auf Buzzsprout",
+  "source": "draft"
+ },
+ "embedConsentButton": {
+  "text": "Einverstanden",
+  "source": "live"
+ },
+ "embedConsentText": {
+  "text": "Dieser Inhalt wird von einem Drittanbieter ({host}) bereitgestellt. Mit dem Aufrufen und Ansehen dieses externen Inhalts nehmen Sie zur Kenntnis, dass der jeweilige externe Anbieter personenbezogene Daten verarbeiten kann, und bestätigen, dass Ihnen die Nutzungsbedingungen und die Datenschutzhinweise von {host} bekannt sind.",
+  "source": "draft"
+ },
+ "embedFile": {
+  "text": "Video",
+  "source": "draft"
+ },
+ "embedOther": {
+  "text": "Eingebetteter Inhalt von {host}",
+  "source": "draft"
+ },
+ "embedPlayVideo": {
+  "text": "Video abspielen: {title}",
+  "source": "draft"
+ },
+ "embedPlayYoutube": {
+  "text": "YouTube-Video abspielen",
+  "source": "draft"
+ },
+ "embedSpotify": {
+  "text": "Spotify-Player",
+  "source": "draft"
+ },
+ "embedSpotifyAlbum": {
+  "text": "Album auf Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyEpisode": {
+  "text": "Podcast-Folge auf Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyPlaylist": {
+  "text": "Playlist auf Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyShow": {
+  "text": "Podcast auf Spotify",
+  "source": "draft"
+ },
+ "embedSpotifyTrack": {
+  "text": "Titel auf Spotify",
+  "source": "draft"
+ },
+ "embedVimeo": {
+  "text": "Video auf Vimeo",
+  "source": "draft"
+ },
+ "embedYoutube": {
+  "text": "Video auf YouTube",
+  "source": "draft"
+ },
+ "footerAppStore": {
+  "text": "Škoda Media Room im App Store",
+  "source": "draft"
+ },
+ "footerGooglePlay": {
+  "text": "Škoda Media Room bei Google Play",
+  "source": "draft"
+ },
+ "footerNav": {
+  "text": "Fußzeile",
+  "source": "draft"
+ },
+ "galleryCarousel": {
+  "text": "Karussell",
+  "source": "draft"
+ },
+ "galleryGoTo": {
+  "text": "Zu Bild {n} springen",
+  "source": "draft"
+ },
+ "galleryImagesHeading": {
+  "text": "Bilder",
+  "source": "draft"
+ },
+ "galleryMore": {
+  "text": "+{n}",
+  "source": "live"
+ },
+ "galleryMoreLabel": {
+  "text": "{n} weitere Bilder anzeigen",
+  "source": "draft"
+ },
+ "galleryMoreLabelOne": {
+  "text": "{n} weiteres Bild anzeigen",
+  "source": "draft"
+ },
+ "galleryNext": {
+  "text": "Nächstes Bild",
+  "source": "draft"
+ },
+ "galleryOpenGallery": {
+  "text": "Galerie öffnen, {n} Bilder",
+  "source": "draft"
+ },
+ "galleryOpenGalleryOne": {
+  "text": "Galerie öffnen, {n} Bild",
+  "source": "draft"
+ },
+ "galleryOpenNamed": {
+  "text": "Bild {n} öffnen: {alt}",
+  "source": "draft"
+ },
+ "galleryOpenNumbered": {
+  "text": "Bild {n} öffnen",
+  "source": "draft"
+ },
+ "galleryPrev": {
+  "text": "Vorheriges Bild",
+  "source": "draft"
+ },
+ "gallerySlide": {
+  "text": "Folie",
+  "source": "draft"
+ },
+ "gallerySlideOf": {
+  "text": "{n} von {total}",
+  "source": "draft"
+ },
+ "gallerySlider": {
+  "text": "Bilder-Slider",
+  "source": "draft"
+ },
+ "headerCloseNav": {
+  "text": "Navigation schließen",
+  "source": "draft"
+ },
+ "headerCloseNewsletter": {
+  "text": "Newsletter-Anmeldung schließen",
+  "source": "draft"
+ },
+ "headerCloseSearch": {
+  "text": "Suche schließen",
+  "source": "draft"
+ },
+ "headerHome": {
+  "text": "Škoda Storyboard, Startseite",
+  "source": "draft"
+ },
+ "headerLanguages": {
+  "text": "Sprache",
+  "source": "draft"
+ },
+ "headerNewTab": {
+  "text": "{name} (öffnet in einem neuen Tab)",
+  "source": "draft"
+ },
+ "headerOpenNav": {
+  "text": "Navigation öffnen",
+  "source": "draft"
+ },
+ "headerScopeAll": {
+  "text": "Alles",
+  "source": "live"
+ },
+ "headerScopeImage": {
+  "text": "Bilder",
+  "source": "live"
+ },
+ "headerScopePost": {
+  "text": "Artikel",
+  "source": "live"
+ },
+ "headerScopePressKit": {
+  "text": "Pressemappen",
+  "source": "live"
+ },
+ "headerScopePressRelease": {
+  "text": "Nachrichten",
+  "source": "live"
+ },
+ "headerScopeVideo": {
+  "text": "Videos",
+  "source": "live"
+ },
+ "headerSearch": {
+  "text": "Medien suchen",
+  "source": "live"
+ },
+ "headerSearchIn": {
+  "text": "Suchen in",
+  "source": "draft"
+ },
+ "headerSubscribe": {
+  "text": "Unsere Stories abonnieren",
+  "source": "draft"
+ },
+ "lightboxAddTip": {
+  "text": "Hinzufügen/Löschen Original Version",
+  "source": "live"
+ },
+ "lightboxAddToBox": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "lightboxClose": {
+  "text": "Galerie schließen",
+  "source": "draft"
+ },
+ "lightboxCopyLink": {
+  "text": "Bildlink kopieren",
+  "source": "draft"
+ },
+ "lightboxCounterLabel": {
+  "text": "Bild {n} von {total}",
+  "source": "draft"
+ },
+ "lightboxDialog": {
+  "text": "Bildergalerie",
+  "source": "draft"
+ },
+ "lightboxDownload": {
+  "text": "Bild herunterladen",
+  "source": "draft"
+ },
+ "lightboxDownloadTip": {
+  "text": "Download Original Version",
+  "source": "live"
+ },
+ "lightboxHideDetails": {
+  "text": "Bilddetails ausblenden",
+  "source": "draft"
+ },
+ "lightboxLinkTip": {
+  "text": "Link zur Seite",
+  "source": "live"
+ },
+ "lightboxNext": {
+  "text": "Nächstes Bild",
+  "source": "draft"
+ },
+ "lightboxPrev": {
+  "text": "Vorheriges Bild",
+  "source": "draft"
+ },
+ "lightboxShowDetails": {
+  "text": "Bilddetails anzeigen",
+  "source": "draft"
+ },
+ "lightboxStoryCounter": {
+  "text": "{n}/{total}",
+  "source": "live"
+ },
+ "lightboxVideo": {
+  "text": "Videoplayer",
+  "source": "draft"
+ },
+ "lightboxVideoAddTip": {
+  "text": "Hinzufügen/Löschen dies",
+  "source": "live"
+ },
+ "lightboxVideoAddToBox": {
+  "text": "Hinzufügen/Löschen dies",
+  "source": "live"
+ },
+ "lightboxVideoCopyLink": {
+  "text": "Link zur Seite",
+  "source": "live"
+ },
+ "lightboxVideoDownload": {
+  "text": "Download dies",
+  "source": "live"
+ },
+ "lightboxVideoDownloadTip": {
+  "text": "Download dies",
+  "source": "live"
+ },
+ "lightboxVideoLinkTip": {
+  "text": "Link zur Seite",
+  "source": "live"
+ },
+ "listingAdvancedFilter": {
+  "text": "Erweiterte Suche",
+  "source": "live"
+ },
+ "listingFacetBodywork": {
+  "text": "Karosserie",
+  "source": "draft"
+ },
+ "listingFacetCompany": {
+  "text": "Unternehmen",
+  "source": "draft"
+ },
+ "listingFacetConcept": {
+  "text": "Konzept",
+  "source": "draft"
+ },
+ "listingFacetDerivative": {
+  "text": "Version",
+  "source": "draft"
+ },
+ "listingFacetEnvironment": {
+  "text": "Umwelt",
+  "source": "draft"
+ },
+ "listingFacetEquipment": {
+  "text": "Ausstattung",
+  "source": "draft"
+ },
+ "listingFacetHappening": {
+  "text": "Veranstaltung",
+  "source": "draft"
+ },
+ "listingFacetHistory": {
+  "text": "Geschichte",
+  "source": "draft"
+ },
+ "listingFacetModel": {
+  "text": "Modell",
+  "source": "draft"
+ },
+ "listingFacetMotorsport": {
+  "text": "Motorsport",
+  "source": "draft"
+ },
+ "listingFacetSponsorship": {
+  "text": "Sponsoring",
+  "source": "draft"
+ },
+ "listingFacetTechnology": {
+  "text": "Technologie",
+  "source": "draft"
+ },
+ "listingFacetView": {
+  "text": "Innenraum/Exterieur",
+  "source": "draft"
+ },
+ "listingFacetVip": {
+  "text": "Personen",
+  "source": "draft"
+ },
+ "listingFacetYears": {
+  "text": "Jahr",
+  "source": "draft"
+ },
+ "listingFilters": {
+  "text": "Filter",
+  "source": "draft"
+ },
+ "listingLoadError": {
+  "text": "Die Ergebnisse konnten nicht geladen werden.",
+  "source": "draft"
+ },
+ "listingNewest": {
+  "text": "Neueste",
+  "source": "live"
+ },
+ "listingNoResults": {
+  "text": "Keine Ergebnisse – Filter entfernen, um mehr zu sehen.",
+  "source": "draft"
+ },
+ "listingOldest": {
+  "text": "Älteste",
+  "source": "live"
+ },
+ "listingRemoveFilter": {
+  "text": "Filter entfernen",
+  "source": "draft"
+ },
+ "loadMore": {
+  "text": "Mehr laden",
+  "source": "live"
+ },
+ "loading": {
+  "text": "Wird geladen…",
+  "source": "draft"
+ },
+ "mediaAddSize": {
+  "text": "Hinzufügen/Löschen {size} Version",
+  "source": "live"
+ },
+ "mediaAddToCart": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "mediaAddVideo": {
+  "text": "Hinzufügen/Löschen dies",
+  "source": "live"
+ },
+ "mediaCartAddAll": {
+  "text": "Alle Dateien zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "mediaCartAddedSome": {
+  "text": "{added} von {total} Dateien zum Medienkorb hinzugefügt.",
+  "source": "draft"
+ },
+ "mediaCartBadge": {
+  "text": "Medienkorb",
+  "source": "draft"
+ },
+ "mediaCartBadgeCount": {
+  "text": "Medienkorb, {n} Dateien",
+  "source": "draft"
+ },
+ "mediaCartBadgeCountOne": {
+  "text": "Medienkorb, 1 Datei",
+  "source": "draft"
+ },
+ "mediaCartCancel": {
+  "text": "Abbrechen",
+  "source": "draft"
+ },
+ "mediaCartCancelled": {
+  "text": "Der Download wurde abgebrochen.",
+  "source": "draft"
+ },
+ "mediaCartClose": {
+  "text": "Schließen",
+  "source": "draft"
+ },
+ "mediaCartCount": {
+  "text": "{n} / {max} Dateien · {size}",
+  "source": "draft"
+ },
+ "mediaCartCountChanged": {
+  "text": "{n} Dateien im Medienkorb",
+  "source": "draft"
+ },
+ "mediaCartCountChangedOne": {
+  "text": "1 Datei im Medienkorb",
+  "source": "draft"
+ },
+ "mediaCartDownloadFailed": {
+  "text": "Das Paket konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+  "source": "draft"
+ },
+ "mediaCartDownloadPackage": {
+  "text": "Paket herunterladen",
+  "source": "draft"
+ },
+ "mediaCartDownloaded": {
+  "text": "Ihr Paket ist fertig.",
+  "source": "draft"
+ },
+ "mediaCartEmptyMessage": {
+  "text": "Keine Downloads",
+  "source": "draft"
+ },
+ "mediaCartEmptyPackage": {
+  "text": "Paket leeren",
+  "source": "draft"
+ },
+ "mediaCartFailedFiles": {
+  "text": "{n} Dateien konnten nicht zum Paket hinzugefügt werden:",
+  "source": "draft"
+ },
+ "mediaCartFailedFilesOne": {
+  "text": "1 Datei konnte nicht zum Paket hinzugefügt werden:",
+  "source": "draft"
+ },
+ "mediaCartHeading": {
+  "text": "Ihre Downloads",
+  "source": "draft"
+ },
+ "mediaCartKindDocument": {
+  "text": "Dokumente",
+  "source": "draft"
+ },
+ "mediaCartKindImage": {
+  "text": "Bilder",
+  "source": "draft"
+ },
+ "mediaCartKindOther": {
+  "text": "Weitere Dateien",
+  "source": "draft"
+ },
+ "mediaCartKindVideo": {
+  "text": "Videos",
+  "source": "draft"
+ },
+ "mediaCartLimitBanner": {
+  "text": "Ein Downloadpaket kann bis zu {max} Dateien enthalten ({size} insgesamt). Größere Auswahlen müssen in mehreren Paketen heruntergeladen werden.",
+  "source": "draft"
+ },
+ "mediaCartLimitBytes": {
+  "text": "Diese Datei passt nicht: Ein Downloadpaket kann bis zu {size} enthalten.",
+  "source": "draft"
+ },
+ "mediaCartLimitItems": {
+  "text": "Ihr Downloadpaket ist voll: Es kann bis zu {max} Dateien enthalten. Laden Sie es herunter oder leeren Sie es, um weitere hinzuzufügen.",
+  "source": "draft"
+ },
+ "mediaCartNetwork": {
+  "text": "Die Datei konnte nicht zum Medienkorb hinzugefügt werden. Bitte versuchen Sie es erneut.",
+  "source": "draft"
+ },
+ "mediaCartPreparing": {
+  "text": "Ihr Paket wird erstellt: {done} von {total} Dateien",
+  "source": "draft"
+ },
+ "mediaCartRemove": {
+  "text": "{title} aus dem Medienkorb entfernen",
+  "source": "draft"
+ },
+ "mediaCartSizeOriginal": {
+  "text": "Original",
+  "source": "live"
+ },
+ "mediaCartSkippedLimitBytes": {
+  "text": "{n} Dateien passen nicht: Ein Downloadpaket kann bis zu {size} enthalten.",
+  "source": "draft"
+ },
+ "mediaCartSkippedLimitBytesOne": {
+  "text": "1 Datei passt nicht: Ein Downloadpaket kann bis zu {size} enthalten.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetwork": {
+  "text": "{n} Dateien konnten nicht zum Medienkorb hinzugefügt werden. Bitte versuchen Sie es erneut.",
+  "source": "draft"
+ },
+ "mediaCartSkippedNetworkOne": {
+  "text": "1 Datei konnte nicht zum Medienkorb hinzugefügt werden. Bitte versuchen Sie es erneut.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolved": {
+  "text": "{n} Dateien können nicht zum Medienkorb hinzugefügt werden.",
+  "source": "draft"
+ },
+ "mediaCartSkippedUnresolvedOne": {
+  "text": "1 Datei kann nicht zum Medienkorb hinzugefügt werden.",
+  "source": "draft"
+ },
+ "mediaCartStorage": {
+  "text": "Der Medienkorb konnte in diesem Browser nicht gespeichert werden.",
+  "source": "draft"
+ },
+ "mediaCartUnresolved": {
+  "text": "Diese Datei kann nicht zum Medienkorb hinzugefügt werden.",
+  "source": "draft"
+ },
+ "mediaDownload": {
+  "text": "Herunterladen",
+  "source": "draft"
+ },
+ "mediaDownloadSize": {
+  "text": "Download {size} Version",
+  "source": "live"
+ },
+ "mediaDownloadVideo": {
+  "text": "Download dies",
+  "source": "live"
+ },
+ "mediaPanelAudioFormat": {
+  "text": "Audio Format",
+  "source": "live"
+ },
+ "mediaPanelBitrate": {
+  "text": "Bitrate",
+  "source": "draft"
+ },
+ "mediaPanelDimensions": {
+  "text": "Abmessungen",
+  "source": "live"
+ },
+ "mediaPanelFileSize": {
+  "text": "Dateigröße",
+  "source": "live"
+ },
+ "mediaPanelFileType": {
+  "text": "Dateityp",
+  "source": "live"
+ },
+ "mediaPanelLength": {
+  "text": "Länge",
+  "source": "live"
+ },
+ "mediaPanelPublished": {
+  "text": "Veröffentlicht",
+  "source": "live"
+ },
+ "mediaPanelRelatedArticle": {
+  "text": "Verwandter Artikel",
+  "source": "draft"
+ },
+ "mediaSize1920": {
+  "text": "1920px",
+  "source": "live"
+ },
+ "mediaSizeOriginal": {
+  "text": "Original",
+  "source": "live"
+ },
+ "modelNav": {
+  "text": "Auf dieser Seite",
+  "source": "draft"
+ },
+ "newsletterButton": {
+  "text": "Abonnieren",
+  "source": "live"
+ },
+ "newsletterConsentError": {
+  "text": "Bitte akzeptieren Sie die Bedingungen, bevor Sie fortfahren.",
+  "source": "draft"
+ },
+ "newsletterError": {
+  "text": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+  "source": "draft"
+ },
+ "newsletterLabel": {
+  "text": "E-Mail-Adresse",
+  "source": "draft"
+ },
+ "newsletterMessage": {
+  "text": "Die Newsletter-Anmeldung ist noch nicht verfügbar",
+  "source": "draft"
+ },
+ "newsletterPlaceholder": {
+  "text": "Ihre E-Mail-Adresse",
+  "source": "live"
+ },
+ "pressKitAddAll": {
+  "text": "Alle Dateien zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "pressKitAddVideo": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "pressKitAddVideoNamed": {
+  "text": "Zum Medienkorb hinzufügen: {title}",
+  "source": "draft"
+ },
+ "pressKitChapters": {
+  "text": "Kapitel",
+  "source": "draft"
+ },
+ "pressKitDownloadVideo": {
+  "text": "Video herunterladen",
+  "source": "draft"
+ },
+ "pressKitDownloadVideoNamed": {
+  "text": "{title} herunterladen",
+  "source": "draft"
+ },
+ "pressKitOpenVideo": {
+  "text": "Video öffnen",
+  "source": "draft"
+ },
+ "pressKitOpenVideoNamed": {
+  "text": "{title} öffnen",
+  "source": "draft"
+ },
+ "pressKitTipAdd": {
+  "text": "Hinzufügen/Löschen dies",
+  "source": "live"
+ },
+ "pressKitTipDownload": {
+  "text": "Download dies",
+  "source": "live"
+ },
+ "pressKitTipLink": {
+  "text": "Link zur Seite",
+  "source": "live"
+ },
+ "pressReleaseAddAllMediaBox": {
+  "text": "Alle Media-Box-Dateien zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "pressReleaseAdditionalInfo": {
+  "text": "Weitere Informationen",
+  "source": "draft"
+ },
+ "promoCarousel": {
+  "text": "Karussell",
+  "source": "draft"
+ },
+ "promoFeaturedStories": {
+  "text": "Ausgewählte Stories",
+  "source": "draft"
+ },
+ "promoFeaturedStorySlides": {
+  "text": "Folien der ausgewählten Stories",
+  "source": "draft"
+ },
+ "promoGoToStory": {
+  "text": "Zu ausgewählter Story {number} springen",
+  "source": "draft"
+ },
+ "promoPauseRotation": {
+  "text": "Wechsel anhalten",
+  "source": "draft"
+ },
+ "promoResumeRotation": {
+  "text": "Wechsel fortsetzen",
+  "source": "draft"
+ },
+ "promoUnavailable": {
+  "text": "Ausgewählte Stories nicht verfügbar",
+  "source": "draft"
+ },
+ "searchLoadError": {
+  "text": "Der Suchindex konnte nicht geladen werden.",
+  "source": "draft"
+ },
+ "searchNoResults": {
+  "text": "Keine Ergebnisse für „%q“.",
+  "source": "draft"
+ },
+ "searchPrompt": {
+  "text": "Suchbegriff eingeben.",
+  "source": "draft"
+ },
+ "searchResultsCount": {
+  "text": "%d Ergebnisse für „%q“",
+  "source": "draft"
+ },
+ "searchResultsOne": {
+  "text": "1 Ergebnis für „%q“",
+  "source": "draft"
+ },
+ "showLess": {
+  "text": "Weniger anzeigen",
+  "source": "draft"
+ },
+ "showMore": {
+  "text": "Mehr anzeigen",
+  "source": "draft"
+ },
+ "skipToContent": {
+  "text": "Zum Inhalt springen",
+  "source": "draft"
+ },
+ "storiesLoadError": {
+  "text": "Die Ergebnisse konnten nicht geladen werden.",
+  "source": "draft"
+ },
+ "storiesNewTab": {
+  "text": "öffnet in einem neuen Tab",
+  "source": "draft"
+ },
+ "storiesNoResults": {
+  "text": "Noch nichts vorhanden.",
+  "source": "draft"
+ },
+ "storiesResultsShown": {
+  "text": "{n} Artikel angezeigt",
+  "source": "draft"
+ },
+ "storiesResultsShownOne": {
+  "text": "{n} Artikel angezeigt",
+  "source": "draft"
+ },
+ "storyRailAddToCart": {
+  "text": "Zum Medienkorb hinzufügen",
+  "source": "draft"
+ },
+ "storyRailDownloadOriginal": {
+  "text": "Original herunterladen",
+  "source": "draft"
+ },
+ "storyRailDownloadVideo": {
+  "text": "Video herunterladen",
+  "source": "draft"
+ },
+ "storyRailViewAll": {
+  "text": "Alle anzeigen",
+  "source": "draft"
+ },
+ "suggestDateFormat": {
+  "text": "{dd}. {mm}. {yyyy}",
+  "source": "live"
+ },
+ "suggestPressKit": {
+  "text": "Pressemappen",
+  "source": "live"
+ },
+ "suggestPressRelease": {
+  "text": "Nachrichten",
+  "source": "live"
+ },
+ "suggestStory": {
+  "text": "Artikel",
+  "source": "live"
+ }
+}
