@@ -15,6 +15,18 @@ function header(main) {
   h1?.closest('.section').classList.add('press-kit-header');
 }
 
+// the Chapters bar's link back to the kit's hub, as the source labels it
+const INTRODUCTION = 'Introduction';
+
+// The bar is sticky; once it is held at the top it takes the source's fixed-bar spacing
+// (press-kit.css `.is-stuck`). Held means its top edge sits in the 1px the root margin cuts off.
+function stuckState(section) {
+  if (typeof IntersectionObserver === 'undefined') return;
+  new IntersectionObserver(([entry]) => {
+    section.classList.toggle('is-stuck', entry.intersectionRatio < 1 && entry.boundingClientRect.top < 1);
+  }, { rootMargin: '-1px 0px 0px 0px', threshold: [1] }).observe(section);
+}
+
 function chapters(main, relabel = []) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
@@ -30,6 +42,25 @@ function chapters(main, relabel = []) {
       link.setAttribute('aria-current', 'page');
     }
   });
+  // The source's bar shows "← Introduction" on the left: the way back to the kit's hub, which DA
+  // keeps as the menu's first entry (the parent page). The menu itself lists the chapters only
+  // (SKODA-805, measured 2026-10-26).
+  const parent = here.slice(0, here.lastIndexOf('/'));
+  const hub = [...list.querySelectorAll('a[href]')]
+    .find((link) => link.origin === origin && link.pathname.replace(/\/$/, '') === parent);
+  let intro = null;
+  if (hub) {
+    intro = document.createElement('a');
+    intro.className = 'press-kit-chapters-intro';
+    intro.href = hub.getAttribute('href');
+    ['target', 'rel'].forEach((attr) => { if (hub.hasAttribute(attr)) intro.setAttribute(attr, hub.getAttribute(attr)); });
+    intro.textContent = INTRODUCTION;
+    // the menu's first chapter is also "Introduction": the accessible name adds the kit (its
+    // DA label), still starting with the visible text (WCAG 2.5.3)
+    const kit = hub.textContent.trim();
+    if (kit && kit !== INTRODUCTION) intro.setAttribute('aria-label', `${INTRODUCTION}: ${kit}`);
+    hub.closest('li')?.remove();
+  }
   const nav = document.createElement('nav');
   nav.className = 'press-kit-chapters-nav';
   const button = document.createElement('button');
@@ -58,7 +89,9 @@ function chapters(main, relabel = []) {
     button.focus();
   });
   list.replaceWith(nav);
+  if (intro) nav.append(intro);
   nav.append(button, list);
+  stuckState(section);
 }
 
 /*
@@ -70,6 +103,20 @@ function chapters(main, relabel = []) {
 function mediaBox(main) {
   const section = main.querySelector('.section.media-box');
   if (section?.querySelector('.downloads')) section.id = 'media-box';
+}
+
+// The Related Press Releases band's "All" (the import's `<p><a>All</a></p>` after the heading
+// and the "Based on tags" line) is the band's ghost pill, as on press releases; decorateButtons
+// skips it (it buttonizes bold or italic links only).
+function relatedLinks(main) {
+  main.querySelectorAll(':scope > .section.related .default-content-wrapper > p').forEach((p) => {
+    const link = p.querySelector(':scope > a[href]');
+    const onlyLink = link && p.children.length === 1
+      && p.textContent.trim() === link.textContent.trim();
+    if (!onlyLink) return;
+    p.classList.add('button-container');
+    link.classList.add('button');
+  });
 }
 
 // The sidebar preview shows 4 images; the source's "+51" pill on the last one points at the
@@ -317,6 +364,7 @@ export default function decorate(main) {
   const relabel = [];
   chapters(main, relabel);
   mediaBox(main);
+  relatedLinks(main);
   galleryMore(main);
   accordionMedia(main);
   sidebarMediaBox(main, relabel);
