@@ -65,9 +65,11 @@ export const LIVE_ALIASES = {
 // `/en/media-cart` is the demo's own cart page (SKODA-505b): the cart badge links there.
 // `/en/contacts` and `/en/copyright` are the migrated page-shell pages (SKODA-813): the header's
 // Contacts and the footers' contact and Copyright links.
+// `/en/newsletter` is the migrated plant newsletter page (SKODA-845): Company → Newsletter.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
   '/en/series-2', '/en/search', '/en/media-cart', '/en/contacts', '/en/copyright',
+  '/en/newsletter',
 ]);
 
 // Source anchors a demo page has under another id: the Media Room footer links to the source's

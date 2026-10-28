@@ -50,9 +50,11 @@ const WIDGETS = `
   </div>
 </div>`;
 
-function footerOf(...sections) {
-  const footer = parseHTML(sections.join(''));
-  decorateFooterSections(footer);
+function footerOf(...parts) {
+  // a trailing object is the options (labels, year)
+  const options = typeof parts[parts.length - 1] === 'object' ? parts.pop() : undefined;
+  const footer = parseHTML(parts.join(''));
+  decorateFooterSections(footer, undefined, options);
   return footer;
 }
 
@@ -220,4 +222,45 @@ test('outbound: without a page origin nothing is changed', () => {
   const footer = parseHTML(SOCIAL);
   decorateFooterSections(footer, '');
   assert.ok([...footer.querySelectorAll('a')].every((a) => a.getAttribute('target') === null));
+});
+
+// --- per locale (SKODA-1003) ---------------------------------------------------------------------
+test('labels: the nav and app-badge names from the locale; English by default', () => {
+  const footer = footerOf(SOCIAL, SITEMAP, LEGAL('x'));
+  assert.equal(footer.querySelector('nav').getAttribute('aria-label'), 'Footer');
+  const cs = footerOf(SOCIAL, SITEMAP, LEGAL('x'), { labels: { nav: 'Zápatí', appStore: 'Škoda Media Room v App Store', googlePlay: 'Škoda Media Room na Google Play' } });
+  assert.equal(cs.querySelector('nav').getAttribute('aria-label'), 'Zápatí');
+  assert.equal(cs.querySelector('.app-badges a').getAttribute('aria-label'), 'Škoda Media Room v App Store');
+});
+
+test('the © notice shows the current year; a range keeps its start, a later year stays', async () => {
+  const { updateCopyrightYear } = await import('./footer-sections.js');
+  const notice = (html) => parseHTML(`<p>${html}</p>`).firstElementChild;
+  const a = notice('© Škoda Auto a.s. 2026');
+  updateCopyrightYear(a, 2027);
+  assert.equal(a.textContent, '© Škoda Auto a.s. 2027');
+  const range = notice('© 2019–2026 <a href="/x">Škoda</a>');
+  updateCopyrightYear(range, 2027);
+  assert.equal(range.textContent, '© 2019–2027 Škoda');
+  assert.equal(range.querySelector('a').getAttribute('href'), '/x', 'the link is untouched');
+  const later = notice('© Škoda 2030');
+  updateCopyrightYear(later, 2027);
+  assert.equal(later.textContent, '© Škoda 2030');
+  const none = notice('No year © here');
+  updateCopyrightYear(none, 2027);
+  assert.equal(none.textContent, 'No year © here');
+  updateCopyrightYear(notice('© 2026'), Number.NaN); // an invalid year changes nothing (no throw)
+  const founded = notice('© Škoda Auto a.s. 2024. Founded 1991.');
+  updateCopyrightYear(founded, 2027);
+  assert.equal(founded.textContent, '© Škoda Auto a.s. 2027. Founded 1991.', 'the © year, not a later one');
+  const open = notice('© 2019 – present');
+  updateCopyrightYear(open, 2027);
+  assert.equal(open.textContent, '© 2019 – present', 'an open range stays');
+  const nested = notice('© <strong>Škoda Auto a.s. 2025</strong>, <em>all rights reserved</em>');
+  updateCopyrightYear(nested, 2027);
+  assert.equal(nested.querySelector('strong').textContent, 'Škoda Auto a.s. 2027');
+  assert.ok(nested.querySelector('em'), 'markup kept');
+  const before = notice('2010 ©Škoda 2025');
+  updateCopyrightYear(before, 2027);
+  assert.equal(before.textContent, '2010 ©Škoda 2027', 'a year before the © is not the notice\'s');
 });

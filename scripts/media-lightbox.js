@@ -6,10 +6,12 @@
  */
 
 import { buildLightbox } from './lightbox.js';
+import { buildMediaPanel } from './media-panel.js';
 import { cleanTitle } from './query-index.js';
 import { fileKey, findRowsByFile } from './media-feed.js';
 import { formatCardDate } from './card-teaser.js';
 import { downloadHref } from './media-card.js';
+import { fetchPlaceholders } from './placeholders.js';
 import { builtLocale } from './locale-paths.js';
 
 /*
@@ -19,36 +21,16 @@ import { builtLocale } from './locale-paths.js';
  */
 export function feedLightboxItem(row) {
   const title = cleanTitle(row.title);
-  const caption = document.createElement('div');
-  const para = (...nodes) => {
-    const p = document.createElement('p');
-    p.append(...nodes);
-    caption.append(p);
-    return p;
-  };
-  if (title) para(title);
-  if (row.description) para(row.description);
   // the source panel order; videos add length, bitrate and audio format
-  const meta = [['File type', row.filetype], ['File size', row.filesize], ['Length', row.length],
-    ['Bitrate', row.bitrate], ['Audio format', row.audioformat], ['Dimensions', row.dimensions],
-    ['Published', formatCardDate(row.date)]].filter(([, v]) => v);
-  if (meta.length) {
-    const p = para();
-    meta.forEach(([label, value], i) => {
-      if (i) p.append(document.createElement('br'));
-      const strong = document.createElement('strong');
-      strong.textContent = value;
-      p.append(`${label}: `, strong);
-    });
-  }
-  const labels = String(row.labels || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (labels.length) para(labels.join(' · '));
-  if (row.related) {
-    const a = document.createElement('a');
-    a.href = row.related;
-    a.textContent = row['related-title'] || row.related;
-    para('Related article: ', a);
-  }
+  const caption = buildMediaPanel({
+    title,
+    description: row.description,
+    meta: [['fileType', row.filetype], ['fileSize', row.filesize], ['length', row.length],
+      ['bitrate', row.bitrate], ['audioFormat', row.audioformat], ['dimensions', row.dimensions],
+      ['published', formatCardDate(row.date)]],
+    tags: String(row.labels || '').split(',').map((s) => s.trim()).filter(Boolean),
+    related: { href: row.related, title: row['related-title'] },
+  });
   if (row.template === 'video') {
     const vimeo = row['vimeo-id'];
     return {
@@ -61,8 +43,9 @@ export function feedLightboxItem(row) {
       // player (an MP4 still on the source CDN only plays in a tab, #273); a new tab, as live
       download: downloadHref(row.mp4 || ''),
       downloadTarget: '_blank',
-      // the source player's action names (its colorbox media-cart-actions titles)
-      labels: { addToBox: 'Add/remove this', download: 'Download this', copyLink: 'Link to page' },
+      // the action names are the lightbox's clip names (the source player's titles), per locale,
+      // also for a row with neither a Vimeo id nor an MP4
+      clip: true,
       link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
       cartId: row.id || '',
       cartHref: row.mp4 || '',
@@ -102,13 +85,18 @@ export const mediaFeedUrl = (pathname = window.location.pathname) => (
  */
 export function wireImageLinks(links) {
   if (!links.length) return;
-  let lightbox = null;
+  // one build for every link: a second click while the first is still waiting reuses it (a
+  // failed build is retried on the next click)
+  let pending = null;
   const build = async () => {
-    // only the keyed shards of these files when the feed has them (SKODA-517)
-    let byFile = new Map();
-    try {
-      byFile = await findRowsByFile(mediaFeedUrl(), links.map((a) => a.href));
-    } catch (e) { /* titled by the alt */ }
+    // only the keyed shards of these files when the feed has them (SKODA-517); with the page
+    // locale's sheet (memoized, never longer than SHEET_WAIT_MS), so the items and the lightbox
+    // are built in its labels, as every other lightbox caller does (PR #496 review)
+    // (no feed: each item is titled by its alt; no sheet: English)
+    const [byFile] = await Promise.all([
+      findRowsByFile(mediaFeedUrl(), links.map((a) => a.href)).catch(() => new Map()),
+      fetchPlaceholders().catch(() => ({})),
+    ]);
     const items = links.map((a) => {
       const img = a.querySelector('img');
       const row = byFile.get(fileKey(a.href));
@@ -128,8 +116,11 @@ export function wireImageLinks(links) {
     a.addEventListener('click', async (e) => {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
-      lightbox = lightbox || await build();
-      lightbox.open(i, a, true);
+      pending = pending || build().catch((err) => {
+        pending = null;
+        throw err;
+      });
+      (await pending).open(i, a, true);
     });
   });
 }

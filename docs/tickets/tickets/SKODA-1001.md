@@ -115,8 +115,21 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
     live, Storyboard and Media Room pages alike). The URL prefixes (`/cs/`), the placeholders sheets and the
     language links' `hreflang` / `lang` stay the two-letter codes. The skip link's text is looked up by the
     URL locale, not the html lang, so it keeps its language (checked: `Přeskočit na obsah`, `Zum Inhalt
-    springen`, … on the CS / DE / SK / SR pages; axe: no `lang` violation).
+    springen`, … on the CS / DE / SK / SR pages; axe: no `lang` violation). Since the merge with `main`
+    (2026-10-28, after #496) both come from #496's code: the tags from `scripts/locale-tags.js` (the same
+    six), the skip link from the locale's placeholders sheet (`skipToContent`).
   - **English store-badge artwork: accepted** (above).
   - **UI labels must be DA-managed:** the remaining English listing / search / header labels are #492
     (SKODA-1003a, a child of #85 / SKODA-1003), not a permanent deviation.
 - **Merge note:** merging this code removes the runtime locale rule, so the chrome fragments and the sheet above must be published together with it. Otherwise the relative `/cs/…` links in the published chrome, which the rule sent to live, become unmigrated EDS paths (404).
+- **Merge with `main` after #496 (2026-10-28):** conflicts in `scripts/scripts.js` (`main`'s: the same regional
+  `<html lang>` and the sheet's skip link), `blocks/footer/footer-sections.js` (both: this branch's German / Slovak
+  label columns and TikTok / LinkedIn, #496's localized nav name), and the imports of `scripts/media-lightbox.js`
+  and `templates/skoda-model/skoda-model.js`. `import-carousel-listing.bundle.js` (#497) rebuilt from the merged
+  transformers: the newsletter import is byte-identical. #496's image-link test now serves the English feed a
+  Czech page reads (`BUILT.mediaFeed`). Checked on the merged code: CS story `cs-CZ`, `Přeskočit na obsah`,
+  footer `Zápatí`, Media Box caption `Typ souboru` / `Zavřít galerii`; DE story `de-DE`, `Fußzeile`, the
+  Modelle / Lifestyle label columns, TikTok and LinkedIn; the Octavia drawing lightbox.
+- **Note (out of scope, already on `main`):** `tools/i18n/ui-text.test.mjs` "the registry names every label
+  object" fails on `main` since #483 + #496: `blocks/exec-bio/exec-bio.js` `LABELS` (Board of Management) is not
+  in `REGISTRY`. Its fix needs the sheet keys and the 5 translations.

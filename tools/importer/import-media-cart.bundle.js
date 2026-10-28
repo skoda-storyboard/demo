@@ -265,6 +265,7 @@ var CustomImportScript = (() => {
     yeti: "models",
     "yeti-outdoor": "models"
   };
+  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
   function extractCategories(document) {
     const cls = document.body && document.body.getAttribute("class") || "";
     const id = cls.match(/\bpostid-(\d+)\b/);
@@ -386,7 +387,7 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
-    const categories = template === "story" ? extractCategories(document) : [];
+    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
     if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");

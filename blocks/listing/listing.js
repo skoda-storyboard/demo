@@ -16,7 +16,7 @@
 import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
 import { defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { openListingFeed } from '../../scripts/media-feed.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
 // dependency-free: the limit banner renders in the first paint without the cart (SKODA-505b)
 import { buildLimitBanner, LIMIT_BANNER_TEXT } from '../../scripts/media-cart-limits.js';
 import { formatCardDate, buildCardTeaser } from '../../scripts/card-teaser.js';
@@ -26,25 +26,48 @@ import {
   decodeState, encodeState, selectedCount, INDEX_FACETS,
 } from './listing-logic.mjs';
 
-// Live facet order + label remaps (faceted-listing.md §3; supersedes backlog).
+// Live facet order (faceted-listing.md §3; supersedes backlog).
 const DEFAULT_FACETS = INDEX_FACETS;
-const FACET_LABELS = {
-  years: 'Year', happening: 'Event', vip: 'People', view: 'Interior/Exterior',
+
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet.
+// `loadMore` and `loading` are shared with the stories block (no prefix); the rest are
+// `listing…` (`listingNewest`).
+export const SHARED_LABELS = { loadMore: 'Load more', loading: 'Loading…' };
+export const LISTING_LABELS = {
+  advancedFilter: 'Advanced filter',
+  noResults: 'No results — clear filters to see more.',
+  removeFilter: 'Remove filter',
+  filters: 'Filters',
+  loadError: 'Could not load results.',
+  newest: 'Newest',
+  oldest: 'Oldest',
+};
+// the facet group names (index columns, the source's labels), as `listingFacet…`
+// (`listingFacetYears`); an authored `facet-label` row wins
+export const FACET_LABELS = {
+  model: 'Model',
+  derivative: 'Derivative',
+  concept: 'Concept',
+  bodywork: 'Bodywork',
+  equipment: 'Equipment',
+  years: 'Year',
+  company: 'Company',
+  happening: 'Event',
+  history: 'History',
+  motorsport: 'Motorsport',
+  sponsorship: 'Sponsorship',
+  vip: 'People',
+  view: 'Interior/Exterior',
+  technology: 'Technology',
+  environment: 'Environment',
 };
 
-// UI strings resolve from the per-locale placeholders sheet (i18n architecture),
-// with English defaults so the block works before any sheet is authored.
-function buildStrings(ph) {
+/** The listing's text in the page locale (English per missing key). */
+export function buildStrings(ph = {}) {
   return {
-    loadMore: ph.loadMore || 'Load more',
-    advancedFilter: ph.advancedFilter || 'Advanced filter',
-    noResults: ph.listingNoResults || 'No results — clear filters to see more.',
-    loading: ph.loading || 'Loading…',
-    removeFilter: ph.removeFilter || 'Remove filter',
-    filters: ph.filters || 'Filters',
-    loadError: ph.listingLoadError || 'Could not load results.',
-    newest: ph.sortNewest || 'Newest',
-    oldest: ph.sortOldest || 'Oldest',
+    ...localize(SHARED_LABELS, ph),
+    ...localize(LISTING_LABELS, ph, 'listing'),
+    facets: localize(FACET_LABELS, ph, 'listingFacet'),
   };
 }
 
@@ -61,7 +84,7 @@ export const LOAD_MORE_MS = 500;
 const reducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
-const labelFor = (key, labels) => labels[key] || FACET_LABELS[key] || titleCase(key);
+const labelFor = (key, labels, names = FACET_LABELS) => labels[key] || names[key] || titleCase(key);
 // Facet values are index slugs ("peaq", "enyaq-coupe"); the source shows names ("Peaq").
 export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
 
@@ -596,8 +619,8 @@ async function buildListing(block, onFirstPaint) {
         chip.className = 'listing-chip';
         chip.dataset.facet = key;
         chip.dataset.value = val;
-        chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${optionName(key, val)}`;
-        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${optionName(key, val)}`);
+        chip.textContent = `${labelFor(key, cfg.facetLabels, STRINGS.facets)}: ${optionName(key, val)}`;
+        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels, STRINGS.facets)} — ${optionName(key, val)}`);
         // removing a filter veils, updates and collapses like a pick, but at once (live: the
         // chip is a link, so there is no settle time)
         chip.addEventListener('click', () => {
@@ -844,7 +867,7 @@ async function buildListing(block, onFirstPaint) {
     pill.setAttribute('aria-controls', panelId);
     const labelSpan = document.createElement('span');
     labelSpan.className = 'facet-label';
-    labelSpan.textContent = labelFor(key, cfg.facetLabels);
+    labelSpan.textContent = labelFor(key, cfg.facetLabels, STRINGS.facets);
     const countBadge = document.createElement('span');
     countBadge.className = 'facet-count';
     pill.append(labelSpan, countBadge);
@@ -856,7 +879,7 @@ async function buildListing(block, onFirstPaint) {
     panel.hidden = true;
     const legend = document.createElement('legend');
     legend.className = 'sr-only';
-    legend.textContent = labelFor(key, cfg.facetLabels);
+    legend.textContent = labelFor(key, cfg.facetLabels, STRINGS.facets);
     panel.append(legend);
 
     values.forEach(({ value }) => {

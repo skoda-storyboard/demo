@@ -115,6 +115,49 @@ New M1 tickets:
 
 ---
 
+## M2 requirements additions (2026-10-27)
+
+The client Functional Requirements, NFRs and Deliverables PDFs supplied on 27 October
+supersede the older coverage claim above. [SKODA-718](tickets/SKODA-718.md) owns the
+rebaseline of all 120 functional/migration IDs, 47 general NFRs, 39 security NFRs
+(including two cancelled clauses), 27 functional open points and 19 unique deliverables.
+Source filenames and the assessment commit are recorded in that ticket.
+
+The following **17 new tickets** cover previously untracked or materially stronger scope.
+They are M2, unestimated, with proposed owner roles but no named assignees; approvals and
+platform applicability remain human gates. GitHub issue links are listed below.
+Historical SP/day totals elsewhere in this overview have **not** been recalculated.
+
+| Ticket | Additional scope | Parent / existing work |
+|---|---|---|
+| [SKODA-718](tickets/SKODA-718.md) ([#516](https://github.com/skoda-storyboard/demo/issues/516)) | Requirements Coverage Report, scope decisions and all 19 deliverable approvals | E07 |
+| [SKODA-719](tickets/SKODA-719.md) ([#517](https://github.com/skoda-storyboard/demo/issues/517)) | Accepted TS/Solution Design, EA models, LeanIX and integration/platform applicability | E07 |
+| [SKODA-720](tickets/SKODA-720.md) ([#518](https://github.com/skoda-storyboard/demo/issues/518)) | Enterprise DevOps, source ownership/Azure delivery, four-eyes review, release notes and rollback | E07; 712, 710 |
+| [SKODA-721](tickets/SKODA-721.md) ([#519](https://github.com/skoda-storyboard/demo/issues/519)) | Blocking Sonar/JFrog gates, recurring scans and vulnerability remediation | E07; 720 |
+| [SKODA-722](tickets/SKODA-722.md) ([#520](https://github.com/skoda-storyboard/demo/issues/520)) | ASA, technical security controls, provider assurance and accepted IRMA dispositions | E07; 101a, 521, 714 |
+| [SKODA-723](tickets/SKODA-723.md) ([#521](https://github.com/skoda-storyboard/demo/issues/521)) | Third-party approvals, FOSS reports and customer-facing licence agreements | E07; 712 vendor register |
+| [SKODA-724](tickets/SKODA-724.md) ([#522](https://github.com/skoda-storyboard/demo/issues/522)) | Supplier Test Strategy/Final Report, browser matrix, publish-wave validation and formal UAT | E07; 715, 716, 803, 710 |
+| [SKODA-725](tickets/SKODA-725.md) ([#523](https://github.com/skoda-storyboard/demo/issues/523)) | Formal GDPR/legal gate, controller/processor and retention responsibilities | E07; 804, 904, 907, 843, 711 |
+| [SKODA-726](tickets/SKODA-726.md) ([#524](https://github.com/skoda-storyboard/demo/issues/524)) | Independent source review, penetration test, remediation and retest acceptance | E07; 722, 724 |
+| [SKODA-712a](tickets/SKODA-712a.md) ([#525](https://github.com/skoda-storyboard/demo/issues/525)) | Logging Concept/Solution, CLA, retention and approved AEM/IMS exceptions | 712; 812, 511b |
+| [SKODA-712b](tickets/SKODA-712b.md) ([#526](https://github.com/skoda-storyboard/demo/issues/526)) | Monitoring Concept/Solution, SC3 and Watch Center integration | 712; 511b, 712a |
+| [SKODA-712c](tickets/SKODA-712c.md) ([#527](https://github.com/skoda-storyboard/demo/issues/527)) | Approved BIA and resolution of 99.95% requirement versus 99.9% contract | 712; 719 |
+| [SKODA-712d](tickets/SKODA-712d.md) ([#528](https://github.com/skoda-storyboard/demo/issues/528)) | Backup/Technical Recovery Plan and independent <12h RTO/RPO rehearsal | 712; 712c, 712e |
+| [SKODA-712e](tickets/SKODA-712e.md) ([#529](https://github.com/skoda-storyboard/demo/issues/529)) | Accepted installation/service manuals, L1/L2 KB and independent handover | 712; 720, 712d |
+| [SKODA-809a](tickets/SKODA-809a.md) ([#530](https://github.com/skoda-storyboard/demo/issues/530)) | Dual-controlled grants, account lifecycle and periodic rights review | 809; 101a, 812 |
+| [SKODA-850f](tickets/SKODA-850f.md) ([#531](https://github.com/skoda-storyboard/demo/issues/531)) | MR-I06 Must: asset inaccessible even from an already-public page, not merely absent from a feed | 850c; 811, 522 |
+| [SKODA-713e](tickets/SKODA-713e.md) ([#532](https://github.com/skoda-storyboard/demo/issues/532)) | NFR_SEO_02 Should: applicable VideoObject metadata beyond existing Article schema | 713b; 523, 1001, 1005 |
+
+Existing execution tickets remain authoritative for consent/analytics (804/905/907),
+newsletter (904/908c), full content/locale migration (803/801b/847/848/1004), media
+ingestion/sync/lifecycle (504a/511/518–523), roles/preview/page embargo (809/101a/811),
+production URLs/cutover/SEO (103a–e/709–714) and performance/accessibility (715/716).
+The additions link that work rather than commission duplicate implementations.
+Client-marked DONE identity/accessibility clauses need evidence reconciliation, not
+automatic reimplementation; cancelled native-mobile clauses create no build scope.
+
+---
+
 ## 1. Program Summary
 
 Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
@@ -194,7 +237,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | ✅ Done (#172 closed 2026-09-30). Was: M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | ✅ Done (#142 closed 2026-10-05). Was: 🟡 ready for QA 2026-10-01: `Columns (split-NN[, portrait-NNN])`, contract v2; 4 stories match live (±2px) on drafts copies; re-import after merge |
 | [SKODA-228](tickets/SKODA-228.md) | Card titles keep their colour on hover in every rail and card grid | E02 | 0.5 | 0.25 | 0.5 | 201,224 | ✅ Done (#323 closed 2026-10-13). Was: 🟡 M1, in review 2026-10-12 on `fix-296-stories-qa` (the #296 PR); #323; one shared fix for the hover rows of #274/#284/#296 |
-| [SKODA-226](tickets/SKODA-226.md) | Charging profile heading and portrait sizing parity (#292) | E02 | – | – | – | 225,824 | 🔵 M2, ready to pick up; GitHub-only until 2026-10-15 (file mirrored) |
+| [SKODA-226](tickets/SKODA-226.md) | Charging profile heading and portrait sizing parity (#292) | E02 | – | – | – | 225,824 | 🟡 verified fixed on `main` by #414 / SKODA-227: all five bands and edges equal (2026-10-27); the next panel's trailing-nbsp wrap filed as #509 |
 | [SKODA-227](tickets/SKODA-227.md) | Related Stories heading-to-card spacing parity (#293) | E02 | – | – | – | 820,212 | 🔵 M2, ready to pick up; GitHub-only until 2026-10-15 (file mirrored) |
 | SKODA-229 | Series directory cards: no image zoom on hover | E02 | – | – | – | 207,221 | ✅ Done (#331 closed 2026-10-14, PR #347) |
 | SKODA-230 | Media Room home rails: card parity with the source | E02 | – | – | – | 212,224 | ✅ Done (#332 closed 2026-10-15, PRs #343/#351) |
@@ -324,7 +367,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-807 | FAQ block (Press Kit) | E08 | B | 2 | 0.5–1 | 1–2 | 805,106 | ✅ Done (#68 closed 2026-10-08). Was: 🟡 in review 2026-10-06: `Accordion (faq)` + FAQPage JSON-LD, source-parity inset/icon; per-kit authored |
 | SKODA-808 | Press Kit variant subsections + selector + categorization | E08 | B | 3 | 1–2 | 2–3 | 805,806,401 | ✅ Done (#69 closed 2026-10-12). **M2 review 2026-10-15:** Variant selector, pending MR-PK03 → proposed follow-up **SKODA-808a** (M2, decision-gated). Was: 🟡 in review 2026-10-09: hub facets (all 15, `years` id → year); variant tile/nav/chapter already at parity; selector pending MR-PK03 |
 | [SKODA-808a](tickets/SKODA-808a.md) | Press kit: model-variant selector (#370) | E08 | B | 1–2 | 0.5 | 1–2 | 808,401 | 🔵 M2 (#370, created 2026-10-15); blocked on MR-PK03 |
-| SKODA-810 | Company/Page family (board/annual-reports/logo/app/contacts) | E08 | B | 8 | 3–5 | 6–10 | 202,304,502,601,602,803,813 | 🟢 M2 (D18); 5 net-new blocks on the 813 shell |
+| SKODA-810 | Company/Page family (board/annual-reports/logo/app/contacts) | E08 | B | 8 | 3–5 | 6–10 | 202,304,502,601,602,803,813 | 🟢 M2 (D18); 5 net-new blocks on the 813 shell · 810a (contacts + board: `contact-directory`, `exec-bio`) + 810b (logo: `brand-asset`; app page: `app-promo`) in one PR off #409 (2026-10-23); annual reports blocked (source 404) |
 | SKODA-813 | Generic Page base shell (STO page + MR media-room-page) | E08 | B | 2 | 0.5–1 | 1–2 | 202,304,305,309,814 | 🟡 built 2026-10-21 (branch `skoda-813-page-shell`); shared shell under 810; spec `ui-specs/template-page-base.md` |
 | SKODA-814 | SiteOrigin body flatten contract (1,614 pages) | E08 | B | 5 | 2–3 | 4–6 | 601,203,204 | 🟢 M2; feeds 801/208/813; spec `ui-specs/siteorigin-body.md` (recount §3/§6) |
 | SKODA-815 | Story flatten: `ys-milestones` timeline (content-loss fix) | E08 | B | 3 | 1–2 | 3–5 | 801 | 🔵 `Timeline` block + importer in PR (2026-10-16, branch `skoda-815-timeline`): the 801 flatten dropped every description; now year, title, image(s) and description per entry, measured against the source at 375–1440 |
@@ -343,7 +386,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-842](tickets/SKODA-842.md) | DA block library + page templates for authors (authoring review AR-02/03) | E08 | A | – | – | – | 211,841,840 | 🟡 M2; #320; PR #322 (library + templates live, noindex; editor checks open) |
 | [SKODA-843](tickets/SKODA-843.md) | Generic pages: legal set, BGC, sustainability page, keep / drop list (#363) | E08 | A | – | – | – | 813,609 | 🔵 M2 (#363, created 2026-10-15); 41 default + 1 sustainability page, none live |
 | [SKODA-844](tickets/SKODA-844.md) | Featured-image mini-pages: Road to Christmas + classic-car pages (29) (#364) | E08 | A | – | – | – | 813,220 | 🔵 M2 (#364, created 2026-10-15); keep / drop first (Q-3) |
-| [SKODA-845](tickets/SKODA-845.md) | Media Room Newsletter page: press-release carousels by plant (#365) | E08 | A | 2 | – | – | 813,224 | 🔵 M2 (#365, created 2026-10-15); MR nav Company menu · amended 2026-10-21 (gap review) |
+| [SKODA-845](tickets/SKODA-845.md) | Media Room Newsletter page: press-release carousels by plant (#365) | E08 | A | 2 | – | – | 813,224 | 🟡 EN built on branch `skoda-845-newsletter` (#457, 2026-10-22), stacked on #409; CS page open (1001, 1004a); MR nav Company menu · amended 2026-10-21 (gap review) |
 | [SKODA-847](tickets/SKODA-847.md) | Press-kit corpus: enumerate every EN kit and run the three importers (#366) | E08 | A | – | – | – | 805,836,803 | 🔵 M2 (#366, created 2026-10-15); ≥ 790 EN pages, 104 live; 12 `layout-article` hubs have no importer |
 | [SKODA-848](tickets/SKODA-848.md) | Taxonomy archives at scale: keep / redirect rule for 378 EN archives (#367) | E02 | A | 3 | – | – | 209,402d,841 | 🔵 M2 (#367, created 2026-10-15); 41 live (Q-4) · amended 2026-10-22 (gap review §7.2) |
 | [SKODA-849](tickets/SKODA-849.md) | In-body widget census: Škodapedia glossary, ys-embed-share HTML, social embeds, skoda_iframe, quizzes (#426) | E06 | B | 2 | 2–3 | 4–6 | 801b,803,802,Q-19 | 🔵 M2; importer drops them silently today · split 2026-10-21: 3 sub-tickets, 12 SP in total |
