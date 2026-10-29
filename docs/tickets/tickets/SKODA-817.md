@@ -61,8 +61,8 @@ second row, which leaves the first row image-less.
 - **#404:** already fixed on main for 137 of 139 stories (re-imports since 20 Oct). Two left:
   - "RS four ways" is one of the 40 stories in the 28 Oct DA batch (see below);
   - the Enyaq / Elroq gaming-consoles story is blocked by the push's binary gate: its MP4 isn't in the DAM.
-- **Content (not pushed):** the 139 stories (132 EN + 7 in the locale trees) were re-imported with this branch and
-  compared with preview:
+- **Content:** the 139 stories (132 EN + 7 in the locale trees) were re-imported with this branch and compared
+  with preview:
   - 393 card titles h3 → h2 and 8 #404 section headings h2 → h3;
   - 109 links on 55 stories now point at the migrated page instead of the source;
   - the source's current "Explore more" picks;
@@ -73,8 +73,28 @@ second row, which leaves the first row image-less.
   12:03–12:05 by two team members, mostly without a preview; their images now point at DA-hosted copies
   (`content.da.live/…`). A re-push would put the source CDN URLs back, so they are held until the order is agreed
   with whoever ran that batch.
-- **Found, not changed here:** some hero images carry a literal `<br>` in their alt (`ŠKODA 4×4: <br>Your Best
-  Bet in the Snow`), on main too.
+- **Pushed and published, 2026-10-29 (PO requests; PR #548):**
+  - **91 EN stories:** pushed, previewed and published. On live, all 268 card titles are h2 and every section
+    heading is h3; no empty headings; DA equals what was pushed. Push record committed (15d5387).
+  - **7 stories in the locale trees** (4 CS, DE, SK, SR): pushed and previewed, **not published**. The publish
+    gate stops on their `/{cs,de,sk,sr}/fragments/newsletter-card`: CS is preview-only; DE / SK / SR don't exist.
+    Open: publish the CS fragment and create the others, or publish the stories without them, as they are live
+    today.
+  - **40 held** (the 28 Oct DA image batch, above) and **1 blocked** (gaming consoles: its MP4 isn't in the DAM)
+    keep their old content: h3 card titles, and on "RS four ways" the #404 h2 section headings.
+- **Checked on live** (PR #548):
+  - the outline equals the source's (`H3 Explore more | H2 ×3 | H3 Tags`);
+  - the card type and boxes are unchanged at 1280 / 768 / 390;
+  - real clicks: a migrated target opens in the same tab, an unmigrated one the source in a new tab;
+  - axe: no new violations; the existing `heading-order` (the newsletter h3 after the h1, as on the source) and
+    one body-link contrast remain;
+  - no broken images, no visible Spacer text, the in-site links resolve;
+  - the newsletter-card fragment re-imports unchanged.
+- **Found, not changed here (notes, no issues filed):**
+  - some hero images carry a literal `<br>` in their alt (`ŠKODA 4×4: <br>Your Best Bet in the Snow`), on main
+    too;
+  - the locale stories' newsletter-card fragments (above);
+  - the card title box is 313×40 against the source's 345×72 at 1280 (type equal), on main before this change too.
 
 ## Dependencies
 SKODA-801 (aside rebuild), SKODA-201 (cards/card-teaser overlay style).
