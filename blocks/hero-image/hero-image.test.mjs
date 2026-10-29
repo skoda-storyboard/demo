@@ -42,6 +42,31 @@ test('story separates heading, image and caption; date and category remain toget
   assert.equal(meta.querySelector('a').getAttribute('href'), '/en/category/emobility/');
 });
 
+test('story with a category and its sub-categories: one badge group after the date (#458)', () => {
+  // as DA delivers it: the date as text, the links side by side
+  const hero = block('', `
+    <div><div><h1>Title</h1></div></div>
+    <div><div><p>11. 9. 2018<a href="/en/category/lifestyle">Lifestyle</a><a href="/en/category/lifestyle/sports">Sports</a><a href="/en/category/lifestyle/sports/cycling">Cycling</a></p></div></div>
+  `);
+  decorate(hero);
+  const meta = hero.querySelector('.hero-image-meta');
+  assert.deepEqual([...meta.children].map((el) => el.className), ['hero-image-date', 'hero-image-categories']);
+  assert.equal(meta.querySelector('.hero-image-date').textContent, '11. 9. 2018');
+  assert.deepEqual([...meta.querySelectorAll('.hero-image-categories > a')].map((a) => a.textContent), ['Lifestyle', 'Sports', 'Cycling']);
+  // one badge stays as before: no group
+  const single = block();
+  decorate(single);
+  assert.equal(single.querySelector('.hero-image-categories'), null);
+  assert.equal(single.querySelector('.hero-image-meta > a').textContent, 'eMobility');
+});
+
+test('story category badges: the group\'s gap is the source\'s space, the row gap stays (#458)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./hero-image.css', import.meta.url), 'utf8');
+  assert.match(css, /--hero-story-category-gap: 2\.75px;/);
+  assert.match(css, /\.hero-image \.hero-image-meta \.hero-image-categories \{[^}]*display: inline-flex;[^}]*gap: var\(--hero-story-category-gap\);/);
+});
+
 test('story accepts missing heading and date-only or category-only caption', () => {
   const hero = block('', `
     <div><div><picture><img src="/hero.png" alt=""></picture></div></div>

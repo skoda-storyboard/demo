@@ -99,6 +99,21 @@ test('story hero keeps image, h1, perex and same-row date/category inside Hero I
   assert.equal(doc.querySelectorAll('table').length, 1, 'no separate hero Tags block');
 });
 
+test('story hero keeps every category badge in source order, each once (#458)', { skip }, () => {
+  const L = 'https://www.skoda-storyboard.com/en/category/lifestyle/';
+  const doc = dom(HERO.replace(/<span class="category">[\s\S]*?<\/span>/, `<span class="category">
+    <a href="${L}" class="label">Lifestyle</a> <a href="${L}sports/" class="label">Sports</a>
+    <a href="${L}sports/cycling/" class="label">Cycling</a> <a href="${L}sports/" class="label">Sports</a>
+    <a href="${L}empty/" class="label"> </a></span>`));
+  storyHero(doc.querySelector('.hero'), { document: doc });
+  const meta = [...doc.querySelectorAll('tr')].at(-1).querySelector('p');
+  assert.deepEqual([...meta.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')]), [
+    ['Lifestyle', L], ['Sports', `${L}sports/`], ['Cycling', `${L}sports/cycling/`],
+  ], 'the repeated and the empty link are dropped');
+  assert.ok(meta.querySelector('time'), 'the date stays first');
+  assert.equal(meta.firstElementChild.tagName, 'TIME');
+});
+
 test('story hero tolerates a missing caption (authors omit cells)', { skip }, () => {
   const doc = dom('<div class="hero"><h1>Only title</h1></div>');
   storyHero(doc.querySelector('.hero'), { document: doc });

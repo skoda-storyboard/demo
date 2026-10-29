@@ -16,7 +16,8 @@
  *   Hero Image  | image |
  *               | h1    |
  *               | perex |
- *               | date + linked category |
+ *               | date + linked categories (every source badge, in source order: a category and
+ *               |   its sub-categories, e.g. Lifestyle, Sports, Cycling; #458) |
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Every part is optional (authors omit cells): no
  * image and no heading → unwrap and bail, like hero-banner.
@@ -66,9 +67,11 @@ export default function parse(element, { document }) {
 
   const published = caption.querySelector('.published, time');
   const dateText = published && (published.textContent || '').trim();
-  const category = caption.querySelector('.category a[href]');
-  const categoryText = category && (category.textContent || '').trim();
-  const categoryHref = category && category.getAttribute('href');
+  // every badge the source shows, in its order, each href once (#458)
+  const seen = new Set();
+  const categories = [...caption.querySelectorAll('.category a[href]')]
+    .map((a) => ({ text: (a.textContent || '').trim(), href: a.getAttribute('href') }))
+    .filter(({ text, href }) => text && href && !seen.has(href) && seen.add(href));
   const meta = document.createElement('p');
   meta.className = 'hero-image-meta';
   if (dateText) {
@@ -87,12 +90,12 @@ export default function parse(element, { document }) {
     meta.append(date);
   }
 
-  if (categoryText && categoryHref) {
+  categories.forEach(({ text, href }) => {
     const link = document.createElement('a');
-    link.setAttribute('href', categoryHref);
-    link.textContent = categoryText;
+    link.setAttribute('href', href);
+    link.textContent = text;
     meta.append(link);
-  }
+  });
 
   if (meta.childNodes.length) cells.push([meta]);
   element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));

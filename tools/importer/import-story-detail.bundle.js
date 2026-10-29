@@ -74,9 +74,8 @@ var CustomImportScript = (() => {
     }
     const published = caption.querySelector(".published, time");
     const dateText = published && (published.textContent || "").trim();
-    const category = caption.querySelector(".category a[href]");
-    const categoryText = category && (category.textContent || "").trim();
-    const categoryHref = category && category.getAttribute("href");
+    const seen = /* @__PURE__ */ new Set();
+    const categories = [...caption.querySelectorAll(".category a[href]")].map((a) => ({ text: (a.textContent || "").trim(), href: a.getAttribute("href") })).filter(({ text: text5, href }) => text5 && href && !seen.has(href) && seen.add(href));
     const meta = document2.createElement("p");
     meta.className = "hero-image-meta";
     if (dateText) {
@@ -94,12 +93,12 @@ var CustomImportScript = (() => {
       date.textContent = dateText;
       meta.append(date);
     }
-    if (categoryText && categoryHref) {
+    categories.forEach(({ text: text5, href }) => {
       const link = document2.createElement("a");
-      link.setAttribute("href", categoryHref);
-      link.textContent = categoryText;
+      link.setAttribute("href", href);
+      link.textContent = text5;
       meta.append(link);
-    }
+    });
     if (meta.childNodes.length) cells.push([meta]);
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }

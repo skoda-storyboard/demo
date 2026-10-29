@@ -32,6 +32,9 @@
 .hero-image:not(.overlay, .archive, .page) {
   --hero-story-media-max-width: 970px;
   --hero-story-date-size: 12px;
+
+  /* between category badges: the source's inline space, one 16px SKODA Next space (#458) */
+  --hero-story-category-gap: 2.75px;
   --hero-story-title-gap: 32px;
 
   gap: 0;
@@ -131,6 +134,14 @@
   font-size: var(--hero-story-date-size);
   font-weight: var(--weight-light);
   line-height: 1.5;
+}
+
+/* several categories (#458): one group in the meta row, 12px after the date like a single
+   badge, its badges a space apart, as the source's inline chips (3px at every width) */
+.hero-image .hero-image-meta .hero-image-categories {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--hero-story-category-gap);
 }
 
 /* The source chip starts 1px above the 18px date line and doesn't make the row taller

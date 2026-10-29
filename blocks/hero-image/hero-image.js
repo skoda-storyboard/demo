@@ -252,6 +252,15 @@ export default function decorate(block) {
                 }
               }
             }
+            // a category and its sub-categories (Lifestyle, Sports, Cycling): one group, its
+            // badges a space apart as on the source, not the row's date gap (#458)
+            const badges = isMeta ? [...node.children].filter((el) => el.matches('a[href]')) : [];
+            if (badges.length > 1) {
+              const group = document.createElement('span');
+              group.className = 'hero-image-categories';
+              badges[0].before(group);
+              group.append(...badges);
+            }
           }
           caption.append(node);
         } else {

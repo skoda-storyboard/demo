@@ -104,3 +104,27 @@ indexed).
   - `big-possibilities-in-a-small-package…` loads an unknown `version` block (404): a source spec table passes through
     as a raw table and is read as a block named after its first cell. It was already in DA, so it's not a regression.
     It's already covered by SKODA-801a's pending `spec-table-versions` contract.
+
+## Several categories, #458 (2026-10-29, branch `fix-458-hero-categories`)
+- **Defect:** the source's hero shows every category badge: a category and its sub-categories, e.g. Lifestyle,
+  Sports, Cycling, or Models, Kamiq. `parsers/story-hero.js` kept only the first. The sweep of the 139 migrated
+  stories gives 124 with one badge, 11 with two and 4 with three; the 15 showed only their first.
+- **Fix:**
+  - the parser keeps every `.category a[href]`, in source order, each href once (an empty link dropped);
+  - the block groups two or more badges in `span.hero-image-categories`; a single badge is unchanged;
+  - the CSS spaces them `--hero-story-category-gap: 2.75px`, the source's inline space. Measured 3px on the source
+    at every width, against the meta row's 12px date gap, which stays.
+- **Measured,** source vs a local render of the re-import, at 1280 / 768 / 390, on "Miss Peaches … Barcelona"
+  (three badges) and "First sketches of the Kamiq" (two):
+  - the date is 56×18 then 12px;
+  - the badges are 84 / 71 / 75 × 21, 3px apart, 11px / 600, the same on both;
+  - no wrapping at 390.
+- **Behaviour:**
+  - real click: "Sports" opens `/en/category/lifestyle/sports`;
+  - Tab walks Lifestyle → Sports → Cycling with a visible focus ring;
+  - axe on the hero: none.
+  - The deepest badges (Cycling, Kamiq) open the source in a new tab: their archives aren't migrated (link policy
+    D-3 (b)), unlike the source's same-tab link.
+- **Content:** all 15 are among the 91 stories published for #387 (PR #548, h2 card titles). Their re-push needs
+  both importer fixes, so it waits until #548 is merged, or is built from the two branches combined. It also follows
+  this branch's merge: without the block change, live would show the badges 12px apart.
