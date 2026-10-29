@@ -562,7 +562,7 @@ export function feedMediaRefs(sheet) {
  * Feed binaries without a media-manifest row (by logical id, or a URL the row has seen): the
  * feed must not be published while any is missing.
  * @param {object} sheet the media feed
- * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ * @param {Record<string, object>} manifestRows the media manifest's `rows` (loadManifest)
  */
 export function feedCoverageGaps(sheet, manifestRows = {}) {
   const seen = new Set(Object.values(manifestRows)
@@ -581,7 +581,7 @@ const canonicalUrl = (url) => cdnUrl(url) || String(url || '').split(/[?#]/)[0];
  * The media manifest's published files: canonical master URL → AEM Assets `public_url`, for rows
  * uploaded to the DAM, published, and publicly verified at that URL. Keyed by the master only,
  * so a rendition never resolves to its original.
- * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ * @param {Record<string, object>} manifestRows the media manifest's `rows` (loadManifest)
  * @returns {Map<string, string>}
  */
 export function damIndex(manifestRows = {}) {

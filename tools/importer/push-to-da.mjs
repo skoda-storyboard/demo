@@ -37,7 +37,7 @@
  *
  * Output: tools/importer/reports/push/<stamp>.json (per-URL report) and
  * <stamp>-urls.txt (validated preview URLs for SKODA-603). Shared push state:
- * tools/importer/push/push-manifest.json (committed, like media-manifest.json).
+ * tools/importer/push/push-manifest.json (committed, like the media manifest ledger).
  * Publish holds pages the import contract marks [hold publish] (push/block-check.mjs
  * checkPage, the same check as `npm run import:validate-blocks`); they still preview.
  * Exit code 1 when any page conflicts, errors, or fails validation/publish.
@@ -58,12 +58,13 @@ import {
   fragmentPaths, contentFragmentPaths, fragmentOrder, fragmentHolds, imageCheck, summarize,
 } from './push/push-lib.mjs';
 import { checkPage } from './push/block-check.mjs';
+import { loadManifest as loadMediaManifest } from './media/manifest-ledger.mjs';
 import { loadContracts } from './validate-blocks.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MANIFEST = path.join(HERE, 'push', 'push-manifest.json');
 const REPORT_DIR = path.join(HERE, 'reports', 'push');
-const MEDIA_MANIFEST = path.join(HERE, 'media', 'media-manifest.json');
+const MEDIA_MANIFEST = path.join(HERE, 'media', 'manifest');
 const DEAD_SOURCES = path.join(HERE, 'media', 'dead-source-images.json');
 const ADMIN = 'https://admin.hlx.page';
 const DA = 'https://admin.da.live';
@@ -209,7 +210,7 @@ export default async function main(argv = process.argv.slice(2), {
   const log = (...m) => console.log(...m);
   const h = hosts(a);
   const manifest = loadManifest(manifestFile);
-  const mediaManifest = JSON.parse(readFileSync(mediaManifestFile, 'utf8'));
+  const mediaManifest = loadMediaManifest(mediaManifestFile, { mustExist: true });
   // One byte probe per image per run: the preview/publish/fragment rechecks reuse it.
   const mediaCache = new Map();
   // source images verified dead on live (SKODA-843): stripped as live, not blocked

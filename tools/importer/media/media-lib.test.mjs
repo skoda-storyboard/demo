@@ -15,7 +15,7 @@ import {
   logicalId, masterUrl, imageOriginalUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, publishDamBinary, publishDamImage, ensureDamFolder, resolveDamToken,
-  fetchBinaryToFile,
+  fetchBinaryToFile, sha256Of,
   needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
   renditionCandidates, remoteImageSize,
 } from './media-lib.mjs';
@@ -313,6 +313,9 @@ test('file download retries a stalled transfer from byte zero and checks the fin
     assert.equal(got.header.subarray(4, 8).toString(), 'ftyp');
     assert.equal(got.header.subarray(8, 12).toString(), 'mock');
     assert.equal(readFileSync(filePath).toString(), '\0\0\0\0ftypmock');
+    // the provenance hash is of the complete retried body, not of the stalled attempt (SKODA-518)
+    assert.equal(got.sha256, sha256Of(Buffer.from('\0\0\0\0ftypmock')));
+    assert.match(got.sha256, /^[0-9a-f]{64}$/);
   } finally {
     await new Promise((resolve) => { server.close(resolve); });
     rmSync(dir, { recursive: true, force: true });

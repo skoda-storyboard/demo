@@ -171,3 +171,38 @@ test('apply rewrites public PDF/MP4 links by page-relative source path, atomical
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('an image URL two rows claim is rewritten to the row it is the logical id of, in either order (SKODA-518)', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-apply-'));
+  try {
+    const url = 'https://cdn.example.test/2022/04/Roadtrip.JPG-768x432.jpg';
+    const own = {
+      logical_id: logicalId(url),
+      source_url: url,
+      seen_urls: [url],
+      delivery_url: 'https://cdn.example.test/2022/04/Roadtrip.JPG.jpg',
+      bytes: 800_000,
+      steps: { deliver: 'done' },
+      status: 'done',
+    };
+    // a stray row for the same file (another extension spelling) that also lists the URL
+    const stray = {
+      ...own,
+      logical_id: 'ffffffff__Roadtrip.jpg',
+      delivery_url: 'https://cdn.example.test/2022/04/Roadtrip.JPG-768x432.jpg',
+    };
+    const index = path.join(dir, 'media-index.json');
+    const manifest = path.join(dir, 'manifest.json');
+    const page = path.join(dir, 'page.plain.html');
+    for (const order of [[own, stray], [stray, own]]) {
+      const rows = Object.fromEntries(order.map((r) => [r.logical_id, r]));
+      writeFileSync(manifest, JSON.stringify({ rows }));
+      writeFileSync(page, `<p><img alt="R" src="${url}"></p>`);
+      // eslint-disable-next-line no-await-in-loop
+      await run(dir, manifest, index, [page]);
+      assert.match(readFileSync(page, 'utf8'), new RegExp(`src="${own.delivery_url}"`), `${order[0].logical_id} first`);
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

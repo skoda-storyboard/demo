@@ -20,8 +20,9 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { loadManifest } from './manifest-ledger.mjs';
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -69,10 +70,10 @@ async function main() {
   const applyJs = path.join(mediaDir, 'apply-media-manifest.mjs');
   if (!existsSync(buildJs) || !existsSync(applyJs)) return; // toolkit absent → no-op
 
-  const manifestPath = path.join(mediaDir, 'media-manifest.json');
+  const manifestPath = path.join(mediaDir, 'manifest');
   const countRows = (fallback) => {
     try {
-      return Object.keys(JSON.parse(readFileSync(manifestPath, 'utf8')).rows || {}).length;
+      return Object.keys(loadManifest(manifestPath).rows).length;
     } catch {
       return fallback;
     }

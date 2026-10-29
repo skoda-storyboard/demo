@@ -1,12 +1,12 @@
 import path from 'node:path';
-import { readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { publishDamImage, resolveDamToken } from './media-lib.mjs';
+import { publishDamImage, resolveDamToken, openManifest } from './media-lib.mjs';
 
 const DAM_FOLDER = '/content/dam/storyboard';
 const AUTHOR = 'https://author-p220607-e2281243.adobeaemcloud.com';
 const PUBLISH = 'https://publish-p220607-e2281243.adobeaemcloud.com';
-const MANIFEST = fileURLToPath(new URL('./media-manifest.json', import.meta.url));
+const MANIFEST = fileURLToPath(new URL('./manifest/', import.meta.url));
 
 function imageUrl(base, damPath) {
   return `${base}${path.posix.dirname(damPath)}/${encodeURIComponent(path.posix.basename(damPath))}`;
@@ -130,26 +130,32 @@ export async function main(args = process.argv.slice(2)) {
   }
   const token = resolveDamToken({ tokenFile: options.tokenFile });
   if (!token) throw new Error('DAM token not available');
-  const manifest = JSON.parse(readFileSync(options.manifest, 'utf8'));
+  if (!existsSync(options.manifest)) throw new Error(`Manifest not found: ${options.manifest}`);
+  const manifest = openManifest(options.manifest);
   const ids = readFileSync(options.idsFile, 'utf8').split(/\r?\n/)
     .map((id) => id.trim()).filter((id) => id && !id.startsWith('#'));
   if (!ids.length || new Set(ids).size !== ids.length || ids.some((id) => {
     const row = manifest.rows[id];
     return !row || row.kind === 'document' || row.kind === 'video'
       || row.steps?.dam !== 'done' || !row.dam_asset_path?.startsWith(`${DAM_FOLDER}/`);
-  })) throw new Error('ID list must contain distinct, uploaded image originals only');
+  })) {
+    manifest.compact(); // nothing recorded: releases the writer lock
+    throw new Error('ID list must contain distinct, uploaded image originals only');
+  }
   const selected = ids.slice(0, options.limit);
+  // each publish step is one journal line; the touched shards are written once at the end
   const save = (row) => {
     manifest.rows[row.logical_id] = row;
-    const temp = `${options.manifest}.tmp`;
-    writeFileSync(temp, `${JSON.stringify(manifest, null, 2)}\n`);
-    renameSync(temp, options.manifest);
+    manifest.record(row.logical_id);
   };
   const counts = { done: 0, failed: 0, skipped: 0 };
   let next = 0;
   const workerCount = Math.min(options.concurrency, selected.length);
+  // a fatal error (401) stops new publishes; the run settles once every running one has, so
+  // each is recorded before the manifest is compacted (SKODA-518)
+  let fatal = null;
   await Promise.all(Array.from({ length: workerCount }, async () => {
-    for (;;) {
+    while (!fatal) {
       const index = next;
       next += 1;
       if (index >= selected.length) return;
@@ -169,11 +175,13 @@ export async function main(args = process.argv.slice(2)) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${error.message}`);
         if (/DAM original HEAD returned 401|DAM activation returned 401/.test(error.message)) {
-          throw error;
+          fatal ??= error;
         }
       }
     }
   }));
+  manifest.compact();
+  if (fatal) throw fatal;
   console.log(`[image publish] done=${counts.done} failed=${counts.failed} skipped=${counts.skipped}`);
   if (counts.failed) process.exitCode = 1;
   return counts;

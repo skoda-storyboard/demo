@@ -160,8 +160,8 @@ npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
 # PDFs/MP4s additionally need approved AEM Assets ingest + activation + a
 # verified public URL mapping before media:apply (see media/README.md).
-# media:build above already records them as pending manifest rows: commit
-# media-manifest.json with the import; the ingest runs on a developer machine.
+# media:build above already records them as pending manifest rows: commit the
+# manifest ledger (tools/importer/media/manifest/) with the import; the ingest runs on a developer machine.
 npm run media:validate-binaries -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
@@ -215,7 +215,7 @@ unknown/unresolved images still stop `media:apply`.
 6. **Ingest + rewrite media** — after the content import, run the media toolkit
    (`tools/importer/media/`, see its `README.md`): `npm run media:build -- --pages content/<path>.plain.html`
    dedups to logical masters, **pre-conditions >~10 MB masters** (else the content bus 409s on publish),
-   optionally ingests to the AEM DAM / DA archive, and writes `media-manifest.json`; then
+   optionally ingests to the AEM DAM / DA archive, and writes the manifest ledger (`tools/importer/media/manifest/`, SKODA-518); then
    `npm run media:apply -- --pages content/<path>.plain.html` rewrites `<img src>` to each image's
    `delivery_url` and removes the old derivative-ladder `srcset`. EDS auto-ingests those absolute URLs into its media bus at publish (self-hosted + webp),
    so the published page carries no legacy-CDN dependency and gets a masters-only responsive upgrade.

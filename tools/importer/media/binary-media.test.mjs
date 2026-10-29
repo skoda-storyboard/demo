@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { logicalId } from './media-lib.mjs';
 import {
   binaryAnchors, binaryErrors, binaryKind, publicBinaryUrl, rewriteBinaryLinks, verifyPublicBinary,
-  isExternalDocument,
+  isExternalDocument, binaryLookups, binarySource,
 } from './binary-media.mjs';
 
 const exec = promisify(execFile);
@@ -285,4 +285,33 @@ test('rewriteBinaryLinks leaves an approved external document link alone (SKODA-
   const cookie = 'https://assets.cookies.skoda-auto.com/documents/cookie-policy/skoda-cookie-policy-sk.pdf';
   const html = `<a href="${cookie}">Zásady cookies</a>`;
   assert.deepEqual(rewriteBinaryLinks(html, { rows: {} }), { html, errors: [], rewrites: 0 });
+});
+
+test('a URL two rows claim goes to the verified row, in either row order (SKODA-518)', () => {
+  const done = row(pdf, hostedPdf, 'document');
+  // an alias row of the same file that never reached the DAM, sorted before and after the done row
+  const alias = (id) => ({
+    ...done,
+    logical_id: id,
+    status: 'partial',
+    steps: { dam: 'error', publish: 'pending' },
+    public_url: '',
+    public_verified: null,
+    dam_asset_path: '',
+  });
+  const lookupOf = (order) => binaryLookups({
+    rows: Object.fromEntries(order.map((r) => [r.logical_id, r])),
+  });
+  ['00000000__report.pdf', 'ffffffff__report.pdf'].forEach((id) => {
+    [[done, alias(id)], [alias(id), done]].forEach((order) => {
+      const winner = lookupOf(order).get(binarySource(pdf)).logical_id;
+      assert.equal(winner, done.logical_id, `${id}, ${order[0].status} first`);
+    });
+  });
+  // two unverified claimants: the first by logical id, whatever the file order
+  const a = alias('00000000__report.pdf');
+  const b = alias('ffffffff__report.pdf');
+  [[a, b], [b, a]].forEach((order) => {
+    assert.equal(lookupOf(order).get(binarySource(pdf)).logical_id, a.logical_id);
+  });
 });
