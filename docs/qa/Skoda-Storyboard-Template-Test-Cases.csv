@@ -1,0 +1,781 @@
+﻿TC ID,Template,Component / Area,Test Scenario,Test Case Title,Pre-conditions,Test Steps,Test URL (main live),Source URL (reference),Expected Result,Viewport(s) px,Test Type,Priority,Ticket / Spec ref,Actual Result,Status,Defect ID,Defect Priority (P1–P4),Executed By,Execution Date,Comments
+TC-GL-001,Global shell (all templates),Page load,Every template returns HTTP 200 on live,Starred pages load on main live,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open each main URL in the ""Test URLs"" sheet (fresh incognito window, add ?x=<random>).
+4. In DevTools > Network, check the document status.
+5. Run document.documentElement.lang in the Console.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/media-room
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2
+https://main--demo--skoda-storyboard.aem.live/en/series/130-years","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/media-room/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/
+https://www.skoda-storyboard.com/en/series/130-years/","Each page returns 200 (not 404 / 5xx); html lang = ""en-GB"", the same as the source.","1280, 1440",Functional / Smoke,High,"#74, #85; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-002,Global shell (all templates),URLs,Old links with a trailing slash still work,Trailing-slash URL opens the page,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open each URL with a trailing ""/"" (e.g. /en/, /en/news/, /en/skoda-model/epiq/).
+4. Open the same URL on the source.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/
+https://main--demo--skoda-storyboard.aem.live/en/news/
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq/","https://www.skoda-storyboard.com/en//
+https://www.skoda-storyboard.com/en/news//
+https://www.skoda-storyboard.com/en/skoda-model/epiq//","The page opens (200 or a 301 to the slash-less URL), as on the source. Not ""Page not found"".","1280, 1440",Functional / Negative,High,"#505, #402; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-003,Global shell (all templates),URLs,Root redirect,Site root redirects to the English home,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the main root URL ""/"".
+4. Check the final URL and the redirect status in Network.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/,https://www.skoda-storyboard.com/,The root redirects (301) to /en. Note: the source redirects by browser language; the demo always goes to /en (PO-accepted deviation).,"1280, 1440",Functional,Medium,"#85 (SKODA-1003); header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-004,Global shell (all templates),SEO / meta,Page title format,Browser tab title has the site suffix,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Run document.title on main and source for each template URL.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/images
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq","https://www.skoda-storyboard.com/en/images/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/","Title = ""<Page title> - Škoda Storyboard"", the same as the source.","1280, 1440",SEO,Medium,"#420; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-005,Global shell (all templates),SEO / meta,Meta tags,"Description, og:image, canonical and robots present",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. In DevTools > Elements <head>, check meta description, og:title / og:image, link rel=canonical and meta robots.
+4. Compare with the source.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/news","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/news/",Description and og:image are present; canonical points to the page on the live host; robots does not block indexing.,"1280, 1440",SEO,Medium,"SKODA-401; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-006,Global shell (all templates),Header STO,Storyboard header: menu items,Storyboard menu items and order equal the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a Storyboard page at 1280.
+4. List the top-menu items left to right.
+5. Hover each item and list its dropdown links.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/",Menu = Models / eMobility / Lifestyle / Škoda World / Series / Škodapedia / Podcast with the same dropdown items and order as the source.,"1280, 1440",Functional / Content,High,"header-megamenu.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-007,Global shell (all templates),Header STO,Header geometry and typography,"Header height, font and colours equal the source",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. At each viewport, measure the header box (getBoundingClientRect height).
+4. Measure the first menu item: font-family / size / weight / color.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Header height and menu font equal the source (e.g. Skoda Next 16px / 400, rgb(22, 23, 24)), ±1px.","375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"header-megamenu.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-008,Global shell (all templates),Header STO,Megamenu: mouse and keyboard,"Dropdowns open by hover and keyboard, close with Escape",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Hover ""Models"": the dropdown opens.
+4. Tab to ""Models"" and press Enter / Space: the dropdown opens.
+5. Press Escape: it closes and focus returns to ""Models"".
+6. Click a dropdown link: the target page opens in the same tab (200).
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Same behaviour as the source; every dropdown link resolves (200).,"1280, 1440",Functional / Accessibility,High,"header-megamenu.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-009,Global shell (all templates),Header,Section switcher,Stories | Media Room switch changes the side,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. On a Storyboard page click ""Media Room"" in the top bar.
+4. Then click ""Stories"".
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"""Media Room"" opens /en/media-room with the Media Room menu (News / Press Kits / Models / Images / Videos / Company / Škodapedia); ""Stories"" opens /en with the Storyboard menu.","1280, 1440",Functional,High,"header-megamenu.md §3; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-010,Global shell (all templates),Header MR,Media Room menu: Company submenu,Company submenu links open the right page,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the Media Room home at 1280.
+4. Hover ""Company"" and click each item: Contacts, Newsletter, Management, Company Logo, Mobile App.
+5. Note same tab / new tab and the status of the target.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,"Contacts and Newsletter open the demo page in the same tab (200). Items not migrated yet open the source in a new tab. No item leads to ""Page not found"".","1280, 1440",Functional,High,"#71, #365; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-011,Global shell (all templates),Mobile nav,Hamburger menu (<1080),"Mobile drawer opens, expands sub-menus and closes",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992.
+3. At 375 / 768 / 992 click the menu button.
+4. Check its aria-label changes ""Open navigation"" → ""Close navigation"".
+5. Expand a sub-menu (Models), then collapse it.
+6. Press Escape / click the close button.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/media-room","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/media-room/","Drawer opens and closes, sub-menus toggle, focus stays inside the drawer while open, and labels equal the source.","375, 768, 992",Functional / Responsive / Accessibility,High,"mobile-nav.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-012,Global shell (all templates),Header search,Search suggestions,Typing in header search shows suggestions from the locale index,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click the search (magnifier) icon in the header.
+4. Type ""epiq"" slowly.
+5. Check the suggestions, then click the first one.
+6. Repeat and type ""stories"" (negative check).
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/","Suggestions are migrated pages only, and clicking one opens it on the demo in the same tab. No ""nav"" / ""footer"" fragments are suggested.","1280, 1440",Functional,High,"#499, #83; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-013,Global shell (all templates),Header search,Search submit,Enter opens the search results page,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open search, type ""epiq"", press Enter.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Opens /en/search?filter[search]=epiq with the results count (e.g. ""49 results for “epiq”""), the same as the source.","1280, 1440",Functional,High,"SKODA-402; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-014,Global shell (all templates),Language switcher,Translated versions only,Language row lists translations; switch opens the translation,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a story that has translations (EN Epiq story).
+4. Read the language row: current language is plain text (aria-current), others are links.
+5. Click DE: the German story opens.
+6. Open a page without translations: only the current language shows.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Language links equal the page's hreflang set and the source; each opens the same story in that language (200).,"1280, 1440",Functional / Localization,High,"#83, SKODA-303a; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-015,Global shell (all templates),Footer STO,Storyboard footer content and links,"Footer columns, social icons and app badges equal the source",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Scroll to the footer.
+4. Compare the column headings, links, social icons, App Store / Google Play badges and the copyright / RSS row.
+5. Click every footer link (check same tab / new tab and status).
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/",Content and order equal the source; 0 broken links; external links open as on the source.,"1280, 1440",Functional / Content,High,"footer.md, SKODA-304; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-016,Global shell (all templates),Footer STO,Footer geometry,Footer height equals the source at every band,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure the footer height (getBoundingClientRect) at each viewport.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Footer height equals the source ±1px (e.g. 796 / 606 / 786 / 768 at 390 / 768 / 992 / 1280 as measured for #485).,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"footer.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-017,Global shell (all templates),Footer MR,Media Room footer,Media Room footer headings and links,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. On a Media Room page scroll to the footer.
+4. Check the headings (h3 Contacts / Newsletter / Company) and links.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/media-room
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company","https://www.skoda-storyboard.com/en/media-room/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/","Headings, levels, links and newsletter intro equal the source; links resolve.","1280, 1440",Functional / Content,High,"footer-mediaroom.md, SKODA-305; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-018,Global shell (all templates),Footer,Footer accordions (<992),Footer columns collapse on phone and toggle on click,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992.
+3. At 375 / 768 click each footer column heading.
+4. At 992+ check the columns are expanded and the toggle is hidden.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Columns toggle open / closed on phone, as on the source; from 992px they are always open.","375, 768, 992",Functional / Responsive,Medium,"footer.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-019,Global shell (all templates),Share / scroll-top,Floating share + scroll-top dock,Share menu and back-to-top work,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll down 2 screens: the share / scroll-top dock appears.
+4. Click Share: the network links show (Facebook, X, LinkedIn, e-mail, copy link).
+5. Click a network link: a share window opens with the page URL.
+6. Click scroll-top: the page returns to the top.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/",Dock position and behaviour equal the source; share URLs carry the demo page URL.,"375, 768, 992, 1080, 1280, 1440",Functional,Medium,"social-share.md, SKODA-215; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-020,Global shell (all templates),Media cart,Cart badge,Adding an item updates the cart badge and persists,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. On Images, click ""+"" on 2 cards.
+4. Check the header cart badge shows 2.
+5. Reload: the badge still shows 2.
+6. Click the badge: the media cart opens.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/images,https://www.skoda-storyboard.com/en/images/,"Badge count = items added, persists after reload, opens /en/media-cart.","1280, 1440",Functional,High,"media-cart.md; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-021,Global shell (all templates),Cookie consent,Consent banner,Cookie banner shows on first visit and can be managed,Fresh profile (no cookies).,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the home page in a new incognito window.
+4. Check the cookie banner appears; click Accept / Reject.
+5. Reload: the banner does not come back.
+6. Click the cookie settings link in the footer: the preferences open.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Banner behaviour equals the source; the choice is remembered.,"1280, 1440",Functional / Compliance,Medium,"#363; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-022,Global shell (all templates),Accessibility,Skip link,"""Skip to content"" link moves focus to main",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Load the page and press Tab once.
+4. Check ""Skip to content"" appears; press Enter.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/",The skip link is the first focusable element; Enter moves focus to <main>.,"1280, 1440",Accessibility,Medium,"#85; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-023,Global shell (all templates),Accessibility,Heading outline,h1–h6 sequence equals the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. On main and source run: [...document.querySelectorAll(""h1,h2,h3,h4,h5,h6"")].map(h=>h.tagName+"" ""+h.innerText.trim())
+4. Compare the two lists level by level.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/",Same levels and texts in the same order. Any level mismatch is a defect unless the ticket records an accepted exception.,"1280, 1440",Accessibility / SEO,High,"AGENTS.md review step 5, #507, #508; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-024,Global shell (all templates),Accessibility,Lighthouse accessibility,No new accessibility failures,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 1280.
+3. Run Lighthouse > Accessibility (desktop and mobile) on each template URL.
+4. Compare failed audits with the source.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/news","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/news/","No new failed audits versus the source (contrast, names, ARIA, landmarks).","375, 1280",Accessibility,Medium,"AGENTS.md review step 5; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-025,Global shell (all templates),Responsive,"No horizontal scroll, no broken images",Page fits the viewport and every image loads,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375.
+3. At 375 run: document.documentElement.scrollWidth > clientWidth.
+4. Scroll to the bottom; in Console list images with complete && naturalWidth===0.
+5. Check Network for 404s.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/images","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/images/",No horizontal scroll; 0 broken images; 0 failed requests (other than tracking).,375,Responsive,High,"header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-026,Global shell (all templates),Performance,Core Web Vitals,LCP and CLS within targets,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375.
+3. Run Lighthouse > Performance (mobile) 3 times; take the median.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en
+https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/news","https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/news/",CLS < 0.1; LCP not worse than the source; no layout jump when rails / listings load.,375,Performance,Medium,"#375, #494; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-GL-027,Global shell (all templates),Links,Migrated vs not-migrated links,Links to migrated pages stay on the demo,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. On the page, list all links in <main> (href).
+4. Click 3 links to migrated pages and 1 to a page that is not migrated.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/","Migrated targets open on the demo (relative path, same tab). Not-migrated targets open the source (absolute URL), as decided per ticket.","1280, 1440",Functional,Medium,"#485, #499; header-megamenu.md, mobile-nav.md, footer.md, footer-mediaroom.md, language-switcher.md, social-share.md",,Not Run,,,,,
+TC-HM-001,Storyboard home,Promo box,Featured stories slider,"Promo slider shows the featured stories, arrows / dots work",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the home at 1280.
+4. Compare the first 3 promo slides (title, image, category) with the source.
+5. Click Next / Prev and a dot; check the slide changes.
+6. Check the pause button (if the source has one) pauses rotation.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Same slides and order as the source; controls work by mouse and keyboard; layout stays stable after each click.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"template-home.md; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-002,Storyboard home,Latest Stories,Feed and Load more,Latest Stories list and Load more,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Scroll to ""Latest Stories"".
+4. Count the cards and note the first 3 titles.
+5. Click ""Load more"" until it disappears; count the cards after each click.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,First cards = source (newest first); Load more appends the same number of cards as the source; no duplicates.,"1280, 1440",Functional / Content,High,"stories.md, SKODA-214; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-003,Storyboard home,Category rails,eMobility / Lifestyle / Škoda World rails,Rail cards and Prev / Next,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. For each category rail note the heading level and first 4 cards.
+4. Click Next, then Prev.
+5. After each click re-check the layout (card widths, arrow positions).
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Heading level (h3), cards and order equal the source; arrows show icons and move one page; no empty arrow buttons.","375, 768, 992, 1080, 1280, 1440",Functional / UI,High,"carousel-rails.md, #361; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-004,Storyboard home,Models rail,Models tiles,Model tiles list and links,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Scroll to ""Models"".
+4. List the tiles in order and click 2 of them.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Tiles = Elroq, Kodiaq, Enyaq, Karoq, Kamiq, Scala, Fabia, Superb, Octavia, Epiq, Peaq (source order); each opens its model page (200).","1280, 1440",Functional / Content,Medium,"template-home.md; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-005,Storyboard home,Social media,Social handles block,Social media handles and links,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Scroll to ""Social media"".
+4. Check handles @skodaglobal / @skodagram / @skoda and click each.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Handles and icons equal the source; links open the network in a new tab.,"1280, 1440",Functional,Low,"P4 note: handle is span on main, h3 on source; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-006,Storyboard home,Card teaser,Card anatomy,"Card image ratio, title clamp, label and date",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure 3 cards: image width × height, title font-size / line-height / lines, category label, date format.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,"Values equal the source ±1px; dates use ""dd. mm. yyyy""; long titles clamp with ""…"" like the source.","375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"card-teaser.md; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-007,Storyboard home,Layout,Page geometry,Home height and section order equal the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll to the bottom to load everything; measure document.documentElement.scrollHeight.
+4. List the sections in order.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Same sections in the same order; page height within ±1px at 1280 (measured 4734 / 4734 on 29 Oct).,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"template-home.md; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-HM-008,Storyboard home,Content,Freshness,Newest stories equal the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Compare the newest 3 stories in the promo box and Latest Stories with the source.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en,https://www.skoda-storyboard.com/en/,Newest items are the same as the source (content import / feed is current).,"1280, 1440",Content,High,"#342, #447; template-home.md, stories.md, carousel-rails.md",,Not Run,,,,,
+TC-MRH-001,Media Room home,Promo box,Featured press content,Media Room promo box equals the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the Media Room home.
+4. Compare promo slides and controls with the source; click Next / Prev.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,"Same slides, order and controls; layout stable after clicks.","375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"template-home.md; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-002,Media Room home,News rail,Press-release rail,"News rail cards, dates and Prev / Next",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Note the first 4 News cards (title, date).
+4. Click Next / Prev and re-check the layout.
+5. Click a card: the press release opens (200).
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,"Cards, dates and order equal the source; arrows work; links stay on the demo.","375, 768, 992, 1080, 1280, 1440",Functional,High,"carousel-rails.md; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-003,Media Room home,Images / Videos rails,Media rail title clamp,Media card titles show at most 2 full lines,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 390, 768, 992, 1080.
+3. On the Images and Videos rails, check every visible title: no partial 3rd line visible.
+4. Measure the title box (36px + 10px margin) and the card size.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,"Max 2 lines ending with ""…""; card size = source (e.g. 223 × 265.4 at 1080).","390, 768, 992, 1080",UI (measured),Medium,"#466; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-004,Media Room home,Images / Videos rails,Add to cart and download,"Media card ""+"" and download sizes",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Hover an image card: click ""+""; check the cart badge increments.
+4. Open the download menu and click each size; check the file downloads (200).
+5. On a video card, repeat while the video is playing.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,Cart and downloads work like the source; every size returns a file.,"1280, 1440",Functional,High,"media-cart.md, downloads.md; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-005,Media Room home,Lightbox,Image / video lightbox,"Lightbox opens, navigates and closes",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click an image card: lightbox opens.
+4. Use the arrows and keyboard ← → to move; check the counter.
+5. Press Escape: lightbox closes and focus returns to the card.
+6. Open a video card: it plays in the lightbox.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,Same behaviour as the source; focus returns to the trigger.,"1280, 1440",Functional / Accessibility,High,"gallery-lightbox.md; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-006,Media Room home,Dark bands,Cover-box dark sections,Dark section colour and full-bleed width,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Measure the dark band background-color and its left / width at 1280 and 1440.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,Background #0e3a2f; band spans the full viewport width (0 + 1280 / 0 + 1440) like the source.,"1280, 1440",UI (measured),Medium,"template-home.md; template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-MRH-007,Media Room home,Layout,Page geometry and outline,"Section order, heights and heading outline",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure scrollHeight at each band; list the h1–h6 outline.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,Same sections and heading levels; height within ±1px.,"375, 768, 992, 1080, 1280, 1440",UI (measured) / Accessibility,Medium,"template-home.md, carousel-rails.md, card-teaser.md",,Not Run,,,,,
+TC-ST-001,Story detail,Hero,Story hero,"Hero image, h1, category and date",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the story.
+4. Measure the hero image box, h1 font (family / size / line-height / weight / colour), category label and date.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/","Values equal the source ±1px; h1 text identical; date ""dd. mm. yyyy"".","375, 768, 992, 1080, 1280, 1440",UI (measured),High,"story-detail.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-002,Story detail,Layout,Two-column shell,"Content 66.66% / sidebar 33.33%, stacks under 768",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. At 1280 measure the main column and sidebar widths.
+4. At 375 check the sidebar is below the content.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Column widths equal the source; one column under 768px.,"375, 768, 992, 1080, 1280, 1440",UI (measured) / Responsive,High,"_TEMPLATES.md shared shell; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-003,Story detail,Body,Body text,Body paragraph typography and spacing,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure the first 2 body paragraphs: font, size, line-height, colour, margin.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,"Equal to the source (e.g. Skoda Next 16px / 24px 400 rgb(22, 23, 24)).","375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"story-detail.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-004,Story detail,Image slider,Story gallery slider,"Slider arrows, counter, swipe; no auto-rotation",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Click Next / Prev on the photo slider; check the counter.
+4. At 375 swipe left / right.
+5. Wait 7 s without touching: the slide must not change.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones/",Arrows show icons and move one slide; no pause button and no auto-rotation (accepted deviation #361).,"375, 768, 992, 1080, 1280, 1440",Functional,High,"story-image-carousel.md, #361, #456; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-005,Story detail,Image slider,Slide height on mobile,Each slide keeps its image ratio at 375,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375.
+3. At 375 measure the height of each slide image.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Heights follow each photo's ratio like the source (182–337px); not a fixed 215px for every slide.,375,UI (measured) / Responsive,Medium,"Open defect (sweep 29 Oct); story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-006,Story detail,Lightbox,Gallery lightbox,Clicking a story image opens the lightbox,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click a gallery image: lightbox opens.
+4. Navigate with arrows and ← →; press Escape.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Lightbox like the source; Escape closes; focus returns to the image.,"1280, 1440",Functional / Accessibility,Medium,"gallery-lightbox.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-007,Story detail,Embeds,Video embeds,YouTube / Vimeo / MP4 embeds play,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Find the embedded video; click Play.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling,https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/,Video plays inline as on the source; consent behaviour is the same.,"1280, 1440",Functional,Medium,"embeds.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-008,Story detail,Highlight,In-column dark panel,Highlight panel style,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure the highlight panel: background, padding, font.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Equal to the source.,"375, 768, 992, 1080, 1280, 1440",UI (measured),Low,"highlight.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-009,Story detail,Quote,Quote block,Quote text and author name style,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Find the quote; measure the quote text and the author name (font-size / weight).
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-comfort-just-like-at-home
+https://main--demo--skoda-storyboard.aem.live/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling","https://www.skoda-storyboard.com/en/emobility/meet-the-peaq-comfort-just-like-at-home/
+https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/",Author name bold like the source (16px / 600); quote text equal.,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"Open defect (sweep 29 Oct); story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-010,Story detail,Sidebar,Explore more,Explore more teasers and heading levels,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. In the sidebar compare the ""Explore more"" teasers (titles, images, links).
+4. Check the heading levels of the section and the teaser titles.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france/","Same teasers; section h3 and teaser titles h2, like the source.","1280, 1440",Content / Accessibility,High,"#507, #508; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-011,Story detail,Sidebar,Tags,Tag list and tag links,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Compare the tags list; click 2 tags.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Same tags; each opens its tag archive on the demo (200).,"1280, 1440",Functional,Medium,"tags.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-012,Story detail,Media Box,Story Media Box,"Media Box tiles, dates, title clamp, cart and downloads",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll to Media Box; count tiles and dates.
+4. Check titles: no partial 3rd line.
+5. Click ""+"" (cart badge increments) and each download size (file 200).
+6. Measure the band left + width at 1280 / 1440.
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones
+https://main--demo--skoda-storyboard.aem.live/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones/
+https://www.skoda-storyboard.com/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france/",Tile count and dates = source; titles clamp cleanly; cart / download work; band full width (0 + 1280 / 0 + 1440).,"375, 768, 992, 1080, 1280, 1440",Functional / UI (measured),High,"#293, #295, downloads.md; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-013,Story detail,Related Stories,Related band,"Related Stories band, ""Based on tags"" and rail",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll to ""Related Stories"".
+4. Compare the 4 cards and the ""Based on tags"" line.
+5. Click Next / Prev; measure the band width.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour/",Band present with the same cards as the source; full width; arrows work.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"#293, #506; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-014,Story detail,Newsletter,Story newsletter card,Newsletter card shows on EN / CS stories only,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Check the newsletter card in the sidebar (EN).
+4. Open a DE story: no newsletter card (as on the source).
+5. Click the card CTA.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/","Shown on EN / CS, not on DE / SK / SR; CTA opens the newsletter page.","1280, 1440",Functional,Low,"#485, #365; story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-ST-015,Story detail,Layout,Page geometry,Story height and section order,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll to the bottom; measure scrollHeight at 1280 and 375; list the sections.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds,https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/,Same sections in the same order; height difference explained by content only (record Δ).,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"story-detail.md, story-image-carousel.md, highlight.md, tags.md, downloads.md",,Not Run,,,,,
+TC-PR-001,Press release,Title area,Text title (no hero),"h1, date and lead text",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the press release; measure the h1, date and lead / perex text styles.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs","https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/","No hero image; h1, date and lead equal the source (text and measured style).","375, 768, 992, 1080, 1280, 1440",UI (measured),High,"template-press-release.md, SKODA-607; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-002,Press release,Body,"Body, bullet points and links","Body text, bullets and link colours",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure body paragraph and bullet styles.
+4. Hover a body link: check colour green → ink on hover.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company,https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/,"Equal to the source; links green, ink on hover.","375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"#386; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-003,Press release,Highlight,Grey callout,Grey highlight callout style,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure the grey callout background / padding / font.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs,https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/,Equal to the source.,"375, 768, 992, 1080, 1280, 1440",UI (measured),Low,"highlight.md; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-004,Press release,Media kit,Downloads / media kit (secondary column),PDF card and image downloads,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. In the secondary column, check the PDF card icon (size / colour) and click it: the PDF opens / downloads (200).
+4. On an image tile click ""+"" and each download size.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs","https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",PDF icon and card equal the source; files return 200; cart badge increments.,"1280, 1440",Functional / UI,High,"#274, downloads.md; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-005,Press release,Sidebar,Tags and newsletter,Tags and newsletter box in the secondary column,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Compare tags and the newsletter box; click a tag and the newsletter CTA.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company,https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/,Same content and links as the source.,"1280, 1440",Functional,Medium,"template-press-release.md; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-006,Press release,Related,Related Press Releases band,"Full-bleed dark band, ""Based on tags"", Prev / Next",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Scroll to ""Related Press Releases"".
+4. Measure band background and width; compare cards; click Next / Prev.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs","https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",Dark band full width; same cards as the source; arrows work.,"375, 768, 992, 1080, 1280, 1440",Functional / UI (measured),High,"template-press-release.md; template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-007,Press release,Layout,Two-column and mobile stack,"Columns at desktop, stack under 768",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure primary / secondary widths at 1280; check stacking at 375.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company,https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/,Equal to the source.,"375, 768, 992, 1080, 1280, 1440",Responsive,Medium,"template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-PR-008,Press release,Layout,Page geometry and outline,Height ±1px and heading outline,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure scrollHeight at 1280 / 375; list h1–h6.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company
+https://main--demo--skoda-storyboard.aem.live/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs","https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",Height within ±1px (936 km PR: record known −43px); heading levels equal the source.,"375, 768, 992, 1080, 1280, 1440",UI (measured) / Accessibility,Medium,"template-press-release.md, downloads.md, highlight.md",,Not Run,,,,,
+TC-MD-001,Model page,Hero,Model hero carousel,Hero image carousel and model name overlay,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the model page; compare hero images and name overlay; click the carousel arrows.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb","https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/",Same images and order; arrows work; overlay text equal.,"375, 768, 992, 1080, 1280, 1440",Functional / UI,High,"template-model-page.md, SKODA-208; template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-002,Model page,Section nav,Icon section-nav (desktop),In-page anchors scroll to each section,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 768, 1280.
+3. At 1280 click each of the 8 icons in the section nav.
+4. At 768 check the nav is hidden (desktop-only).
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq,https://www.skoda-storyboard.com/en/skoda-model/epiq/,Each click scrolls to the matching section; hidden on smaller screens like the source.,"768, 1280",Functional,Medium,"template-model-page.md; template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-003,Model page,Content,"Model description, Highlights, Technical data",Description and data sections present,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Compare ""Model Description"", Highlights and Technical Data text and tables with the source.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/peaq","https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/peaq/",All sections present with the same content.,"1280, 1440",Content,High,"#495; template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-004,Model page,Rails,5 related rails,News / Press Kits / Stories / Images / Videos rails,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. For each rail: compare the ""Based on tags"" line and count the cards (click Next to the end).
+4. Re-check the layout after each Next / Prev.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/octavia","https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/
+https://www.skoda-storyboard.com/en/skoda-model/octavia/","Card counts and order equal the source (e.g. Superb News 10, Press Kits 10); arrows work.","375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"template-model-page.md, open sweep defect (Superb); template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-005,Model page,Rails,"Media rails: clamp, cart and download",Images / Videos cards on model page,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 390, 768, 992, 1080.
+3. Check title clamp (no partial 3rd line).
+4. Click ""+"" and a download size.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/peaq","https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/peaq/",Titles clamp at 2 lines; cart and downloads work.,"390, 768, 992, 1080",Functional / UI,Medium,"#466; template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-006,Model page,Rails,Rail language mix,Rails show the same items as the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Compare Press Kits / Stories rails with the source (source may include SK / SR items).
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq,https://www.skoda-storyboard.com/en/skoda-model/epiq/,Record differences; EN-only rails are a PO decision (P4).,"1280, 1440",Content,Low,"P4 PO decision; template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-007,Model page,Layout,Page geometry and outline,Height and heading outline,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure scrollHeight at 1280; list h1–h6.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/skoda-model/epiq
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb
+https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-fabia","https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/
+https://www.skoda-storyboard.com/en/skoda-model/new-fabia/",Height equals the source (Epiq / Peaq known −74px); same heading levels.,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-MD-008,Model page,Sub-model,Derivative pages,Sub-model page loads and links back,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a derivative page; check hero, content and rails.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/skoda-model/elroq/elroq-rs,https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-rs/,Page equals the source.,"1280, 1440",Functional,Low,"template-model-page.md, carousel-rails.md",,Not Run,,,,,
+TC-CT-001,Category / tag listing,Hero,Category title,Hero / h1 equals the category name,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the category page; compare the h1 and hero.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/category/emobility
+https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle","https://www.skoda-storyboard.com/en/category/emobility/
+https://www.skoda-storyboard.com/en/category/lifestyle/",h1 text and style equal the source.,"375, 768, 992, 1080, 1280, 1440",UI (measured),High,SKODA-209; template-category-archive.md,,Not Run,,,,,
+TC-CT-002,Category / tag listing,Grid,Card grid,"Cards, order and grid columns",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Count the cards on the first page; compare the first 6 titles and order.
+4. Measure the grid columns at each band.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/category/emobility,https://www.skoda-storyboard.com/en/category/emobility/,"Same cards, newest first; same number of columns per band.","375, 768, 992, 1080, 1280, 1440",Content / Responsive,High,template-category-archive.md; template-category-archive.md,,Not Run,,,,,
+TC-CT-003,Category / tag listing,Paging,Pagination / Load more,Next page loads more cards,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click Load more / page 2; count the new cards; check no duplicates.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/category/emobility,https://www.skoda-storyboard.com/en/category/emobility/,Same behaviour and counts as the source.,"1280, 1440",Functional,High,template-category-archive.md,,Not Run,,,,,
+TC-CT-004,Category / tag listing,Sub-category,Sub-category archive,Sub-category page lists only its stories,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a sub-category; compare h1 and cards.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle/adventures
+https://main--demo--skoda-storyboard.aem.live/en/category/skoda-world/design","https://www.skoda-storyboard.com/en/category/lifestyle/adventures/
+https://www.skoda-storyboard.com/en/category/skoda-world/design/",Equal to the source.,"1280, 1440",Content,Medium,template-category-archive.md,,Not Run,,,,,
+TC-CT-005,Category / tag listing,Tag archive,Tag pages,Tag archive lists tagged items,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a model tag and a year tag; compare h1 and cards.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/tag/model/elroq
+https://main--demo--skoda-storyboard.aem.live/en/tag/years/2026","https://www.skoda-storyboard.com/en/tag/model/elroq/
+https://www.skoda-storyboard.com/en/tag/years/2026/",Equal to the source; no facet panel (archives have no facets).,"1280, 1440",Content,Medium,template-category-archive.md; template-category-archive.md,,Not Run,,,,,
+TC-FL-001,Faceted listing (News / Images / Videos / Search / Press Kits),News,Default list,News lists press releases newest first,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open News; count cards; compare the first 6 titles and dates.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/news,https://www.skoda-storyboard.com/en/news/,Same items and order as the source (e.g. 12 cards + Load more).,"1280, 1440",Content,High,"SKODA-402; faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-002,Faceted listing (News / Images / Videos / Search / Press Kits),Sort,Newest / Oldest,Sort switches the order,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click ""Oldest"": check the first card date; click ""Newest"".
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/news
+https://main--demo--skoda-storyboard.aem.live/en/images","https://www.skoda-storyboard.com/en/news/
+https://www.skoda-storyboard.com/en/images/",Order reverses like the source; URL / state updates.,"1280, 1440",Functional,High,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-003,Faceted listing (News / Images / Videos / Search / Press Kits),Search box,In-listing search,Search box filters the listing,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Type ""superb"" in the listing search; press Enter.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/news,https://www.skoda-storyboard.com/en/news/,Results and count equal the source for the same term.,"1280, 1440",Functional,High,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-004,Faceted listing (News / Images / Videos / Search / Press Kits),Facets,Advanced search panel,"Facets filter, count badge, clear",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click ""Advanced search""; select a model and a year.
+4. Check the badge ""(n)"" and the results.
+5. Clear the filters.
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/news
+https://main--demo--skoda-storyboard.aem.live/en/images","https://www.skoda-storyboard.com/en/news/
+https://www.skoda-storyboard.com/en/images/",Facet values and result counts equal the source; clear restores the default list.,"1280, 1440",Functional,High,"faceted-listing.md; faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-005,Faceted listing (News / Images / Videos / Search / Press Kits),Empty state,No results,No-results message,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Search a nonsense term (e.g. ""zzqxw"").
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/news,https://www.skoda-storyboard.com/en/news/,"Message ""No results – clear filters…"" (grey-600, 4.54:1), same text as the source.","1280, 1440",Negative,Medium,"#485; faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-006,Faceted listing (News / Images / Videos / Search / Press Kits),Load more,Load more,Load more appends items,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click Load more twice; count the cards after each click.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/news
+https://main--demo--skoda-storyboard.aem.live/en/images
+https://main--demo--skoda-storyboard.aem.live/en/videos","https://www.skoda-storyboard.com/en/news/
+https://www.skoda-storyboard.com/en/images/
+https://www.skoda-storyboard.com/en/videos/",Same page size as the source; no duplicates; button hides at the end.,"1280, 1440",Functional,High,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-007,Faceted listing (News / Images / Videos / Search / Press Kits),Images,"Image grid, lightbox, cart, downloads",Image card actions,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click an image: lightbox opens; navigate; Escape.
+4. Click ""+"": cart badge increments.
+5. Download each size (200).
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/images,https://www.skoda-storyboard.com/en/images/,Same behaviour as the source.,"1280, 1440",Functional,High,"gallery-lightbox.md, media-cart.md; faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-008,Faceted listing (News / Images / Videos / Search / Press Kits),Videos,Video play and download,Video plays; downloads work while playing,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open a video; play it.
+4. While it plays, open the download menu and download a size.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/videos,https://www.skoda-storyboard.com/en/videos/,Video plays; downloads return files; playback continues.,"1280, 1440",Functional,High,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-009,Faceted listing (News / Images / Videos / Search / Press Kits),Search page,Site search results,Search page results and tabs,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open /en/search?filter[search]=epiq.
+4. Check the results count text and the type tabs; switch tabs.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/search?filter[search]=epiq,https://www.skoda-storyboard.com/en/search/?filter[search]=epiq,"Count text, tabs and first results equal the source.","1280, 1440",Functional,High,"SKODA-402; faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-010,Faceted listing (News / Images / Videos / Search / Press Kits),State,"URL state, reload and Back",Filters persist on reload and Back,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Apply a filter; reload; then open a card and press Back.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/news,https://www.skoda-storyboard.com/en/news/,Filters and scroll position are restored like the source.,"1280, 1440",Functional,Medium,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-011,Faceted listing (News / Images / Videos / Search / Press Kits),Press Kits,Press kits listing,Press kits listing items,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open Press Kits; compare cards and order; click a card.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-kits,https://www.skoda-storyboard.com/en/press-kits/,Same items; card opens the press kit (200).,"1280, 1440",Content,Medium,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-FL-012,Faceted listing (News / Images / Videos / Search / Press Kits),Layout,Geometry at all bands,Listing heights and columns,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure scrollHeight and grid columns at each band.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/images
+https://main--demo--skoda-storyboard.aem.live/en/videos","https://www.skoda-storyboard.com/en/images/
+https://www.skoda-storyboard.com/en/videos/",Within ±1px (measured 2140 / 2139 at 1280).,"375, 768, 992, 1080, 1280, 1440",UI (measured),Medium,"faceted-listing.md, media-cart.md, gallery-lightbox.md",,Not Run,,,,,
+TC-MC-001,Media cart,Cart,Items in cart,Cart lists the added items,Add 2 images + 1 video from Images / Videos first.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the media cart.
+4. Check the 3 items (thumbnail, title, type).
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-cart,https://www.skoda-storyboard.com/en/media-cart/,"All added items are listed, the same as on the source.","1280, 1440",Functional,High,media-cart.md; media-cart.md,,Not Run,,,,,
+TC-MC-002,Media cart,Cart,Remove item,Removing an item updates list and badge,Cart has items.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Remove one item.
+4. Check the list and the header badge.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-cart,https://www.skoda-storyboard.com/en/media-cart/,Item removed; badge decrements; persists after reload.,"1280, 1440",Functional,High,media-cart.md,,Not Run,,,,,
+TC-MC-003,Media cart,Cart,Download cart,Download selected / all,Cart has items.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click download (all / selected).
+4. Check the file / ZIP.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-cart,https://www.skoda-storyboard.com/en/media-cart/,Download returns the files like the source.,"1280, 1440",Functional,High,media-cart.md,,Not Run,,,,,
+TC-MC-004,Media cart,Cart,Empty cart,Empty state,Cart empty.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the media cart with no items.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-cart,https://www.skoda-storyboard.com/en/media-cart/,Empty-state message equals the source.,"1280, 1440",Negative,Low,media-cart.md,,Not Run,,,,,
+TC-CO-001,Company pages,Contacts,Contact directory,"Contacts: groups, portraits, mailto / tel / LinkedIn",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open Contacts; compare groups and people.
+4. Click a mailto, a tel: and a LinkedIn link.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/contacts,https://www.skoda-storyboard.com/en/contacts/,Same content; mailto / tel open the client; LinkedIn opens in a new tab; text boxes equal the source.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"#71 (SKODA-810); company-pages.md, template-page-base.md",,Not Run,,,,,
+TC-CO-002,Company pages,Board of Management,Executive bios,"Bio toggles, gallery lightbox, CV links",Page on preview until published.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the preview URL.
+4. Toggle each bio with mouse, Enter and Space (aria-expanded).
+5. Open a photo lightbox (""3 / 6"" → ""4 / 6""); press Escape.
+6. Click CV / photo-set links (new tab, 200).
+7. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.page/en/board-of-management,https://www.skoda-storyboard.com/en/board-of-management/,Toggles and lightbox work; focus returns; links 200.,"375, 768, 992, 1080, 1280, 1440",Functional / Accessibility,High,"#71; company-pages.md, template-page-base.md",,Not Run,,,,,
+TC-CO-003,Company pages,Company logo,Brand assets,Logo tiles and PDF / PNG downloads,Page on preview until published.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the preview URL; count tiles.
+4. Download a PDF and a PNG.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.page/en/company-logo,https://www.skoda-storyboard.com/en/company-logo/,18 tiles; downloads open in a new tab and return 200.,"375, 768, 992, 1080, 1280, 1440",Functional,Medium,"#71; company-pages.md, template-page-base.md",,Not Run,,,,,
+TC-CO-004,Company pages,Mobile app,App promo page,QR codes and store badges,Open via Media Room menu > Company > Mobile App.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Check the QR codes, store badges and banner alt text.
+4. Click each store badge.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,Equal to the source; store links open.,"375, 768, 992, 1080, 1280, 1440",Functional,Low,"#71; company-pages.md, template-page-base.md",,Not Run,,,,,
+TC-CO-005,Company pages,Newsletter,Newsletter page,Newsletter page cards and links,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open Newsletter; compare the cards (3 + 3) and click each CTA.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/newsletter,https://www.skoda-storyboard.com/en/newsletter/,Same cards and heights as the source; CTAs work; Media Room menu link opens it.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"#365; company-pages.md, template-page-base.md",,Not Run,,,,,
+TC-GP-001,Generic page,Content,Generic page shell,"Title, rich text, links and tables",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open each generic page; compare h1, text, lists and tables.
+4. Click every link in the content.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/copyright
+https://main--demo--skoda-storyboard.aem.live/en/impressum
+https://main--demo--skoda-storyboard.aem.live/en/documents/cookies
+https://main--demo--skoda-storyboard.aem.live/en/terms-and-conditions-2","https://www.skoda-storyboard.com/en/copyright/
+https://www.skoda-storyboard.com/en/impressum/
+https://www.skoda-storyboard.com/en/documents/cookies/
+https://www.skoda-storyboard.com/en/terms-and-conditions-2/",Content equals the source; 0 broken links.,"375, 768, 992, 1080, 1280, 1440",Content,Medium,"SKODA-813, #363; template-page-base.md",,Not Run,,,,,
+TC-GP-002,Generic page,Redirects,IIHF section redirects + legal pages,IIHF roots redirect; IIHF legal pages open,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open /en/iihf, /en/iihf/, /en/iihf/lv and /en/iihf/ru; check the status and final URL in Network.
+4. Open the IIHF terms and picture-guidelines pages; compare content with the source.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/iihf
+https://main--demo--skoda-storyboard.aem.live/en/iihf/terms-and-conditions
+https://main--demo--skoda-storyboard.aem.live/en/iihf/picture-guidelines","https://www.skoda-storyboard.com/en/iihf/
+https://www.skoda-storyboard.com/en/iihf/terms-and-conditions/
+https://www.skoda-storyboard.com/en/iihf/picture-guidelines/",IIHF roots: 301 to the source hockey story (approved on #363). Legal pages: 200 with the same content as the source.,"1280, 1440",Functional,Low,#363; template-page-base.md,,Not Run,,,,,
+TC-GP-003,Generic page,Layout,Page shell geometry,"Hero, content width and footer",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Measure the content width and text styles at each band.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/copyright,https://www.skoda-storyboard.com/en/copyright/,Equal to the source.,"375, 768, 992, 1080, 1280, 1440",UI (measured),Low,#74; template-page-base.md,,Not Run,,,,,
+TC-SE-001,Series directory + series hub,Directory,Series directory,Series cards with excerpts,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the series directory; count cards; compare titles and excerpts; click 2 cards.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/series-2,https://www.skoda-storyboard.com/en/series-2/,Same series cards (25) and order; links open the hubs (200).,"375, 768, 992, 1080, 1280, 1440",Content,Medium,SKODA-207; series.md,,Not Run,,,,,
+TC-SE-002,Series directory + series hub,Hero,Series hero,Hero title over image ≥768; image + dark caption <768,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. At 1280 measure the hero height (61.8vh) and title (white 48px).
+4. At 375 check the 16:9 image followed by the dark 48px caption.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/series/130-years
+https://main--demo--skoda-storyboard.aem.live/en/series/roads-places","https://www.skoda-storyboard.com/en/series/130-years/
+https://www.skoda-storyboard.com/en/series/roads-places/",Matches the source at both layouts; SERIES label and perex shown.,"375, 768, 992, 1080, 1280, 1440",UI (measured) / Responsive,High,"series.md, SKODA-221; series.md",,Not Run,,,,,
+TC-SE-003,Series directory + series hub,Mosaic,Curated tile mosaic,"Tile count, order and ratios",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Count the tiles; compare the order; measure 1:1 and ~2:1 tiles.
+4. Click a story tile and the Press Kits tile (130 years).
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/series/130-years
+https://main--demo--skoda-storyboard.aem.live/en/series/125-years-of-motorsport
+https://main--demo--skoda-storyboard.aem.live/en/series/unexpected-jobs
+https://main--demo--skoda-storyboard.aem.live/en/series/minutes-from-car-production","https://www.skoda-storyboard.com/en/series/130-years/
+https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/
+https://www.skoda-storyboard.com/en/series/unexpected-jobs/
+https://www.skoda-storyboard.com/en/series/minutes-from-car-production/","Tile counts (8 / 14 / 10 / 5 / 12), editorial order and ratios equal the source; height 0px difference.","375, 768, 992, 1080, 1280, 1440",Content / UI (measured),High,series.md; series.md,,Not Run,,,,,
+TC-PK-001,Press kit (hub + chapter),Hub,Press kit hub tiles,Hero + tile grid equal the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the hub; list every tile in order; click each tile.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/125-years-of-skoda-motorsport-press-kit","https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/","Same tiles and order (incl. ""Škoda Epiq Sportline"" on the Epiq hub); each opens (200).","375, 768, 992, 1080, 1280, 1440",Content,High,"SKODA-805, open sweep defect (Epiq Sportline); press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-PK-002,Press kit (hub + chapter),Hub,WhatsApp / ZIP row,Share and ZIP download row,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click the WhatsApp link and the ZIP download.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2","https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/",Same targets as the source; ZIP downloads (200).,"1280, 1440",Functional,Medium,"press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-PK-003,Press kit (hub + chapter),Hub,Media Box band width,Media Box band full width on press kit,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Scroll to Media Box; measure band left + width at 1280 / 1440 / 1920.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship,https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/,Band 0 + full width like the source (not 1248px).,"1280, 1440",UI (measured),Medium,"Open sweep defect; press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-PK-004,Press kit (hub + chapter),Chapter,Chapter page,"Chapter nav, variant selector, technical data",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open a chapter page; use the chapter nav and the variant selector.
+4. Compare tables / text.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/technical-data
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/technical-data","https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/technical-data/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/technical-data/",Navigation and data equal the source.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,High,"SKODA-806–808; press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-PK-005,Press kit (hub + chapter),Chapter,FAQ accordion,Accordion opens / closes by mouse and keyboard,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click a question; press Enter / Space on another; check aria-expanded.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2,https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/,Toggles like the source; accessible by keyboard.,"1280, 1440",Functional / Accessibility,Medium,"faq-accordion.md; press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-PK-006,Press kit (hub + chapter),Chapter,Gallery chapter,Videos / infographics chapter media,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the videos chapter; play a video; download a file.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/videos
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/infographics","https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/videos/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/infographics/",Media and downloads equal the source.,"1280, 1440",Functional,Medium,"press-kit-media.md; press-kit-template.md, press-kit-media.md, press-kit-variant.md, faq-accordion.md",,Not Run,,,,,
+TC-ER-001,Branded 404,404,Real 404 with branded content,Unknown URL shows the branded 404,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open an unknown URL; check status 404 in Network.
+4. Reload 3–4 times (two random variants).
+5. Click ""return to the homepage"".
+6. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/does-not-exist,https://www.skoda-storyboard.com/en/does-not-exist/,"HTTP 404; header + footer kept; one of the source's two variants (e.g. ""Welcome to our remote car park…""); homepage link opens /en.","375, 768, 992, 1080, 1280, 1440",Functional / Negative,Medium,"#76, SKODA-706; template-404.md",,Not Run,,,,,
+TC-ER-002,Branded 404,404,Encoded / odd URLs,"URL with %20 or ""..."" still shows the branded 404",Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open /en/does%20not%20exist and /en/test... .
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/does%20not%20exist,https://www.skoda-storyboard.com/en/does%20not%20exist/,Branded 404 page (not a plain-text 404).,"1280, 1440",Negative,Low,#76; template-404.md,,Not Run,,,,,
+TC-LO-001,Localization (CS / DE / SK / SR / SL),Chrome,Localized header and footer,Locale menus and footers equal the source,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the CS / DE / SK / SR story; compare the menu (Modely / Modelle / Modely / Modeli) and the footer.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund
+https://main--demo--skoda-storyboard.aem.live/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund
+https://main--demo--skoda-storyboard.aem.live/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds","https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/
+https://www.skoda-storyboard.com/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/
+https://www.skoda-storyboard.com/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/","Labels, links and order equal the source; html lang cs-CZ / de-DE / sk-SK / sr-RS.","1280, 1440",Localization,High,"#85, #485; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-002,Localization (CS / DE / SK / SR / SL),Chrome,Subscribe button per locale,Header subscribe link where the source has one,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Check the top bar: CS ""Odebírat články"", SK ""Odber noviniek""; DE / SR none.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund
+https://main--demo--skoda-storyboard.aem.live/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund","https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/
+https://www.skoda-storyboard.com/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/",Same as the source for each locale.,"1280, 1440",Localization,Medium,"#85; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-003,Localization (CS / DE / SK / SR / SL),A11y labels,Skip link and menu button labels,Accessibility labels translated,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 390, 1280.
+3. Tab once: read the skip link.
+4. At 390 read the menu button label before / after opening.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund,https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/,"CS ""Přeskočit na obsah"", ""Otevřít / Zavřít navigaci"" (and per locale as on #85).","390, 1280",Localization / Accessibility,Medium,"#85; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-004,Localization (CS / DE / SK / SR / SL),Index,Per-locale query index,Each locale has its own index without chrome rows,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Open /{cs,de,sk,sr,sl}/query-index.json.
+3. Check rows: no /nav, /footer, /media-room/nav, /media-room/footer.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs/query-index.json
+https://main--demo--skoda-storyboard.aem.live/de/query-index.json","—
+—",All 200; only real pages listed; same facet columns as EN.,—,Functional,High,"#83 (SKODA-1001); language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-005,Localization (CS / DE / SK / SR / SL),Listing,Locale listing,CS press-release listing shows Czech items,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open the CS listing; check labels and results; click Load more.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs/tiskove-zpravy
+https://main--demo--skoda-storyboard.aem.live/cs/category/e-mobilita-cs","https://www.skoda-storyboard.com/cs/tiskove-zpravy/
+https://www.skoda-storyboard.com/cs/category/e-mobilita-cs/",Czech labels and the same items as the source.,"1280, 1440",Localization / Content,High,"#83, SKODA-1004a; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-006,Localization (CS / DE / SK / SR / SL),Search,Locale search suggestions,Suggestions come from the locale index,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open search on the CS story, type ""epiq""; click a suggestion.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund,https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/,Only CS stories suggested; opens on the demo in the same tab.,"1280, 1440",Localization,High,"#499, #83; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-007,Localization (CS / DE / SK / SR / SL),hreflang,Language alternates,hreflang links on every translated page,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Run document.querySelectorAll(""link[rel=alternate][hreflang]"").length on main and source.
+4. Click each language in the switcher.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund
+https://main--demo--skoda-storyboard.aem.live/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline","https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/
+https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline/",Alternates equal the source minus versions not on the demo; switcher works.,"1280, 1440",Localization / SEO,High,"#83; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-008,Localization (CS / DE / SK / SR / SL),Homes,Language home pages,Locale homes open,Std pre-conditions (Read Me §2),"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Open /cs, /de, /sk, /sr, /sl.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".","https://main--demo--skoda-storyboard.aem.live/cs
+https://main--demo--skoda-storyboard.aem.live/de
+https://main--demo--skoda-storyboard.aem.live/sk
+https://main--demo--skoda-storyboard.aem.live/sr
+https://main--demo--skoda-storyboard.aem.live/sl","https://www.skoda-storyboard.com/cs/
+https://www.skoda-storyboard.com/de/
+https://www.skoda-storyboard.com/sk/
+https://www.skoda-storyboard.com/sr/
+https://www.skoda-storyboard.com/sl/","Each opens the language home (200), like the source.","1280, 1440",Localization,High,"#85; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-LO-009,Localization (CS / DE / SK / SR / SL),Placeholders,Author-editable labels,Editing a label in DA changes the site without a code deploy,DA access; agree a test label with Dev.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Change one CS label in the placeholders sheet in DA; preview and publish.
+4. Reload the CS page.
+5. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/cs/placeholders.json,—,The new label shows after publish with no code change; revert afterwards.,"1280, 1440",Localization / Authoring,Medium,"#492, #85; language-switcher.md, header-megamenu.md, footer.md",,Not Run,,,,,
+TC-SP-001,Škodapedia (M2),Directory,A–Z navigation,Letter nav filters the terms,Page not built on the demo yet: mark Blocked until delivered.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open Škodapedia; click letters A, K, Z.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/skodapedia,https://www.skoda-storyboard.com/en/skodapedia/,26 letters; each shows its terms like the source.,"375, 768, 992, 1080, 1280, 1440",Functional,Medium,"SKODA-206, 802; skodapedia.md",,Not Run,,,,,
+TC-SP-002,Škodapedia (M2),Term,Term detail modal,Term modal opens and closes,As above.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 1280, 1440.
+3. Click a term; read the modal; press Escape.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",https://main--demo--skoda-storyboard.aem.live/en/skodapedia,https://www.skoda-storyboard.com/en/skodapedia/,Modal content equals the source; focus returns.,"1280, 1440",Functional / Accessibility,Medium,SKODA-802; skodapedia.md,,Not Run,,,,,
+TC-CM-001,Custom microsite (deferred),Microsite,Event gallery / campaign page,Microsite content and gallery,Deferred (SKODA-210): mark Blocked until a page is delivered.,"1. Open the main URL(s) and the source URL(s) side by side (fresh incognito window, main with ?x=<random>; close cookie / newsletter pop-ups on the source).
+2. Set the viewport to: 375, 768, 992, 1080, 1280, 1440.
+3. Open the agreed microsite URL; compare content and the gallery grid; open the lightbox.
+4. Record the measured values (main vs source) in ""Actual Result""; raise a GitHub issue for any difference and enter its number in ""Defect ID"".",To be provided when delivered,—,Equal to the source.,"375, 768, 992, 1080, 1280, 1440",Functional / Content,Low,SKODA-210; custom-microsite.md,,Not Run,,,,,

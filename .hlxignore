@@ -24,3 +24,4 @@ blocks/*/metadata.json
 tools/library/
 docs/client/
 tools/i18n/
+docs/qa/
