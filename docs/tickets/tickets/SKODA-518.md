@@ -6,8 +6,7 @@
 - **Estimate:** 2 SP · AI-assisted 1–1.5d / manual 2–3d *(planning estimate, not a quote)*
 - **GitHub issue:** [#376](https://github.com/skoda-storyboard/demo/issues/376) (created 2026-10-16)
 - **Status (2026-10-29):** 🟡 Built on branch `skoda-518-manifest-ledger` (see "Implementation, 2026-10-29").
-  Open: `media:reconcile` against author (developer machine, DAM token) and the code-bus 404 check once the
-  branch is pushed. Prerequisite for the SKODA-504a bulk ingest. Design in
+  Open: `media:reconcile` against author (developer machine, DAM token). Prerequisite for the SKODA-504a bulk ingest. Design in
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3A.
 
 ## Why
@@ -42,7 +41,8 @@
 - [x] Two branches that add rows for different pages merge without a conflict in a test fixture.
 - [ ] `media:reconcile` runs against author with the DAM token on a developer machine and reports 0 unexplained
       differences for the current rows. *(Built and tested with a fake QueryBuilder; not run against author.)*
-- [ ] The ledger is not served (`curl` on the code bus path returns 404). *(`.hlxignore` added; checked after push.)*
+- [x] The ledger is not served (`curl` on the code bus path returns 404). *(2026-10-29 on the branch preview: shards
+      `00.jsonl` / `3f.jsonl` 404, `manifest-ledger.mjs` 200 after code sync.)*
 
 ## Dependencies
 SKODA-504 ✅, SKODA-503 ✅. Feeds SKODA-504a, 511, 519.
