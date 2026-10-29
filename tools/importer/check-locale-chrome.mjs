@@ -5,7 +5,8 @@
  *   - a link into another locale's tree (English included), outside the language switcher and the
  *     accepted exceptions below;
  *   - an in-site link that does not resolve (after the runtime link policy, scripts/links.js
- *     policyHref, so it reports what a visitor gets; a redirect is followed one hop). Links to the
+ *     policyHref, so it reports what a visitor gets; a redirect resolves only when it ends on a
+ *     2xx within MAX_REDIRECTS hops). Links to the
  *     live source host are not fetched: by link policy D-3 (b) they open the source in a new tab.
  *
  *   node tools/importer/check-locale-chrome.mjs [--base=https://main--demo--skoda-storyboard.aem.live]
@@ -108,9 +109,15 @@ export function sitePaths(html, base) {
     .map((c) => c.path))];
 }
 
+// redirects followed before a link counts as unresolved (the site's own chains are 1–2 hops)
+export const MAX_REDIRECTS = 5;
+
 /**
- * A path's status on `base`: HEAD, a redirect followed one hop, a network error / 429 / 5xx
- * retried twice. 0 when it never answers.
+ * A path's status on `base`: HEAD, redirects followed to their end (at most MAX_REDIRECTS hops),
+ * a network error / 429 / 5xx retried twice. Only a 2xx at the end resolves; a redirect without a
+ * Location, a loop or a chain past the limit answers with its last 3xx, so it is reported. A
+ * redirect off the demo (to the live source) leaves the site: it resolves there. 0 when a hop never
+ * answers.
  * @param {string} base
  * @param {string} path
  * @param {typeof fetch} [fetchImpl]
@@ -125,17 +132,29 @@ export async function pathStatus(base, path, fetchImpl = fetch) {
     }
     return null;
   };
-  const first = await head(`${base}${path}`);
-  if (!first) return 0;
-  if (first.status < 300 || first.status >= 400) return first.status;
-  const location = first.headers?.get?.('location');
-  if (!location) return first.status;
-  const target = new URL(location, `${base}${path}`);
-  // a redirect off the demo (to the live source) leaves the site: it resolves there
-  if (target.origin !== new URL(base).origin) return 200;
-  const second = await head(target.href);
-  return second ? second.status : 0;
+  const { origin } = new URL(base);
+  const seen = new Set();
+  let url = new URL(`${base}${path}`).href;
+  let last = 0;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
+    seen.add(url);
+    const res = await head(url);
+    if (!res) return 0;
+    last = res.status;
+    if (res.status < 300 || res.status >= 400) return res.status;
+    const location = res.headers?.get?.('location');
+    if (!location) return res.status;
+    let target;
+    try { target = new URL(location, url); } catch { return res.status; } // an unparsable Location
+    if (target.origin !== origin) return 200;
+    if (seen.has(target.href)) return res.status; // a loop
+    url = target.href;
+  }
+  return last; // past the redirect limit: the last 3xx, reported
 }
+
+/** Whether a pathStatus() result is a link that does not resolve: anything but a 2xx. */
+export const isUnresolved = (status) => !(status >= 200 && status < 300);
 
 /**
  * Checks the locales' fragments on `base`.
@@ -162,7 +181,7 @@ export async function checkFragments({ base, locales = LOCALES, fetchImpl = fetc
       }
       const html = await res.text();
       const checked = sitePaths(html, origin).map(async (p) => [p, await status(p)]);
-      const dead = (await Promise.all(checked)).filter(([, s]) => s >= 400 || s === 0);
+      const dead = (await Promise.all(checked)).filter(([, s]) => isUnresolved(s));
       results.push({
         path, links: extractHrefs(html).length, cross: crossLocaleLinks(html, locale), dead,
       });

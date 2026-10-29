@@ -79,9 +79,10 @@ CS pages, 10:36 GMT).
 - **AC3, cross-locale check:** `npm run import:chrome-check` (`tools/importer/check-locale-chrome.mjs`, tests in
   `check-locale-chrome.test.mjs`) reads the 20 fragments and fails on a link into another locale's tree (English
   included) outside the language switcher, and on an in-site link that does not resolve after the runtime link
-  policy (#542 review: the switcher is exempt by position, not by target; only the site's own hosts count; a
-  redirect is followed one hop; errors and 429s are retried). On live: no findings. Without its exceptions it reports the 8 source links below (the check is not blind
-  to them).
+  policy (#542 review: the switcher is exempt by position, not by target; only the site's own hosts count;
+  errors and 429s are retried; a redirect counts only when it ends on a 2xx within 5 hops, so a loop, a 3xx
+  without Location or a chain past the limit is a finding, with regression tests). On live: no findings. Without
+  its exceptions it reports the 8 source links below (the check is not blind to them).
 - **AC4:** the live CS Media Room page (`/cs/tiskove-zpravy`) shows the CS Media Room menu, equal to the source's.
 
 **Decisions (PO, 2026-10-28): the source's cross-locale links stay as live** (accepted in the check, `ACCEPTED`):
