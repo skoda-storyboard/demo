@@ -5,13 +5,13 @@
   "description": "Starter project for Adobe Helix",
   "scripts": {
     "lint:js": "eslint \"**/*.js\"",
-    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\" \"templates/**/*.css\"",
+    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\" \"templates/**/*.css\" \"tools/tech-data/**/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "test:blocks": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"blocks/**/*.test.mjs\"",
     "test:blocks:coverage": "node --experimental-test-coverage --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"blocks/**/*.test.mjs\"",
     "test:blocks:watch": "node --watch --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"blocks/**/*.test.mjs\"",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"templates/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\" \"tools/library/**/*.test.mjs\" \"tools/i18n/**/*.test.mjs\"",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"templates/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\" \"tools/library/**/*.test.mjs\" \"tools/i18n/**/*.test.mjs\" \"tools/tech-data/**/*.test.mjs\"",
     "media:build": "node tools/importer/media/build-media-manifest.mjs",
     "media:publish-images": "node tools/importer/media/publish-dam-images.mjs",
     "media:apply": "node tools/importer/media/apply-media-manifest.mjs",
@@ -30,7 +30,8 @@
     "prepare": "husky",
     "vendor:fflate": "cp node_modules/fflate/esm/browser.js scripts/vendor/fflate.js && cp node_modules/fflate/LICENSE scripts/vendor/fflate.LICENSE.txt",
     "library:check": "node tools/library/library-check.mjs",
-    "library:build": "node tools/library/build-library.mjs"
+    "library:build": "node tools/library/build-library.mjs",
+    "tech-data:audit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/tech-data/audit.mjs"
   },
   "repository": {
     "type": "git",

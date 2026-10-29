@@ -24,3 +24,5 @@ blocks/*/metadata.json
 tools/library/
 docs/client/
 tools/i18n/
+tools/tech-data/*.test.mjs
+tools/tech-data/audit.mjs

@@ -7,8 +7,11 @@
 - **Estimate:** 5 SP · AI-assisted 4–5d / manual 7–9d, excluding the client's data-owner answer *(planning
   estimate, not a quote)*. Demo cut (sheet, rules, Preflight, audit, page script; picker after): ≈3d AI-assisted.
 - **GitHub issue:** [#544](https://github.com/skoda-storyboard/demo/issues/544) (created 2026-10-28)
-- **Status (2026-10-28):** 🔵 TODO, ticket only (no code). No owner. Source: read-only audit of the 23 live model
-  pages against their own technical-data PDFs (below).
+- **Status (2026-10-29):** 🟡 code on branch `skoda-852-tech-data`, ready for QA. The DA steps are not done:
+  the sheet upload, the two config rows and the draft copies wait for a go-ahead.
+  - Source of the findings: a read-only audit of the 23 live model pages against their own technical-data PDFs
+    (below).
+  - Developer notes: [Delivered](#delivered-2026-10-29).
 
 ## Why
 Model pages, press releases and stories repeat the same vehicle figures (range, power, speed, acceleration, boot,
@@ -97,16 +100,73 @@ request-to-publish step (SKODA-850a).
 
 ## Acceptance criteria
 - [ ] `/data/tech-data.json` holds every Technical Data value of Peaq, Elroq and Enyaq Coupé, each row with its PDF
-  and date.
+  and date. *The seed (`tools/tech-data/tech-data.seed.json`, 7 models) has them; the DA upload waits for a go-ahead.*
 - [ ] On the Peaq draft, Preflight shows an Issue for the Range cell with "459 – 647 km" and the PDF date; "Update"
-  rewrites it, and Preflight then passes.
+  rewrites it, and Preflight then passes. *Unit-tested on the DA markup; the draft waits for a go-ahead.*
 - [ ] On the record-release draft, the linked 647 km passes, the 936 km record passes, and an added "936 km WLTP"
-  is an Issue.
-- [ ] The audit run over all 23 model pages reports exactly the three differences above (or explains any change),
+  is an Issue. *Unit-tested; the draft waits for a go-ahead.*
+- [x] The audit run over all 23 model pages reports exactly the three differences above (or explains any change),
   and no RS/Sportline/Epiq false positives.
-- [ ] Linked values render as text on `.aem.page`; `.plain.html` keeps the link.
-- [ ] Unit tests for every rule; `npm run lint` passes.
-- [ ] The built-in Preflight's checks are listed, and the decision on the `prepare` row is recorded.
+- [ ] Linked values render as text on `.aem.page`; `.plain.html` keeps the link. *`scripts/tech-values.js` is unit-tested
+  and loads cleanly on the branch; no page has a linked value until the drafts exist.*
+- [x] Unit tests for every rule; `npm run lint` passes.
+- [x] The built-in Preflight's checks are listed, and the decision on the `prepare` row is recorded. *No replacement is
+  needed (see Delivered).*
+
+## Delivered (2026-10-29)
+Branch `skoda-852-tech-data`. Files and setup are in `tools/tech-data/README.md`.
+
+- **The `prepare` row doesn't replace the built-in Preflight.**
+  - DA builds the prepare menu from the built-in actions, then org rows, then site rows, merged **by title**
+    (`da-live` `blocks/edit/da-prepare/da-prepare.js`, `loadMenu`).
+  - A row titled **Tech data check** adds a menu item. Only a row titled `Preflight` would replace the built-in one.
+  - So the branch test window is no longer needed to protect Preflight. The row is still site-wide.
+- **Deviations from the design above:**
+  - The rules live in `tools/tech-data/tech-data.js` and `checks.js`, not `scripts/tech-data.js`, so pages
+    don't load them.
+  - The page needs only `scripts/tech-values.js` (28 lines, no CSS: the span inherits the cell's style).
+  - The seed covers 7 model pages, not 3: Peaq, Elroq, Elroq RS, Enyaq, Enyaq RS, Enyaq Coupé, Epiq. This makes the
+    23-page audit meaningful. Sportline pages stay unlisted: the PDFs say "Technical specifications do not apply for
+    Sportline cars".
+  - No torque row: none of the PDFs has torque, so the Elroq torque cells are a Review ("no official value").
+- **Two more checks than the design table:**
+  - Range sentences without "WLTP", skipping drive, test and record sentences, so the 936 km record is never asked
+    to say WLTP.
+  - Decimal commas ("5,4 s" on the Elroq RS and Enyaq RS pages).
+- **Audit, 2026-10-29:**
+  - The run: `npm run tech-data:audit -- --sheet tools/tech-data/tech-data.seed.json --sitemap /en/skoda-model/`,
+    over 25 pages.
+  - **Issues:** exactly the three Range cells above.
+  - **Reviews** (all on live model pages, inherited from the source):
+    - Peaq: "more than 640 km" and "from 460 to over 600 kilometers" in the text.
+    - Elroq: "more than 560 km in WLTP mode".
+    - Elroq RS: "up to 550 kilometres" (official 516 – 554).
+    - Enyaq RS: "up to 560 km for the SUV and 570 km for the Coupé" (official RS: 513 – 565 / 528 – 572).
+    - Epiq: "over 430 kilometers".
+    - Every Range and fuel-consumption cell lacks "WLTP".
+- **Verified:**
+  - 40 unit tests (`tools/tech-data/*.test.mjs`, `scripts/tech-values.test.mjs`), JS lint, and stylelint incl. the plugin CSS.
+  - Both plugins standalone on the branch preview:
+    - the check lists the Peaq Issue with the PDF and date;
+    - the picker lists 7 models, the first preselected when it has no page.
+  - The Peaq model page on the branch loads with no console errors.
+- **Review round 1 (PR #546, 2026-10-29), every finding fixed:**
+  - **P1:** Update could delete authored content. The cell pattern ran across paragraphs from a bold introduction.
+    - Fix: the pattern stays inside one cell, and a save guard refuses any change to block or format tags or to text
+      outside the values.
+  - **P2 #2:** draft copies lost their model. Fix: models from the path, else the metadata (`model`, `derivative`,
+    `tags`) against the sheet's model `tags`/`excludeTags`.
+  - **P2 #3:** a cell linked to another model's row passed. Fix: it's an Issue, and Update relinks it.
+  - **P2 #4:** linked stats lost the 32 px value / 24 px unit split.
+    - Fix: a link that is all of its `<strong>` unwraps into it.
+    - Measured on the branch: identical to the unlinked cell at 390, 768, 992 and 1080.
+  - **P2 #5:** Insert split the sentence. Fix: the picker copies; a paste stays inline (checked in ProseMirror).
+  - **P2 #6:** "up to 577 km" for the Elroq 85 failed. Fix: the top or bottom of an official interval passes.
+  - **CSS:** the plugin CSS passes stylelint and is now in `lint:css`.
+- **Not verified:**
+  - Inside DA: the SDK handshake in a prepare dialog, the save (PUT to the source) while the editor is open, and the
+    clipboard copy inside the library frame (`allow="clipboard-write"`).
+  - These wait for the config rows and a draft.
 
 ## Open questions (client)
 1. **Who owns the technical figures, and is the PDF the authority?** The page and its PDF disagree on 3 of 9 EV
