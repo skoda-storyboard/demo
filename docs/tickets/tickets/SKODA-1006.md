@@ -5,10 +5,11 @@
 - **Phase:** D · **Milestone:** M2. CS for go-live; the others with their 1004 run.
 - **Estimate:** 2 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
 - **GitHub issue:** [#401](https://github.com/skoda-storyboard/demo/issues/401) (created 2026-10-20) (sub-issue of the E10 epic #96; moved from #83 on 2026-10-22)
-- **Status (2026-10-28):** 🟡 The four acceptance criteria are met on live (see "Verified, 2026-10-28"). The
+- **Status (2026-10-29):** 🟡 The four acceptance criteria are met on live (see "Verified, 2026-10-28"). The
   fragments were built in #485 (SKODA-1001) and published with its merge; this ticket adds the cross-locale check
-  and one importer fix (a heading's single real sub-item). Open: the SK Media Room nav re-push with that fix, and
-  the CS contact anchors once `/cs/kontakty/` is migrated. (Was 🔵 TODO, 2026-10-20.) Source:
+  and one importer fix (a heading's single real sub-item). The SK Media Room nav with that fix is live
+  (2026-10-29). Open: the SL Media Room footer re-push after the merge, and the CS contact anchors once
+  `/cs/kontakty/` is migrated. (Was 🔵 TODO, 2026-10-20.) Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-X-05, L-CS-06, L-DE-07, L-SK-06/07,
   L-SR-05/06, L-SL-03/04.
 
@@ -93,6 +94,12 @@ CS pages, 10:36 GMT).
 These replace "Fixes on the way" above for SR and SL.
 
 **Open:**
-- Re-push `/sk/media-room/nav` (and `/sl/media-room/footer`) with the fixed importer: a DA write, on request.
+- ~~Re-push `/sk/media-room/nav` with the fixed importer.~~ **Done, 2026-10-29** (PO request): pushed to DA,
+  previewed and published from this branch's importer. Live has the source's "Modely → Fabia"
+  (`/sk/hladat/?filter[model][]=fabia-sk`); its 18 links equal the local re-import and DA, and
+  `import:chrome-check --locales=sk` reports no findings. The push overwrote a DA re-save made during QA, with the
+  same text and links minus Fabia, so nothing was lost; the push record is committed (24686f6).
+- Re-push `/sl/media-room/footer` with the merged importer (drops the empty middle section DA kept from its
+  22 Oct push): a DA write, on request.
 - The CS contact anchors (`#podnik`, `#produkt`) link the source's `/cs/kontakty/` until the CS contacts page is
   migrated; the heading ids are needed then.
