@@ -10,7 +10,9 @@
  * can't add checks to; this check runs next to it, not inside it.
  */
 import { applyFromSheet, runChecks } from '../checks.js';
-import { modelsForPage, normalizePath, pageTags } from '../tech-data.js';
+import {
+  modelsForPage, normalizePath, pageTags, withSavedMetadata,
+} from '../tech-data.js';
 import {
   connect, documentPath, loadSheet, readPage, writePage,
 } from '../da.js';
@@ -18,6 +20,17 @@ import {
 const LABELS = { pass: 'Pass', warn: 'Review', fail: 'Issue' };
 // Canvas answers a live-document subscription at once; this only guards a host that never does
 const LIVE_TIMEOUT_MS = 5000;
+// how often the panel re-reads the saved source for metadata edits saved since (at most)
+const METADATA_REFRESH_MS = 60000;
+const timeOf = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+/** Where the page metadata (model, tags, Title, Description) of a live check came from. */
+function metadataNote(state) {
+  if (!state.live) return '';
+  if (state.metadataFrom === 'live') return 'metadata from the live document';
+  if (state.metadataFrom === 'saved') return `metadata (model, tags, Title, Description) from the saved source, read ${timeOf(state.savedAt)}; unsaved metadata edits show after saving`;
+  return `no page metadata: Canvas leaves it out of the live document and the saved source ${state.savedError ? `could not be read (${state.savedError})` : 'has none'}`;
+}
 
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -62,8 +75,9 @@ function render(main, state, onApply) {
     models ? `model: ${models}` : 'no model in the sheet',
     `sheet: ${state.sheet.from}`,
     state.live ? 'live document' : 'saved source',
+    metadataNote(state),
     open ? `${open} of ${results.length} checks need attention` : 'all checks pass',
-  ].join(' · ')));
+  ].filter(Boolean).join(' · ')));
   main.append(state.status);
   results.forEach((r) => main.append(renderCheck(r)));
 
@@ -130,11 +144,38 @@ function describeChanges(changes) {
     if (live) {
       main.replaceChildren(el('p', 'tech-data-muted', 'Waiting for the document…'));
       let hasSnapshot = false;
-      const unsubscribe = sdk.actions.subscribeLiveDocument(({ html: snapshot }) => {
-        if (typeof snapshot !== 'string' || !snapshot) return;
-        hasSnapshot = true;
-        state.html = snapshot;
+      let snapshot = '';
+      let saved = { html: '', at: null, error: '' };
+      let reading = null;
+      // the live snapshot has no page metadata (da-live prose2aem livePreview removes it): take
+      // the saved source's metadata block; the body checked is always the live one
+      const show = () => {
+        const merged = withSavedMetadata(snapshot, saved.html);
+        Object.assign(state, {
+          html: merged.html,
+          metadataFrom: merged.metadataFrom,
+          savedAt: saved.at,
+          savedError: saved.error,
+        });
         render(main, state, onApply);
+      };
+      const readSaved = () => {
+        reading ??= readPage(sdk, path)
+          .then((source) => { saved = { html: source, at: new Date(), error: '' }; })
+          .catch((e) => { saved = { ...saved, at: saved.at ?? new Date(), error: e.message }; })
+          .finally(() => {
+            reading = null;
+            if (hasSnapshot) show();
+          });
+        return reading;
+      };
+      readSaved();
+      const unsubscribe = sdk.actions.subscribeLiveDocument(({ html: next }) => {
+        if (typeof next !== 'string' || !next) return;
+        hasSnapshot = true;
+        snapshot = next;
+        if (saved.at && Date.now() - saved.at.getTime() > METADATA_REFRESH_MS) readSaved();
+        show();
       });
       window.addEventListener('pagehide', () => unsubscribe(), { once: true });
       // a host that advertises the live document but never sends one: check the saved source

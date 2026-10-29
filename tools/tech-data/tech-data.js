@@ -281,6 +281,40 @@ export function readMetadata(html) {
     .map((r) => [valueOf(r[0]).toLowerCase(), valueOf(r[1])]));
 }
 
+const METADATA_START_RE = /<div\b[^>]*\bclass="metadata"[^>]*>/i;
+
+/** The document's page-metadata block (`<div class="metadata">…</div>`) as HTML, or ''. */
+export function metadataBlockOf(html) {
+  const doc = String(html ?? '');
+  const start = doc.search(METADATA_START_RE);
+  if (start < 0) return '';
+  const tags = /<\/?div\b[^>]*>/gi;
+  tags.lastIndex = start;
+  let depth = 0;
+  for (let m = tags.exec(doc); m; m = tags.exec(doc)) {
+    depth += m[0][1] === '/' ? -1 : 1;
+    if (depth === 0) return doc.slice(start, m.index + m[0].length);
+  }
+  return '';
+}
+
+/**
+ * Canvas's live document leaves the page metadata out: the host serializes it with da-live's
+ * `prose2aem(…, livePreview = true)`, which removes the `.metadata` block. The model, tags,
+ * title and description then come from the saved source: its metadata block goes into the live
+ * `<main>`. Metadata in the live document, if a host ever sends it, wins.
+ * @returns {{html: string, metadataFrom: 'live'|'saved'|'none'}}
+ */
+export function withSavedMetadata(liveHtml, savedHtml) {
+  const live = String(liveHtml ?? '');
+  if (METADATA_START_RE.test(live)) return { html: live, metadataFrom: 'live' };
+  const block = metadataBlockOf(savedHtml);
+  if (!block) return { html: live, metadataFrom: 'none' };
+  const at = live.lastIndexOf('</main>');
+  const html = at >= 0 ? `${live.slice(0, at)}${block}${live.slice(at)}` : `${live}${block}`;
+  return { html, metadataFrom: 'saved' };
+}
+
 /** The page's model facts from its metadata: `model`, `derivative` and `tags`, as one tag set. */
 export function pageTags(html) {
   const meta = readMetadata(html);

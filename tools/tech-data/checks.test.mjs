@@ -5,7 +5,7 @@ import {
   applyFromSheet, assertSameStructure, fieldForLabel, findGridCells, findLinkedValues,
   findUnlabelledRanges, findWltpFigures, runChecks,
 } from './checks.js';
-import { readSheet } from './tech-data.js';
+import { metadataBlockOf, readSheet, withSavedMetadata } from './tech-data.js';
 
 const sheet = readSheet(JSON.parse(fs.readFileSync(new URL('./tech-data.seed.json', import.meta.url), 'utf8')));
 const PEAQ = '/en/skoda-model/peaq';
@@ -302,4 +302,59 @@ test('Link only links verified claims: not the Peaq 60\'s wrong 647 km, not a ro
   });
   assert.deepEqual(fixed.changes.map((c) => c.what), ['peaq-90.range']);
   assert.equal(byId(runChecks({ html: right, path: PEAQ_PAGE, sheet })).linkable.linkable, 1);
+});
+
+// --- Canvas live document: the snapshot has no page metadata (da-live prose2aem livePreview) ---
+
+// what Canvas posts as `liveDocument.html` (da-live editor-utils.js getInstrumentedHTMLForSDK →
+// prose2aem(view, true)): metadata block removed, section metadata applied as classes,
+// editor indexes added
+const LIVE_SNAPSHOT = `<body>
+      <header></header>
+      <main><div class="body-column"><div class="hero-image" data-block-index="1"><div><div><h1 data-prose-index="3">Family Weekend Getaway on One Charge</h1><p data-prose-index="40">With a range of up to 936 km on a single charge, a weekend escape to the countryside has never been so effortless.</p></div></div></div><p data-prose-index="160">With a 91 kWh (net 86 kWh) battery and a combined WLTP range of up to 608 kilometres, it was purpose-built for exactly this kind of trip.</p><p data-prose-index="300">At home, the optional 22 kW AC on-board charger means overnight charging from a wallbox is all most families will ever need.</p></div><div class="body-column highlight-dark"><p data-prose-index="420">The Peaq supports DC rapid charging at up to 200 kW.</p></div></main>
+      <footer></footer>
+    </body>`;
+// the same document's saved DA source: metadata as DA stores it
+const SAVED_SOURCE = `<body><header></header><main><div><p>older text</p></div>${metadataBlock({
+  Title: 'Family Weekend Getaway on One Charge',
+  Description: 'With a range of up to 936 km on a single charge, a weekend escape to the countryside has never been so effortless.',
+  template: 'story',
+  tags: '2026, peaq',
+  model: 'peaq',
+})}</main><footer></footer></body>`;
+const ARTICLE_PATH = '/en/skoda-world/peaq-family-weekend-getaway-on-one-charge';
+
+test('the live snapshot alone has no metadata: every claim would be "no model" (what real Canvas showed)', () => {
+  const { claims } = byId(runChecks({ html: LIVE_SNAPSHOT, path: ARTICLE_PATH, sheet }));
+  // only the sentence that names the Peaq itself is checked; the rest have no model to go by
+  assert.equal(claims.counts.issues, 1);
+  const rest = claims.details.filter((d) => !d.startsWith('"200 kW"'));
+  assert.equal(rest.length, 5); // 936 km, 91 kWh, 86 kWh, 608 kilometres, 22 kW
+  rest.forEach((d) => assert.match(d, /no model in the sheet/));
+});
+
+test('with the saved source\'s metadata, the live snapshot is checked for the Peaq, Title and Description included', () => {
+  const merged = withSavedMetadata(LIVE_SNAPSHOT, SAVED_SOURCE);
+  assert.equal(merged.metadataFrom, 'saved');
+  const at = merged.html.indexOf('<div class="metadata">');
+  assert.ok(at > 0 && at < merged.html.indexOf('</main>'), 'the metadata block goes into <main>');
+  assert.ok(!merged.html.includes('older text'), 'only the metadata comes from the saved source, the body stays live');
+  const { claims } = byId(runChecks({ html: merged.html, path: ARTICLE_PATH, sheet }));
+  const issues = claims.details.filter((d) => d.includes('differs from the official'));
+  assert.deepEqual(issues.map((d) => d.split('"')[1]), ['936 km', '608 kilometres', '22 kW', '200 kW', '936 km']);
+  assert.ok(issues[4].includes('in Description: "With a range of up to 936 km'));
+  assert.equal(claims.details.some((d) => d.includes('no model')), false);
+});
+
+test('metadata in the live document wins; no metadata anywhere stays "none"', () => {
+  const liveWithMeta = LIVE_SNAPSHOT.replace('</main>', `${metadataBlock({ model: 'epiq', tags: 'epiq' })}</main>`);
+  assert.equal(withSavedMetadata(liveWithMeta, SAVED_SOURCE).metadataFrom, 'live');
+  assert.equal(withSavedMetadata(liveWithMeta, SAVED_SOURCE).html, liveWithMeta);
+  const none = withSavedMetadata(LIVE_SNAPSHOT, '<body><main><div><p>x</p></div></main></body>');
+  assert.equal(none.metadataFrom, 'none');
+  assert.equal(none.html, LIVE_SNAPSHOT);
+  assert.equal(
+    metadataBlockOf('<div class="metadata"><div><div>a</div><div>b</div></div></div><p>after</p>'),
+    '<div class="metadata"><div><div>a</div><div>b</div></div></div>',
+  );
 });

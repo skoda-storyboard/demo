@@ -144,6 +144,11 @@ the repo.
   - `Tech data check` → `…/preflight/preflight.html`. In Canvas a library row is a side panel, and the host
     offers the live document (`capabilities.liveDocument`). The panel re-checks as the author types, unsaved
     edits included, read-only.
+  - Canvas leaves the page metadata out of the live document: it serializes it with da-live's
+    `prose2aem(…, livePreview = true)`, which removes the `.metadata` block. The panel therefore reads the saved
+    source once (read-only, again at most once a minute) and checks the live body with the saved metadata (model,
+    tags, Title, Description), and the header says so with the time it was read. Metadata edits show after they
+    are saved. If a host ever sends metadata in the live document, that wins.
 - **Canvas's built-in Preflight panel** can't run this check.
   - It posts the preview URL to Adobe's Experience Governance service (`experience-context.adobe.io`,
     `da-live` `blocks/canvas/ew-preflight/api.js`) and shows the built-in, text, image and "site-code" checks
