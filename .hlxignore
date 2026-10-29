@@ -24,3 +24,5 @@ blocks/*/metadata.json
 tools/library/
 docs/client/
 tools/i18n/
+# the media manifest ledger is build data, not site content (the code bus refused the old 11 MB file, SKODA-518)
+tools/importer/media/manifest/

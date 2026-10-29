@@ -6,10 +6,11 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createServer } from 'node:http';
+import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { logicalId } from './media-lib.mjs';
+import { logicalId, loadManifest, writeManifest } from './media-lib.mjs';
 import build, { pageLocale } from './build-media-manifest.mjs';
 
 const exec = promisify(execFile);
@@ -18,6 +19,7 @@ const script = fileURLToPath(new URL('./build-media-manifest.mjs', import.meta.u
 async function mockDam() {
   const uploads = [];
   const activations = [];
+  const metadata = []; // the provenance PUTs: { path, properties }
   let originalAvailable = true;
   let originalHeadStatus = 404;
   let originalHeadBytes = 12;
@@ -88,6 +90,9 @@ async function mockDam() {
       } else if (req.url === '/completeUpload.json') {
         res.writeHead(completeStatus); res.end('{}');
       } else if (req.url.startsWith('/api/assets/')) {
+        if (req.method === 'PUT') {
+          metadata.push({ path: req.url, ...JSON.parse(Buffer.concat(chunks).toString() || '{}') });
+        }
         res.writeHead(200); res.end('{}');
       } else {
         res.writeHead(404); res.end();
@@ -99,6 +104,7 @@ async function mockDam() {
     base: `http://127.0.0.1:${server.address().port}`,
     uploads,
     activations,
+    metadata,
     setActivationStatus(value) { activationStatus = value; },
     setOriginalAvailable(value) { originalAvailable = value; },
     setOriginalHeadStatus(value) { originalHeadStatus = value; },
@@ -953,6 +959,48 @@ test('an asset keeps its own locale\'s alt and caption: another locale\'s page n
     assert.equal(row.alt, 'Škoda Epiq Sportline');
     assert.equal(row.caption, 'Caption');
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a run on the ledger (SKODA-518): rows land in their shards, no journal is left', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-ledger-'));
+  const dam = await mockDam();
+  try {
+    const source = `${dam.base}/master-768x512.jpg`;
+    const id = logicalId(source);
+    const ledger = path.join(dir, 'manifest');
+    writeManifest(ledger, {
+      rows: {
+        [id]: {
+          logical_id: id,
+          source_url: source,
+          master_url: `${dam.base}/master.jpg`,
+          delivery_url: source,
+          bytes: 4,
+          preconditioned: true,
+          status: 'done',
+          seen_urls: [source],
+          dam_page_path: 'en/story',
+          steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+        },
+      },
+    });
+    const args = [script, '--from-manifest', '--manifest', ledger, '--dam-base', dam.base];
+    await exec(process.execPath, args, { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } });
+    const { rows } = loadManifest(ledger);
+    assert.equal(rows[id].status, 'done');
+    assert.match(rows[id].dam_asset_path, /\/content\/dam\/storyboard\/en\/story\/master\.jpg$/);
+    assert.deepEqual(readdirSync(ledger).filter((f) => !/^[0-9a-f]{2}\.jsonl$/.test(f)), [], 'no journal, no temp file');
+    assert.deepEqual(dam.uploads, ['ORIGINAL']);
+    // provenance on the asset: the original's sha256 and the logical id, also kept in the row
+    const sha256 = createHash('sha256').update('ORIGINAL').digest('hex');
+    assert.equal(rows[id].sha256, sha256);
+    assert.deepEqual(dam.metadata.map((m) => m.properties['skoda:sha256']), [sha256]);
+    assert.deepEqual(dam.metadata.map((m) => m.properties['skoda:logicalId']), [id]);
+    assert.equal(dam.metadata[0].properties['skoda:sourceUrl'], `${dam.base}/master.jpg`);
+  } finally {
+    await dam.close();
     rmSync(dir, { recursive: true, force: true });
   }
 });

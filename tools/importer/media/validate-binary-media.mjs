@@ -2,11 +2,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { binaryAnchors, binaryErrors } from './binary-media.mjs';
-import { pagePathFromFile } from './media-lib.mjs';
+import { pagePathFromFile, loadManifest } from './media-lib.mjs';
 
 function main(args) {
   const pages = [];
-  let manifestFile = 'tools/importer/media/media-manifest.json';
+  let manifestFile = 'tools/importer/media/manifest';
   for (let i = 0; i < args.length; i += 1) {
     if (args[i] === '--manifest' && args[i + 1]) { manifestFile = args[i + 1]; i += 1; continue; }
     if (args[i] === '--pages') {
@@ -16,7 +16,7 @@ function main(args) {
     } else throw new Error(`Unknown or incomplete option: ${args[i]}`);
   }
   if (!pages.length) throw new Error('At least one --pages <file> is required');
-  const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
+  const manifest = loadManifest(path.resolve(manifestFile));
   const results = pages.map((file) => {
     const html = readFileSync(file, 'utf8');
     return {

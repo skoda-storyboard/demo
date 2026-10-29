@@ -28,9 +28,10 @@ import { fileURLToPath } from 'node:url';
 import {
   DAM_HOST, normalizeSource, stripDerivative, filenameOf,
 } from '../../../scripts/media-cart-resolver.js';
+import { loadManifest } from './manifest-ledger.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const DEFAULT_MANIFEST = path.join(ROOT, 'tools', 'importer', 'media', 'media-manifest.json');
+const DEFAULT_MANIFEST = path.join(ROOT, 'tools', 'importer', 'media', 'manifest');
 const DEFAULT_OUT = path.join(ROOT, 'scripts', 'media-cart-index.json');
 export const BASE = '/content/dam/storyboard/';
 
@@ -116,7 +117,7 @@ function parseArgs(argv) {
 function main() {
   const cfg = parseArgs(process.argv.slice(2));
   if (!existsSync(cfg.manifest)) throw new Error(`Manifest not found: ${cfg.manifest}`);
-  const { index, stats } = buildCartIndex(JSON.parse(readFileSync(cfg.manifest, 'utf8')));
+  const { index, stats } = buildCartIndex(loadManifest(cfg.manifest));
   const text = serialize(index);
   const rel = path.relative(process.cwd(), cfg.out);
   if (cfg.check) {

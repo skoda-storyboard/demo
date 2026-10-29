@@ -7,7 +7,7 @@
  * Usage:
  *   node tools/importer/media/build-media-manifest.mjs \
  *     --pages content/en/skoda-model/elroq.plain.html [more.plain.html ...] \
- *     [--manifest tools/importer/media/media-manifest.json] \
+ *     [--manifest tools/importer/media/manifest] \
  *     [--dam-base https://author-p220607-e2281243.adobeaemcloud.com] \
  *     [--dam-folder /content/dam/storyboard] \
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
@@ -44,7 +44,7 @@ import {
   pagePathFromFile, isAspectCrop,
   pickIngestUrl, headBytes, fetchBinary, fetchBinaryToFile,
   uploadToDA, uploadToDAM, verifyDamOriginal, publishDamBinary,
-  setDamMetadata, resolveDamToken,
+  setDamMetadata, resolveDamToken, openManifest, sha256Of,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 import {
@@ -54,7 +54,8 @@ import {
 import { feedMediaRefs } from '../media-items/media-items-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
-const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
+// the ledger directory (SKODA-518); `--manifest <file>.json` still reads and writes one JSON object
+const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'manifest');
 const MEDIA_DA_DIR = path.join(WORKSPACE, 'content', 'media-da');
 
 function parseArgs(args = process.argv.slice(2)) {
@@ -165,13 +166,6 @@ function binaryDamPath(url, kind, options) {
   return `${dest}.${kind === 'document' ? 'pdf' : 'mp4'}`;
 }
 
-function loadManifest(file) {
-  if (!existsSync(file)) return { generatedAt: null, rows: {} };
-  const m = JSON.parse(readFileSync(file, 'utf8'));
-  if (!m.rows || typeof m.rows !== 'object') throw new Error(`Invalid media manifest: ${file}`);
-  return m;
-}
-
 function ensureDir(dir) { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); }
 
 /** Bounded-concurrency map (B): run worker over items, at most `limit` at once. */
@@ -209,7 +203,7 @@ export default async function main(args = process.argv.slice(2)) {
     if (missing.length) throw new Error(`Requested page(s) not found: ${missing.join(', ')}`);
   }
 
-  const manifest = loadManifest(cfg.manifest);
+  const manifest = openManifest(cfg.manifest, { dryRun: cfg.dryRun });
   const publicUrls = cfg.publicUrls ? JSON.parse(readFileSync(cfg.publicUrls, 'utf8')) : {};
   if (!publicUrls || typeof publicUrls !== 'object' || Array.isArray(publicUrls)) {
     throw new Error('--public-urls must be a JSON object keyed by DAM asset path');
@@ -368,13 +362,9 @@ export default async function main(args = process.argv.slice(2)) {
   if (cfg.uploadOnly) console.log('[media] UPLOAD ONLY — verify author originals; no activation or public delivery');
   if (cfg.dryRun) console.log('[media] DRY RUN — headers/range probes only; no upload/activation/write');
 
-  // Incremental persistence (B): flush after each row completes.
-  let dirty = 0;
-  const flush = () => {
-    if (cfg.dryRun) return;
-    writeFileSync(cfg.manifest, JSON.stringify(manifest, null, 2));
-    dirty = 0;
-  };
+  // Incremental persistence (B): each changed row goes to the ledger's journal (one line, no
+  // rewrite); the touched shards are written once at the end (SKODA-518)
+  const flush = (id) => manifest.record(id);
 
   const counts = {
     done: 0, uploaded: 0, skipped: 0, failed: 0, precond: 0,
@@ -455,7 +445,7 @@ export default async function main(args = process.argv.slice(2)) {
           row.status = 'partial';
           counts.failed += 1;
           manifest.rows[id] = row;
-          flush();
+          flush(id);
           console.error(`  ✗ ${id}  ${row.note}`);
           return;
         }
@@ -481,6 +471,7 @@ export default async function main(args = process.argv.slice(2)) {
             throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
           }
           row.bytes = got.bytes;
+          row.sha256 = got.sha256;
           row.mime_type = mime;
           row.source_content_type = type;
           row.dam_original_url = row.master_url;
@@ -496,7 +487,7 @@ export default async function main(args = process.argv.slice(2)) {
                 row.steps.dam = 'uncertain';
                 row.note = 'DAM completion pending confirmation';
                 manifest.rows[id] = row;
-                flush();
+                flush(id);
               }
             },
           });
@@ -518,7 +509,12 @@ export default async function main(args = process.argv.slice(2)) {
           damPath: damAssetPath,
           token: damToken,
           metadata: {
-            originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
+            originUrl: row.master_url,
+            alt: '',
+            title: row.title,
+            sourcePage: pagePath,
+            sha256: row.sha256,
+            logicalId: id,
           },
         });
         if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
@@ -576,7 +572,7 @@ export default async function main(args = process.argv.slice(2)) {
       console.error(`  ✗ ${id}  ${row.note}`);
     }
     manifest.rows[id] = row;
-    flush();
+    flush(id);
   }
 
   async function processOne(id) {
@@ -603,7 +599,7 @@ export default async function main(args = process.argv.slice(2)) {
           alt: prior.alt || (sameLocale(prior.dam_page_path, info.ownerPage) ? info.alt : '') || '',
           caption: prior.caption || (sameLocale(prior.dam_page_path, info.ownerPage) ? info.caption : '') || '',
         };
-        flush();
+        flush(id);
       }
       counts.skipped += 1;
       return;
@@ -712,6 +708,7 @@ export default async function main(args = process.argv.slice(2)) {
         }
         if (damConfig && row.steps.dam !== 'done') {
           row.dam_original_url = row.master_url;
+          if (masterBuffer) row.sha256 = sha256Of(masterBuffer);
           if (masterBuffer) {
             const dam = await uploadToDAM({
               damConfig,
@@ -729,7 +726,12 @@ export default async function main(args = process.argv.slice(2)) {
                 damPath: damAssetPath,
                 token: damToken,
                 metadata: {
-                  originUrl: row.master_url, alt: row.alt, title: row.alt, sourcePage: pagePath,
+                  originUrl: row.master_url,
+                  alt: row.alt,
+                  title: row.alt,
+                  sourcePage: pagePath,
+                  sha256: row.sha256,
+                  logicalId: id,
                 },
               });
               if (!metadata.ok) {
@@ -791,13 +793,15 @@ export default async function main(args = process.argv.slice(2)) {
       manifest.rows[id] = row;
       console.error(`  ✗ ${id}  ${row.note}`);
     }
-    dirty += 1;
-    if (dirty >= 1) flush(); // flush per row (B)
+    flush(id); // flush per row (B)
   }
 
-  await mapPool(logicalIds.filter((id) => byLogical.get(id).kind === 'image'), cfg.concurrency, processOne);
-  await mapPool(logicalIds.filter((id) => byLogical.get(id).kind !== 'image'), 1, processOne);
-  flush();
+  try {
+    await mapPool(logicalIds.filter((id) => byLogical.get(id).kind === 'image'), cfg.concurrency, processOne);
+    await mapPool(logicalIds.filter((id) => byLogical.get(id).kind !== 'image'), 1, processOne);
+  } finally {
+    manifest.compact(); // also after a failure: the rows done so far are kept
+  }
 
   console.log(`\n[media] done=${counts.done} partial/failed=${counts.failed} skipped=${counts.skipped} pre-conditioned=${counts.precond} uploaded-only=${counts.uploaded}`);
   console.log(`[media] manifest → ${path.relative(WORKSPACE, cfg.manifest)}`);

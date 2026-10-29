@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
 import { isIP } from 'node:net';
+import { byLogicalId } from './manifest-ledger.mjs';
 
 const MIME = { document: 'application/pdf', video: 'video/mp4' };
 const SOURCE = 'https://www.skoda-storyboard.com';
@@ -86,12 +87,32 @@ export function binaryAnchors(html) {
   });
 }
 
+/** A PDF/MP4 row whose original is published and verified on the public Assets host. */
+export function isVerifiedBinary(row) {
+  return row?.status === 'done'
+    && row.steps?.dam === 'done' && row.steps?.publish === 'done'
+    && !!publicBinaryUrl(row.public_url)
+    && row.public_verified?.url === row.public_url
+    && row.public_verified?.mime === binaryMime(row) // throws on an unsupported MIME, as before
+    && Number.isSafeInteger(row.public_verified?.bytes)
+    && Number.isSafeInteger(row.bytes)
+    && row.bytes > 0
+    && row.public_verified.bytes === row.bytes;
+}
+
+/**
+ * Each binary URL (source, alias, public) → its row. A URL two rows claim (a CDN row and its
+ * /direct-download/ alias) goes to the verified one, else to the first by logical id: the
+ * answer doesn't depend on the order of the manifest's rows (SKODA-518).
+ */
 export function binaryLookups(manifest) {
   const urls = new Map();
-  for (const row of Object.values(manifest.rows || {})) {
-    if (!MIME[row.kind]) continue;
+  const rows = Object.values(manifest.rows || {}).filter((row) => MIME[row.kind]).sort(byLogicalId);
+  for (const row of rows) {
     for (const url of [row.source_url, ...(row.seen_urls || []), row.public_url].filter(Boolean)) {
-      urls.set(binarySource(url), row);
+      const key = binarySource(url);
+      const held = urls.get(key);
+      if (!held || (!isVerifiedBinary(held) && isVerifiedBinary(row))) urls.set(key, row);
     }
   }
   return urls;
@@ -123,15 +144,7 @@ export function binaryErrors(html, manifest, pagePath = '') {
       seen.add(row.logical_id);
       if (row.dam_asset_path) seenAssets.add(row.dam_asset_path);
     }
-    if (!row || row.kind !== kind || row.status !== 'done'
-      || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
-      || !row.dam_asset_path || !row.public_url || !publicBinaryUrl(row.public_url)
-      || row.public_verified?.url !== row.public_url
-      || row.public_verified?.mime !== binaryMime(row)
-      || !Number.isSafeInteger(row.public_verified?.bytes)
-      || !Number.isSafeInteger(row.bytes)
-      || row.bytes < 1
-      || row.public_verified.bytes !== row.bytes) {
+    if (!row || row.kind !== kind || !row.dam_asset_path || !isVerifiedBinary(row)) {
       errors.push(`unverified ${kind} link: ${href}`);
     } else if (href !== row.public_url) {
       errors.push(`binary link not re-hosted: ${href}`);
@@ -162,15 +175,7 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
     const kind = binaryKind(href, type);
     if (!kind) return tag;
     const row = lookup.get(binarySource(href, pagePath));
-    if (!row || row.kind !== kind || row.status !== 'done'
-      || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
-      || !publicBinaryUrl(row.public_url)
-      || row.public_verified?.url !== row.public_url
-      || row.public_verified?.mime !== binaryMime(row)
-      || !Number.isSafeInteger(row.public_verified?.bytes)
-      || !Number.isSafeInteger(row.bytes)
-      || row.bytes < 1
-      || row.public_verified.bytes !== row.bytes) {
+    if (!row || row.kind !== kind || !isVerifiedBinary(row)) {
       errors.push(`unverified ${kind} link: ${href}`);
       return tag;
     }

@@ -67,6 +67,9 @@ The projections scale the per-row sizes measured today. They are not load tests.
 
 ### A. AEM Assets is the record of identity (SKODA-518, 504a)
 
+*Built (2026-10-29, SKODA-518): the ledger, the journal, the shared loader and `.hlxignore`. See
+`tools/importer/media/README.md`, "The manifest ledger".*
+
 - Each upload already writes `skoda:sourceUrl` and `skoda:sourcePage` (`setDamMetadata`). Add:
   - `skoda:sha256` of the original: the dedup key 504a needs across posts, releases and kits;
   - `skoda:logicalId`.

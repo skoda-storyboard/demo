@@ -24,6 +24,11 @@ import path from 'node:path';
 import { Readable, Transform } from 'node:stream';
 import { finished, pipeline } from 'node:stream/promises';
 
+// The manifest's one loader / writer: the sharded ledger (SKODA-518)
+export {
+  LEDGER_DIR, loadManifest, openManifest, writeManifest,
+} from './manifest-ledger.mjs';
+
 // WordPress pre-bakes an 8-size derivative ladder as `-WxH` filename suffixes.
 // Strip a *scaled* suffix to recover the logical (master) image. Aspect CROPS
 // (e.g. -1920x1082) are handled separately — see isAspectCrop / F7.
@@ -431,9 +436,11 @@ export async function fetchBinaryToFile(url, {
         throw new Error(`Invalid source Content-Length for ${url}`);
       }
       let bytes = 0;
+      const hash = createHash('sha256'); // the original's provenance key (SKODA-518)
       const counter = new Transform({
         transform(chunk, encoding, callback) {
           bytes += chunk.length;
+          hash.update(chunk);
           resetIdle();
           callback(null, chunk);
         },
@@ -457,7 +464,7 @@ export async function fetchBinaryToFile(url, {
         await handle.close();
       }
       return {
-        filePath, header, bytes, contentType: res.headers.get('content-type') || '',
+        filePath, header, bytes, sha256: hash.digest('hex'), contentType: res.headers.get('content-type') || '',
       };
     } catch (err) {
       if (!retry || attempt === retries) throw err;
@@ -987,9 +994,14 @@ export async function publishDamImage(options) {
   return activateDamOriginal(options, /\.(png|jpe?g|gif|webp|svg|avif)$/i);
 }
 
+/** The SHA-256 (hex) of an original: with `skoda:sourceUrl`, its DAM identity (SKODA-518). */
+export const sha256Of = (buffer) => createHash('sha256').update(buffer).digest('hex');
+
 /**
  * Set asset metadata (provenance) after completeUpload. Best-effort — a failure
  * here doesn't invalidate the uploaded original. Uses the AEM assets metadata API.
+ * `skoda:sha256` and `skoda:logicalId` make the DAM the record of identity: `media:reconcile`
+ * finds an original by them on author (SKODA-518).
  */
 export async function setDamMetadata({
   damConfig, damPath, metadata, token, fetchImpl = fetchWithRetry,
@@ -1002,6 +1014,8 @@ export async function setDamMetadata({
   if (metadata?.alt) props['dc:description'] = metadata.alt;
   if (metadata?.title) props['dc:title'] = metadata.title;
   if (metadata?.sourcePage) props['skoda:sourcePage'] = metadata.sourcePage;
+  if (metadata?.sha256) props['skoda:sha256'] = metadata.sha256;
+  if (metadata?.logicalId) props['skoda:logicalId'] = metadata.logicalId;
   try {
     const res = await fetchImpl(endpoint, {
       method: 'PUT',

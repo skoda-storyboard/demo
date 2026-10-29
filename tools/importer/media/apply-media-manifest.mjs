@@ -7,7 +7,7 @@
  * Usage:
  *   node tools/importer/media/apply-media-manifest.mjs \
  *     --pages content/en/skoda-model/elroq.plain.html [more ...] \
- *     [--manifest tools/importer/media/media-manifest.json] \
+ *     [--manifest tools/importer/media/manifest] \
  *     [--media-index content/media-index.json] [--dry-run]
  *
  * Two outputs:
@@ -27,12 +27,12 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import {
-  logicalId, isImageUrl, cleanUrl, OVERSIZE_BYTES, pagePathFromFile,
+  logicalId, isImageUrl, cleanUrl, OVERSIZE_BYTES, pagePathFromFile, loadManifest,
 } from './media-lib.mjs';
 import { rewriteBinaryLinks } from './binary-media.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
-const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
+const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'manifest');
 const DEFAULT_MEDIA_INDEX = path.join(WORKSPACE, 'content', 'media-index.json');
 const DEFERRED = Symbol('oversized image deferred to import:push media gate');
 
@@ -72,9 +72,11 @@ function buildLookups(manifest) {
       || row.steps?.deliver !== 'done'
       || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) continue;
     byId.set(row.logical_id, dest);
-    for (const u of row.seen_urls || []) byExact.set(u, dest);
-    if (row.source_url) byExact.set(row.source_url, dest);
-    if (row.master_url) byExact.set(row.master_url, dest);
+    // a URL two rows claim (`x.JPG.jpg` and `x.jpg`) goes to the row it is the logical id of,
+    // whatever the order of the manifest's rows (SKODA-518); else the first claim stays
+    [...(row.seen_urls || []), row.source_url, row.master_url].filter(Boolean).forEach((u) => {
+      if (!byExact.has(u) || logicalId(u) === row.logical_id) byExact.set(u, dest);
+    });
   }
   return { byExact, byId, deferred };
 }
@@ -109,7 +111,7 @@ function emitMediaIndex(manifest, file, dryRun) {
 function main() {
   const cfg = parseArgs();
   if (!existsSync(cfg.manifest)) throw new Error(`Manifest not found: ${cfg.manifest}`);
-  const manifest = JSON.parse(readFileSync(cfg.manifest, 'utf8'));
+  const manifest = loadManifest(cfg.manifest);
   const lookups = buildLookups(manifest);
 
   let totalRewrites = 0;

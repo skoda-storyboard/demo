@@ -66,7 +66,7 @@ URLs are not binaries.
 
 **Tracking convention: record at import, ingest on a developer machine.**
 Every PDF/MP4 link on a migrated page must have a row in the committed
-`media-manifest.json`, like its images. The import-time build (no
+manifest ledger (`manifest/`), like its images. The import-time build (no
 `--dam-base`, as the post-import hook runs it) records each one as a
 `partial` row with `steps.dam: "n/a"` and `steps.publish: "pending"`.
 It fetches and uploads nothing. **Commit the manifest with the import.**
@@ -411,7 +411,7 @@ page, DA source, or a bulk preview/live job.
 The imported `.plain.html` lives in the separate content store (`content/` is a
 symlink), so it is **not** in a code-repo checkout. To run the DAM ingest from a
 clean checkout, re-ingest straight from the source URLs already recorded in the
-committed `media-manifest.json` — no page file needed. For an approved batch,
+committed manifest ledger — no page file needed. For an approved batch,
 provide a plain-text file containing **one reviewed `logical_id` per line**:
 
 ```bash
@@ -559,7 +559,50 @@ index); the cart store and controls don't.
 - `build-cart-index.mjs` — the media cart's served index `scripts/media-cart-index.json`
   (`npm run media:cart-index [-- --check]`; test: `build-cart-index.test.mjs`).
 - `media-lib.test.mjs` — unit + mock-DAM integration tests (`npm run test:media`).
-- `media-manifest.json` — generated manifest (git-tracked; inspectable).
+- `manifest-ledger.mjs` — the manifest's one loader / writer (`loadManifest`, `openManifest`),
+  re-exported by `media-lib.mjs`; `npm run media:ledger -- --check | --compact | --fold`.
+- `manifest/` — the manifest ledger (git-tracked; inspectable; not served). See below.
+
+## The manifest ledger (SKODA-518)
+
+The manifest was one JSON object (`media-manifest.json`, 7,001 rows and 11.5 MB on 2026-10-29),
+rewritten in full after every row, refused by the code bus (413) and merged by hand. It is now a
+ledger under `tools/importer/media/manifest/`:
+
+- **64 shards** `NN.jsonl`, chosen by a hash of `logical_id`. One row per line, sorted by
+  `logical_id`. The rows are the same objects as before; every tool still sees
+  `{ generatedAt, rows }` (`loadManifest()`).
+- **A run journals, then compacts.** `media:build` and `media:publish-images` append each changed
+  row to `manifest/journal.jsonl` (one line, no rewrite) and write each touched shard once at
+  the end, also after a failure. A journal left by an interrupted run is replayed on the next
+  load and compacted by the next run (or `npm run media:ledger -- --compact`). The journal is
+  git-ignored; the integrity test fails on a committed one.
+- **Merging.** `.gitattributes` merges the shards as a union: two branches that add rows merge
+  without a conflict (`git merge` honours it; GitHub's web conflict editor may not, so merge
+  `main` into a branch locally). A row both branches changed ends up as two lines; every tool
+  then refuses the ledger with the row's two places (`… twice (0a.jsonl:12 and 0a.jsonl:13);
+  merge the copies`). Keep one line (union `page_refs` / `seen_urls`, the meaningful alt).
+- **Checks.** `npm run media:ledger -- --check` and `media-manifest-integrity.test.mjs`: no
+  duplicate row, no row without an id or in the wrong shard, no journal, every `seen_urls`
+  entry the row's own file.
+- **Old-format files.** A `--manifest <file>.json` location is still read and written as one
+  JSON object (test fixtures). A branch made before the ledger that changed
+  `media-manifest.json` folds its rows in with
+  `git show $(git merge-base HEAD origin/main):tools/importer/media/media-manifest.json > /tmp/base.json`
+  and `npm run media:ledger -- --fold <its media-manifest.json> --base /tmp/base.json`: only the
+  rows the branch changed are applied; a row changed on both sides is listed and left as it is.
+- **Provenance on the asset.** Every upload writes `skoda:sourceUrl`, `skoda:sourcePage`,
+  `skoda:sha256` (of the original, hashed while it downloads) and `skoda:logicalId`; the row
+  keeps `sha256` too. `npm run media:reconcile -- --dam-base <author>` (developer machine, DAM
+  token) lists every asset under the DAM folder through QueryBuilder on author and compares it
+  with the ledger, read-only. Exit 1 on an unexplained difference: a row whose asset is gone, an
+  asset with migration provenance but no row, or a row and asset that disagree on the source,
+  the logical id or sha256. Assets uploaded before SKODA-518 lack sha256 / logical id: they are
+  listed, and `--backfill [--limit N]` (an approved batch: it writes DAM metadata) hashes the
+  author original, checks its size and writes both.
+- **Lookups don't depend on row order.** A URL two rows claim (`x.JPG.jpg` and `x.jpg`, a CDN
+  row and its `/direct-download/` alias) resolves to the row it is the logical id of (images,
+  `media:apply`) or to the verified row (PDF/MP4 gate), not to whichever row came last.
 
 ## Scale-out (M2)
 

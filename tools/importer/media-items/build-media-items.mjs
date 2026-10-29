@@ -40,7 +40,7 @@ import {
   mergeQueries, matchesFilter,
   libraryRequest, librarySlices, libraryNonce, damIndex, damFile,
 } from './media-items-lib.mjs';
-import { uploadToDA } from '../media/media-lib.mjs';
+import { uploadToDA, loadManifest } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -336,14 +336,14 @@ async function oembed(vimeoId, cacheDir, offline) {
   }
 }
 
-const MEDIA_MANIFEST = path.join(ROOT, 'tools/importer/media/media-manifest.json');
+const MEDIA_MANIFEST = path.join(ROOT, 'tools/importer/media/manifest');
 
 /**
  * Publication gate (SKODA-501/504 traceability): every binary the feed serves (thumbnail,
  * 1920 rendition, original, poster, MP4) needs a media-manifest row, recorded with
  * `npm run media:build -- --feed <feed file>`. Throws with the uncovered URLs.
  */
-const manifestRows = () => (existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {});
+const manifestRows = () => loadManifest(MEDIA_MANIFEST).rows;
 
 function assertManifestCoverage(file) {
   const rows = manifestRows();

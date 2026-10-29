@@ -114,7 +114,7 @@ runbook: [`../../tools/importer/media/README.md`](../../tools/importer/media/REA
   folder** `/content/dam/storyboard/<source-page-path>/<file>` (e.g. Elroq →
   `/content/dam/storyboard/en/skoda-model/elroq/…`). First page to reference an image
   owns its folder; shared images reuse it (logical-image dedup).
-- **Manifest** (`media-manifest.json`) = the `s3_url → { dam_asset_path, delivery_url,
+- **Manifest** (the ledger `tools/importer/media/manifest/`, was `media-manifest.json`; SKODA-518) = the `s3_url → { dam_asset_path, delivery_url,
   original_download_url, alt, per-step status }` index. Re-runnable, incrementally
   persisted (resumable), non-zero exit on residual failures.
 - **Two mechanisms:**

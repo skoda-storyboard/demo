@@ -1,0 +1,3 @@
+# The media manifest ledger: shards are one row per line, so a merge keeps both sides' rows
+# (a row changed on both sides becomes a duplicate the ledger refuses; SKODA-518).
+tools/importer/media/manifest/*.jsonl merge=union

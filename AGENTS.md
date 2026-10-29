@@ -83,5 +83,5 @@ Steps 4–9 exist because M1 manual QA found 57 of 94 defects that agent reviews
 - Merging `main` ships code; content publishes separately.
 - A PR without a `{branch}--demo--skoda-storyboard.aem.page/{path}` link is rejected.
 - All committed files are served. Use `.hlxignore`.
-- Migrated PDFs/MP4s get rows in `tools/importer/media/media-manifest.json` (`kind: document|video`), like images; commit it with the import. The DAM ingest runs on a developer machine, not here (`tools/importer/media/README.md`, "PDF/MP4 links").
+- Migrated PDFs/MP4s get rows in the media manifest ledger `tools/importer/media/manifest/` (`kind: document|video`), like images; commit it with the import. The DAM ingest runs on a developer machine, not here (`tools/importer/media/README.md`, "PDF/MP4 links").
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).
