@@ -24,6 +24,22 @@ export function cleanTitle(raw) {
   return t.replace(SITE_SUFFIX, '').trim() || t;
 }
 
+// A chrome fragment (`/cs/nav`, `/cs/media-room/footer`, `/sustainability/nav`) or a shared
+// fragment (`/cs/fragments/newsletter-card`) is no content: the locale indexes cover their whole
+// tree, so they index the locale's fragments, which search and listings must never show
+// (SKODA-1001 QA: "Stories" → /cs/nav). The English ones sit outside /en/**.
+const CHROME_FRAGMENT = new RegExp([
+  '^/(?:[a-z]{2}/)?(?:(?:media-room|sustainability)/)?(?:nav|footer)/?$', // nav / footer
+  '/fragments/', // shared fragments
+].join('|'), 'i');
+
+/** Is this index path a chrome or shared fragment, not a page? */
+export function isChromeFragment(path) {
+  return CHROME_FRAGMENT.test(String(path || ''));
+}
+
+const isPage = (row) => !(row && typeof row === 'object' && isChromeFragment(row.path));
+
 /** Normalise one index row for display (currently: the title). */
 export function normalizeRow(row) {
   if (!row || typeof row !== 'object' || typeof row.title !== 'string') return row;
@@ -65,9 +81,9 @@ export async function loadQueryIndex(url = defaultIndexUrl(), { force = false } 
     for (;;) {
       // eslint-disable-next-line no-await-in-loop
       const json = await fetchChunk(url, offset);
-      if (Array.isArray(json)) { rows.push(...json.map(normalizeRow)); break; }
+      if (Array.isArray(json)) { rows.push(...json.filter(isPage).map(normalizeRow)); break; }
       const data = Array.isArray(json.data) ? json.data : [];
-      rows.push(...data.map(normalizeRow));
+      rows.push(...data.filter(isPage).map(normalizeRow));
       const total = Number(json.total);
       const limit = Number(json.limit) || data.length;
       offset += data.length;
