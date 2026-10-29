@@ -1,19 +1,24 @@
 /* Tech data check + picker (SKODA-852): DA plugin iframes, not site pages */
 :root {
-  --td-text: #2c2c2c;
-  --td-muted: #6e6e6e;
-  --td-line: #e1e1e1;
-  --td-accent: #3b63fb;
-  --td-pass: #007a4d;
-  --td-warn: #b35c00;
-  --td-fail: #d31510;
+  --td-text: rgb(44 44 44);
+  --td-muted: rgb(110 110 110);
+  --td-line: rgb(225 225 225);
+  --td-surface: rgb(255 255 255);
+  --td-disabled: rgb(245 245 245);
+  --td-accent: rgb(59 99 251);
+  --td-pass: rgb(0 122 77);
+  --td-warn: rgb(179 92 0);
+  --td-fail: rgb(211 21 16);
+  --td-font: adobe-clean, "Source Sans Pro", system-ui, sans-serif;
   --td-gap: 0.75rem;
 }
 
 body {
   margin: 0;
   color: var(--td-text);
-  font: 14px/1.45 adobe-clean, "Source Sans Pro", system-ui, sans-serif;
+  font-family: var(--td-font);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .tech-data-plugin {
@@ -59,14 +64,14 @@ body {
 .tech-data-badge {
   border-radius: 1rem;
   padding: 0 0.5rem;
-  color: #fff;
+  color: var(--td-surface);
   font-size: 0.75rem;
   font-weight: 700;
 }
 
-.is-pass .tech-data-badge { background: var(--td-pass); }
-.is-warn .tech-data-badge { background: var(--td-warn); }
-.is-fail .tech-data-badge { background: var(--td-fail); }
+.is-pass .tech-data-badge { background-color: var(--td-pass); }
+.is-warn .tech-data-badge { background-color: var(--td-warn); }
+.is-fail .tech-data-badge { background-color: var(--td-fail); }
 
 .tech-data-actions {
   display: flex;
@@ -80,21 +85,21 @@ body {
   border: 2px solid var(--td-accent);
   border-radius: 1rem;
   padding: 0.25rem 0.75rem;
-  background: var(--td-accent);
-  color: #fff;
+  background-color: var(--td-accent);
+  color: var(--td-surface);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .tech-data-values .tech-data-button {
-  background: #fff;
+  background-color: var(--td-surface);
   color: var(--td-accent);
 }
 
 .tech-data-button:disabled {
   border-color: var(--td-line);
-  background: #f5f5f5;
+  background-color: var(--td-disabled);
   color: var(--td-muted);
   cursor: default;
 }

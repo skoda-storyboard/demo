@@ -131,6 +131,8 @@ const rowsOf = (json, name) => {
 };
 
 const str = (v) => flat(v);
+// "elroq, RS" → ['elroq', 'rs']
+const tagList = (v) => flat(v).split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
 
 /**
  * Read the sheet JSON (multi-sheet: `values` and `models` tabs) into a value map and model list.
@@ -173,6 +175,8 @@ export function readSheet(json) {
       code,
       name: str(row.name) || code,
       pages: str(row.pages).split(',').map((p) => p.trim()).filter(Boolean),
+      tags: tagList(row.tags),
+      excludeTags: tagList(row.excludeTags),
       pdf: str(row.pdf),
       pdfDate: str(row.pdfDate),
     });
@@ -187,6 +191,73 @@ export const normalizePath = (path) => flat(path).replace(/\.(plain\.)?html$/, '
 export function modelsForPath(models, path) {
   const page = normalizePath(path);
   return models.filter((m) => m.pages.some((p) => normalizePath(p) === page));
+}
+
+/**
+ * The rows of a document's metadata block (DA source) as a map, keys lowercased. A cell with
+ * several paragraphs reads as one comma-separated value. Empty when there is no block.
+ * @returns {Map<string, string>}
+ */
+export function readMetadata(html) {
+  const doc = String(html ?? '');
+  const start = doc.search(/<div\b[^>]*\bclass="metadata"/i);
+  const rows = [];
+  if (start < 0) return new Map();
+  let depth = 0;
+  let cells = null;
+  let cell = null;
+  doc.slice(start).split(/(<[^>]+>)/).some((part) => {
+    if (/^<div\b/i.test(part)) {
+      depth += 1;
+      if (depth === 2) {
+        cells = [];
+        rows.push(cells);
+      } else if (depth === 3) {
+        cell = [];
+        cells.push(cell);
+      }
+      return false;
+    }
+    if (/^<\/div>/i.test(part)) {
+      depth -= 1;
+      if (depth < 3) cell = null;
+      return depth === 0;
+    }
+    if (!cell) return false;
+    if (/^<\/?(?:p|br|li)\b/i.test(part)) cell.push(',');
+    else if (!part.startsWith('<')) cell.push(decodeEntities(part));
+    return false;
+  });
+  const valueOf = (parts) => (parts ?? []).join('').split(',').map(flat)
+    .filter(Boolean)
+    .join(', ');
+  return new Map(rows.filter((r) => r.length >= 2)
+    .map((r) => [valueOf(r[0]).toLowerCase(), valueOf(r[1])]));
+}
+
+/** The page's model facts from its metadata: `model`, `derivative` and `tags`, as one tag set. */
+export function pageTags(html) {
+  const meta = readMetadata(html);
+  return ['model', 'derivative', 'tags'].flatMap((name) => tagList(meta.get(name)));
+}
+
+/**
+ * The page's models: the ones whose `pages` list it, else the ones its tags match (every model
+ * tag present, no excluded tag), keeping only the most specific match. So a draft copy of the
+ * Elroq RS page (tags elroq, rs) is the Elroq RS, not the Elroq (review P2).
+ * @param {object[]} models
+ * @param {{path: string, tags?: string[]}} page
+ */
+export function modelsForPage(models, { path, tags = [] }) {
+  const listed = modelsForPath(models, path);
+  if (listed.length) return listed;
+  const have = new Set(tags.map((t) => t.toLowerCase()));
+  if (!have.size) return [];
+  const hits = models.filter((m) => m.tags.length
+    && m.tags.every((t) => have.has(t)) && !m.excludeTags.some((t) => have.has(t)));
+  const isNarrower = (other, m) => other.tags.length > m.tags.length
+    && m.tags.every((t) => other.tags.includes(t));
+  return hits.filter((m) => !hits.some((other) => other !== m && isNarrower(other, m)));
 }
 
 /** All sheet rows of the given model codes (model-level and version rows). */

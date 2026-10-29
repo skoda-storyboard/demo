@@ -1,10 +1,19 @@
 /*
- * Tech data picker (SKODA-852): a DA library plugin. Pick a model, click a value, and it lands
- * in the document as a link to its sheet row (the link text is the formatted value). The page's
- * own model is preselected. Standalone it lists the values without inserting.
+ * Tech data picker (SKODA-852): a DA library plugin. Pick a model, click a value, and the value is
+ * copied as a link to its sheet row (the link text is the formatted value); paste it where it
+ * belongs in the sentence. The page's own model is preselected.
+ *
+ * Why copy, not insert: DA's library inserts `sendHTML` content as a closed block (da-live
+ * `da-library.js`: `new Slice(parsed.content, 0, 0)`), so an inline value would split its
+ * sentence into three paragraphs (review P2 #5), and `sendText` can't carry the link. A paste
+ * goes through the editor's own inline parsing.
  */
-import { FIELD_LABELS, linkHtml, modelsForPath } from '../tech-data.js';
-import { connect, documentPath, loadSheet } from '../da.js';
+import {
+  FIELD_LABELS, linkHtml, modelsForPage, pageTags,
+} from '../tech-data.js';
+import {
+  connect, documentPath, loadSheet, readPage,
+} from '../da.js';
 
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -16,9 +25,19 @@ const el = (tag, className, text) => {
 // the model's own figures first (what its page shows), then each version
 const byVersion = (a, b) => a.version.localeCompare(b.version, 'en', { numeric: true });
 
-function valueRow(row, sdk) {
+/** Put the linked value on the clipboard as HTML (the link) and as plain text (the value). */
+async function copyValue(row) {
+  const html = linkHtml(row);
+  await navigator.clipboard.write([new window.ClipboardItem({
+    'text/html': new Blob([html], { type: 'text/html' }),
+    'text/plain': new Blob([row.display], { type: 'text/plain' }),
+  })]);
+}
+
+function valueRow(row, status) {
   const tr = el('tr');
-  const th = el('th', '', FIELD_LABELS[row.field] || row.field);
+  const fieldLabel = FIELD_LABELS[row.field] || row.field;
+  const th = el('th', '', fieldLabel);
   th.scope = 'row';
   const source = el('td', 'tech-data-muted');
   if (row.source) {
@@ -29,21 +48,24 @@ function valueRow(row, sdk) {
     source.append(a);
   }
   if (row.note) source.append(el('span', 'tech-data-note', row.note));
-  const insert = el('td');
+  const copy = el('td');
   const button = el('button', 'tech-data-button', row.display);
   button.type = 'button';
-  button.disabled = !sdk;
-  button.setAttribute('aria-label', `Insert ${row.label} ${FIELD_LABELS[row.field] || row.field}: ${row.display}`);
+  button.setAttribute('aria-label', `Copy ${row.label} ${fieldLabel}: ${row.display}`);
   button.addEventListener('click', async () => {
-    await sdk.actions.sendHTML(linkHtml(row));
-    sdk.actions.closeLibrary?.();
+    try {
+      await copyValue(row);
+      status.textContent = `Copied ${row.label} ${fieldLabel}: ${row.display}. Paste it into the text (Ctrl+V or ⌘V); it stays linked to the sheet.`;
+    } catch (e) {
+      status.textContent = `Copying was blocked (${e.message}). In Technical Data cells, use Tech data check → Update or Link instead.`;
+    }
   });
-  insert.append(button);
-  tr.append(th, insert, source);
+  copy.append(button);
+  tr.append(th, copy, source);
   return tr;
 }
 
-function renderValues(container, rows, sdk) {
+function renderValues(container, rows, status) {
   container.replaceChildren();
   const groups = new Map();
   [...rows].sort(byVersion).forEach((row) => {
@@ -54,10 +76,22 @@ function renderValues(container, rows, sdk) {
     const table = el('table', 'tech-data-values');
     table.append(el('caption', '', label));
     const body = el('tbody');
-    group.forEach((row) => body.append(valueRow(row, sdk)));
+    group.forEach((row) => body.append(valueRow(row, status)));
     table.append(body);
     container.append(table);
   });
+}
+
+/** The open document's model (path or metadata tags), or null. */
+async function pageModel(sdk, sheet) {
+  if (!sdk) return null;
+  const path = documentPath(sdk.context);
+  try {
+    const tags = pageTags(await readPage(sdk, path));
+    return modelsForPage(sheet.models, { path, tags })[0]?.code ?? null;
+  } catch {
+    return modelsForPage(sheet.models, { path })[0]?.code ?? null;
+  }
 }
 
 (async function init() {
@@ -65,12 +99,11 @@ function renderValues(container, rows, sdk) {
   try {
     const sdk = await connect();
     const sheet = await loadSheet(sdk, window.location.search);
-    const path = sdk ? documentPath(sdk.context) : '';
-    const preselected = modelsForPath(sheet.models, path)[0]?.code ?? sheet.models[0]?.code;
     if (!sheet.models.length) {
       main.replaceChildren(el('p', 'tech-data-error', `The sheet (${sheet.from}) has no models.`));
       return;
     }
+    const preselected = (await pageModel(sdk, sheet)) ?? sheet.models[0].code;
 
     const label = el('label', '', 'Model ');
     const select = el('select');
@@ -81,17 +114,18 @@ function renderValues(container, rows, sdk) {
       select.append(option);
     });
     label.append(select);
+    const status = el('p', 'tech-data-status');
+    status.setAttribute('role', 'status');
     const values = el('div');
     const rowsOf = (code) => [...sheet.values.values()].filter((v) => v.model === code);
-    const show = () => renderValues(values, rowsOf(select.value), sdk);
+    const show = () => renderValues(values, rowsOf(select.value), status);
     select.addEventListener('change', show);
 
     main.replaceChildren(
       el('h1', '', 'Tech data'),
-      el('p', 'tech-data-muted', sdk
-        ? 'Click a value to insert it as a linked value. Preflight then keeps it in line with the sheet.'
-        : 'Open this from the DA library to insert values.'),
+      el('p', 'tech-data-muted', 'Click a value to copy it as a linked value, then paste it into your text. Tech data check keeps it in line with the sheet.'),
       label,
+      status,
       values,
     );
     show();

@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
-  hasDecimalComma, modelsForPath, normalizePath, parseFigure, parseTechDataHref, readSheet,
-  sameFigure, techDataHref, textOf, valuesOfModels,
+  hasDecimalComma, modelsForPage, modelsForPath, normalizePath, pageTags, parseFigure,
+  parseTechDataHref, readMetadata, readSheet, sameFigure, techDataHref, textOf, valuesOfModels,
 } from './tech-data.js';
 
 const seed = JSON.parse(fs.readFileSync(new URL('./tech-data.seed.json', import.meta.url), 'utf8'));
@@ -84,6 +84,25 @@ test('the seed sheet: every row is valid, every model has pages, version rows gr
   assert.equal(sheet.values.get('peaq-90.range').model, 'peaq');
   assert.equal(sheet.values.get('peaq.range').display, '459 – 647 km');
   assert.ok(valuesOfModels(sheet.values, ['peaq']).some((v) => v.key === 'peaq-90x.range'));
+});
+
+test('readMetadata reads DA and imported metadata blocks; pageTags joins model, derivative and tags', () => {
+  const da = '<main><div><p>x</p></div><div class="metadata"><div><div><p>Tags</p></div><div><p>elroq</p><p>rs</p></div></div><div><div><p>model</p></div><div><p>elroq</p></div></div></div></main>';
+  assert.equal(readMetadata(da).get('tags'), 'elroq, rs');
+  const imported = '<div class="metadata"><div><div>tags</div><div>elroq, rs</div></div><div><div>derivative</div><div>rs</div></div><div><div>Image</div><div><picture><img src="x.png"></picture></div></div></div>';
+  assert.deepEqual(pageTags(imported), ['rs', 'elroq', 'rs']);
+  assert.deepEqual([...readMetadata('<p>no block</p>')], []);
+});
+
+test('modelsForPage: listed path first, then the most specific tag match, excluded tags respected', () => {
+  const { models } = readSheet(seed);
+  const codes = (page) => modelsForPage(models, page).map((m) => m.code);
+  assert.deepEqual(codes({ path: '/en/skoda-model/elroq/elroq-rs', tags: ['peaq'] }), ['elroq-rs'], 'path wins');
+  assert.deepEqual(codes({ path: '/drafts/a', tags: ['elroq', 'rs'] }), ['elroq-rs']);
+  assert.deepEqual(codes({ path: '/drafts/a', tags: ['enyaq', 'coupe-en'] }), ['enyaq-coupe']);
+  assert.deepEqual(codes({ path: '/drafts/a', tags: ['enyaq', 'suv', 'sportline'] }), []);
+  assert.deepEqual(codes({ path: '/drafts/a', tags: ['2026', 'peaq', 'emobility'] }), ['peaq']);
+  assert.deepEqual(codes({ path: '/drafts/a' }), []);
 });
 
 test('modelsForPath matches with or without extension and trailing slash', () => {

@@ -56,8 +56,19 @@ async function main() {
 
   const auditPage = async (path) => {
     try {
-      const html = await fetchText(`${host}${path}.plain.html`);
-      return { path, results: runChecks({ html, path, sheet }) };
+      const [html, page] = await Promise.all([
+        fetchText(`${host}${path}.plain.html`),
+        fetchText(`${host}${path}`),
+      ]);
+      // .plain.html carries no metadata block: the model and tags come from the page's head
+      const tags = [...page.matchAll(/<meta (?:name="model"|property="article:tag") content="([^"]*)"/g)]
+        .map((m) => m[1]);
+      return {
+        path,
+        results: runChecks({
+          html, path, sheet, tags,
+        }),
+      };
     } catch (e) {
       return { path, error: e.message };
     }

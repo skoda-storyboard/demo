@@ -1323,6 +1323,8 @@
         "code": "peaq",
         "name": "Peaq",
         "pages": "/en/skoda-model/peaq, /en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs, /en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging",
+        "tags": "peaq",
+        "excludeTags": "",
         "pdf": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/peaq/TD-Peaq-en_8fa4f649.pdf",
         "pdfDate": "21. 9. 2026"
       },
@@ -1330,6 +1332,8 @@
         "code": "elroq",
         "name": "Elroq",
         "pages": "/en/skoda-model/elroq",
+        "tags": "elroq",
+        "excludeTags": "rs, sportline",
         "pdf": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
         "pdfDate": "23. 4. 2026"
       },
@@ -1337,6 +1341,8 @@
         "code": "elroq-rs",
         "name": "Elroq RS",
         "pages": "/en/skoda-model/elroq/elroq-rs",
+        "tags": "elroq, rs",
+        "excludeTags": "",
         "pdf": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
         "pdfDate": "23. 4. 2026"
       },
@@ -1344,6 +1350,8 @@
         "code": "enyaq",
         "name": "Enyaq",
         "pages": "/en/skoda-model/enyaq-iv-2",
+        "tags": "enyaq",
+        "excludeTags": "rs, sportline, coupe-en",
         "pdf": "https://cdn.skoda-storyboard.com/2025/06/TD-Enyaq-en_new_db50ac09.pdf",
         "pdfDate": "23. 4. 2026"
       },
@@ -1351,6 +1359,8 @@
         "code": "enyaq-rs",
         "name": "Enyaq RS",
         "pages": "/en/skoda-model/enyaq-iv-2/enyaq-rs",
+        "tags": "enyaq, rs",
+        "excludeTags": "",
         "pdf": "https://cdn.skoda-storyboard.com/2025/06/TD-Enyaq-en_new_db50ac09.pdf",
         "pdfDate": "23. 4. 2026"
       },
@@ -1358,6 +1368,8 @@
         "code": "enyaq-coupe",
         "name": "Enyaq Coupé",
         "pages": "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
+        "tags": "enyaq, coupe-en",
+        "excludeTags": "rs, sportline",
         "pdf": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv/TD-Enyaq-Coupe-en_new_44e9640d.pdf",
         "pdfDate": "23. 4. 2026"
       },
@@ -1365,6 +1377,8 @@
         "code": "epiq",
         "name": "Epiq",
         "pages": "/en/skoda-model/epiq",
+        "tags": "epiq",
+        "excludeTags": "",
         "pdf": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/epiq/TD-Epiq-en_9ab9372d.pdf",
         "pdfDate": "14. 9. 2026"
       }

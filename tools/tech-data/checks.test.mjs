@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
-  applyFromSheet, fieldForLabel, findGridCells, findLinkedValues, findUnlabelledRanges,
-  findWltpFigures, runChecks,
+  applyFromSheet, assertSameStructure, fieldForLabel, findGridCells, findLinkedValues,
+  findUnlabelledRanges, findWltpFigures, runChecks,
 } from './checks.js';
 import { readSheet } from './tech-data.js';
 
@@ -57,6 +57,36 @@ test('update links the differing cell to its row; then the grid passes', () => {
   assert.equal(r.grid.status, 'pass');
   assert.equal(r.links.status, 'pass');
   assert.equal(r.links.summary, 'The linked value matches the sheet');
+});
+
+test('a bold introduction before the grid is not a cell: update changes only the Range cell (review P1)', () => {
+  const intro = '<p><strong>The Peaq</strong> is the largest Škoda yet.</p>';
+  const input = doc(`${intro}${PEAQ_GRID}`);
+  assert.equal(findGridCells(input).length, 6, 'only the six real cells');
+  const { html, changes } = applyFromSheet({
+    html: input, path: PEAQ, sheet, mode: 'update',
+  });
+  assert.deepEqual(changes.map((c) => c.what), ['Range']);
+  assert.ok(html.startsWith(`<body><header></header><main><div>${intro}<h2 id="technical-data">Technical Data</h2>`), 'introduction and heading kept');
+  assert.equal(html, input.replace('458 - 646 km', '<a href="/data/tech-data.json#peaq.range">459 – 647 km</a>'));
+});
+
+test('the save guard refuses a lost heading, a lost paragraph or changed text, and accepts value links', () => {
+  const before = '<p><strong>The Peaq</strong> intro.</p><h2>Technical Data</h2><p><strong>458 - 646 km</strong></p><p>Range</p>';
+  // what the old cell pattern did: the introduction and heading gone
+  assert.throws(() => assertSameStructure(before, '<p><strong><a href="/data/tech-data.json#peaq.range">459 – 647 km</a></strong></p><p>Range</p>'), /structure/);
+  assert.throws(() => assertSameStructure(before, before.replace('intro.', 'outro.')), /text outside the values/);
+  assert.doesNotThrow(() => assertSameStructure(before, before.replace('458 - 646 km', '<a href="/data/tech-data.json#peaq.range">459 – 647 km</a>')));
+});
+
+test('a fix that would change the document structure is refused, nothing is returned to save', () => {
+  // a label paragraph that never closes: the cell can't be matched, so nothing changes
+  const broken = doc('<div><p><strong>458 - 646 km</strong></p><p>Range</div>');
+  const { html, changes } = applyFromSheet({
+    html: broken, path: PEAQ, sheet, mode: 'update',
+  });
+  assert.equal(changes.length, 0);
+  assert.equal(html, broken);
 });
 
 test('link turns the matching cells into links and leaves the rest of the document alone', () => {
@@ -152,6 +182,66 @@ test('empty and malformed documents pass without throwing', () => {
   assert.throws(() => applyFromSheet({
     html: '', path: PEAQ, sheet, mode: 'nope',
   }), /unknown mode/);
+});
+
+// a DA metadata block (cells as paragraphs, as DA stores them)
+const metadataBlock = (rows) => `<div class="metadata">${Object.entries(rows)
+  .map(([k, v]) => `<div><div><p>${k}</p></div><div><p>${v}</p></div></div>`).join('')}</div>`;
+const draft = (main, rows) => `<body><header></header><main><div>${main}</div>${metadataBlock(rows)}</main><footer></footer></body>`;
+
+test('a draft copy keeps its model through its metadata: the Peaq draft updates its Range cell (review P2 #2)', () => {
+  const html = draft(PEAQ_GRID, { Template: 'skoda_model', tags: 'peaq', model: 'peaq' });
+  const r = byId(runChecks({ html, path: '/drafts/tech-data/peaq', sheet }));
+  assert.equal(r.grid.status, 'fail');
+  assert.equal(r.grid.fixable, 1);
+  const { changes } = applyFromSheet({
+    html, path: '/drafts/tech-data/peaq', sheet, mode: 'update',
+  });
+  assert.deepEqual(changes.map((c) => c.to), ['459 – 647 km']);
+});
+
+test('the Peaq draft no longer accepts another model\'s WLTP figure (Epiq 441 km)', () => {
+  const html = draft('<p>The Peaq has a WLTP range of 441 km.</p>', { tags: 'peaq', model: 'peaq' });
+  const r = byId(runChecks({ html, path: '/drafts/tech-data/peaq-record-release', sheet }));
+  assert.equal(r['wltp-figures'].status, 'fail');
+  assert.match(r['wltp-figures'].details[0], /official: 459 – 647 km \(Peaq\)/);
+});
+
+test('metadata picks the most specific model: RS is the RS, Sportline is none, the audit can pass tags', () => {
+  const grid = `${cell('403 - 577 km', 'Range')}`;
+  const rs = byId(runChecks({ html: draft(grid, { tags: 'elroq, rs', model: 'elroq', derivative: 'rs' }), path: '/drafts/x', sheet }));
+  assert.match(rs.grid.details[0], /"516 – 554 km"/);
+  const sportline = byId(runChecks({ html: draft(grid, { tags: 'elroq, sportline', model: 'elroq' }), path: '/drafts/y', sheet }));
+  assert.match(sportline.grid.summary, /isn't listed for a model/);
+  const fromCaller = byId(runChecks({
+    html: doc(grid), path: '/drafts/z', sheet, tags: ['elroq'],
+  }));
+  assert.match(fromCaller.grid.details[0], /"408 – 577 km"/);
+});
+
+test('a linked grid cell must link this page\'s row: Elroq on the RS page is an Issue and update relinks it (review P2 #3)', () => {
+  const html = doc(cell('<a href="/data/tech-data.json#elroq.range">408 – 577 km</a>', 'Range'));
+  const path = '/en/skoda-model/elroq/elroq-rs';
+  const r = byId(runChecks({ html, path, sheet }));
+  assert.equal(r.links.status, 'pass', 'the link matches its own row');
+  assert.equal(r.grid.status, 'fail');
+  assert.equal(r.grid.fixable, 1);
+  assert.match(r.grid.details[0], /linked to elroq\.range; this page's official value is "516 – 554 km"/);
+  const fixed = applyFromSheet({
+    html, path, sheet, mode: 'update',
+  });
+  assert.ok(fixed.html.includes('<a href="/data/tech-data.json#elroq-rs.range">516 – 554 km</a>'));
+  assert.equal(byId(runChecks({ html: fixed.html, path, sheet })).grid.status, 'pass');
+});
+
+test('"up to" the top of an official interval is official; "from" its bottom; above the top is not (review P2 #6)', () => {
+  const path = '/en/skoda-model/elroq';
+  const ok = doc('<p>The Elroq 85 has a WLTP range of up to 577 km. The Elroq 60 offers a WLTP range from 408 km.</p>');
+  assert.equal(byId(runChecks({ html: ok, path, sheet }))['wltp-figures'].status, 'pass');
+  const tooHigh = doc('<p>The Elroq 85 has a WLTP range of up to 590 km.</p>');
+  assert.equal(byId(runChecks({ html: tooHigh, path, sheet }))['wltp-figures'].status, 'fail');
+  const notLinkable = byId(runChecks({ html: ok, path, sheet })).linkable;
+  assert.equal(notLinkable.status, 'pass', 'a bound is not the interval, so it is not offered as a link');
 });
 
 test('details are capped and the rest counted', () => {

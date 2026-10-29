@@ -4,7 +4,7 @@
  * and the audit, covered by checks.test.mjs.
  */
 import {
-  decodeEntities, escapeHtml, flat, hasDecimalComma, linkHtml, modelsForPath, parseFigure,
+  decodeEntities, escapeHtml, flat, hasDecimalComma, linkHtml, modelsForPage, pageTags, parseFigure,
   parseTechDataHref, sameFigure, textOf, valuesOfModels,
 } from './tech-data.js';
 
@@ -12,11 +12,17 @@ const METADATA_OPEN_RE = /^<div\b[^>]*\bclass="(?:section-)?metadata"/i;
 const BLOCK_TAG_RE = /^<\/?(?:p|div|li|h[1-6]|td|th|tr|table|ul|ol|br|blockquote)\b/i;
 const HREF_RE = /\bhref="([^"]*)"/i;
 const ANCHOR_RE = /<a\b([^>]*?)\bhref="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/gi;
-// a Technical Data cell: <p><strong>value</strong></p><p>label</p>
-const CELL_RE = /(<p\b[^>]*>\s*<strong\b[^>]*>)([\s\S]*?)(<\/strong>\s*<\/p>\s*<p\b[^>]*>)([\s\S]*?)(<\/p>)/gi;
+// a Technical Data cell: <p><strong>value</strong></p><p>label</p>. Value and label may hold inline
+// markup only, so a match never runs across paragraphs, headings or cells (review P1).
+const CELL_RE = /(<p\b[^>]*>\s*<strong\b[^>]*>)((?:(?!<\/?(?:strong|p|div|h[1-6]|ul|ol|li|table|tr|td|th)\b)[\s\S])*?)(<\/strong>\s*<\/p>\s*<p\b[^>]*>)((?:(?!<\/?(?:p|div|h[1-6]|ul|ol|li|table|tr|td|th)\b)[\s\S])*?)(<\/p>)/gi;
+// the block and formatting tags a fix must leave exactly as they were
+const STRUCTURE_RE = /<\/?(?:p|div|h[1-6]|ul|ol|li|table|tr|td|th|strong|em|picture|img|source)\b/gi;
 // a range or consumption figure in running text
 const CLAIM_RE = /(\d[\d.,]*(?:\s*[-–]\s*\d[\d.,]*)?)\s*((?:kWh|l)\/100\s*km|km(?![/\w])|kilomet(?:re|er)s?\b)/g;
 const APPROXIMATE_RE = /\b(?:more than|over|at least|almost|nearly|around|approximately|about|in excess of|by)\s*$/i;
+// "up to 577 km" names the top of an official interval, "from 408 km" its bottom (review P2 #6)
+const UP_TO_RE = /\b(?:up to|maximum(?: of)?|max\.?|as much as)\s*$/i;
+const FROM_RE = /\bfrom\s*$/i;
 // a range sentence about a drive, a test or a record states a measured result, not the WLTP figure
 const MEASURED_RE = /\b(?:record|test|tested|real-world|drive|drove|driven|covered|journey|trip)\b/i;
 const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+(?=[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ"“])/;
@@ -127,6 +133,13 @@ export function findGridCells(html) {
   }).filter(Boolean);
 }
 
+/** 'max' after "up to", 'min' after "from", else null. */
+function boundOf(before) {
+  if (UP_TO_RE.test(before)) return 'max';
+  if (FROM_RE.test(before)) return 'min';
+  return null;
+}
+
 /** Range and consumption figures in sentences that say WLTP (technical-data links excluded). */
 export function findWltpFigures(html) {
   return textBlocks(html).flatMap((block) => block.split(SENTENCE_SPLIT_RE))
@@ -135,6 +148,7 @@ export function findWltpFigures(html) {
       text: flat(`${m[1]} ${m[2]}`),
       sentence,
       isApproximate: APPROXIMATE_RE.test(sentence.slice(0, m.index)),
+      bound: boundOf(sentence.slice(0, m.index)),
     })));
 }
 
@@ -150,9 +164,15 @@ export function findUnlabelledRanges(html) {
       .map((m) => ({ text: flat(`${m[1]} ${m[2]}`), sentence })));
 }
 
-/** The page's models and the rows to compare with (all rows when the page has no model). */
-function pageContext(sheet, path) {
-  const models = modelsForPath(sheet.models, path);
+/**
+ * The page's models and the rows to compare with (all rows when the page has no model). Models
+ * come from the path, else from the metadata block's model / derivative / tags, else from `tags`
+ * the caller read elsewhere (the audit reads them from the rendered page).
+ */
+function pageContext(sheet, path, html, tags) {
+  const fromDocument = pageTags(html);
+  const pageTagSet = fromDocument.length ? fromDocument : (tags ?? []);
+  const models = modelsForPage(sheet.models, { path, tags: pageTagSet });
   const rows = models.length
     ? valuesOfModels(sheet.values, models.map((m) => m.code))
     : [...sheet.values.values()];
@@ -201,10 +221,10 @@ function linksCheck(html, sheet) {
 }
 
 function gridCheck(html, sheet, models) {
-  const cells = findGridCells(html).filter((c) => !c.linked);
+  const cells = findGridCells(html);
   if (!cells.length) {
     return {
-      id: 'grid', title: 'Technical Data', status: 'pass', summary: 'No unlinked Technical Data values', details: [],
+      id: 'grid', title: 'Technical Data', status: 'pass', summary: 'No Technical Data values', details: [],
     };
   }
   if (!models.length) {
@@ -222,6 +242,13 @@ function gridCheck(html, sheet, models) {
     const row = rowForCell(sheet, models, cell.field);
     if (!row) {
       reviews.push(`${cell.label}: "${cell.text}" has no official value in the sheet`);
+      return;
+    }
+    if (cell.linked) {
+      // a linked cell may only link this page's row; its text against that row is the links check
+      if (cell.linked.key !== row.key) {
+        mismatches.push(`${cell.label}: "${cell.text}" is linked to ${cell.linked.key}; this page's official value is "${row.display}" (${sourceOf(row)})`);
+      }
       return;
     }
     if (!sameFigure(cell.text, row.display)) {
@@ -247,6 +274,18 @@ const officialFor = (figure, rows) => rows
   .filter((r) => LEGAL_FIELDS.includes(r.field))
   .find((r) => sameFigure(figure.text, r.display)) ?? null;
 
+/** The row whose interval starts ("from") or ends ("up to") at a single-number figure, or null. */
+function boundFor(figure, rows) {
+  const claim = parseFigure(figure.text);
+  if (!figure.bound || !claim || claim.numbers.length !== 1) return null;
+  const pick = figure.bound === 'max' ? Math.max : Math.min;
+  return rows.filter((r) => LEGAL_FIELDS.includes(r.field)).find((r) => {
+    const official = parseFigure(r.display);
+    return official && official.unit === claim.unit
+      && pick(...official.numbers) === claim.numbers[0];
+  }) ?? null;
+}
+
 const officialSummary = (rows, models) => {
   const ranges = models.map((m) => rows.find((r) => r.key === `${m.code}.range`)).filter(Boolean);
   return ranges.map((r) => `${r.display} (${r.label || r.model})`).join('; ');
@@ -259,7 +298,7 @@ function wltpFiguresCheck(html, rows, models) {
   const official = officialSummary(rows, models);
   const expected = official ? `; official: ${official}` : '';
   figures.forEach((figure) => {
-    if (officialFor(figure, rows)) return;
+    if (officialFor(figure, rows) || boundFor(figure, rows)) return;
     if (figure.isApproximate) {
       reviews.push(`"${figure.text}" is a rounded WLTP figure${expected}`);
       return;
@@ -329,8 +368,10 @@ function linkableCheck(html, sheet, rows, models) {
  * @returns {{id, title, status: 'pass'|'warn'|'fail', summary, details: string[], more: number,
  *   fixable?: number, linkable?: number}[]}
  */
-export function runChecks({ html, path, sheet }) {
-  const { models, rows } = pageContext(sheet, path);
+export function runChecks({
+  html, path, sheet, tags,
+}) {
+  const { models, rows } = pageContext(sheet, path, html, tags);
   return [
     linksCheck(html, sheet),
     gridCheck(html, sheet, models),
@@ -342,6 +383,29 @@ export function runChecks({ html, path, sheet }) {
     details: r.details.slice(0, MAX_DETAILS),
     more: Math.max(0, r.details.length - MAX_DETAILS),
   }));
+}
+
+const structureOf = (html) => (html.match(STRUCTURE_RE) || []).map((tag) => tag.toLowerCase()).join(' ');
+const VALUE_MARK = '\u0000';
+const FIGURE_TEXT_RE = /\d[\d.,\s–-]*\s*(?:kWh\/100 ?km|l\/100 ?km|km\/h|kilomet(?:re|er)s?|km|kW|Nm|min|s|l)\b/g;
+// the text with every link and every figure as one mark, so a fix may change only those
+const textOutsideValues = (html) => flat(decodeEntities(html
+  .replace(ANCHOR_RE, ` ${VALUE_MARK} `)
+  .replace(/<[^>]*>/g, ' '))
+  .replace(FIGURE_TEXT_RE, ` ${VALUE_MARK} `))
+  .replace(new RegExp(`${VALUE_MARK}(?:\\s*${VALUE_MARK})*`, 'g'), VALUE_MARK);
+
+/**
+ * A fix only touches link texts and wraps values in links. Anything else (a block or a format
+ * tag gone, text outside the values changed) means a rule matched too much: refuse to save.
+ */
+export function assertSameStructure(before, after) {
+  if (structureOf(before) !== structureOf(after)) {
+    throw new Error('The change would alter the document structure, so nothing was saved');
+  }
+  if (textOutsideValues(before) !== textOutsideValues(after)) {
+    throw new Error('The change would alter text outside the values, so nothing was saved');
+  }
 }
 
 function rewriteLinks(html, sheet, changes) {
@@ -357,9 +421,15 @@ function rewriteLinks(html, sheet, changes) {
 function rewriteCells(html, sheet, models, { mismatched, matching }, changes) {
   return html.replace(CELL_RE, (all, open, value, middle, label, close) => {
     const field = fieldForLabel(textOf(label));
-    if (!field || findLinkedValues(value).length) return all;
-    const row = rowForCell(sheet, models, field);
+    const row = field && rowForCell(sheet, models, field);
     if (!row) return all;
+    const linked = findLinkedValues(value)[0];
+    if (linked) {
+      // linked to another model's row: relink to this page's row (update only)
+      if (!mismatched || linked.key === row.key) return all;
+      changes.push({ what: textOf(label), from: `${textOf(value)} (${linked.key})`, to: row.display });
+      return `${open}${linkHtml(row)}${middle}${label}${close}`;
+    }
     const isSame = sameFigure(textOf(value), row.display);
     if ((isSame && !matching) || (!isSame && !mismatched)) return all;
     changes.push({ what: textOf(label), from: textOf(value), to: row.display });
@@ -400,20 +470,22 @@ function linkProse(html, rows, changes) {
  * @returns {{html: string, changes: {what, from, to}[]}}
  */
 export function applyFromSheet({
-  html, path, sheet, mode,
+  html, path, sheet, mode, tags,
 }) {
   const changes = [];
-  const { models, rows } = pageContext(sheet, path);
-  let out = String(html ?? '');
+  const input = String(html ?? '');
+  const { models, rows } = pageContext(sheet, path, input, tags);
+  let out = input;
   if (mode === 'update') {
-    out = rewriteLinks(out, sheet, changes);
     if (models.length) out = rewriteCells(out, sheet, models, { mismatched: true }, changes);
+    out = rewriteLinks(out, sheet, changes);
   } else if (mode === 'link') {
     if (models.length) out = rewriteCells(out, sheet, models, { matching: true }, changes);
     out = linkProse(out, rows, changes);
   } else {
     throw new Error(`applyFromSheet: unknown mode "${mode}"`);
   }
+  assertSameStructure(input, out);
   return { html: out, changes };
 }
 
