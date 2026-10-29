@@ -59,10 +59,13 @@ SKODA-504 ✅, SKODA-503 ✅. Feeds SKODA-504a, 511, 519.
 - **Tools switched:** `media:build` and `media:publish-images` journal each row and compact at the end, also
   after a failure; `media:apply`, `media:cart-index`, `media:audit`, `media:validate-binaries`, the post-import
   hook, `media-items:build` and the `import:push` gate read the ledger.
-- **Merging:** `.gitattributes` `merge=union` on the shards. In the fixture, the same two-branch merge conflicts
-  in 38 of 64 shards without it and in none with it. A row changed on both branches becomes two lines, and every
-  tool refuses the ledger with the row's two places. GitHub's web conflict editor may not apply the rule: merge
-  `main` into a branch locally.
+- **Merging:** the `media-ledger` merge driver (`.gitattributes`; `npm ci` installs it via `prepare`) merges a
+  shard row by row against the merge base. Rows changed or added on different branches merge cleanly, even next to
+  each other; a row changed on both is a marked conflict that every tool refuses until resolved. Without the driver,
+  git marks text conflicts and `npm run media:ledger -- --resolve` settles them row by row. (The first version used
+  `merge=union`; see "#547 review".) GitHub's web conflict editor uses neither: merge `main` into a branch locally.
+- **One writer at a time:** `manifest/.lock` (a dead process's lock is taken over). Compaction writes the recorded
+  rows over the shard as it is on disk, also on SIGINT / SIGTERM; a torn last journal line is dropped.
 - **Integrity** (`media-manifest-integrity.test.mjs`): no duplicate row, no row without an id or in the wrong
   shard, no committed journal; the `seen_urls` stem check now covers every row, not only PDF/MP4 (0 offenders).
 - **Provenance:** `setDamMetadata` writes `skoda:sha256` and `skoda:logicalId`. The sha256 is computed while the
@@ -91,6 +94,44 @@ SKODA-504 ✅, SKODA-503 ✅. Feeds SKODA-504a, 511, 519.
     "unverified" links on main are verified on the branch.
 - **`import:push` gate:** the same decision on 35 of 36 pages. The Fabia 130 press kit is blocked on both: main
   says "unverified video link", the branch "imported binary link missing" for its unverified duplicate rows.
+
+### #547 review (2026-10-29, independent review + fixes)
+- **P1, merging:** `merge=union` duplicated rows that only ONE branch changed when they were neighbours in a
+  shard (git takes adjacent edits as one hunk; union keeps both sides), so a routine merge left the ledger
+  refused. Reproduced, then replaced by the row-by-row merge driver and `--resolve` (tests: neighbouring edits on
+  two branches merge cleanly; a both-sides change is a marked conflict; `--resolve` without the driver).
+- **P2, two writers:** two runs at once lost a row (each compacted its own view) and one deleted the other's
+  journal. Now the writer lock, and compaction re-reads the shard (tests in child processes: a second writer is
+  refused, SIGTERM compacts and releases the lock, a killed run's lock is taken over and its journal compacted).
+- **P2, signals:** Ctrl-C / the hook's SIGTERM skipped compaction; now compacted (the recorded rows only, so a
+  half-updated row is never written).
+- **P2, reconcile:** rows sharing one DAM asset (3 today) were compared one by one, so each pair showed an
+  unexplained difference, and backfill would stamp two logical ids on one asset. Now grouped per asset (on the
+  real ledger, against a DAM that matches it: 2,925 assets, 0 unexplained, one backfill per asset); a mismatched
+  asset is never backfilled.
+- **P2, backfill:** the size check compared an image original with its rendition's `bytes` (222 rows) and could
+  overwrite a known sha256. Now the size is checked only where the row records the original's, and an existing
+  sha256 must match.
+- **Second pass (same reviewer, all seven confirmed fixed; new P3s fixed):**
+  - the lock is taken at a run's first recorded row, so an early error leaves none;
+  - compaction waits for every running worker (`mapPool`, the publisher), so no recorded row is lost after a 401;
+  - a dead run's journal is adopted only once the lock is held, never a live run's;
+  - readers warn while a journal holds rows the shards don't;
+  - the lock message names the lock file;
+  - an unreadable side in the merge driver is marked;
+  - `--resolve` removes an emptied shard.
+
+  Open as noted: two processes taking over the same stale lock at the same instant can both write. It's rare, and
+  compaction still re-reads each shard, so no row is lost.
+- **P3:**
+  - a torn journal line;
+  - `orderby=path` for paging;
+  - `--dam-base` must be https;
+  - readers fail again on a missing manifest (`mustExist`), and the old `media-manifest.json` path points to the ledger;
+  - `--fold` treats a misnamed row as a conflict and compares rows by content, not key order;
+  - rows load in id order;
+  - the PDF/MP4 sha256 is tested;
+  - dead code removed.
 
 ### Found, not changed here (notes, not tickets)
 - **Failing on `main` too, unchanged here:**

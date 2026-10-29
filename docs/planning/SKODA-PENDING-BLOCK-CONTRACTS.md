@@ -428,7 +428,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   on any gap not recorded as a verified source gap in `sources.json` `knownDetailGaps` (6 today: 5 Peaq / Epiq
   videos with an empty source panel, 1 video without a dimensions line).
 - **Manifest gate (2026-09-29, #200 review):** every binary a row serves (thumbnail, `rendition-1920`, `original`,
-  `poster`, `mp4`) has a row in `tools/importer/media/media-manifest.json` (`npm run media:build -- --feed …`);
+  `poster`, `mp4`) has a row in the media manifest ledger `tools/importer/media/manifest/` (was
+  `media-manifest.json`, SKODA-518; `npm run media:build -- --feed …`);
   `media-items:build --push` refuses to publish while one is missing. DAM upload stays deferred (import-time rows).
 - **Sharding (SKODA-517; reader 2026-10-19, generator 2026-10-21):** a sheet holds 500k cells (~12,500 rows
   at 40 columns), and every reader downloaded the whole feed. The feed is split by how it is read. A registry

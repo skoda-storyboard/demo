@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { publishDamImage, resolveDamToken, openManifest } from './media-lib.mjs';
 
@@ -130,6 +130,7 @@ export async function main(args = process.argv.slice(2)) {
   }
   const token = resolveDamToken({ tokenFile: options.tokenFile });
   if (!token) throw new Error('DAM token not available');
+  if (!existsSync(options.manifest)) throw new Error(`Manifest not found: ${options.manifest}`);
   const manifest = openManifest(options.manifest);
   const ids = readFileSync(options.idsFile, 'utf8').split(/\r?\n/)
     .map((id) => id.trim()).filter((id) => id && !id.startsWith('#'));
@@ -137,7 +138,10 @@ export async function main(args = process.argv.slice(2)) {
     const row = manifest.rows[id];
     return !row || row.kind === 'document' || row.kind === 'video'
       || row.steps?.dam !== 'done' || !row.dam_asset_path?.startsWith(`${DAM_FOLDER}/`);
-  })) throw new Error('ID list must contain distinct, uploaded image originals only');
+  })) {
+    manifest.compact(); // nothing recorded: releases the writer lock
+    throw new Error('ID list must contain distinct, uploaded image originals only');
+  }
   const selected = ids.slice(0, options.limit);
   // each publish step is one journal line; the touched shards are written once at the end
   const save = (row) => {
@@ -147,8 +151,11 @@ export async function main(args = process.argv.slice(2)) {
   const counts = { done: 0, failed: 0, skipped: 0 };
   let next = 0;
   const workerCount = Math.min(options.concurrency, selected.length);
+  // a fatal error (401) stops new publishes; the run settles once every running one has, so
+  // each is recorded before the manifest is compacted (SKODA-518)
+  let fatal = null;
   await Promise.all(Array.from({ length: workerCount }, async () => {
-    for (;;) {
+    while (!fatal) {
       const index = next;
       next += 1;
       if (index >= selected.length) return;
@@ -168,11 +175,13 @@ export async function main(args = process.argv.slice(2)) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${error.message}`);
         if (/DAM original HEAD returned 401|DAM activation returned 401/.test(error.message)) {
-          throw error;
+          fatal ??= error;
         }
       }
     }
-  })).finally(() => manifest.compact()); // also after a 401 stops the run
+  }));
+  manifest.compact();
+  if (fatal) throw fatal;
   console.log(`[image publish] done=${counts.done} failed=${counts.failed} skipped=${counts.skipped}`);
   if (counts.failed) process.exitCode = 1;
   return counts;

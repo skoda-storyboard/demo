@@ -16,7 +16,7 @@ function main(args) {
     } else throw new Error(`Unknown or incomplete option: ${args[i]}`);
   }
   if (!pages.length) throw new Error('At least one --pages <file> is required');
-  const manifest = loadManifest(path.resolve(manifestFile));
+  const manifest = loadManifest(path.resolve(manifestFile), { mustExist: true });
   const results = pages.map((file) => {
     const html = readFileSync(file, 'utf8');
     return {

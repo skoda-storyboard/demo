@@ -21,4 +21,5 @@ helix-importer-ui
 
 # A media run's journal, compacted into the manifest ledger at the end of the run (SKODA-518)
 tools/importer/media/manifest/journal.jsonl
+tools/importer/media/manifest/.lock
 tools/importer/media/manifest/*.tmp

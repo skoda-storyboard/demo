@@ -210,7 +210,7 @@ export default async function main(argv = process.argv.slice(2), {
   const log = (...m) => console.log(...m);
   const h = hosts(a);
   const manifest = loadManifest(manifestFile);
-  const mediaManifest = loadMediaManifest(mediaManifestFile);
+  const mediaManifest = loadMediaManifest(mediaManifestFile, { mustExist: true });
   // One byte probe per image per run: the preview/publish/fragment rechecks reuse it.
   const mediaCache = new Map();
   // source images verified dead on live (SKODA-843): stripped as live, not blocked

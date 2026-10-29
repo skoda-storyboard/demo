@@ -168,18 +168,28 @@ function binaryDamPath(url, kind, options) {
 
 function ensureDir(dir) { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); }
 
-/** Bounded-concurrency map (B): run worker over items, at most `limit` at once. */
+/**
+ * Bounded-concurrency map (B): run worker over items, at most `limit` at once. After a worker
+ * throws, no new item starts; the call settles once every running worker has, then throws the
+ * first error (so the manifest is compacted after the last row is recorded, SKODA-518).
+ */
 async function mapPool(items, limit, worker) {
   const results = new Array(items.length);
   let next = 0;
+  let failure = null;
   async function runner() {
-    for (;;) {
+    while (!failure) {
       const i = next; next += 1;
       if (i >= items.length) return;
-      results[i] = await worker(items[i], i);
+      try {
+        results[i] = await worker(items[i], i);
+      } catch (error) {
+        failure ??= error;
+      }
     }
   }
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, runner));
+  if (failure) throw failure;
   return results;
 }
 
@@ -708,8 +718,8 @@ export default async function main(args = process.argv.slice(2)) {
         }
         if (damConfig && row.steps.dam !== 'done') {
           row.dam_original_url = row.master_url;
-          if (masterBuffer) row.sha256 = sha256Of(masterBuffer);
           if (masterBuffer) {
+            row.sha256 = sha256Of(masterBuffer);
             const dam = await uploadToDAM({
               damConfig,
               damPath: damAssetPath,

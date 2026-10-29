@@ -4,7 +4,8 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { damAssets, reconcile, backfill } from './reconcile-dam.mjs';
@@ -54,7 +55,10 @@ test('reconcile: matched rows, the three unexplained differences and the explain
   assert.match(report.mismatched[1], /sha256 a+ ≠ b+/);
   assert.deepEqual(report.notInLedger, [`${DAM}/en/lost.jpg (from https://cdn.skoda-storyboard.com/lost.jpg)`]);
   assert.deepEqual(report.notMigrated, [`${DAM}/brand/logo.png`], 'authored in the DAM: explained');
-  assert.deepEqual(report.needsBackfill, [row(5).logical_id]);
+  const r5 = row(5);
+  assert.deepEqual(report.needsBackfill, [{
+    path: r5.dam_asset_path, ids: [r5.logical_id], logicalId: r5.logical_id,
+  }]);
   assert.equal(report.unexplained, 4);
   // the source URL may be the row's master, its original or its source
   const r7 = row(7);
@@ -65,14 +69,43 @@ test('reconcile: matched rows, the three unexplained differences and the explain
   assert.equal(viaSource.unexplained, 0);
 });
 
-test('reconcile: two rows sharing one asset (a CDN row and its alias) claim it once', () => {
-  const alias = row(1, { logical_id: 'ffffffff__img-1.jpg' });
-  const report = reconcile(
-    { [row(1).logical_id]: row(1), [alias.logical_id]: alias },
-    new Map([[row(1).dam_asset_path, asset(row(1), { logicalId: '' })]]),
+test('reconcile: rows sharing one asset (a CDN row and its alias) are one group (#547 review)', () => {
+  // the alias has its own source URL (/direct-download/) and id; the asset records the CDN row's
+  const cdn = row(1);
+  const alias = row(1, {
+    logical_id: 'ffffffff__img-1.jpg',
+    source_url: 'https://www.skoda-storyboard.com/direct-download/2025/01/img-1.jpg',
+    master_url: 'https://www.skoda-storyboard.com/direct-download/2025/01/img-1.jpg',
+    dam_original_url: 'https://www.skoda-storyboard.com/direct-download/2025/01/img-1.jpg',
+  });
+  const rows = { [cdn.logical_id]: cdn, [alias.logical_id]: alias };
+  const stamped = reconcile(rows, new Map([[cdn.dam_asset_path, asset(cdn)]]));
+  assert.equal(stamped.unexplained, 0, 'the other row\'s source and id match the group');
+  assert.equal(stamped.matched, 2);
+  const bareAsset = asset(cdn, { logicalId: '', sha256: '' });
+  const bare = reconcile(rows, new Map([[cdn.dam_asset_path, bareAsset]]));
+  assert.deepEqual(bare.needsBackfill, [{
+    path: cdn.dam_asset_path,
+    ids: [cdn.logical_id, alias.logical_id].sort(),
+    logicalId: cdn.logical_id,
+  }], 'one backfill per asset, one logical id for it');
+  // the asset's own logical id stays the one written
+  const own = reconcile(rows, new Map([[cdn.dam_asset_path, asset(cdn, { logicalId: alias.logical_id, sha256: '' })]]));
+  assert.equal(own.needsBackfill[0].logicalId, alias.logical_id);
+});
+
+test('reconcile: a mismatched asset is never backfilled; rows disagreeing on sha256 are a mismatch', () => {
+  const r = row(1);
+  const other = reconcile({ [r.logical_id]: r }, new Map([[r.dam_asset_path, asset(r, { sourceUrl: 'https://cdn/x.jpg', sha256: '', logicalId: '' })]]));
+  assert.equal(other.mismatched.length, 1);
+  assert.deepEqual(other.needsBackfill, []);
+  const twin = row(1, { logical_id: 'ffffffff__img-1.jpg', sha256: 'c'.repeat(64) });
+  const split = reconcile(
+    { [r.logical_id]: { ...r, sha256: 'b'.repeat(64) }, [twin.logical_id]: twin },
+    new Map([[r.dam_asset_path, asset(r, { sha256: '' })]]),
   );
-  assert.equal(report.notInLedger.length, 0);
-  assert.equal(report.unexplained, 0);
+  assert.match(split.mismatched[0], /the rows disagree on sha256/);
+  assert.deepEqual(split.needsBackfill, []);
 });
 
 test('damAssets: pages through QueryBuilder on author with the token, both hit shapes', async () => {
@@ -101,6 +134,7 @@ test('damAssets: pages through QueryBuilder on author with the token, both hit s
   const first = new URL(calls[0][0]).searchParams;
   assert.equal(first.get('path'), DAM);
   assert.equal(first.get('type'), 'dam:Asset');
+  assert.equal(first.get('orderby'), 'path', 'a stable order for offset paging');
   assert.match(first.get('p.properties'), /jcr:content\/metadata\/skoda:sha256/);
   assert.equal(new URL(calls[1][0]).searchParams.get('p.offset'), '2');
   assert.deepEqual([...assets.keys()], [`${DAM}/a.jpg`, `${DAM}/b.jpg`, `${DAM}/c.pdf`]);
@@ -111,11 +145,17 @@ test('damAssets: pages through QueryBuilder on author with the token, both hit s
   }), /QueryBuilder returned 401/);
 });
 
-test('backfill: hashes the author original, checks its size, writes the asset and the row', async () => {
+test('backfill: per asset, checks the original against the rows, writes the asset once and the rows', async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'reconcile-'));
+  const sha = sha256Of(Buffer.from('ORIGINAL'));
   const ok = row(1);
-  const wrongSize = row(2, { bytes: 99 });
-  writeManifest(dir, { rows: { [ok.logical_id]: ok, [wrongSize.logical_id]: wrongSize } });
+  const okAlias = row(1, { logical_id: 'ffffffff__img-1.jpg' });
+  const wrongSize = row(2, { kind: 'document', bytes: 99 });
+  // an image delivered as a 768px rendition records the rendition's bytes: not the original's
+  const rendition = row(3, { bytes: 99, delivery_url: 'https://cdn.skoda-storyboard.com/2025/01/img-3-768x432.jpg' });
+  const knownHash = row(4, { sha256: 'd'.repeat(64) });
+  const all = [ok, okAlias, wrongSize, rendition, knownHash];
+  writeManifest(dir, { rows: Object.fromEntries(all.map((r) => [r.logical_id, r])) });
   const store = openManifest(dir);
   const writes = [];
   const fetchImpl = async (url, opts) => {
@@ -124,13 +164,34 @@ test('backfill: hashes the author original, checks its size, writes the asset an
     return new Response('ORIGINAL', { status: 200, headers: { 'content-length': '8' } });
   };
   const metadataImpl = async (args) => { writes.push(args); return { ok: true, status: 200 }; };
-  const { done, failed } = await backfill(store, [ok.logical_id, wrongSize.logical_id], {
+  const entry = (rows, logicalId = rows[0].logical_id) => ({
+    path: rows[0].dam_asset_path, ids: rows.map((r) => r.logical_id), logicalId,
+  });
+  const { done, failed } = await backfill(store, [
+    entry([ok, okAlias]), entry([wrongSize]), entry([rendition]), entry([knownHash]),
+  ], {
     base: BASE, token: 't0k', fetchImpl, metadataImpl,
   });
-  assert.deepEqual(done, [ok.logical_id]);
-  assert.match(failed[0], /size 8 ≠ the row's 99/);
-  assert.deepEqual(writes.map((w) => w.metadata), [{ sha256: sha256Of(Buffer.from('ORIGINAL')), logicalId: ok.logical_id }]);
+  assert.deepEqual(done, [ok.dam_asset_path, rendition.dam_asset_path]);
+  assert.match(failed[0], /size 8 ≠ .*'s 99/);
+  assert.match(failed[1], /sha256 .* ≠ .*'s d+/, 'an existing sha256 is not overwritten');
+  assert.deepEqual(writes.map((w) => [w.damPath, w.metadata]), [
+    [ok.dam_asset_path, { sha256: sha, logicalId: ok.logical_id }],
+    [rendition.dam_asset_path, { sha256: sha, logicalId: rendition.logical_id }],
+  ], 'one write per asset');
   const { rows } = loadManifest(dir);
-  assert.equal(rows[ok.logical_id].sha256, sha256Of(Buffer.from('ORIGINAL')));
+  assert.deepEqual([ok, okAlias, rendition].map((r) => rows[r.logical_id].sha256), [sha, sha, sha]);
   assert.equal(rows[wrongSize.logical_id].sha256, undefined);
+  assert.equal(rows[knownHash.logical_id].sha256, 'd'.repeat(64));
+  assert.ok(!existsSync(path.join(dir, '.lock')), 'the lock was released');
+  openManifest(dir).compact();
+});
+
+test('media:reconcile refuses a non-https --dam-base before any token is used', () => {
+  const cli = new URL('./reconcile-dam.mjs', import.meta.url).pathname;
+  ['http://author.example.com', 'not a url', ''].forEach((base) => {
+    const out = spawnSync(process.execPath, [cli, '--dam-base', base], { encoding: 'utf8', env: { ...process.env, AEM_DAM_TOKEN: '' } });
+    assert.equal(out.status, 1);
+    assert.match(out.stderr, /https author origin/);
+  });
 });

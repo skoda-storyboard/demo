@@ -502,6 +502,14 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     );
     assert.deepEqual(dam.uploads, ['%PDF-TECH', '%PDF-YEAR', '\0\0\0\0ftypmock']);
     assert.equal(row.steps.dam, 'done');
+    // provenance on the PDF/MP4 assets: the original's sha256 (hashed while downloading) and
+    // the logical id, in the row too (SKODA-518)
+    const sha = (text) => createHash('sha256').update(text).digest('hex');
+    assert.equal(row.sha256, sha('%PDF-TECH'));
+    const written = Object.fromEntries(dam.metadata
+      .map((m) => [m.properties['skoda:logicalId'], m.properties['skoda:sha256']]));
+    assert.equal(written[id], sha('%PDF-TECH'));
+    assert.equal(written[videoId], sha('\0\0\0\0ftypmock'));
     assert.equal(row.steps.publish, 'done');
     assert.equal(row.publish_status, 200);
     assert.equal(row.dam_asset_path, `${assetPath}TD-Kodiaq-en.pdf`);

@@ -12,19 +12,22 @@
  *     (`--backfill` adds them), an asset without migration provenance (authored in the DAM).
  *
  *   npm run media:reconcile -- --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
- *     [--dam-folder /content/dam/storyboard] [--token-file <file>] [--out report.json]
+ *     [--dam-folder /content/dam/storyboard] [--token-file <file>] [--manifest <ledger dir>]
+ *     [--out report.json]
  *   npm run media:reconcile -- … --backfill [--limit 100]
  *
- * `--backfill` downloads each listed original from author, hashes it, checks its size against
- * the row and writes `skoda:sha256` + `skoda:logicalId` on the asset and `sha256` in the row.
- * It writes to the DAM: run it only for an approved batch.
+ * `--backfill` takes each matched asset without sha256 / logical id (rows sharing it counted
+ * once), downloads its original from author, hashes it, checks it against the rows (an
+ * original's size, a sha256 they already hold) and writes `skoda:sha256` + `skoda:logicalId` on
+ * the asset and `sha256` in the rows. A mismatched asset is never backfilled. It writes to the
+ * DAM: run it only for an approved batch.
  */
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  fetchBinaryToFile, openManifest, resolveDamToken, setDamMetadata, LEDGER_DIR,
+  fetchBinaryToFile, loadManifest, openManifest, resolveDamToken, setDamMetadata, LEDGER_DIR,
 } from './media-lib.mjs';
 
 const PROPS = ['skoda:sourceUrl', 'skoda:sha256', 'skoda:logicalId'];
@@ -50,6 +53,7 @@ export async function damAssets({
       type: 'dam:Asset',
       'p.limit': String(pageSize),
       'p.offset': String(offset),
+      orderby: 'path', // a stable order for offset paging
       'p.hits': 'selective',
       'p.properties': ['jcr:path', ...PROPS.map((p) => `jcr:content/metadata/${p}`)].join(' '),
     });
@@ -78,10 +82,17 @@ export async function damAssets({
 }
 
 /**
- * The ledger's DAM rows against the assets. Pure.
+ * The ledger's DAM rows against the assets, per asset: the rows that share one DAM path (a CDN
+ * row and its `/direct-download/` alias) are one group, and any of their ids and sources match.
+ * Pure.
  * @param {Record<string, object>} rows the ledger rows
  * @param {Map<string, {sourceUrl: string, sha256: string, logicalId: string}>} assets by DAM path
  * @param {{folder?: string}} [options] assets outside the folder are not compared
+ * @returns {{matched: number, missingInDam: string[], notInLedger: string[], mismatched: string[],
+ *   needsBackfill: Array<{path: string, ids: string[], logicalId: string}>,
+ *   notMigrated: string[], unexplained: number}} matched counts rows; needsBackfill lists the
+ *   matched assets without sha256 / logical id, with the logical id to write (the asset's own,
+ *   else the group's first)
  */
 export function reconcile(rows, assets, { folder = '/content/dam/storyboard' } = {}) {
   const report = {
@@ -92,29 +103,40 @@ export function reconcile(rows, assets, { folder = '/content/dam/storyboard' } =
     needsBackfill: [],
     notMigrated: [],
   };
-  const inDam = Object.values(rows)
-    .filter((row) => row.steps?.dam === 'done' && row.dam_asset_path?.startsWith(`${folder}/`));
-  const claimed = new Set();
-  inDam.forEach((row) => {
-    const asset = assets.get(row.dam_asset_path);
-    claimed.add(row.dam_asset_path);
+  const groups = new Map();
+  Object.values(rows)
+    .filter((row) => row.steps?.dam === 'done' && row.dam_asset_path?.startsWith(`${folder}/`))
+    .forEach((row) => {
+      const key = row.dam_asset_path;
+      groups.set(key, [...(groups.get(key) || []), row]);
+    });
+  [...groups.keys()].sort().forEach((assetPath) => {
+    const list = groups.get(assetPath);
+    const ids = list.map((row) => row.logical_id).sort();
+    const asset = assets.get(assetPath);
     if (!asset) {
-      report.missingInDam.push(`${row.logical_id}: ${row.dam_asset_path}`);
+      ids.forEach((id) => report.missingInDam.push(`${id}: ${assetPath}`));
       return;
     }
-    const sources = [row.dam_original_url, row.master_url, row.source_url].filter(Boolean);
+    const sources = new Set(list
+      .flatMap((row) => [row.dam_original_url, row.master_url, row.source_url]).filter(Boolean));
+    const hashes = [...new Set(list.map((row) => row.sha256).filter(Boolean))];
     const differences = [
-      asset.sourceUrl && !sources.includes(asset.sourceUrl) && `sourceUrl ${asset.sourceUrl}`,
-      asset.logicalId && asset.logicalId !== row.logical_id && `logicalId ${asset.logicalId}`,
-      asset.sha256 && row.sha256 && asset.sha256 !== row.sha256
-        && `sha256 ${asset.sha256} ≠ ${row.sha256}`,
+      asset.sourceUrl && !sources.has(asset.sourceUrl) && `sourceUrl ${asset.sourceUrl}`,
+      asset.logicalId && !ids.includes(asset.logicalId) && `logicalId ${asset.logicalId}`,
+      asset.sha256 && hashes.some((h) => h !== asset.sha256) && `sha256 ${asset.sha256} ≠ ${hashes.join(', ')}`,
+      !asset.sha256 && hashes.length > 1 && `the rows disagree on sha256 (${hashes.join(', ')})`,
     ].filter(Boolean);
-    if (differences.length) report.mismatched.push(`${row.logical_id}: ${differences.join('; ')}`);
-    else report.matched += 1;
-    if (!asset.sha256 || !asset.logicalId) report.needsBackfill.push(row.logical_id);
+    if (differences.length) {
+      report.mismatched.push(`${ids.join(' + ')} (${assetPath}): ${differences.join('; ')}`);
+      return;
+    }
+    report.matched += list.length;
+    if (!asset.sha256 || !asset.logicalId) {
+      report.needsBackfill.push({ path: assetPath, ids, logicalId: asset.logicalId || ids[0] });
+    }
   });
-  // two rows may share one asset (a CDN row and its alias): the path is claimed once
-  [...assets].filter(([assetPath]) => assetPath.startsWith(`${folder}/`) && !claimed.has(assetPath))
+  [...assets].filter(([assetPath]) => assetPath.startsWith(`${folder}/`) && !groups.has(assetPath))
     .forEach(([assetPath, asset]) => {
       if (asset.sourceUrl) report.notInLedger.push(`${assetPath} (from ${asset.sourceUrl})`);
       else report.notMigrated.push(assetPath);
@@ -124,12 +146,21 @@ export function reconcile(rows, assets, { folder = '/content/dam/storyboard' } =
   return report;
 }
 
+// a row's `bytes` are its original's for PDF/MP4 and for an image delivered as its master; an
+// image delivered as a smaller rendition records that rendition's size
+const bytesOfOriginal = (row) => (row.kind === 'document' || row.kind === 'video'
+  || !row.delivery_url || row.delivery_url === row.master_url ? row.bytes : null);
+
 /**
- * Adds sha256 + logical id to assets uploaded before SKODA-518: download the original from
- * author, hash it, check its size, write the asset metadata and the row.
- * @returns {Promise<{done: string[], failed: string[]}>}
+ * Adds sha256 + logical id to assets uploaded before SKODA-518, per asset (reconcile()'s
+ * needsBackfill): download the original from author, hash it, check it against what the rows
+ * know (their original's size, a sha256 they already hold), then write the asset metadata and
+ * the rows' sha256. A check that fails leaves the asset and the rows as they were.
+ * @param {ReturnType<typeof openManifest>} store the opened ledger (recorded and compacted here)
+ * @param {Array<{path: string, ids: string[], logicalId: string}>} entries
+ * @returns {Promise<{done: string[], failed: string[]}>} by DAM path
  */
-export async function backfill(store, ids, {
+export async function backfill(store, entries, {
   base, token, fetchImpl = fetch, metadataImpl = setDamMetadata,
 }) {
   const done = [];
@@ -137,34 +168,45 @@ export async function backfill(store, ids, {
   const authed = (url, opts = {}) => fetchImpl(url, {
     ...opts, headers: { ...opts.headers, authorization: `Bearer ${token}` },
   });
-  for (const id of ids) {
-    const row = store.rows[id];
-    const dir = mkdtempSync(path.join(tmpdir(), 'skoda-reconcile-'));
-    try {
-      const url = `${base.replace(/\/$/, '')}${row.dam_asset_path.split('/').map(encodeURIComponent).join('/')}`;
-      // eslint-disable-next-line no-await-in-loop
-      const got = await fetchBinaryToFile(url, { filePath: path.join(dir, 'original'), fetchImpl: authed });
-      if (Number.isSafeInteger(row.bytes) && row.bytes > 0 && got.bytes !== row.bytes) {
-        throw new Error(`size ${got.bytes} ≠ the row's ${row.bytes}`);
+  try {
+    for (const entry of entries) {
+      const rows = entry.ids.map((id) => store.rows[id]).filter(Boolean);
+      const dir = mkdtempSync(path.join(tmpdir(), 'skoda-reconcile-'));
+      try {
+        const url = `${base.replace(/\/$/, '')}${entry.path.split('/').map(encodeURIComponent).join('/')}`;
+        // eslint-disable-next-line no-await-in-loop
+        const got = await fetchBinaryToFile(url, { filePath: path.join(dir, 'original'), fetchImpl: authed });
+        rows.forEach((row) => {
+          const bytes = bytesOfOriginal(row);
+          if (Number.isSafeInteger(bytes) && bytes > 0 && got.bytes !== bytes) {
+            throw new Error(`size ${got.bytes} ≠ ${row.logical_id}'s ${bytes}`);
+          }
+          if (row.sha256 && row.sha256 !== got.sha256) {
+            throw new Error(`sha256 ${got.sha256} ≠ ${row.logical_id}'s ${row.sha256}`);
+          }
+        });
+        // eslint-disable-next-line no-await-in-loop
+        const result = await metadataImpl({
+          damConfig: { baseUrl: base },
+          damPath: entry.path,
+          token,
+          metadata: { sha256: got.sha256, logicalId: entry.logicalId },
+        });
+        if (!result.ok) throw new Error(`metadata ${result.status}`);
+        rows.forEach((row) => {
+          row.sha256 = got.sha256; // eslint-disable-line no-param-reassign
+          store.record(row.logical_id);
+        });
+        done.push(entry.path);
+      } catch (error) {
+        failed.push(`${entry.path}: ${error.message}`);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
       }
-      // eslint-disable-next-line no-await-in-loop
-      const result = await metadataImpl({
-        damConfig: { baseUrl: base },
-        damPath: row.dam_asset_path,
-        token,
-        metadata: { sha256: got.sha256, logicalId: id },
-      });
-      if (!result.ok) throw new Error(`metadata ${result.status}`);
-      row.sha256 = got.sha256;
-      store.record(id);
-      done.push(id);
-    } catch (error) {
-      failed.push(`${id}: ${error.message}`);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
     }
+  } finally {
+    store.compact();
   }
-  store.compact();
   return { done, failed };
 }
 
@@ -174,18 +216,30 @@ async function main(args = process.argv.slice(2)) {
     return i >= 0 ? args[i + 1] : null;
   };
   const base = opt('--dam-base');
-  if (!base) throw new Error('--dam-base <author origin> is required');
+  // the token goes to this host: an https author origin only
+  if (!base || !/^https:$/.test(URL.canParse(base) ? new URL(base).protocol : '')) {
+    throw new Error('--dam-base <https author origin> is required');
+  }
   const folder = opt('--dam-folder') || '/content/dam/storyboard';
   const token = resolveDamToken({ tokenFile: opt('--token-file') || undefined });
   if (!token) throw new Error('No DAM token available (README, "Auth")');
-  const store = openManifest(opt('--manifest') ? path.resolve(opt('--manifest')) : LEDGER_DIR);
-  const report = reconcile(store.rows, await damAssets({ base, token, folder }), { folder });
+  const location = opt('--manifest') ? path.resolve(opt('--manifest')) : LEDGER_DIR;
+  // read-only unless --backfill, which takes the writer lock (and records the rows' sha256)
+  const store = args.includes('--backfill')
+    ? openManifest(location) : loadManifest(location, { mustExist: true });
+  let report;
+  try {
+    report = reconcile(store.rows, await damAssets({ base, token, folder }), { folder });
+  } catch (error) {
+    store.compact?.();
+    throw error;
+  }
   const lines = [
     `[reconcile] ${report.matched} row(s) match their asset`,
     `  missing in the DAM: ${report.missingInDam.length}`,
     `  in the DAM with migration provenance, no row: ${report.notInLedger.length}`,
     `  row and asset disagree: ${report.mismatched.length}`,
-    `  explained: ${report.needsBackfill.length} need sha256 / logical id (--backfill), ${report.notMigrated.length} not from the migration`,
+    `  explained: ${report.needsBackfill.length} asset(s) need sha256 / logical id (--backfill), ${report.notMigrated.length} not from the migration`,
   ];
   console.log(lines.join('\n'));
   [...report.missingInDam, ...report.notInLedger, ...report.mismatched].slice(0, 50)

@@ -1,3 +1,3 @@
-# The media manifest ledger: shards are one row per line, so a merge keeps both sides' rows
-# (a row changed on both sides becomes a duplicate the ledger refuses; SKODA-518).
-tools/importer/media/manifest/*.jsonl merge=union
+# The media manifest ledger: shards merged row by row by the media-ledger driver (npm ci installs
+# it); without it git marks text conflicts, which `npm run media:ledger -- --resolve` settles (SKODA-518).
+tools/importer/media/manifest/*.jsonl merge=media-ledger

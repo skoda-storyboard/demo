@@ -115,7 +115,7 @@ function auditPage(pagePath, contentRoot, rows) {
 function main() {
   const cfg = args();
   const urls = canonicalPaths(readFileSync(cfg.urls, 'utf8'));
-  const { rows } = loadManifest(path.resolve(cfg.manifest));
+  const { rows } = loadManifest(path.resolve(cfg.manifest), { mustExist: true });
   const pages = urls.map((url) => auditPage(url.slice(1), cfg.contentRoot, rows));
   const all = pages.flatMap((page) => page.images);
   const docs = pages.flatMap((page) => page.documents);

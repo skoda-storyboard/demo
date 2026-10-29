@@ -572,34 +572,55 @@ ledger under `tools/importer/media/manifest/`:
 - **64 shards** `NN.jsonl`, chosen by a hash of `logical_id`. One row per line, sorted by
   `logical_id`. The rows are the same objects as before; every tool still sees
   `{ generatedAt, rows }` (`loadManifest()`).
-- **A run journals, then compacts.** `media:build` and `media:publish-images` append each changed
-  row to `manifest/journal.jsonl` (one line, no rewrite) and write each touched shard once at
-  the end, also after a failure. A journal left by an interrupted run is replayed on the next
-  load and compacted by the next run (or `npm run media:ledger -- --compact`). The journal is
-  git-ignored; the integrity test fails on a committed one.
-- **Merging.** `.gitattributes` merges the shards as a union: two branches that add rows merge
-  without a conflict (`git merge` honours it; GitHub's web conflict editor may not, so merge
-  `main` into a branch locally). A row both branches changed ends up as two lines; every tool
-  then refuses the ledger with the row's two places (`… twice (0a.jsonl:12 and 0a.jsonl:13);
-  merge the copies`). Keep one line (union `page_refs` / `seen_urls`, the meaningful alt).
+- **One writer at a time.** A writer (`media:build`, `media:publish-images`, `media:ledger
+  --fold / --compact`, `media:reconcile --backfill`) takes `manifest/.lock` when it records its
+  first row, so a run that stops before writing anything leaves no lock. A second writer stops at
+  its first row with "Another media run (pid …, since …) is writing …; let it finish. If no media
+  run is going, remove …/.lock". A lock whose process is gone (a killed run) is taken over, and
+  that run's journal adopted. Readers (`media:apply`, the cart index, the push gate) don't lock;
+  they warn while a journal holds rows the shards don't.
+- **A run journals, then compacts.** A writer appends each row it records to
+  `manifest/journal.jsonl` (one line, no rewrite). At the end, also after an error and on Ctrl-C
+  / SIGTERM (the post-import hook's timeout), it writes each touched shard once: the recorded
+  rows over the shard as it is on disk; a change it never recorded is not written. Its workers
+  stop taking new items after a fatal error and finish the running ones first. A journal left
+  by a killed run is replayed on the next load and compacted by the next writer (or `npm run
+  media:ledger -- --compact`); a torn last line is dropped with a warning. Journal and lock are
+  git-ignored; the integrity test fails on a committed journal.
+- **Merging.** `.gitattributes` names the `media-ledger` merge driver, which `npm ci` installs
+  (`prepare`; or `npm run media:ledger -- --install-merge-driver`). It merges a shard row by row
+  against the merge base: rows changed or added on different branches merge cleanly, even next
+  to each other. A row changed on both branches is a conflict: the shard carries both versions
+  between `<<<<<<< ours` / `>>>>>>> theirs`, and every tool refuses the ledger ("Unresolved merge
+  conflict in 0a.jsonl:12") until one line is kept (union `page_refs` / `seen_urls`, the
+  meaningful alt). Without the driver (a fresh clone before `npm ci`), git marks text conflicts
+  wherever neighbouring lines changed: `npm run media:ledger -- --resolve` settles them row by
+  row from the merge's index, then `git add` the shards. GitHub's web conflict editor uses
+  neither, so merge `main` into a branch locally.
 - **Checks.** `npm run media:ledger -- --check` and `media-manifest-integrity.test.mjs`: no
-  duplicate row, no row without an id or in the wrong shard, no journal, every `seen_urls`
-  entry the row's own file.
+  duplicate row, no unresolved conflict, no row without an id or in the wrong shard, no journal,
+  every `seen_urls` entry the row's own file. Rows load in logical-id order, whatever the order
+  in the files.
 - **Old-format files.** A `--manifest <file>.json` location is still read and written as one
   JSON object (test fixtures). A branch made before the ledger that changed
   `media-manifest.json` folds its rows in with
   `git show $(git merge-base HEAD origin/main):tools/importer/media/media-manifest.json > /tmp/base.json`
   and `npm run media:ledger -- --fold <its media-manifest.json> --base /tmp/base.json`: only the
-  rows the branch changed are applied; a row changed on both sides is listed and left as it is.
+  rows the branch changed are applied; a row changed on both sides, or one whose key and
+  `logical_id` differ, is listed and left as it is. The old path itself
+  (`tools/importer/media/media-manifest.json`) is refused with a pointer to the ledger.
 - **Provenance on the asset.** Every upload writes `skoda:sourceUrl`, `skoda:sourcePage`,
   `skoda:sha256` (of the original, hashed while it downloads) and `skoda:logicalId`; the row
   keeps `sha256` too. `npm run media:reconcile -- --dam-base <author>` (developer machine, DAM
   token) lists every asset under the DAM folder through QueryBuilder on author and compares it
-  with the ledger, read-only. Exit 1 on an unexplained difference: a row whose asset is gone, an
-  asset with migration provenance but no row, or a row and asset that disagree on the source,
-  the logical id or sha256. Assets uploaded before SKODA-518 lack sha256 / logical id: they are
-  listed, and `--backfill [--limit N]` (an approved batch: it writes DAM metadata) hashes the
-  author original, checks its size and writes both.
+  with the ledger, read-only, per asset: rows sharing one DAM path (a CDN row and its alias) are
+  one group, and any of their sources and ids match. Exit 1 on an unexplained difference: a row
+  whose asset is gone, an asset with migration provenance but no row, or an asset and its rows
+  that disagree on the source, the logical id or sha256. Assets uploaded before SKODA-518 lack
+  sha256 / logical id: they are listed once per asset, and `--backfill [--limit N]` (an approved
+  batch: it writes DAM metadata) downloads the author original, hashes it, checks it against the
+  rows (the original's size, where the row records it; a sha256 a row already holds) and writes
+  the sha256 and one logical id per asset. A mismatched asset is never backfilled.
 - **Lookups don't depend on row order.** A URL two rows claim (`x.JPG.jpg` and `x.jpg`, a CDN
   row and its `/direct-download/` alias) resolves to the row it is the logical id of (images,
   `media:apply`) or to the verified row (PDF/MP4 gate), not to whichever row came last.
