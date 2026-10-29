@@ -149,6 +149,17 @@ templates, the tool and the translations), each finding reproduced before it was
   the form control (`a.topbar__newsletter` → `#nl-form`), and the chrome importer knew only the latter. Fixed in
   `locale-chrome.js` `buildNav` (the link kept as the source's; the page is not migrated, so it opens the source);
   re-imported, only the two SK navs change. Their re-push is a DA write, on request.
+  - **#543 review (2026-10-29): the header gave that link no mail icon, and SK phones no mail shortcut.** The header
+    knew only the panel CTA (`#subscribe`). On the source, the SK link carries the mail icon (desktop, 110×18) and
+    phones get an icon link to the same page (292,67, 26×18 at 390). `header.js` now takes a topbar paragraph that
+    is one link and not the language row as the Subscribe CTA too: it gets the mail icon, and the phone shortcut
+    links its page (no panel, no `{nav}-newsletter` fetch). Rendered with the regenerated SK navs: desktop link
+    110×18, phone icon 292,67 26×18 as on the source, both open the source page in a new tab. Unchanged: the EN and
+    CS panel CTAs, and no CTA on the EN Media Room, DE and Sustainability navs. Test
+    `header-newsletter-page.test.mjs` (fails on the old header).
+  - The SK navs to push carry both importer fixes, this one and #542's "Modely → Fabia" (`/sk/media-room/nav`): a
+    re-import with #543 + #542 changes only the two SK navs (+ "Odber noviniek"); the other 18 fragments' links
+    equal live.
 - **The CS press-release listing shows 0 results:** no CS release is imported yet. SKODA-1004a (the CS corpus); the
   3 newest are held for their PDF / MP4 DAM ingest.
 - **The language homes (`/cs`, `/de`, `/sk`, `/sr`, `/sl`) are 404:** not imported. They come with the per-locale

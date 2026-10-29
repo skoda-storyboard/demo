@@ -613,6 +613,8 @@ export default async function decorate(block) {
   const navTopbar = nav.querySelector('.nav-topbar');
   let hasSubscribe = false;
   let subscribeLink = null;
+  // the Subscribe CTA's newsletter page, when it links one instead of opening the panel
+  let subscribePage = '';
   if (navTopbar) {
     const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
     if (switcher) {
@@ -628,9 +630,22 @@ export default async function decorate(block) {
     // group Subscribe + locales so they can float right on desktop / drop into drawer on mobile
     const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
     utility.forEach((p) => p.classList.add('nav-topbar-utility'));
-    // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
-    subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
+    // the Subscribe CTA: the newsletter panel's trigger (`#subscribe`), or a locale's own
+    // newsletter page linked instead (SK "Odber noviniek" → /sk/odber-noviniek/, SKODA-1003): a
+    // utility paragraph that is one link and nothing else, and not the language row
+    const base = window.location.href;
+    const isWholeParagraph = (a) => !!a?.textContent.trim()
+      && a.textContent.trim() === a.parentElement.textContent.trim();
+    subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]')
+      || [...utility].filter((p) => !isLocaleGroup(p, base))
+        .map((p) => p.querySelector(':scope > a[href]'))
+        .find(isWholeParagraph)
+      || null;
     hasSubscribe = !!subscribeLink;
+    if (subscribeLink && !subscribeLink.getAttribute('href').includes('#subscribe')) {
+      subscribePage = subscribeLink.getAttribute('href');
+    }
+    // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
     if (subscribeLink && !subscribeLink.querySelector('.icon')) {
       subscribeLink.classList.add('nav-subscribe');
       const mail = document.createElement('span');
@@ -643,7 +658,6 @@ export default async function decorate(block) {
     // topbar is lifted OUT of <nav>, so it can't appear inside the mobile drawer: a copy of
     // the list goes into a drawer footer (CSS shows it only in the open drawer; the topbar
     // one is the desktop instance), so both use the same mapping.
-    const base = window.location.href;
     const localeGroup = [...utility].find((p) => isLocaleGroup(p, base));
     const locales = localeGroup && buildLocaleList(
       localeEntries(localeGroup, base),
@@ -880,13 +894,14 @@ export default async function decorate(block) {
 
   // mobile action cluster: mail shortcut + hamburger (mail sits before the
   // hamburger, mobile-only). With the newsletter panel it becomes the panel's
-  // button (below). Only a nav that authors the Subscribe CTA gets it: the
-  // Media Room nav has none (SKODA-309).
+  // button (below); a CTA that links a newsletter page gives the shortcut that link,
+  // as the source's SK icon does. Only a nav that authors the Subscribe CTA gets it:
+  // the EN Media Room nav has none (SKODA-309).
   let mail;
   if (hasSubscribe) {
     mail = document.createElement('a');
     mail.className = 'nav-mail';
-    mail.href = '#subscribe';
+    mail.href = subscribePage || '#subscribe';
     mail.setAttribute('aria-label', text.subscribe);
     mail.append(glyph('mail', 'nav-mail-glyph'));
   }
@@ -931,7 +946,7 @@ export default async function decorate(block) {
   // the Subscribe CTA (topbar) and the mail shortcut (phones) open the newsletter panel once
   // its fragment has loaded (not awaited: the header never waits for it; until then, or
   // without it, they stay plain links)
-  const panelTriggers = [subscribeLink, mail].filter(Boolean);
+  const panelTriggers = subscribePage ? [] : [subscribeLink, mail].filter(Boolean);
   if (panelTriggers.length) {
     const newsletterPath = `${navPath}-newsletter`;
     loadFragment(newsletterPath).then((newsletter) => {
