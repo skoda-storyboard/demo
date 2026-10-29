@@ -253,7 +253,7 @@ test('page band: the same picture and img, WebP sources + an img srcset sized fo
   assert.deepEqual([img.getAttribute('width'), img.getAttribute('height')], ['1920', '367']);
 });
 
-test('archive band: sized for its three heights; phones keep 750w; a jpeg keeps the jpg format', () => {
+test('archive band: sized for its three heights; phones at most 1080w; a jpeg keeps the jpg format', () => {
   const hero = block('archive', `<div><div>${MEDIA_PICTURE('2500', '480').replace(/\.png/g, '.jpeg').replace(/format=png/g, 'format=jpeg')}</div></div><div><div><h1>eMobility</h1></div></div>`);
   decorate(hero);
   const img = hero.querySelector('img');
@@ -263,7 +263,7 @@ test('archive band: sized for its three heights; phones keep 750w; a jpeg keeps 
   const sources = [...hero.querySelectorAll('source')];
   const widths = (s) => s.getAttribute('srcset').split(', ').map((c) => c.split(' ')[1]);
   assert.equal(sources[0].getAttribute('media'), '(width < 768px)');
-  assert.deepEqual(widths(sources[0]), ['750w']);
+  assert.deepEqual(widths(sources[0]), ['750w', '1080w']);
   assert.deepEqual(widths(sources[1]), ['750w', '1080w', '1440w', '1920w', '2500w']);
 });
 
