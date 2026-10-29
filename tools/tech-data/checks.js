@@ -5,8 +5,9 @@
  */
 import {
   decodeEntities, escapeHtml, flat, hasDecimalComma, linkHtml, modelsForPage, pageTags, parseFigure,
-  parseTechDataHref, sameFigure, textOf, valuesOfModels,
+  parseTechDataHref, readMetadata, sameFigure, textOf, valuesOfModels,
 } from './tech-data.js';
+import { checkClaims, extractClaims, nameRe } from './claims.js';
 
 const METADATA_OPEN_RE = /^<div\b[^>]*\bclass="(?:section-)?metadata"/i;
 const BLOCK_TAG_RE = /^<\/?(?:p|div|li|h[1-6]|td|th|tr|table|ul|ol|br|blockquote)\b/i;
@@ -23,8 +24,6 @@ const APPROXIMATE_RE = /\b(?:more than|over|at least|almost|nearly|around|approx
 // "up to 577 km" names the top of an official interval, "from 408 km" its bottom (review P2 #6)
 const UP_TO_RE = /\b(?:up to|maximum(?: of)?|max\.?|as much as)\s*$/i;
 const FROM_RE = /\bfrom\s*$/i;
-// a range sentence about a drive, a test or a record states a measured result, not the WLTP figure
-const MEASURED_RE = /\b(?:record|test|tested|real-world|drive|drove|driven|covered|journey|trip)\b/i;
 const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+(?=[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ"“])/;
 const LINK_MASK = ' \u2063 ';
 const LEGAL_FIELDS = ['range', 'consumption'];
@@ -56,10 +55,12 @@ function segments(html) {
   let meta = 0;
   let link = 0;
   let techLink = false;
+  let techKey = '';
+  let techId = 0;
   return String(html ?? '').split(/(<[^>]+>)/).filter((part) => part !== '').map((part) => {
     if (!part.startsWith('<')) {
       return {
-        part, tag: false, inMeta: meta > 0, inTechLink: techLink,
+        part, tag: false, inMeta: meta > 0, inTechLink: techLink, techKey, techId,
       };
     }
     if (meta) {
@@ -73,10 +74,16 @@ function segments(html) {
     }
     if (/^<a\b/i.test(part)) {
       link += 1;
-      techLink = Boolean(parseTechDataHref((part.match(HREF_RE) || [])[1]));
+      const binding = parseTechDataHref((part.match(HREF_RE) || [])[1]);
+      techLink = Boolean(binding);
+      techKey = binding?.key ?? '';
+      if (binding) techId += 1;
     } else if (/^<\/a>/i.test(part)) {
       link = Math.max(0, link - 1);
-      if (!link) techLink = false;
+      if (!link) {
+        techLink = false;
+        techKey = '';
+      }
     }
     return { part, tag: true, inMeta: false };
   });
@@ -99,6 +106,67 @@ function textBlocks(html) {
   });
   blocks.push(current);
   return blocks.map(flat).filter(Boolean);
+}
+
+/**
+ * Text blocks outside metadata with technical-data links left in the text, and the links each
+ * block holds ({key, text}), so a linked value is checked in its sentence like typed text.
+ */
+function textBlocksWithLinks(html) {
+  const blocks = [];
+  let current = { text: '', links: new Map() };
+  segments(html).forEach((s) => {
+    if (s.inMeta) return;
+    if (s.tag) {
+      if (BLOCK_TAG_RE.test(s.part)) {
+        blocks.push(current);
+        current = { text: '', links: new Map() };
+      }
+      return;
+    }
+    const text = decodeEntities(s.part);
+    current.text += text;
+    if (s.inTechLink) {
+      const link = current.links.get(s.techId) ?? { key: s.techKey, text: '' };
+      link.text += text;
+      current.links.set(s.techId, link);
+    }
+  });
+  blocks.push(current);
+  return blocks.map((b) => ({ text: flat(b.text), links: [...b.links.values()] }))
+    .filter((b) => b.text);
+}
+
+// a block that is only a figure ("935 l", "150 - 220 kW") is a Technical Data cell value;
+// the grid check owns it
+const FIGURE_ONLY_RE = /^[\d\s.,–—*-]+\s*(?:[A-Za-z°″%]+\/?)*(?:\s*\/?\s*100\s*km)?\s*\*?$/;
+
+/**
+ * The document's text, sentence by sentence, for the claims check: every text block outside the
+ * metadata (figure-only cells left to the grid check), then the metadata Title and Description,
+ * which search results and social cards show.
+ * Technical-data links stay in the text; each sentence lists the links it holds.
+ * @returns {{text: string, where?: string, links?: {key: string, text: string}[]}[]}
+ */
+export function sentencesOf(html) {
+  const split = (text) => text.split(SENTENCE_SPLIT_RE).map(flat).filter(Boolean);
+  const body = textBlocksWithLinks(html).filter((block) => !FIGURE_ONLY_RE.test(block.text))
+    .flatMap((block) => {
+      const sentences = split(block.text).map((text) => ({ text, links: [] }));
+      // each link goes to the first sentence that holds its text, in order
+      let from = 0;
+      block.links.forEach((link) => {
+        const at = sentences.findIndex((s, i) => i >= from && s.text.includes(flat(link.text)));
+        if (at < 0) return;
+        sentences[at].links.push(link);
+        from = at;
+      });
+      return sentences;
+    });
+  const meta = readMetadata(html);
+  const fromMetadata = [['title', 'Title'], ['description', 'Description']]
+    .flatMap(([key, where]) => split(meta.get(key) ?? '').map((text) => ({ text, where })));
+  return [...body, ...fromMetadata];
 }
 
 /** The text of the paragraph around a position in the HTML ('' when it isn't in one). */
@@ -153,15 +221,16 @@ export function findWltpFigures(html) {
 }
 
 /**
- * Range figures in sentences about range that don't say WLTP, unless the sentence is about a drive,
- * a test or a record (those state a measured result and must not be called WLTP).
+ * Range figures stated as what the car can do, in sentences that don't say WLTP. A measured
+ * result (a record drive) is left out: it must not be called WLTP. Whether a clause is measured is
+ * decided in that clause (claims.js), so "trip" elsewhere in the sentence doesn't hide a claim.
  */
 export function findUnlabelledRanges(html) {
-  return textBlocks(html).flatMap((block) => block.split(SENTENCE_SPLIT_RE))
-    .filter((s) => /\brange\b/i.test(s) && !/\bWLTP\b/.test(s) && !MEASURED_RE.test(s))
-    .flatMap((sentence) => [...sentence.matchAll(CLAIM_RE)]
-      .filter((m) => parseFigure(`${m[1]} ${m[2]}`)?.unit === 'km')
-      .map((m) => ({ text: flat(`${m[1]} ${m[2]}`), sentence })));
+  return textBlocks(html).filter((block) => !FIGURE_ONLY_RE.test(block))
+    .flatMap((block) => block.split(SENTENCE_SPLIT_RE))
+    .flatMap((sentence) => extractClaims(sentence))
+    .filter((c) => c.field === 'range' && !c.measured && !/\bWLTP\b/.test(c.sentence))
+    .map((c) => ({ text: c.text, sentence: c.sentence }));
 }
 
 /**
@@ -173,9 +242,8 @@ function pageContext(sheet, path, html, tags) {
   const fromDocument = pageTags(html);
   const pageTagSet = fromDocument.length ? fromDocument : (tags ?? []);
   const models = modelsForPage(sheet.models, { path, tags: pageTagSet });
-  const rows = models.length
-    ? valuesOfModels(sheet.values, models.map((m) => m.code))
-    : [...sheet.values.values()];
+  // no model, no rows: comparing with every model would let another model's figure pass
+  const rows = valuesOfModels(sheet.values, models.map((m) => m.code));
   return { models, rows };
 }
 
@@ -192,22 +260,30 @@ const status = (issues, reviews) => {
 const countLabel = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const differ = (n) => (n === 1 ? 'differs' : 'differ');
 
-function linksCheck(html, sheet) {
+function linksCheck(html, sheet, models) {
   const linked = findLinkedValues(html);
   const unknown = linked.filter((l) => !sheet.values.has(l.key));
   const stale = linked.filter((l) => {
     const row = sheet.values.get(l.key);
     return row && flat(l.text) !== flat(row.display);
   });
+  const pageCodes = new Set(models.map((m) => m.code));
+  const foreign = models.length ? linked.filter((l) => {
+    const row = sheet.values.get(l.key);
+    if (!row || pageCodes.has(row.model)) return false;
+    const name = sheet.models.find((m) => m.code === row.model)?.name ?? row.model;
+    return !nameRe(name).test(l.paragraph);
+  }) : [];
   const details = [
     ...unknown.map((l) => `"${l.text}" links to ${l.key}, which isn't in the sheet`),
+    ...foreign.map((l) => `"${l.text}" links to ${l.key} (${sheet.values.get(l.key).label}), not this page's ${models.map((m) => m.name).join(', ')}, and the paragraph doesn't name that model`),
     ...stale.map((l) => {
       const row = sheet.values.get(l.key);
       return `${l.key}: "${l.text}" → "${row.display}" (${sourceOf(row)})`;
     }),
   ];
   let summary = 'No linked values on this page';
-  if (details.length) summary = `${countLabel(details.length, 'linked value')} ${differ(details.length)} from the sheet`;
+  if (details.length) summary = `${countLabel(details.length, 'linked value')} need fixing`;
   else if (linked.length === 1) summary = 'The linked value matches the sheet';
   else if (linked.length) summary = `All ${linked.length} linked values match the sheet`;
   return {
@@ -270,51 +346,35 @@ function gridCheck(html, sheet, models) {
   };
 }
 
-const officialFor = (figure, rows) => rows
-  .filter((r) => LEGAL_FIELDS.includes(r.field))
-  .find((r) => sameFigure(figure.text, r.display)) ?? null;
-
-/** The row whose interval starts ("from") or ends ("up to") at a single-number figure, or null. */
-function boundFor(figure, rows) {
-  const claim = parseFigure(figure.text);
-  if (!figure.bound || !claim || claim.numbers.length !== 1) return null;
-  const pick = figure.bound === 'max' ? Math.max : Math.min;
-  return rows.filter((r) => LEGAL_FIELDS.includes(r.field)).find((r) => {
-    const official = parseFigure(r.display);
-    return official && official.unit === claim.unit
-      && pick(...official.numbers) === claim.numbers[0];
-  }) ?? null;
-}
-
 const officialSummary = (rows, models) => {
   const ranges = models.map((m) => rows.find((r) => r.key === `${m.code}.range`)).filter(Boolean);
   return ranges.map((r) => `${r.display} (${r.label || r.model})`).join('; ');
 };
 
-function wltpFiguresCheck(html, rows, models) {
-  const figures = findWltpFigures(html);
-  const issues = [];
-  const reviews = [];
-  const official = officialSummary(rows, models);
-  const expected = official ? `; official: ${official}` : '';
-  figures.forEach((figure) => {
-    if (officialFor(figure, rows) || boundFor(figure, rows)) return;
-    if (figure.isApproximate) {
-      reviews.push(`"${figure.text}" is a rounded WLTP figure${expected}`);
-      return;
-    }
-    issues.push(`"${figure.text}" is labelled WLTP but isn't an official figure${models.length ? '' : ' for any model in the sheet'}${expected}`);
-  });
-  let summary = 'No WLTP figures in the text';
-  if (issues.length) summary = `${countLabel(issues.length, 'WLTP figure')} not in the sheet`;
-  else if (reviews.length) summary = `${countLabel(reviews.length, 'rounded WLTP figure')} to check`;
-  else if (figures.length) summary = `${countLabel(figures.length, 'WLTP figure')}, all official`;
+/**
+ * Every technical claim in the text (claims.js): an Issue when it contradicts the official figures,
+ * a Review when it is rounded, measured but not recorded, or has nothing to be checked against.
+ */
+function claimsCheck(html, sheet, models) {
+  const results = checkClaims(sentencesOf(html), sheet, models);
+  const issues = results.filter((r) => r.status === 'issue');
+  const reviews = results.filter((r) => r.status === 'review');
+  const passed = results.length - issues.length - reviews.length;
+  let summary = 'No technical claims in the text';
+  if (results.length) {
+    summary = [
+      issues.length && `${countLabel(issues.length, 'claim')} ${differ(issues.length)} from the official figures`,
+      reviews.length && `${reviews.length} need${reviews.length === 1 ? 's' : ''} review`,
+      passed && `${passed} match${passed === 1 ? 'es' : ''}`,
+    ].filter(Boolean).join(', ');
+  }
   return {
-    id: 'wltp-figures',
-    title: 'WLTP figures in the text',
+    id: 'claims',
+    title: 'Technical claims in the text',
     status: status(issues.length, reviews.length),
     summary,
-    details: [...issues, ...reviews],
+    details: [...issues, ...reviews].map((r) => r.message),
+    counts: { issues: issues.length, reviews: reviews.length, passed },
   };
 }
 
@@ -340,15 +400,65 @@ function wltpLabelCheck(html, rows, models) {
   };
 }
 
-function linkableCheck(html, sheet, rows, models) {
+/**
+ * Typed WLTP range / consumption figures become links, only where the claims check verified them:
+ * status ok, an official figure of the sentence's model, version and configuration, same unit,
+ * and a row that is exactly that figure. Issues, Reviews, rounded and "up to" a min–max figures
+ * are never linked, and no text is corrected.
+ */
+function linkProse(html, sheet, models, changes) {
+  const parts = segments(html);
+  let block = [];
+  const blocks = [];
+  parts.forEach((s, i) => {
+    if (s.tag && BLOCK_TAG_RE.test(s.part)) {
+      blocks.push(block);
+      block = [];
+    } else if (!s.tag && !s.inMeta) block.push(i);
+  });
+  blocks.push(block);
+  blocks.forEach((indexes) => {
+    const text = flat(decodeEntities(indexes.map((i) => parts[i].part).join('')));
+    if (!/\bWLTP\b/.test(text)) return;
+    // the block's claims in order, each with the row it may be linked to (or none)
+    const sentences = text.split(SENTENCE_SPLIT_RE).map((s) => ({ text: flat(s) }));
+    const plan = checkClaims(sentences, sheet, models)
+      .filter((r) => LEGAL_FIELDS.includes(r.claim.field))
+      .map((r) => ({
+        text: flat(r.claim.text),
+        row: r.status === 'ok' && r.reason === 'official' && /\bWLTP\b/.test(r.claim.sentence) ? r.row : null,
+      }));
+    let next = 0;
+    // match each typed figure to its claim in order; a figure without one is left alone
+    const take = (figure) => {
+      const at = plan.findIndex((p, i) => i >= next && p.text === figure);
+      if (at < 0) return null;
+      next = at + 1;
+      return plan[at];
+    };
+    indexes.forEach((i) => {
+      parts[i].part = parts[i].part.replace(CLAIM_RE, (all) => {
+        const entry = take(flat(decodeEntities(all)));
+        if (parts[i].inTechLink || !entry?.row) return all;
+        const from = flat(decodeEntities(all));
+        changes.push({ what: entry.row.key, from, to: entry.row.display });
+        return linkHtml(entry.row);
+      });
+    });
+  });
+  return parts.map((s) => s.part).join('');
+}
+
+function linkableCheck(html, sheet, models) {
   const cells = models.length
     ? findGridCells(html).filter((c) => !c.linked).filter((c) => {
       const row = rowForCell(sheet, models, c.field);
       return row && sameFigure(c.text, row.display);
     }).map((c) => `${c.label}: "${c.text}"`)
     : [];
-  const prose = findWltpFigures(html).filter((f) => officialFor(f, rows))
-    .map((f) => `"${f.text}" in "${f.sentence.slice(0, 80)}"`);
+  const planned = [];
+  linkProse(html, sheet, models, planned);
+  const prose = planned.map((c) => `"${c.from}" (${c.what})`);
   const details = [...cells, ...prose];
   return {
     id: 'linkable',
@@ -373,11 +483,11 @@ export function runChecks({
 }) {
   const { models, rows } = pageContext(sheet, path, html, tags);
   return [
-    linksCheck(html, sheet),
+    linksCheck(html, sheet, models),
     gridCheck(html, sheet, models),
-    wltpFiguresCheck(html, rows, models),
+    claimsCheck(html, sheet, models),
     wltpLabelCheck(html, rows, models),
-    linkableCheck(html, sheet, rows, models),
+    linkableCheck(html, sheet, models),
   ].map((r) => ({
     ...r,
     details: r.details.slice(0, MAX_DETAILS),
@@ -437,33 +547,6 @@ function rewriteCells(html, sheet, models, { mismatched, matching }, changes) {
   });
 }
 
-// official WLTP figures typed in a paragraph that says WLTP become links
-function linkProse(html, rows, changes) {
-  const parts = segments(html);
-  let block = [];
-  const blocks = [];
-  parts.forEach((s, i) => {
-    if (s.tag && BLOCK_TAG_RE.test(s.part)) {
-      blocks.push(block);
-      block = [];
-    } else if (!s.tag && !s.inMeta) block.push(i);
-  });
-  blocks.push(block);
-  blocks.forEach((indexes) => {
-    const text = indexes.map((i) => parts[i].part).join('');
-    if (!/\bWLTP\b/.test(decodeEntities(text))) return;
-    indexes.filter((i) => !parts[i].inTechLink).forEach((i) => {
-      parts[i].part = parts[i].part.replace(CLAIM_RE, (all) => {
-        const row = officialFor({ text: decodeEntities(all) }, rows);
-        if (!row) return all;
-        changes.push({ what: row.key, from: flat(decodeEntities(all)), to: row.display });
-        return linkHtml(row);
-      });
-    });
-  });
-  return parts.map((s) => s.part).join('');
-}
-
 /**
  * Fix what the checks can fix, from the sheet. `update`: stale links and Technical Data cells
  * that differ (they become links). `link`: official values typed as text become links.
@@ -474,14 +557,14 @@ export function applyFromSheet({
 }) {
   const changes = [];
   const input = String(html ?? '');
-  const { models, rows } = pageContext(sheet, path, input, tags);
+  const { models } = pageContext(sheet, path, input, tags);
   let out = input;
   if (mode === 'update') {
     if (models.length) out = rewriteCells(out, sheet, models, { mismatched: true }, changes);
     out = rewriteLinks(out, sheet, changes);
   } else if (mode === 'link') {
     if (models.length) out = rewriteCells(out, sheet, models, { matching: true }, changes);
-    out = linkProse(out, rows, changes);
+    out = linkProse(out, sheet, models, changes);
   } else {
     throw new Error(`applyFromSheet: unknown mode "${mode}"`);
   }

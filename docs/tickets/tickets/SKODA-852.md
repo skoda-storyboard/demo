@@ -7,11 +7,14 @@
 - **Estimate:** 5 SP · AI-assisted 4–5d / manual 7–9d, excluding the client's data-owner answer *(planning
   estimate, not a quote)*. Demo cut (sheet, rules, Preflight, audit, page script; picker after): ≈3d AI-assisted.
 - **GitHub issue:** [#544](https://github.com/skoda-storyboard/demo/issues/544) (created 2026-10-28)
-- **Status (2026-10-29):** 🟡 code on branch `skoda-852-tech-data`, ready for QA. The DA steps are not done:
-  the sheet upload, the two config rows and the draft copies wait for a go-ahead.
+- **Status (2026-10-29):** 🟡 PR #546 merged (`1c0652b`).
+  - Round 2 is on branch `skoda-852-claims`, not pushed: prose claims and Canvas.
+  - DA setup done 2026-10-29:
+    - sheet `/data/tech-data.json` uploaded, previewed and published;
+    - site config: `prepare` row `Tech data check`, and `library` rows `Tech data` and `Tech data check`.
   - Source of the findings: a read-only audit of the 23 live model pages against their own technical-data PDFs
     (below).
-  - Developer notes: [Delivered](#delivered-2026-10-29).
+  - Developer notes: [Delivered](#delivered-2026-10-29) and [Round 2](#round-2-2026-10-29-prose-claims-and-canvas).
 
 ## Why
 Model pages, press releases and stories repeat the same vehicle figures (range, power, speed, acceleration, boot,
@@ -167,6 +170,59 @@ Branch `skoda-852-tech-data`. Files and setup are in `tools/tech-data/README.md`
   - Inside DA: the SDK handshake in a prepare dialog, the save (PUT to the source) while the editor is open, and the
     clipboard copy inside the library frame (`allow="clipboard-write"`).
   - These wait for the config rows and a draft.
+
+## Round 2 (2026-10-29): prose claims and Canvas
+Branch `skoda-852-claims`, from `1c0652b`. Target: the Canvas article
+`/en/skoda-world/peaq-family-weekend-getaway-on-one-charge`, which exists only in DA (not previewed).
+
+- **Gap closed:** the check covered linked values, the grid and WLTP-labelled sentences only.
+  - New `claims.js` checks every technical claim in the text and in the metadata Title and Description.
+  - It replaces the `wltp-figures` check.
+  - Details are in `tools/tech-data/README.md`.
+- **Reference data v2:**
+  - New columns `configuration`, `confidence`, `limitations`, and a `records` tab.
+  - Peaq fields from the TD PDF (21. 9. 2026): battery gross/net, DC and AC charging power, DC time per
+    version, boot by configuration (5-seater, 7-seater, third row, folded), towing, seats, seat rows, CO₂.
+  - The display (13.6-inch) comes from an official story (15. 10. 2026), marked as such.
+  - The Peaq 90 record (936 km, 9.2 kWh/100 km) is a record, not a capability.
+  - Two inferred values from round 1 (Elroq RS / Enyaq RS DC charging 29 min and top speed) were removed: the
+    PDFs don't assign them, and the Enyaq RS page says 26 min / 185 kW.
+- **The target article** (DA source, `npm run tech-data:audit -- --source da …`):
+  - **10 Issues:**
+    - "up to 936 km on a single charge", in the intro and in the Description (official WLTP 459 / 647 / 613 km;
+      936 km is the record drive);
+    - "WLTP range of up to 608 kilometres";
+    - "765-litre" boot (935 / 890 l) and "1,690 litres" folded (2150 / 2075 l);
+    - "32-inch" display (13.6);
+    - DC "up to 200 kW" (160 / 199 kW; not the 220 kW motor);
+    - "22 kW AC" (11 kW);
+    - "up to 2,500 kg" towing (1800–2000 kg);
+    - "14.8 – 18.6 kWh/100 km" (14.7 / 15.0 / 15.8).
+  - **2 Reviews:** "six trim levels" and "MEB+ platform" have no reference data.
+  - **6 match:** 91 kWh, net 86 kWh, about 28 min, CO₂ 0 g/km, seven-seat, three rows.
+  - The article was not changed or published.
+- **Model pages** (25):
+  - The three Range Issues stand.
+  - New prose Issues are real disagreements with the TD PDFs, from outdated source text:
+    - Elroq RS "up to 550 km" (554);
+    - Enyaq "from 150 kW" (140 / 210 / 220);
+    - Enyaq Coupé "132 / 150 / 195 kW";
+    - Epiq "up to 440 km" (441).
+  - The record release and story: all figures pass; the only Review is "19-inch wheels".
+- **Canvas:**
+  - The built-in Preflight panel is a closed Adobe service; site code can't add checks to it.
+  - Tech data check is in the Canvas prepare menu (dialog, saved source, fixes) and is a Canvas side panel (live
+    document, read-only).
+- **Verified:**
+  - 57 unit tests and lint (JS + CSS).
+  - The real DA SDK (`da.live/nx/utils/sdk.js`) against a host harness speaking Canvas's panel and
+    prepare-dialog protocol, with the article's real DA source:
+    - panel: subscribe, check, re-check after an edit;
+    - dialog: DA source read, no fix offered for prose claims.
+- **Not verified:** the real Canvas UI. It needs an Adobe sign-in this environment doesn't have.
+- **Behaviour changes:**
+  - A page without a model no longer compares claims with every model's figures; they are Reviews.
+  - A prose link to another model's row is an Issue.
 
 ## Open questions (client)
 1. **Who owns the technical figures, and is the PDF the authority?** The page and its PDF disagree on 3 of 9 EV

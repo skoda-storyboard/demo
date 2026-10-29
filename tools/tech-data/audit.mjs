@@ -3,10 +3,13 @@
  * Technical-data audit (SKODA-852): run the Tech data check over published pages.
  *
  *   npm run tech-data:audit -- [--host <origin>] [--sheet <file|url>] [--sitemap <prefix>]
- *     [--json] [paths…]
+ *     [--source page|da] [--org <org>] [--site <site>] [--json] [paths…]
  *
  * Defaults: the live demo host, the sheet served from that host, and every page the sheet's
  * `models` tab lists. `--sitemap /en/skoda-model/` adds every sitemap page under that prefix.
+ * `--source da` reads the DA document source instead (unpublished drafts too; needs DA access),
+ * metadata block included. For published pages the model, tags, title and description come from
+ * the page's head, because .plain.html has no metadata block.
  * Read-only. Exit code 1 when any page has an Issue.
  */
 /* eslint-disable no-console */
@@ -16,6 +19,25 @@ import { runChecks } from './checks.js';
 import { TECH_DATA_SHEET, normalizePath, readSheet } from './tech-data.js';
 
 const DEFAULT_HOST = 'https://main--demo--skoda-storyboard.aem.live';
+const DA_SOURCE = 'https://admin.da.live/source';
+const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const decodeAttr = (s) => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>')
+  .replace(/&amp;/g, '&');
+
+/** A metadata block (as DA stores it) from a page head: title, description, model, tags. */
+function metadataFromHead(page) {
+  const meta = (attr, name) => [...page.matchAll(new RegExp(`<meta ${attr}="${name}" content="([^"]*)"`, 'g'))]
+    .map((m) => decodeAttr(m[1]));
+  const rows = [
+    ['title', meta('property', 'og:title')[0]],
+    ['description', meta('name', 'description')[0]],
+    ['model', meta('name', 'model')[0]],
+    ['tags', meta('property', 'article:tag').join(', ')],
+  ].filter(([, value]) => value);
+  const cells = rows.map(([k, v]) => `<div><div><p>${k}</p></div><div><p>${escapeHtml(v)}</p></div></div>`);
+  return `<div class="metadata">${cells.join('')}</div>`;
+}
 const LABELS = { pass: 'Pass', warn: 'Review', fail: 'Issue' };
 
 async function fetchText(url) {
@@ -44,6 +66,9 @@ async function main() {
       host: { type: 'string', default: DEFAULT_HOST },
       sheet: { type: 'string' },
       sitemap: { type: 'string' },
+      source: { type: 'string', default: 'page' },
+      org: { type: 'string', default: 'skoda-storyboard' },
+      site: { type: 'string', default: 'demo' },
       json: { type: 'boolean', default: false },
     },
   });
@@ -54,21 +79,19 @@ async function main() {
   const requested = positionals.length ? positionals : [...listed, ...fromSitemap];
   const paths = [...new Set(requested.map(normalizePath))];
 
+  if (!['page', 'da'].includes(opts.source)) throw new Error(`--source must be page or da, not ${opts.source}`);
+  const readDocument = async (path) => {
+    if (opts.source === 'da') return fetchText(`${DA_SOURCE}/${opts.org}/${opts.site}${path}.html`);
+    const [plain, page] = await Promise.all([
+      fetchText(`${host}${path}.plain.html`),
+      fetchText(`${host}${path}`),
+    ]);
+    return `${plain}${metadataFromHead(page)}`;
+  };
   const auditPage = async (path) => {
     try {
-      const [html, page] = await Promise.all([
-        fetchText(`${host}${path}.plain.html`),
-        fetchText(`${host}${path}`),
-      ]);
-      // .plain.html carries no metadata block: the model and tags come from the page's head
-      const tags = [...page.matchAll(/<meta (?:name="model"|property="article:tag") content="([^"]*)"/g)]
-        .map((m) => m[1]);
-      return {
-        path,
-        results: runChecks({
-          html, path, sheet, tags,
-        }),
-      };
+      const html = await readDocument(path);
+      return { path, results: runChecks({ html, path, sheet }) };
     } catch (e) {
       return { path, error: e.message };
     }

@@ -74,10 +74,25 @@ export const FIELD_LABELS = {
   dcCharging: 'Charging time (DC, 10 – 80%)',
   range: 'Range (WLTP)',
   consumption: 'Consumption (WLTP)',
+  batteryGross: 'Battery capacity (gross)',
+  batteryNet: 'Battery capacity (net)',
+  dcChargingPower: 'DC charging power',
+  acChargingPower: 'AC charging power',
+  bootThirdRow: 'Boot behind the third row',
+  bootFolded: 'Boot with the rear seats folded',
+  towing: 'Towing capacity (braked, 12 %)',
+  seats: 'Seats',
+  seatRows: 'Rows of seats',
+  display: 'Infotainment display',
+  co2: 'CO₂ emissions (WLTP)',
+  // fields the sheet has no rows for yet: a claim about them is always "needs review"
+  trims: 'Trim levels',
+  platform: 'Platform',
+  other: 'Other figure',
 };
 
 // "5,4" is a decimal comma; "2,965" (three digits after the comma) is a thousands separator
-function toNumber(token) {
+export function toNumber(token) {
   const t = token.replace(/\s/g, '');
   const normalized = /^\d{1,3}(,\d{3})+$/.test(t) ? t.replace(/,/g, '') : t.replace(',', '.');
   const n = Number(normalized);
@@ -154,13 +169,42 @@ export function readSheet(json) {
       key,
       model: str(row.model) || key.split('.')[0],
       version: str(row.version),
+      configuration: str(row.configuration),
       field: str(row.field) || key.split('.')[1],
       value,
       unit,
       label: str(row.label),
       source: str(row.source),
       sourceDate: str(row.sourceDate),
+      confidence: str(row.confidence),
+      limitations: str(row.limitations),
       note: str(row.note),
+      display: unit ? `${value} ${unit}` : value,
+    });
+  });
+  // measured results (record drives): never official capability figures, checked separately
+  const records = [];
+  rowsOf(json, 'records').forEach((row) => {
+    const model = str(row.model);
+    const field = str(row.field);
+    const value = str(row.value);
+    if (!model || !field || !value) {
+      skipped += 1;
+      return;
+    }
+    const unit = str(row.unit);
+    records.push({
+      model,
+      version: str(row.version),
+      configuration: str(row.configuration),
+      field,
+      value,
+      unit,
+      label: str(row.label),
+      conditions: str(row.conditions),
+      source: str(row.source),
+      sourceDate: str(row.sourceDate),
+      confidence: str(row.confidence),
       display: unit ? `${value} ${unit}` : value,
     });
   });
@@ -181,7 +225,9 @@ export function readSheet(json) {
       pdfDate: str(row.pdfDate),
     });
   });
-  return { values, models, skipped };
+  return {
+    values, models, records, skipped,
+  };
 }
 
 /** "/en/x.html", "/en/x/" and "/en/x" are the same page. */

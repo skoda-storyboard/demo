@@ -14,7 +14,9 @@ const RELEASE = '/en/press-releases/936-km-without-recharging-skoda-peaq-sets-ra
 const cell = (value, label) => `<div><p><strong>${value}</strong></p><p>${label}</p></div>`;
 // the Peaq model page's Technical Data as DA stores it (2026-10-28)
 const PEAQ_GRID = `<h2 id="technical-data">Technical Data</h2><div class="columns"><div>${cell('150 - 220 kW', 'Maximum performance')}${cell('27 - 28 min', 'Charging time (DC, 10 – 80%)')}${cell('160 - 180 km/h', 'Maximum speed')}</div><div>${cell('6.7 - 8.4 s', 'Acceleration 0 – 100 km/h')}${cell('935 l', 'Boot capacity')}${cell('458 - 646 km', 'Range')}</div></div>`;
-const METADATA = '<div class="metadata"><div><div><p>Description</p></div><div><p>A WLTP range of 999 km</p></div></div></div>';
+// metadata rows other than Title and Description are not text: "limit 10 km" is no claim
+const METADATA = '<div class="metadata"><div><div><p>Description</p></div><div><p>The family SUV</p></div></div>'
+  + '<div><div><p>limit</p></div><div><p>10 km</p></div></div></div>';
 const doc = (main) => `<body><header></header><main><div>${main}</div>${METADATA}</main><footer></footer></body>`;
 const byId = (results) => Object.fromEntries(results.map((r) => [r.id, r]));
 
@@ -126,27 +128,27 @@ test('a link to a row the sheet does not have is an Issue and is not "fixed"', (
 test('the record guard: 936 km passes as a record, fails once it is labelled WLTP', () => {
   const release = doc('<p>The Škoda Peaq 90 has a homologated WLTP range of up to 647 km, based on the full range of driving conditions prescribed by legislation. The seven-seater Peaq’s record range of 936 km exceeded this figure by 289 km, or almost 45%.</p>');
   const ok = byId(runChecks({ html: release, path: RELEASE, sheet }));
-  assert.equal(ok['wltp-figures'].status, 'pass');
+  assert.equal(ok.claims.status, 'pass');
   assert.equal(ok['wltp-label'].status, 'pass');
   assert.equal(ok.linkable.linkable, 1);
 
   const wrong = doc('<p>The Peaq has a WLTP range of 936 km.</p>');
   const bad = byId(runChecks({ html: wrong, path: RELEASE, sheet }));
-  assert.equal(bad['wltp-figures'].status, 'fail');
-  assert.match(bad['wltp-figures'].details[0], /"936 km" is labelled WLTP but isn't an official figure; official: 459 – 647 km \(Peaq\)/);
+  assert.equal(bad.claims.status, 'fail');
+  assert.match(bad.claims.details[0], /"936 km" \(Range \(WLTP\)\).*official Peaq 60: 459 km; Peaq 90: 647 km; Peaq 90x: 613 km.*936 km is the Peaq 90 record drive/);
 });
 
 test('a rounded WLTP figure is a Review, not an Issue', () => {
   const html = doc('<p>The largest battery provides a range of more than 560 km in WLTP mode.</p>');
   const r = byId(runChecks({ html, path: '/en/skoda-model/elroq', sheet }));
-  assert.equal(r['wltp-figures'].status, 'warn');
+  assert.equal(r.claims.status, 'warn');
 });
 
 test('WLTP figures inside metadata and inside linked values are not scanned twice', () => {
   const html = doc('<p>A WLTP range of <a href="/data/tech-data.json#peaq-90.range">647 km</a>.</p>');
   assert.deepEqual(findWltpFigures(html), []);
   const r = byId(runChecks({ html, path: PEAQ, sheet }));
-  assert.equal(r['wltp-figures'].status, 'pass');
+  assert.equal(r.claims.status, 'pass');
   assert.equal(r.links.status, 'pass');
 });
 
@@ -165,13 +167,17 @@ test('range figures in prose without WLTP are found, drive and record sentences 
   assert.deepEqual(findUnlabelledRanges(html).map((f) => f.text), ['640 km', '600 kilometers']);
 });
 
-test('a page the sheet does not list: grid values are not checked, WLTP claims are checked against every model', () => {
-  const html = doc(`${cell('5.3 – 6.6 l/100 km', 'Fuel consumption (combined)')}<p>A WLTP range of 1000 km.</p>`);
+test('a page with no model: nothing is compared across models; its claims need review, none pass', () => {
+  // Epiq's official 441 km must not "pass" on a page that isn't the Epiq (no cross-model fallback)
+  const html = doc(`${cell('5.3 – 6.6 l/100 km', 'Fuel consumption (combined)')}<p>A WLTP range of 1000 km. A WLTP range of up to 441 km.</p>`);
   const r = byId(runChecks({ html, path: '/en/skoda-model/new-kodiaq', sheet }));
   assert.equal(r.grid.status, 'warn');
   assert.match(r.grid.summary, /isn't listed for a model/);
-  assert.equal(r['wltp-figures'].status, 'fail');
-  assert.match(r['wltp-figures'].details[0], /for any model in the sheet/);
+  assert.equal(r.claims.status, 'warn');
+  assert.equal(r.claims.counts.passed, 0);
+  assert.equal(r.claims.details.length, 2);
+  r.claims.details.forEach((d) => assert.match(d, /no model in the sheet/));
+  assert.equal(r.linkable.status, 'pass', 'nothing is offered as a link to another model');
 });
 
 test('empty and malformed documents pass without throwing', () => {
@@ -203,8 +209,8 @@ test('a draft copy keeps its model through its metadata: the Peaq draft updates 
 test('the Peaq draft no longer accepts another model\'s WLTP figure (Epiq 441 km)', () => {
   const html = draft('<p>The Peaq has a WLTP range of 441 km.</p>', { tags: 'peaq', model: 'peaq' });
   const r = byId(runChecks({ html, path: '/drafts/tech-data/peaq-record-release', sheet }));
-  assert.equal(r['wltp-figures'].status, 'fail');
-  assert.match(r['wltp-figures'].details[0], /official: 459 – 647 km \(Peaq\)/);
+  assert.equal(r.claims.status, 'fail');
+  assert.match(r.claims.details[0], /"441 km".*official Peaq 60: 459 km; Peaq 90: 647 km; Peaq 90x: 613 km/);
 });
 
 test('metadata picks the most specific model: RS is the RS, Sportline is none, the audit can pass tags', () => {
@@ -223,7 +229,9 @@ test('a linked grid cell must link this page\'s row: Elroq on the RS page is an 
   const html = doc(cell('<a href="/data/tech-data.json#elroq.range">408 – 577 km</a>', 'Range'));
   const path = '/en/skoda-model/elroq/elroq-rs';
   const r = byId(runChecks({ html, path, sheet }));
-  assert.equal(r.links.status, 'pass', 'the link matches its own row');
+  // the link text matches its own row, but that row is another model's (cross-model link)
+  assert.equal(r.links.status, 'fail');
+  assert.match(r.links.details[0], /links to elroq\.range \(Elroq\), not this page's Elroq RS/);
   assert.equal(r.grid.status, 'fail');
   assert.equal(r.grid.fixable, 1);
   assert.match(r.grid.details[0], /linked to elroq\.range; this page's official value is "516 – 554 km"/);
@@ -237,9 +245,9 @@ test('a linked grid cell must link this page\'s row: Elroq on the RS page is an 
 test('"up to" the top of an official interval is official; "from" its bottom; above the top is not (review P2 #6)', () => {
   const path = '/en/skoda-model/elroq';
   const ok = doc('<p>The Elroq 85 has a WLTP range of up to 577 km. The Elroq 60 offers a WLTP range from 408 km.</p>');
-  assert.equal(byId(runChecks({ html: ok, path, sheet }))['wltp-figures'].status, 'pass');
+  assert.equal(byId(runChecks({ html: ok, path, sheet })).claims.status, 'pass');
   const tooHigh = doc('<p>The Elroq 85 has a WLTP range of up to 590 km.</p>');
-  assert.equal(byId(runChecks({ html: tooHigh, path, sheet }))['wltp-figures'].status, 'fail');
+  assert.equal(byId(runChecks({ html: tooHigh, path, sheet })).claims.status, 'fail');
   const notLinkable = byId(runChecks({ html: ok, path, sheet })).linkable;
   assert.equal(notLinkable.status, 'pass', 'a bound is not the interval, so it is not offered as a link');
 });
@@ -247,6 +255,51 @@ test('"up to" the top of an official interval is official; "from" its bottom; ab
 test('details are capped and the rest counted', () => {
   const many = Array.from({ length: 15 }, () => '<p>A WLTP range of 1 km.</p>').join('');
   const r = byId(runChecks({ html: doc(many), path: PEAQ, sheet }));
-  assert.equal(r['wltp-figures'].details.length, 12);
-  assert.equal(r['wltp-figures'].more, 3);
+  assert.equal(r.claims.details.length, 12);
+  assert.equal(r.claims.more, 3);
+});
+
+// --- review round 3: linked values are checked in their sentence; links never bypass scope ---
+
+const PEAQ_PAGE = '/en/skoda-model/peaq';
+const linked = (key, text) => `<a href="/data/tech-data.json#${key}">${text}</a>`;
+
+test('a linked value is checked in its sentence: the Peaq 90\'s 647 km linked in a Peaq 60 sentence fails', () => {
+  const html = doc(`<p>The Peaq 60 has a WLTP range of up to ${linked('peaq-90.range', '647 km')}.</p>`);
+  const r = byId(runChecks({ html, path: PEAQ_PAGE, sheet }));
+  assert.equal(r.links.status, 'pass', 'the link text matches its own row');
+  assert.equal(r.claims.status, 'fail');
+  assert.match(r.claims.details[0], /linked to peaq-90\.range/);
+});
+
+test('a link never changes what a figure is about: DC charging linked to motor power, a drive linked to WLTP', () => {
+  const dc = doc(`<p>The Peaq charges at DC stations at up to ${linked('peaq-90x.power', '220 kW')}.</p>`);
+  assert.equal(byId(runChecks({ html: dc, path: PEAQ_PAGE, sheet })).claims.status, 'fail');
+  const drive = doc(`<p>The Peaq 90 covered ${linked('peaq-90.range', '647 km')} without recharging.</p>`);
+  const r = byId(runChecks({ html: drive, path: PEAQ_PAGE, sheet }));
+  assert.equal(r.claims.status, 'fail');
+  assert.match(r.claims.details[0], /measured result linked to/);
+});
+
+test('a correctly linked value in the right sentence passes', () => {
+  const html = doc(`<p>The Peaq 90 has a WLTP range of up to ${linked('peaq-90.range', '647 km')}.</p>`);
+  assert.equal(byId(runChecks({ html, path: PEAQ_PAGE, sheet })).claims.status, 'pass');
+});
+
+test('Link only links verified claims: not the Peaq 60\'s wrong 647 km, not a rounded figure', () => {
+  const wrong = doc('<p>The Peaq 60 has a WLTP range of up to 647 km.</p>');
+  assert.deepEqual(applyFromSheet({
+    html: wrong, path: PEAQ_PAGE, sheet, mode: 'link',
+  }).changes, []);
+  assert.equal(byId(runChecks({ html: wrong, path: PEAQ_PAGE, sheet })).linkable.status, 'pass');
+  const rounded = doc('<p>The Peaq has a WLTP range of more than 640 km.</p>');
+  assert.deepEqual(applyFromSheet({
+    html: rounded, path: PEAQ_PAGE, sheet, mode: 'link',
+  }).changes, []);
+  const right = doc('<p>The Peaq 90 has a WLTP range of up to 647 km.</p>');
+  const fixed = applyFromSheet({
+    html: right, path: PEAQ_PAGE, sheet, mode: 'link',
+  });
+  assert.deepEqual(fixed.changes.map((c) => c.what), ['peaq-90.range']);
+  assert.equal(byId(runChecks({ html: right, path: PEAQ_PAGE, sheet })).linkable.linkable, 1);
 });
