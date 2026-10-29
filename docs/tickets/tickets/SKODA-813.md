@@ -41,6 +41,13 @@ Measurable gates live in [`template-page-base.md` §10](../../ui-specs/template-
 - [x] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body). Copyright passes; Contacts' hero passes,
       its body is SKODA-810 (see "Pixel gate").
 
+**Band image sharpness (#480, 2026-10-28).** The 240px band covers its height with the image, so a wide
+panorama is drawn wider than the viewport, and the generic 750w mobile file was stretched (1.71× on
+`/en/newsletter` at 390). The band and the archive band now size their image for the crop: `sizes` from
+the band height × scale × aspect, candidates up to the master (`docs/ui-specs/hero.md` §4). On phones
+the band gets at most 1440w and the archive band at most 1080w, as its story card (the LCP) loads
+only after it.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-304/305 (footers), SKODA-309 (MR side chrome), SKODA-814 (SiteOrigin body contract)
 - Downstream: SKODA-810 (company sub-type blocks fill the MR variant), SKODA-802 (remaining-templates import), SKODA-843 / 844 / 845 (generic, featured-image and newsletter pages), SKODA-1001 (per-locale trees)

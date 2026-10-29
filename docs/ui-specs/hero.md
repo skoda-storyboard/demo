@@ -148,6 +148,41 @@ with archive heights also stepping at **576**.
   ~970px by the `.container{max-width:990px}` wrapper.
 - Capture note: DevTools floored at ~500px; the <768 state was captured at 500. A true 375 check needs
   device emulation (follow-up).
+- **Fixed-height bands: image sized for the cover crop (#480).** The `page` band (240px, image scale
+  1.02) and the `archive` band (184 / 224 / 240px) cover a fixed height. A wide panorama is therefore
+  drawn much wider than the viewport: the newsletter's 5.23 : 1 image is 1281px across a 390px phone,
+  and eMobility's 5.21 : 1 is 959px. EDS's generic picture (750w below 600px, 2000w above) stretched it
+  up to 1.71× at DPR 1.
+  - `hero-image.js` (`coverSources`) gives those two bands one WebP `<source>` plus the `<img>` with
+    width candidates `750 / 1080 / 1440 / 1920 / 2560` below the master, plus the master itself, and a
+    `sizes` equal to the drawn width: `max(viewport × scale, band height × scale × aspect)` per band
+    step. The browser picks the file for its viewport, DPR and zoom.
+  - **Phones (below 768px) get a capped width** (`phoneMax` in `COVER_BANDS`):
+    - **page band: at most 1440px**, the source's own phone rendition. There the band image is the
+      LCP element (mobile PageSpeed 100 on `/en/newsletter`).
+    - **archive band: at most 1080px** (user decision, #480 review). Its LCP element is the first
+      story card, in a later section, which EDS loads only once the first section's image (this band)
+      has loaded, so every extra hero byte delays the card. On `/en/category/emobility` at DPR 1.75 on
+      slow 4G (4× CPU), 1080w (165 vs 141 KB on `main`) puts the card about 116ms later; 1440w about
+      245ms; 1920w about 550ms.
+    - DPR 1 phones get the exact need on both bands.
+    - PageSpeed on a branch preview reads about 10 points lower than on `main` for the same code (a
+      branch with `main`'s code: 81–92, `main`: 94–97, Lighthouse 13 mobile). Compare branch with
+      branch, not with `main`.
+    - The crop sizes are set while the image is still lazy. Made eager first, Chrome started the
+      authored 750w file and aborted it for the new one.
+  - Measured on `/en/newsletter`, `/en/contacts`, `/en/category/emobility` and `/en/tag/model/peaq`
+    at 390–1440, DPR 1 and 2 and 390 at 175% zoom, real decoded pixels:
+    - page bands: no stretch at DPR 1 (it was 1.09–1.71 on phones); at DPR 1.75–2 1440w, stretch
+      0.99–1.78 (it was 1.90–3.42);
+    - archive bands: no stretch at DPR 1 (it was 1.26–1.28 on phones); phones at DPR 1.75–2 1080w,
+      stretch 1.53–1.78 (it was 2.20–2.56); 1440w where `main` loaded 2000w at 768–1080 DPR 1;
+    - from 768px at DPR 2: the master where the need exceeds it, so any remaining stretch is the
+      master's limit (the newsletter master in DA is 1920px, the source's 2237px);
+    - at most one ladder step of overshoot;
+    - band, image and title boxes unchanged (24 / 24 cases).
+
+  The story and overlay heroes keep the generic picture.
 
 ## 5. Interaction states
 

@@ -38,6 +38,107 @@ function decorateLabels(h1) {
   });
 }
 
+/*
+ * The fixed-height cover bands (#480): the image fills a band of a set height with
+ * object-fit: cover, so a wide panorama is drawn much wider than the viewport (the newsletter's
+ * 5.2:1 image: 1281px across a 390px phone). EDS's generic picture picks 750px below 600px of
+ * viewport and 2000px above, which blurs it. These bands mirror hero-image.css: the band heights
+ * (`--hero-page-h`, `--hero-archive-h-*` in styles.css) per min-width, and the image scale.
+ */
+// `phoneMax`: the widest file a phone (below COVER_PHONE.below) gets. Page bands: 1440px, the
+// source's own phone rendition (there the band image is the LCP element). Archive bands: 1080px:
+// their LCP element is the first story card, in a later section, which EDS loads only once this
+// first image has loaded, so every extra hero byte delays the card (#480 review, eMobility at DPR
+// 1.75 on slow 4G: 1080w = 165 vs 141 KB, the card ~116ms later; 1920w ~550ms). DPR 1 phones get
+// the exact need on both.
+export const COVER_BANDS = {
+  page: { heights: [[0, 240]], scale: 1.02, phoneMax: 1440 },
+  archive: { heights: [[0, 184], [576, 224], [768, 240]], scale: 1, phoneMax: 1080 },
+};
+// rendition widths offered below the master; the master itself is always the largest candidate
+export const COVER_WIDTHS = [750, 1080, 1440, 1920, 2560];
+export const COVER_PHONE = { below: 768 };
+
+/**
+ * The `sizes` and width candidates for an image covering a fixed-height band: per band step the
+ * drawn width is the larger of the viewport (× scale) and the band height × scale × the image's
+ * aspect. The browser then picks the candidate for its viewport, DPR and zoom.
+ * @param {{width: number, height: number, heights: number[][], scale?: number}} opts the master's
+ *   size, the band's [min-width, height] steps, the image scale
+ * @returns {{sizes: string, widths: number[]}|null} null without a usable size
+ */
+export function coverSources({
+  width, height, heights, scale = 1,
+}) {
+  const w = Number(width);
+  const h = Number(height);
+  if (!(w > 0 && h > 0) || !heights?.length) return null;
+  const aspect = w / h;
+  const vw = `${Math.round(scale * 10000) / 100}vw`;
+  const steps = [...heights].sort((a, b) => a[0] - b[0]);
+  const entries = [];
+  steps.forEach(([min, bandHeight], i) => {
+    const next = steps[i + 1]?.[0] ?? Infinity;
+    const crop = Math.ceil(bandHeight * scale * aspect);
+    // the viewport width from which the viewport, not the crop, is the wider
+    const wide = Math.ceil(crop / scale);
+    const step = [];
+    if (wide < next) step.push([Math.max(min, wide), vw]);
+    if (wide > min) step.push([min, `${crop}px`]);
+    entries.unshift(...step);
+  });
+  // the same size on consecutive steps is one entry, from the lower min-width
+  const sizes = entries
+    .filter(([, size], i) => entries[i + 1]?.[1] !== size)
+    .map(([min, size]) => (min > 0 ? `(min-width: ${min}px) ${size}` : size))
+    .join(', ');
+  return { sizes, widths: [...COVER_WIDTHS.filter((c) => c < w), w] };
+}
+
+/**
+ * Size a band's authored picture for its cover crop, in place (#480): one WebP `<source>` and the
+ * `<img>` (original format) with width candidates up to the master and the crop's `sizes`. Only
+ * media-bus images (`…/media_<hash>.<ext>`) are resized; anything else keeps its picture.
+ * @param {HTMLPictureElement} picture the band's picture
+ * @param {{heights: number[][], scale: number, phoneMax: number}} band COVER_BANDS entry
+ * @param {{width: string|null, height: string|null}} size the master's authored size (no
+ *   fallback: without it the crop is unknown and the picture stays as it is)
+ */
+function sizeForCover(picture, band, { width, height }) {
+  const img = picture.querySelector('img');
+  // an unparsable src (e.g. "http://[") keeps the authored picture, as on main
+  let url;
+  try {
+    url = new URL(img.getAttribute('src') || '', window.location.href);
+  } catch {
+    return;
+  }
+  const ext = url.pathname.match(/\/media_[0-9a-f]+\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+  if (!ext) return;
+  const cover = coverSources({ width, height, ...band });
+  if (!cover) return;
+  const candidate = (format) => (w) => `${url.pathname}?width=${w}&format=${format}&optimize=medium ${w}w`;
+  const webp = (widths, media) => {
+    const source = document.createElement('source');
+    source.type = 'image/webp';
+    if (media) source.media = media;
+    source.srcset = widths.map(candidate('webply')).join(', ');
+    source.sizes = cover.sizes;
+    return source;
+  };
+  picture.querySelectorAll('source').forEach((s) => s.remove());
+  // phones first (the first matching source wins): the widths up to the band's phoneMax
+  const phone = cover.widths.filter((w) => w <= band.phoneMax);
+  if (phone.length < cover.widths.length) {
+    picture.prepend(webp(phone, `(width < ${COVER_PHONE.below}px)`), webp(cover.widths));
+  } else {
+    picture.prepend(webp(cover.widths));
+  }
+  const format = ext === 'jpeg' ? 'jpg' : ext;
+  img.srcset = cover.widths.map(candidate(format)).join(', ');
+  img.sizes = cover.sizes;
+}
+
 /**
  * Hero (image variant) — SKODA-202.
  *
@@ -73,8 +174,9 @@ export default function decorate(block) {
     // Preserve intrinsic dimensions for low CLS. EDS may strip the width/height
     // attributes off the authored <img>; fall back to the natural size if the
     // asset has loaded, else the 16:9 master (1920×1080, hero.md §3).
-    const width = img.getAttribute('width') || img.naturalWidth || 1920;
-    const height = img.getAttribute('height') || img.naturalHeight || 1080;
+    const authored = { width: img.getAttribute('width'), height: img.getAttribute('height') };
+    const width = authored.width || img.naturalWidth || 1920;
+    const height = authored.height || img.naturalHeight || 1080;
 
     // Only rebuild via createOptimizedPicture when the authored image has a
     // usable http(s)/relative src. When EDS already emitted an optimized
@@ -98,6 +200,11 @@ export default function decorate(block) {
       picture.append(img.cloneNode(true));
     }
 
+    // the fixed-height bands draw the image wider than the viewport: size it for that crop. First,
+    // while the image is still lazy: made eager before, Chrome starts the authored 750w file, then
+    // aborts it, and Lighthouse counts that request against the LCP (#480 review)
+    const band = (isPage && COVER_BANDS.page) || (isArchive && COVER_BANDS.archive);
+    if (band) sizeForCover(picture, band, authored);
     const heroImg = picture.querySelector('img');
     heroImg.setAttribute('fetchpriority', 'high'); // LCP element
     heroImg.setAttribute('loading', 'eager');
