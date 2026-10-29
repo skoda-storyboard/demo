@@ -49,5 +49,32 @@ second row, which leaves the first row image-less.
       and aside still stack below 768px, with 3 full-width teasers in one column at 767px.
 - [x] Unit/regression check on the transformer (nested teaser markup gives N rows, not 2N).
 
+## Heading levels, #387 / #404 (2026-10-29, branch `fix-387-404-story-headings`)
+- **#387, the "Explore more" card titles:** the source has them as h2, under the h3 "Explore more"
+  (`h3.sidebar-heading` + `.related article h2.title`; outline measured on the Peaq and wireless-charging
+  stories). All 386 card titles on main were h3. `skoda-story-aside.js` now writes them as h2; the section
+  headings stay h3 (#296 / #336). The card title's type and box don't change (`.card-teaser-title`, any level):
+  16/20 px 500, title 313×40 / card 345×194 at 1280, the same at 768 and 390, measured on the real template;
+  the card click still opens its story. The outline equals the source's.
+- **Empty source headings:** the Mallorca and olive-oil stories space paragraphs with `<h6>&nbsp;</h6>`; the
+  importer kept them as empty headings. `skoda-story-cleanup.js` drops a heading with no text and no media.
+- **#404:** already fixed on main for 137 of 139 stories (re-imports since 20 Oct). Two left:
+  - "RS four ways" is one of the 40 stories in the 28 Oct DA batch (see below);
+  - the Enyaq / Elroq gaming-consoles story is blocked by the push's binary gate: its MP4 isn't in the DAM.
+- **Content (not pushed):** the 139 stories (132 EN + 7 in the locale trees) were re-imported with this branch and
+  compared with preview:
+  - 393 card titles h3 → h2 and 8 #404 section headings h2 → h3;
+  - 109 links on 55 stories now point at the migrated page instead of the source;
+  - the source's current "Explore more" picks;
+  - Spacer blocks (#380);
+  - restored body sections and quote names (gaming consoles, Sportline, Enyaq RS Race).
+
+  `import:push --dry-run`: 98 update, **40 conflict**, 1 blocked. The 40 were saved in DA on 2026-10-28
+  12:03–12:05 by two team members, mostly without a preview; their images now point at DA-hosted copies
+  (`content.da.live/…`). A re-push would put the source CDN URLs back, so they are held until the order is agreed
+  with whoever ran that batch.
+- **Found, not changed here:** some hero images carry a literal `<br>` in their alt (`ŠKODA 4×4: <br>Your Best
+  Bet in the Snow`), on main too.
+
 ## Dependencies
 SKODA-801 (aside rebuild), SKODA-201 (cards/card-teaser overlay style).

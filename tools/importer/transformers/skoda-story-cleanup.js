@@ -443,6 +443,15 @@ function finishMediaBox(element, document) {
   });
 }
 
+// The source spaces paragraphs with empty headings (`<h6>&nbsp;</h6>` on the Mallorca and
+// olive-oil stories): no text and nothing in them is no heading, and an empty heading is an
+// accessibility failure. Dropped (#387 review).
+function dropEmptyHeadings(element) {
+  element.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((h) => {
+    if (!h.textContent.replace(/[\s\u00a0]+/g, '') && !h.querySelector('img, picture, svg, iframe, video')) h.remove();
+  });
+}
+
 export default function transform(hookName, element, payload) {
   if (hookName === TransformHook.beforeTransform) {
     const doc = element.ownerDocument || document;
@@ -489,5 +498,6 @@ export default function transform(hookName, element, payload) {
       );
     }
     WebImporter.DOMUtils.remove(element, deferredSelectors);
+    dropEmptyHeadings(element);
   }
 }

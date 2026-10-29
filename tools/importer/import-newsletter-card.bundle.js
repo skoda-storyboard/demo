@@ -120,7 +120,7 @@ var CustomImportScript = (() => {
       if (!link && !img) return;
       const content = [];
       if (title) {
-        const h = document2.createElement("h3");
+        const h = document2.createElement("h2");
         if (link) {
           const a = document2.createElement("a");
           a.setAttribute("href", link.getAttribute("href"));
