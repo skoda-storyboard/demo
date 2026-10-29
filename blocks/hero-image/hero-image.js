@@ -106,7 +106,13 @@ export function coverSources({
  */
 function sizeForCover(picture, band, { width, height }) {
   const img = picture.querySelector('img');
-  const url = new URL(img.getAttribute('src') || '', window.location.href);
+  // an unparsable src (e.g. "http://[") keeps the authored picture, as on main
+  let url;
+  try {
+    url = new URL(img.getAttribute('src') || '', window.location.href);
+  } catch {
+    return;
+  }
   const ext = url.pathname.match(/\/media_[0-9a-f]+\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
   if (!ext) return;
   const cover = coverSources({ width, height, ...band });

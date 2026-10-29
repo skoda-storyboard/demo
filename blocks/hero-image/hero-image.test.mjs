@@ -277,6 +277,12 @@ test('bands without the master size or a media-bus image, and the story / overla
   const external = block('page', '<div><div><picture><img src="https://cdn.example.com/banner.jpg" alt="" width="1920" height="367"></picture></div></div>');
   decorate(external);
   assert.equal(external.querySelector('img').getAttribute('srcset'), null, 'not a media-bus image');
+  const broken = block('page', `<div><div>${MEDIA_PICTURE().replace(/src="[^"]+"/, 'src="http://["')}</div></div><div><div><h1>Title</h1></div></div>`);
+  const brokenWas = sourcesOf(broken);
+  decorate(broken);
+  assert.deepEqual(sourcesOf(broken), brokenWas, 'an unparsable src: unchanged');
+  assert.ok(broken.querySelector('.hero-image-media picture'), 'still decorated');
+  assert.equal(broken.querySelector('img').getAttribute('loading'), 'eager');
   ['', 'overlay'].forEach((variant) => {
     const hero = block(variant, `<div><div>${MEDIA_PICTURE()}</div></div><div><div><h1>Title</h1></div></div>`);
     const was = sourcesOf(hero);
