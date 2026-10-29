@@ -44,7 +44,9 @@ Measurable gates live in [`template-page-base.md` §10](../../ui-specs/template-
 **Band image sharpness (#480, 2026-10-28).** The 240px band covers its height with the image, so a wide
 panorama is drawn wider than the viewport, and the generic 750w mobile file was stretched (1.71× on
 `/en/newsletter` at 390). The band and the archive band now size their image for the crop: `sizes` from
-the band height × scale × aspect, candidates up to the master (`docs/ui-specs/hero.md` §4).
+the band height × scale × aspect, candidates up to the master (`docs/ui-specs/hero.md` §4). On phones
+the band gets at most 1440w; the archive band keeps the 750w file there, as its story card (the LCP)
+loads only after it.
 
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-304/305 (footers), SKODA-309 (MR side chrome), SKODA-814 (SiteOrigin body contract)

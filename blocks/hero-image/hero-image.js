@@ -46,13 +46,13 @@ function decorateLabels(h1) {
  * (`--hero-page-h`, `--hero-archive-h-*` in styles.css) per min-width, and the image scale.
  */
 // `phoneMax`: the widest file a phone (below COVER_PHONE.below) gets. Page bands: 1440px, the
-// source's own phone rendition (there the band image is the LCP element). Archive bands: 1080px,
-// as their LCP element is the first story card, which a heavier hero delays (#480 review, eMobility
-// at DPR 1.75: 1920w = 244 KB vs 141 KB on main, the card ~550ms later, PSI 88; 1440w still
-// ~245ms). DPR 1 phones get the exact need on both.
+// source's own phone rendition (there the band image is the LCP element). Archive bands: 750px,
+// the generic picture's phone file: their LCP element is the first story card, in a later
+// section, which EDS loads only once this first image has loaded, so every extra hero byte delays
+// the card (#480 review, eMobility mobile: 1080w = 165 vs 141 KB, Lighthouse 83–91 vs 96–97).
 export const COVER_BANDS = {
   page: { heights: [[0, 240]], scale: 1.02, phoneMax: 1440 },
-  archive: { heights: [[0, 184], [576, 224], [768, 240]], scale: 1, phoneMax: 1080 },
+  archive: { heights: [[0, 184], [576, 224], [768, 240]], scale: 1, phoneMax: 750 },
 };
 // rendition widths offered below the master; the master itself is always the largest candidate
 export const COVER_WIDTHS = [750, 1080, 1440, 1920, 2560];

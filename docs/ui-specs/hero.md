@@ -160,15 +160,18 @@ with archive heights also stepping at **576**.
   - **Phones (below 768px) get a capped width** (`phoneMax` in `COVER_BANDS`):
     - **page band: at most 1440px**, the source's own phone rendition. There the band image is the
       LCP element (mobile PageSpeed 100 on `/en/newsletter`).
-    - **archive band: at most 1080px.** Its LCP element is the first story card, which a heavier hero
-      delays. On `/en/category/emobility` at DPR 1.75, a 1920w hero (244 KB vs 141 KB on `main`) put the
-      card about 550ms later (mobile PageSpeed 88); 1440w (197 KB) still about 245ms.
-    - DPR 1 phones get the exact need on both bands.
+    - **archive band: 750px, as before** (user decision, #480 review). Its LCP element is the first
+      story card, in a later section, which EDS loads only once the first section's image (this band)
+      has loaded, so every extra hero byte delays the card. On `/en/category/emobility` mobile, 1080w
+      (165 vs 141 KB) gave Lighthouse 83–91 vs 96–97 on `main`; 1920w put the card about 550ms later.
+      Archive phone bands therefore stay as soft as before (stretch 1.26–1.28 at DPR 1).
+    - The crop sizes are set while the image is still lazy. Made eager first, Chrome started the
+      authored 750w file and aborted it for the new one.
   - Measured on `/en/newsletter`, `/en/contacts`, `/en/category/emobility` and `/en/tag/model/peaq`
     at 390–1440, DPR 1 and 2 and 390 at 175% zoom, real decoded pixels:
-    - no stretch at DPR 1 (it was 1.09–1.71 on phones);
-    - phones at DPR 1.75–2: page bands 1440w, stretch 0.99–1.78 (it was 1.90–3.42); archive bands
-      1080w, stretch 1.53–1.78 (it was 2.20–2.56);
+    - page bands: no stretch at DPR 1 (it was 1.09–1.71 on phones); at DPR 1.75–2 1440w, stretch
+      0.99–1.78 (it was 1.90–3.42);
+    - archive bands from 768px: no stretch at DPR 1, and 1440w where `main` loaded 2000w at 768–1080;
     - from 768px at DPR 2: the master where the need exceeds it, so any remaining stretch is the
       master's limit (the newsletter master in DA is 1920px, the source's 2237px);
     - at most one ladder step of overshoot;
