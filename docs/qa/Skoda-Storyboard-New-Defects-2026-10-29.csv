@@ -1,0 +1,45 @@
+﻿Defect ID,Priority,Template / Area,Test case(s),Title,Steps to reproduce,Main URL,Source URL,Expected,Actual,GitHub status,Assign to
+NEW-01,P2,Faceted listing / Media Room home / Model page,"TC-FL-007, TC-MRH-004, TC-MD-005","Images / Videos ""+"" (add to media cart) cannot add anything","1. Open Images at 1280.
+2. Hover the first card, click ""+"".
+3. The menu shows only ""1920px"" and it is disabled (aria-disabled=""true"").
+4. Repeat on Videos and on the Media Room Images rail: nothing is added, the cart badge stays empty, /en/media-cart shows ""0 / 80 files"".
+5. Compare: ""+"" in a story Media Box adds the file (badge 1).","https://main--demo--skoda-storyboard.aem.live/en/images
+https://main--demo--skoda-storyboard.aem.live/en/videos
+https://main--demo--skoda-storyboard.aem.live/en/media-room",https://www.skoda-storyboard.com/en/images/,Selecting a size adds the file to the media cart (source offers Original + sizes).,Size option disabled; nothing can be added from media-feed cards.,Not raised yet,vijayr-adobe
+NEW-02,P3,Global shell – Media Room menu,TC-GL-010,Company › Brand Group CORE (BGC) opens the source although the page is live on the demo,"1. Open the Media Room home.
+2. Hover ""Company"" and click ""Brand Group CORE (BGC)"".
+3. The source page opens in a new tab.
+4. Open https://main--demo--skoda-storyboard.aem.live/en/brand-group-core-bgc – it is 200 on the demo.",https://main--demo--skoda-storyboard.aem.live/en/media-room,https://www.skoda-storyboard.com/en/media-room/,"Menu link opens /en/brand-group-core-bgc on the demo, same tab.","Absolute link to www.skoda-storyboard.com, new tab.",Not raised yet,vijayr-adobe
+NEW-03,P2,Press kit hub,TC-PK-001,"Epiq press kit hub: ""Škoda Epiq Sportline"" tile missing","1. Open the Epiq press kit hub on main and source.
+2. List the chapter tiles.
+3. Source: … Škoda Epiq First Edition, Škoda Epiq Sportline, Frequently Asked Questions …
+4. Main: no ""Škoda Epiq Sportline"" tile.",https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2,https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/,Same 14 tiles as the source.,13 tiles; Sportline missing.,Not raised yet,vijayr-adobe
+NEW-04,P2,Press kit hub,TC-PK-002,Epiq press kit ZIP download is an older package than the source,"1. Open the Epiq press kit hub.
+2. Check the ZIP download link.
+3. Main: cdn…/2026/08/Skoda_Epiq_c5a5f2fe.zip; source: cdn…/2026/10/Skoda_Epiq_f59cece2.zip.",https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2,https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/,Same (October) ZIP as the source.,August ZIP (source updated in October).,Not raised yet,vijayr-adobe
+NEW-05,P2,Press kit,TC-PK-003,Peaq first-glimpse press kit: Media Box band not full width,"1. Open the page at 1440.
+2. Scroll to ""Media Box"".
+3. Measure the grey band: main left 96 / width 1248 (1280: 16 / 1248); source 0 / 1440.",https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship,https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/,"Band edge to edge (0 + viewport width), as on stories after #493.",Band capped at 1248px.,Not raised yet,vijayr-adobe
+NEW-06,P2,Story detail,TC-ST-012,Peaq Tour de France (sunroof) story: Media Box tiles show no dates,"1. Open the story.
+2. Scroll to Media Box.
+3. Source: a date on 10 / 10 tiles; main 0 / 10.",https://main--demo--skoda-storyboard.aem.live/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france,https://www.skoda-storyboard.com/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france/,Dates on every tile.,No dates (page needs re-import / republish).,Not raised yet,vijayr-adobe
+NEW-07,P3,Story detail,TC-ST-005,Story image slider: every slide cropped to 215px on mobile,"1. Set the viewport to 375.
+2. Swipe through the story photo slider and measure each image height.
+3. Source keeps each photo ratio (182–337px); main shows every slide at 215px (20 / 20 stories).",https://main--demo--skoda-storyboard.aem.live/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq,https://www.skoda-storyboard.com/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq/,Slide height follows the image ratio.,Fixed 215px – tall photos cropped.,Not raised yet,vijayr-adobe
+NEW-08,P3,Story detail,TC-ST-009,Quote author name not bold,"1. Open the story and find the quote.
+2. Inspect the author name: main 13.33px / 400, source 16px / 600.","https://main--demo--skoda-storyboard.aem.live/en/emobility/meet-the-peaq-comfort-just-like-at-home
+https://main--demo--skoda-storyboard.aem.live/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",https://www.skoda-storyboard.com/en/emobility/meet-the-peaq-comfort-just-like-at-home/,16px / 600 as source.,13.33px / 400.,Not raised yet,vijayr-adobe
+NEW-09,P3,Model page,TC-MD-004,Superb model page: rails have fewer cards and a video is missing,"1. Open the Superb model page.
+2. Click Next to the end of News and Press Kits.
+3. Main 8 / 7 cards, source 10 / 10.
+4. Videos: ""Škoda Superb Sportline | Footage 9:16"" only on the source.",https://main--demo--skoda-storyboard.aem.live/en/skoda-model/new-superb,https://www.skoda-storyboard.com/en/skoda-model/new-superb/,Same cards as the source.,"News 8, Press Kits 7, one video missing.",Not raised yet,vijayr-adobe
+NEW-10,P2,Press kit chapter,TC-PK-004,"Press kit chapters missing content (Technical data, FAQ)","1. Open the Peaq Technical data chapter: main 1694px, 2 headings, 1 image; source 1823px, 5 headings, 4 images.
+2. Open the Epiq FAQ chapter: main 1606px, 7 headings, 0 images; source 1875px, 10 headings, 3 images.
+3. Compare the sections one by one.","https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-peaq-press-kit-2/technical-data
+https://main--demo--skoda-storyboard.aem.live/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/technical-data/,Same sections and images as the source.,"Sections / images missing (technical data: SKODA-852, PR #546 open).",Not raised yet,vijayr-adobe
+NEW-11,P3,Series directory,TC-SE-001,"Series directory shows an extra ""Explorers of sustainability"" card","1. Open the Series directory on main and source.
+2. Count the series cards: main 25, source 24.
+3. ""Explorers of sustainability"" is only on main (+30px).",https://main--demo--skoda-storyboard.aem.live/en/series-2,https://www.skoda-storyboard.com/en/series-2/,Same 24 cards as the source.,Extra card on main.,Not raised yet,vijayr-adobe
+NEW-12,P3,Category listing,TC-CT-004,Lifestyle › Adventures: 2 newest 2026 stories not migrated,"1. Open the sub-category on main and source.
+2. Source first cards: ""Sand, heat, and camels…"" (17. 3. 2026), ""Giant spa towers, gingerbread…"" (5. 2. 2026).
+3. Main starts with ""A journey you will never forget"" (2. 12. 2025).",https://main--demo--skoda-storyboard.aem.live/en/category/lifestyle/adventures,https://www.skoda-storyboard.com/en/category/lifestyle/adventures/,Same stories as the source (or PO-approved scope).,2 stories not in the demo index.,Not raised yet,vijayr-adobe
