@@ -145,14 +145,27 @@ Branch `skoda-852-tech-data`. Files and setup are in `tools/tech-data/README.md`
     - Epiq: "over 430 kilometers".
     - Every Range and fuel-consumption cell lacks "WLTP".
 - **Verified:**
-  - 28 unit tests (`tools/tech-data/*.test.mjs`, `scripts/tech-values.test.mjs`) and lint.
+  - 40 unit tests (`tools/tech-data/*.test.mjs`, `scripts/tech-values.test.mjs`), JS lint, and stylelint incl. the plugin CSS.
   - Both plugins standalone on the branch preview:
     - the check lists the Peaq Issue with the PDF and date;
-    - the picker lists 7 models (the first preselected without a page), and its insert buttons are disabled.
+    - the picker lists 7 models, the first preselected when it has no page.
   - The Peaq model page on the branch loads with no console errors.
+- **Review round 1 (PR #546, 2026-10-29), every finding fixed:**
+  - **P1:** Update could delete authored content. The cell pattern ran across paragraphs from a bold introduction.
+    - Fix: the pattern stays inside one cell, and a save guard refuses any change to block or format tags or to text
+      outside the values.
+  - **P2 #2:** draft copies lost their model. Fix: models from the path, else the metadata (`model`, `derivative`,
+    `tags`) against the sheet's model `tags`/`excludeTags`.
+  - **P2 #3:** a cell linked to another model's row passed. Fix: it's an Issue, and Update relinks it.
+  - **P2 #4:** linked stats lost the 32 px value / 24 px unit split.
+    - Fix: a link that is all of its `<strong>` unwraps into it.
+    - Measured on the branch: identical to the unlinked cell at 390, 768, 992 and 1080.
+  - **P2 #5:** Insert split the sentence. Fix: the picker copies; a paste stays inline (checked in ProseMirror).
+  - **P2 #6:** "up to 577 km" for the Elroq 85 failed. Fix: the top or bottom of an official interval passes.
+  - **CSS:** the plugin CSS passes stylelint and is now in `lint:css`.
 - **Not verified:**
   - Inside DA: the SDK handshake in a prepare dialog, the save (PUT to the source) while the editor is open, and the
-    picker's `sendHTML` of an inline link.
+    clipboard copy inside the library frame (`allow="clipboard-write"`).
   - These wait for the config rows and a draft.
 
 ## Open questions (client)

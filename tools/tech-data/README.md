@@ -8,7 +8,7 @@ sheet row, and a check in DA's prepare menu compares the document with the sheet
 | `tech-data.js` | Shared contract: link format, figure parsing and comparison, sheet reader. Pure, no DOM. |
 | `checks.js` | The five checks and the two fixes (update, link). Used by the plugin and the audit. |
 | `preflight/` | **Tech data check**, a DA prepare-menu plugin. |
-| `picker/` | **Tech data**, a DA library plugin that inserts linked values. |
+| `picker/` | **Tech data**, a DA library plugin that copies a linked value to paste into the text. |
 | `da.js` | DA handshake, page source read/write, sheet loading for both plugins. |
 | `audit.mjs` | `npm run tech-data:audit`: the same checks over published pages (read-only). |
 | `tech-data.seed.json` | The sheet's first content, typed in from the official PDFs. Upload it to DA as `/data/tech-data.json`. |
@@ -31,22 +31,34 @@ Two tabs:
 
 - `values`: `key`, `model`, `version`, `field`, `value`, `unit`, `label` (vehicle name), `source` (PDF URL),
   `sourceDate`, `note`.
-- `models`: `code`, `name`, `pages` (comma-separated paths the model's figures apply to), `pdf`, `pdfDate`.
+- `models`: `code`, `name`, `pages`, `tags`, `excludeTags`, `pdf`, `pdfDate`.
+  - `pages`: comma-separated paths the model's figures apply to.
+  - `tags`: every tag a page needs to be this model.
+  - `excludeTags`: tags that rule it out.
+  - A page's models are the ones listing its path; otherwise its metadata decides (`model`, `derivative`, `tags`),
+    and the most specific match wins.
+  - So a draft copy keeps its model:
+    - `elroq, rs` is the Elroq RS;
+    - `elroq, sportline` is none (the PDFs don't apply to Sportline).
+  - The audit reads the tags from the rendered page's head (`model`, `article:tag`), because `.plain.html` has
+    no metadata.
 
 Fields: `power`, `torque`, `topSpeed`, `acceleration`, `boot`, `dcCharging`, `range`, `consumption`.
 
 The model rows are what the model page's Technical Data grid shows: the min–max of the versions that page
 covers. Sportline pages are not listed, because the PDFs say "Technical specifications do not apply for
-Sportline cars". A page not listed in `models` gets its WLTP sentences checked against every model, but its grid
-isn't checked.
+Sportline cars". A page that matches no model gets its WLTP sentences checked against every model, but its grid isn't
+checked.
 
 ## The checks
 
 | Check | Issue | Review |
 |---|---|---|
 | Linked values | the link text differs from the sheet; the key isn't in the sheet | |
-| Technical Data | a grid cell differs from the model's row | a cell without a sheet row; a decimal comma |
+| Technical Data | a grid cell differs from the model's row; a linked cell links another row | a cell without a sheet row; a decimal comma |
 | WLTP figures in the text | a WLTP-labelled range/consumption that isn't official ("936 km WLTP") | a rounded one ("more than 560 km") |
+
+"Up to 577 km" passes when 577 is the top of an official interval, and "from 408 km" when 408 is its bottom.
 | WLTP label | | a range/consumption cell or sentence without "WLTP" (drive, test and record sentences are skipped) |
 | Values that could be linked | | an official value typed as text |
 
@@ -58,6 +70,9 @@ Metadata is not checked.
 - **Link** turns matching grid cells and official WLTP figures in the text into links.
 
 Each fix re-reads the source first and saves it with the author's token. Nothing is published.
+
+A save guard refuses any fix that would change a block or format tag, or any text outside the values. Then nothing
+is saved.
 
 The check advises; it can't stop a publish. A hard stop would belong to the request-to-publish step (SKODA-850a).
 
@@ -76,7 +91,11 @@ The check advises; it can't stop a publish. A hard stop would belong to the requ
 
 - **Check a published page:** `/tools/tech-data/preflight/preflight.html?path=/en/skoda-model/peaq`.
   - Add `&sheet=/tools/tech-data/tech-data.seed.json` until the DA sheet is published.
-- **Picker:** `/tools/tech-data/picker/picker.html` shows the values; it can't insert them.
+- **Picker:** `/tools/tech-data/picker/picker.html`. **Copy** puts the linked value on the clipboard as HTML.
+  - Paste it where it belongs: the editor parses a paste inline, so the sentence stays one paragraph.
+  - DA's library inserts `sendHTML` as a closed block (`da-library.js`: `new Slice(parsed.content, 0, 0)`), which
+    split the sentence into three paragraphs. So the picker doesn't use it.
+  - For Technical Data cells, the check's **Update** and **Link** are quicker.
 
 ```sh
 npm run tech-data:audit -- --sheet tools/tech-data/tech-data.seed.json --sitemap /en/skoda-model/
