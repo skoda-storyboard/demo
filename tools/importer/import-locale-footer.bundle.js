@@ -83,7 +83,8 @@ var CustomImportScript = (() => {
       else if (!keepHeading && subs.length) item.append(para(document, link(document, subs[0].href, text(top))));
       else item.append(para(document, text(top)));
       const kept = subs.filter((s, i) => keepHeading || !(s.heading || i === 0 && s.href === authoredHref(href)));
-      if (subs.length > 1 && kept.length) {
+      const singleHeadingItem = keepHeading && /^#?$/.test(href) && subs.length === 1 && kept.length === 1 && kept[0].label !== text(top);
+      if (subs.length > 1 && kept.length || singleHeadingItem) {
         const subList = document.createElement("ul");
         kept.forEach((s) => {
           const subItem = document.createElement("li");

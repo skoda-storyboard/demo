@@ -87,6 +87,37 @@ test('buildNav: the 4 sections of /nav (topbar, brand, menu, search), in the loc
   assert.deepEqual(links(search[0]), ['Vyhledat=https://www.skoda-storyboard.com/cs/hledat/']);
 });
 
+// SKODA-1006: the Slovak Media Room's `#` Modely heading lists one model, Fabia, on the source
+test('buildNav: a `#` heading with one real sub-item keeps it; one that repeats it does not', () => {
+  const d = doc();
+  d.querySelector('nav.topnav ul').insertAdjacentHTML('afterbegin', `<li><a href="#">Modely&nbsp;</a><ul class="sub-menu">
+    <li><a href="${LIVE}/sk/hladat/?filter%5Bmodel%5D%5B%5D=fabia-sk">Fabia</a></li></ul></li>
+    <li><a href="${LIVE}/sk/foto/">Foto</a><ul class="sub-menu"><li><a href="${LIVE}/sk/foto/">Foto</a></li></ul></li>`);
+  const [, , menu] = sections(buildNav(d, 'sk'));
+  const [models, photos] = [...menu[0].children];
+  assert.equal(models.querySelector(':scope > p').textContent, 'Modely', 'a text heading');
+  assert.deepEqual(links(models.querySelector(':scope > ul')), [`Fabia=${LIVE}/sk/hladat/?filter%5Bmodel%5D%5B%5D=fabia-sk`]);
+  assert.equal(photos.querySelector(':scope > ul'), null, 'a sub-item that repeats its heading adds nothing');
+});
+
+// #542 review: the exception is for a nav `#` heading only; every other menu keeps its old output
+test('buildNav / buildFooter: outside a nav `#` heading, a single sub-item stays out (as before)', () => {
+  const d = doc();
+  d.querySelector('nav.topnav ul').insertAdjacentHTML('afterbegin', `<li><a href="#">Modely</a><ul class="sub-menu">
+    <li><a href="${LIVE}/sk/modely/">Modely</a></li></ul></li>
+    <li><a href="${LIVE}/cs/foto/">Foto</a><ul class="sub-menu"><li><a href="${LIVE}/cs/video/">Video</a></li></ul></li>`);
+  const [, , menu] = sections(buildNav(d, 'cs'));
+  const [sameName, linkedParent] = [...menu[0].children];
+  assert.equal(sameName.querySelector(':scope > ul'), null, 'a heading whose one item has its name');
+  assert.equal(linkedParent.querySelector(':scope > ul'), null, 'a linked parent with one other item');
+  // the footer: a `#` parent whose second item is a heading keeps its first (two subs, as before)
+  const f = doc();
+  f.querySelector('.footer-nav ul.menu').insertAdjacentHTML('afterbegin', `<li><a href="#">Spol</a><ul class="sub-menu">
+    <li><a href="${LIVE}/cs/a/">A</a></li><li class="heading"><a href="${LIVE}/cs/h/">H</a></li></ul></li>`);
+  const [, footerMenu] = sections(buildFooter(f));
+  assert.deepEqual(links(footerMenu[0].children[0].querySelector(':scope > ul')), [`A=${LIVE}/cs/a/`]);
+});
+
 test('buildNewsletter: the Newsletter Stub (topbar) rows of /nav-newsletter', () => {
   globalThis.WebImporter = {
     DOMUtils: {
