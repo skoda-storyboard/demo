@@ -368,8 +368,10 @@ test('nested div.article-teaser > article yields ONE card per teaser, each with 
   assert.equal(rows.length, 3);
   rows.forEach((tr, i) => {
     assert.ok(tr.querySelector('img'), `row ${i + 1} has its image`);
-    // the linked title is a heading, so the card reads it as the title (not a toolbar)
-    assert.equal(tr.querySelector('h3 > a').textContent, `Story ${i + 1}`);
+    // the linked title is a heading, so the card reads it as the title (not a toolbar); h2, as
+    // the source's teaser titles under the "Explore more" h3 (#387)
+    assert.equal(tr.querySelector('h2 > a').textContent, `Story ${i + 1}`);
+    assert.equal(tr.querySelector('h3'), null);
   });
 });
 
@@ -379,9 +381,19 @@ test('aside emits the "Tags" heading before the existing Tags block', { skip }, 
   // h3, as the source h3.sidebar-heading (#296); the cards' titles are inside the Cards table
   const asideHeadings = [...doc.querySelectorAll('h3')].filter((h) => !h.closest('table'));
   assert.deepEqual(asideHeadings.map((h) => h.textContent), ['Explore more', 'Tags']);
-  assert.equal(doc.querySelectorAll('h2').length, 0);
+  // the only h2s are the three card titles (#387)
+  assert.deepEqual([...doc.querySelectorAll('h2')].map((h) => !!h.closest('table')), [true, true, true]);
   const tagsTable = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Tags');
   assert.equal(asideHeadings[1].nextElementSibling, tagsTable);
+});
+
+test('an empty source heading (`<h6>&nbsp;</h6>` spacer) is dropped; a heading with text or an image stays (#387 review)', { skip }, () => {
+  const doc = dom(`<div class="entry-content"><p>One</p><h6>&nbsp;</h6><p>Two</p><h6> </h6>
+    <h2>A real heading</h2><h6><img src="x.png" alt="x"></h6></div>`);
+  storyCleanup('afterTransform', doc.body, {});
+  assert.deepEqual([...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) => h.tagName), ['H2', 'H6']);
+  assert.ok(doc.querySelector('h6 img'), 'a heading holding an image is kept');
+  assert.deepEqual([...doc.querySelectorAll('p')].map((p) => p.textContent), ['One', 'Two']);
 });
 
 // --- story drop cap + photo grid (#516 PO: "below that images are not there as per live") -------

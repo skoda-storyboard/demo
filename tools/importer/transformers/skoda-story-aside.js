@@ -170,7 +170,9 @@ function relatedCards(sidebar, document) {
     // "[object Object]" here).
     const content = [];
     if (title) {
-      const h = document.createElement('h3');
+      // h2, as the source's teaser titles under the "Explore more" h3 (#387; the section
+      // headings stay h3, #296)
+      const h = document.createElement('h2');
       if (link) {
         const a = document.createElement('a');
         a.setAttribute('href', link.getAttribute('href'));

@@ -49,5 +49,52 @@ second row, which leaves the first row image-less.
       and aside still stack below 768px, with 3 full-width teasers in one column at 767px.
 - [x] Unit/regression check on the transformer (nested teaser markup gives N rows, not 2N).
 
+## Heading levels, #387 / #404 (2026-10-29, branch `fix-387-404-story-headings`)
+- **#387, the "Explore more" card titles:** the source has them as h2, under the h3 "Explore more"
+  (`h3.sidebar-heading` + `.related article h2.title`; outline measured on the Peaq and wireless-charging
+  stories). All 386 card titles on main were h3. `skoda-story-aside.js` now writes them as h2; the section
+  headings stay h3 (#296 / #336). The card title's type and box don't change (`.card-teaser-title`, any level):
+  16/20 px 500, title 313×40 / card 345×194 at 1280, the same at 768 and 390, measured on the real template;
+  the card click still opens its story. The outline equals the source's.
+- **Empty source headings:** the Mallorca and olive-oil stories space paragraphs with `<h6>&nbsp;</h6>`; the
+  importer kept them as empty headings. `skoda-story-cleanup.js` drops a heading with no text and no media.
+- **#404:** already fixed on main for 137 of 139 stories (re-imports since 20 Oct). Two left:
+  - "RS four ways" is one of the 40 stories in the 28 Oct DA batch (see below);
+  - the Enyaq / Elroq gaming-consoles story is blocked by the push's binary gate: its MP4 isn't in the DAM.
+- **Content:** the 139 stories (132 EN + 7 in the locale trees) were re-imported with this branch and compared
+  with preview:
+  - 393 card titles h3 → h2 and 8 #404 section headings h2 → h3;
+  - 109 links on 55 stories now point at the migrated page instead of the source;
+  - the source's current "Explore more" picks;
+  - Spacer blocks (#380);
+  - restored body sections and quote names (gaming consoles, Sportline, Enyaq RS Race).
+
+  `import:push --dry-run`: 98 update, **40 conflict**, 1 blocked. The 40 were saved in DA on 2026-10-28
+  12:03–12:05 by two team members, mostly without a preview; their images now point at DA-hosted copies
+  (`content.da.live/…`). A re-push would put the source CDN URLs back, so they are held until the order is agreed
+  with whoever ran that batch.
+- **Pushed and published, 2026-10-29 (PO requests; PR #548):**
+  - **91 EN stories:** pushed, previewed and published. On live, all 268 card titles are h2 and every section
+    heading is h3; no empty headings; DA equals what was pushed. Push record committed (15d5387).
+  - **7 stories in the locale trees** (4 CS, DE, SK, SR): pushed and previewed, **not published**. The publish
+    gate stops on their `/{cs,de,sk,sr}/fragments/newsletter-card`: CS is preview-only; DE / SK / SR don't exist.
+    Open: publish the CS fragment and create the others, or publish the stories without them, as they are live
+    today.
+  - **40 held** (the 28 Oct DA image batch, above) and **1 blocked** (gaming consoles: its MP4 isn't in the DAM)
+    keep their old content: h3 card titles, and on "RS four ways" the #404 h2 section headings.
+- **Checked on live** (PR #548):
+  - the outline equals the source's (`H3 Explore more | H2 ×3 | H3 Tags`);
+  - the card type and boxes are unchanged at 1280 / 768 / 390;
+  - real clicks: a migrated target opens in the same tab, an unmigrated one the source in a new tab;
+  - axe: no new violations; the existing `heading-order` (the newsletter h3 after the h1, as on the source) and
+    one body-link contrast remain;
+  - no broken images, no visible Spacer text, the in-site links resolve;
+  - the newsletter-card fragment re-imports unchanged.
+- **Found, not changed here (notes, no issues filed):**
+  - some hero images carry a literal `<br>` in their alt (`ŠKODA 4×4: <br>Your Best Bet in the Snow`), on main
+    too;
+  - the locale stories' newsletter-card fragments (above);
+  - the card title box is 313×40 against the source's 345×72 at 1280 (type equal), on main before this change too.
+
 ## Dependencies
 SKODA-801 (aside rebuild), SKODA-201 (cards/card-teaser overlay style).

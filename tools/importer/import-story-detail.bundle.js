@@ -1930,6 +1930,11 @@ var CustomImportScript = (() => {
       }));
     });
   }
+  function dropEmptyHeadings(element) {
+    element.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((h) => {
+      if (!h.textContent.replace(/[\s\u00a0]+/g, "") && !h.querySelector("img, picture, svg, iframe, video")) h.remove();
+    });
+  }
   function transform2(hookName, element, payload) {
     if (hookName === TransformHook2.beforeTransform) {
       const doc = element.ownerDocument || document;
@@ -1966,6 +1971,7 @@ var CustomImportScript = (() => {
         );
       }
       WebImporter.DOMUtils.remove(element, deferredSelectors);
+      dropEmptyHeadings(element);
     }
   }
 
@@ -2065,7 +2071,7 @@ var CustomImportScript = (() => {
       if (!link && !img) return;
       const content = [];
       if (title) {
-        const h = document2.createElement("h3");
+        const h = document2.createElement("h2");
         if (link) {
           const a = document2.createElement("a");
           a.setAttribute("href", link.getAttribute("href"));
