@@ -270,6 +270,9 @@ class PreparationTests(unittest.TestCase):
             self.assertEqual(calls[1][-1], HEAD)
             data = json.loads(manifest.read_text())
             self.assertEqual(data["pr"]["baseRefName"], "release")
+            args = data["command"]
+            self.assertEqual(args[args.index("--model") + 1], "gpt-6.1-sol")
+            self.assertEqual(args[args.index("--reasoning-effort") + 1], "high")
             runner = manifest.with_name("launch.command")
             argv = shlex.split(runner.read_text().splitlines()[1])
             self.assertEqual(argv[-2:], ["--run-session", str(manifest)])
@@ -282,7 +285,8 @@ class PreparationTests(unittest.TestCase):
             root = Path(temporary)
             fake_copilot = root / "fake copilot"
             fake_copilot.write_text(
-                "#!/bin/sh\nkill -INT \"$PPID\"\nprintf 'fake CLI started\\n'\nexit 0\n"
+                "#!/bin/sh\nkill -INT \"$PPID\"\nprintf 'fake CLI started\\n'\n"
+                "printf '%s\\n' \"$@\"\nexit 0\n"
             )
             fake_copilot.chmod(0o700)
             tools = {"git": "/bin/git", "copilot": str(fake_copilot)}
@@ -298,17 +302,22 @@ class PreparationTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("fake CLI started", result.stdout)
+            self.assertIn("--model\ngpt-6.1-sol\n", result.stdout)
+            self.assertIn("--reasoning-effort\nhigh\n", result.stdout)
             self.assertEqual(json.loads(manifest.with_name("status.json").read_text()),
                              {"state": "exited", "code": 0})
 
 
 class LaunchTests(unittest.TestCase):
-    def invoke(self, repo, extra=None, metadata=None):
+    def invoke(self, repo, extra=None, metadata=None, missing_flag=None):
         arguments = [
             "--repo", str(repo), "https://github.com/skoda-storyboard/demo/pull/123",
         ] + (extra or [])
         help_text = "--name --session-id --interactive --mode --add-dir --additional-mcp-config " \
-                    "--disable-mcp-server --enable-mcp-server --allow-tool --deny-tool --allow-url"
+                    "--disable-mcp-server --enable-mcp-server --allow-tool --deny-tool --allow-url " \
+                    "--model --reasoning-effort"
+        if missing_flag:
+            help_text = help_text.replace(missing_flag, "")
         with patch.object(launcher.sys, "platform", "darwin"), \
                 patch.object(launcher.shutil, "which", side_effect=lambda name: "/bin/" + name), \
                 patch.object(launcher, "command", side_effect=[str(repo), help_text]), \
@@ -329,6 +338,16 @@ class LaunchTests(unittest.TestCase):
             self.assertEqual(list(repo.iterdir()), before)
             prepare.assert_not_called()
             open_terminal.assert_not_called()
+
+    def test_missing_model_or_reasoning_support_fails_before_preparing_reviews(self):
+        for flag in ("--model", "--reasoning-effort"):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as temporary, \
+                    patch.object(launcher, "prepare_review") as prepare, \
+                    patch.object(launcher, "open_terminal") as open_terminal:
+                with self.assertRaisesRegex(launcher.LaunchError, "lacks " + flag):
+                    self.invoke(Path(temporary), ["--dry-run"], missing_flag=flag)
+                prepare.assert_not_called()
+                open_terminal.assert_not_called()
 
     def test_output_inside_repo_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:

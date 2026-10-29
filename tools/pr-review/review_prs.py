@@ -276,6 +276,7 @@ def prepare_review(pr: dict, root: Path, repo: Path, tools: Dict[str, str]) -> P
     session_id = str(uuid.uuid4())
     args = [
         tools["copilot"], "--session-id", session_id, "--name", name, "--mode", "interactive",
+        "--model", "gpt-6.1-sol", "--reasoning-effort", "high",
         "--add-dir", str(evidence),
     ] + mcp_arguments(tools["copilot"], worktree) + ["--interactive", prompt]
     manifest = session / "session.json"
@@ -395,7 +396,7 @@ def launch(argv: Optional[List[str]] = None) -> int:
     help_text = command([tools["copilot"], "--help"], repo)
     for flag in ("--name", "--session-id", "--interactive", "--mode", "--add-dir",
                  "--additional-mcp-config", "--disable-mcp-server", "--enable-mcp-server",
-                 "--allow-tool", "--deny-tool", "--allow-url"):
+                 "--allow-tool", "--deny-tool", "--allow-url", "--model", "--reasoning-effort"):
         if flag not in help_text:
             raise LaunchError("Installed Copilot CLI lacks {}; update it first".format(flag))
     output = (args.output_dir or repo.parent / (repo.name + "-reviews")).expanduser().resolve()

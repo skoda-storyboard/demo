@@ -178,11 +178,17 @@ npm run lint:fix                  # auto-fix
 The standard-library Python launcher opens one **new Terminal.app window per PR**,
 with a named Copilot CLI session, detached worktree pinned to the PR head, and its
 own Chrome DevTools MCP process using `--isolated`.
+Each newly prepared review session explicitly selects **GPT-6.1 Sol**
+(`--model gpt-6.1-sol`) with **high reasoning** (`--reasoning-effort high`),
+overriding saved/default model preferences without changing global configuration.
+The launcher does not substitute another model if access is unavailable; resolve
+any Copilot account or organization-policy error before reviewing.
 
 Requirements: Python 3.9+, Git, authenticated `gh` and Copilot CLI, Node/npm (`npx`),
 and Google Chrome. Run `copilot login` / `gh auth login` first if needed. The CLI
 must support `--additional-mcp-config`, `--enable-mcp-server`, `--allow-tool`,
-`--deny-tool`, `--allow-url` and `copilot mcp list --json` (verified with 1.0.105).
+`--deny-tool`, `--allow-url`, `--model`, `--reasoning-effort` and
+`copilot mcp list --json` (verified with 1.0.105).
 No pip packages are needed.
 
 ```bash
@@ -298,8 +304,9 @@ URLs on screen. Pending, failed, missing, skipped, cancelled, inaccessible or st
 remain unverified/blocked, never a pass or a reason to run a local audit.
 Only report accessibility coverage actually present in CI; retain browser
 measurements, real interactions, heading outlines and other QA checks.
-These prompt changes apply to newly prepared sessions; existing sessions retain
-their saved prompts until relaunched with a fresh launcher invocation.
+These prompt and model-selection changes apply to newly prepared sessions;
+existing sessions retain their saved prompts/launch arguments until relaunched
+with a fresh launcher invocation.
 
 On a failed launch, inspect `status.json` and the Terminal window before retrying.
 `launch.command` resumes that prepared review's UUID session and reissues its review
