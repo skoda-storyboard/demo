@@ -74,10 +74,25 @@ export const FIELD_LABELS = {
   dcCharging: 'Charging time (DC, 10 – 80%)',
   range: 'Range (WLTP)',
   consumption: 'Consumption (WLTP)',
+  batteryGross: 'Battery capacity (gross)',
+  batteryNet: 'Battery capacity (net)',
+  dcChargingPower: 'DC charging power',
+  acChargingPower: 'AC charging power',
+  bootThirdRow: 'Boot behind the third row',
+  bootFolded: 'Boot with the rear seats folded',
+  towing: 'Towing capacity (braked, 12 %)',
+  seats: 'Seats',
+  seatRows: 'Rows of seats',
+  display: 'Infotainment display',
+  co2: 'CO₂ emissions (WLTP)',
+  // fields the sheet has no rows for yet: a claim about them is always "needs review"
+  trims: 'Trim levels',
+  platform: 'Platform',
+  other: 'Other figure',
 };
 
 // "5,4" is a decimal comma; "2,965" (three digits after the comma) is a thousands separator
-function toNumber(token) {
+export function toNumber(token) {
   const t = token.replace(/\s/g, '');
   const normalized = /^\d{1,3}(,\d{3})+$/.test(t) ? t.replace(/,/g, '') : t.replace(',', '.');
   const n = Number(normalized);
@@ -154,13 +169,42 @@ export function readSheet(json) {
       key,
       model: str(row.model) || key.split('.')[0],
       version: str(row.version),
+      configuration: str(row.configuration),
       field: str(row.field) || key.split('.')[1],
       value,
       unit,
       label: str(row.label),
       source: str(row.source),
       sourceDate: str(row.sourceDate),
+      confidence: str(row.confidence),
+      limitations: str(row.limitations),
       note: str(row.note),
+      display: unit ? `${value} ${unit}` : value,
+    });
+  });
+  // measured results (record drives): never official capability figures, checked separately
+  const records = [];
+  rowsOf(json, 'records').forEach((row) => {
+    const model = str(row.model);
+    const field = str(row.field);
+    const value = str(row.value);
+    if (!model || !field || !value) {
+      skipped += 1;
+      return;
+    }
+    const unit = str(row.unit);
+    records.push({
+      model,
+      version: str(row.version),
+      configuration: str(row.configuration),
+      field,
+      value,
+      unit,
+      label: str(row.label),
+      conditions: str(row.conditions),
+      source: str(row.source),
+      sourceDate: str(row.sourceDate),
+      confidence: str(row.confidence),
       display: unit ? `${value} ${unit}` : value,
     });
   });
@@ -181,7 +225,9 @@ export function readSheet(json) {
       pdfDate: str(row.pdfDate),
     });
   });
-  return { values, models, skipped };
+  return {
+    values, models, records, skipped,
+  };
 }
 
 /** "/en/x.html", "/en/x/" and "/en/x" are the same page. */
@@ -233,6 +279,40 @@ export function readMetadata(html) {
     .join(', ');
   return new Map(rows.filter((r) => r.length >= 2)
     .map((r) => [valueOf(r[0]).toLowerCase(), valueOf(r[1])]));
+}
+
+const METADATA_START_RE = /<div\b[^>]*\bclass="metadata"[^>]*>/i;
+
+/** The document's page-metadata block (`<div class="metadata">…</div>`) as HTML, or ''. */
+export function metadataBlockOf(html) {
+  const doc = String(html ?? '');
+  const start = doc.search(METADATA_START_RE);
+  if (start < 0) return '';
+  const tags = /<\/?div\b[^>]*>/gi;
+  tags.lastIndex = start;
+  let depth = 0;
+  for (let m = tags.exec(doc); m; m = tags.exec(doc)) {
+    depth += m[0][1] === '/' ? -1 : 1;
+    if (depth === 0) return doc.slice(start, m.index + m[0].length);
+  }
+  return '';
+}
+
+/**
+ * Canvas's live document leaves the page metadata out: the host serializes it with da-live's
+ * `prose2aem(…, livePreview = true)`, which removes the `.metadata` block. The model, tags,
+ * title and description then come from the saved source: its metadata block goes into the live
+ * `<main>`. Metadata in the live document, if a host ever sends it, wins.
+ * @returns {{html: string, metadataFrom: 'live'|'saved'|'none'}}
+ */
+export function withSavedMetadata(liveHtml, savedHtml) {
+  const live = String(liveHtml ?? '');
+  if (METADATA_START_RE.test(live)) return { html: live, metadataFrom: 'live' };
+  const block = metadataBlockOf(savedHtml);
+  if (!block) return { html: live, metadataFrom: 'none' };
+  const at = live.lastIndexOf('</main>');
+  const html = at >= 0 ? `${live.slice(0, at)}${block}${live.slice(at)}` : `${live}${block}`;
+  return { html, metadataFrom: 'saved' };
 }
 
 /** The page's model facts from its metadata: `model`, `derivative` and `tags`, as one tag set. */

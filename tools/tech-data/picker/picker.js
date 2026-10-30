@@ -47,7 +47,8 @@ function valueRow(row, status) {
     a.rel = 'noopener';
     source.append(a);
   }
-  if (row.note) source.append(el('span', 'tech-data-note', row.note));
+  [row.confidence, row.note, row.limitations].filter(Boolean)
+    .forEach((text) => source.append(el('span', 'tech-data-note', text)));
   const copy = el('td');
   const button = el('button', 'tech-data-button', row.display);
   button.type = 'button';

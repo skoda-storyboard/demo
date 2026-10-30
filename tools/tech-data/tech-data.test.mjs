@@ -69,7 +69,9 @@ test('readSheet builds display values and skips invalid rows', () => {
   assert.equal(sheet.values.size, 1);
   assert.deepEqual(sheet.models[0].pages, ['/en/skoda-model/peaq', '/en/x']);
   assert.equal(sheet.skipped, 3);
-  assert.deepEqual(readSheet(null), { values: new Map(), models: [], skipped: 0 });
+  assert.deepEqual(readSheet(null), {
+    values: new Map(), models: [], records: [], skipped: 0,
+  });
 });
 
 test('the seed sheet: every row is valid, every model has pages, version rows group under their model', () => {

@@ -1,18 +1,23 @@
 # Technical data from one sheet (SKODA-852)
 
-Official vehicle figures live in one DA sheet, `/data/tech-data.json`. Documents link each figure to its
-sheet row, and a check in DA's prepare menu compares the document with the sheet before publishing.
+Official vehicle figures live in one DA sheet, `/data/tech-data.json`. Documents can link each figure to its
+sheet row. The **Tech data check** compares the document with the sheet before publishing:
+- the linked values;
+- the Technical Data grid;
+- every technical claim in the running text, including the metadata Title and Description.
 
 | File | What it is |
 |---|---|
-| `tech-data.js` | Shared contract: link format, figure parsing and comparison, sheet reader. Pure, no DOM. |
-| `checks.js` | The five checks and the two fixes (update, link). Used by the plugin and the audit. |
-| `preflight/` | **Tech data check**, a DA prepare-menu plugin. |
+| `tech-data.js` | Shared contract: link format, figure parsing, sheet reader (values, models, records), page metadata, page → model. Pure, no DOM. |
+| `claims.js` | Technical claims in running text: number + unit, field, qualifier, measured or capability, model and version scope, verdict. Pure. |
+| `checks.js` | The five checks and the two fixes (update, link), with the save guard. Used by the plugins and the audit. |
+| `preflight/` | **Tech data check**: prepare-menu dialog (saved source, fixes) and Canvas side panel (live document, read-only). |
 | `picker/` | **Tech data**, a DA library plugin that copies a linked value to paste into the text. |
 | `da.js` | DA handshake, page source read/write, sheet loading for both plugins. |
-| `audit.mjs` | `npm run tech-data:audit`: the same checks over published pages (read-only). |
-| `tech-data.seed.json` | The sheet's first content, typed in from the official PDFs. Upload it to DA as `/data/tech-data.json`. |
-| `../../scripts/tech-values.js` | On the page, a linked value reads as text (`<span class="tech-value">`). |
+| `audit.mjs` | `npm run tech-data:audit`: the same checks over published pages or DA documents (read-only). |
+| `build-seed.mjs` | Writes `tech-data.seed.json` from the hand-checked official figures, with source, date, confidence and limitations per row. |
+| `tech-data.seed.json` | The sheet's content as uploaded to DA (`/data/tech-data.json`, 2026-10-29). |
+| `../../scripts/tech-values.js` | On the page, a linked value reads as text and keeps its key. |
 
 ## A linked value
 
@@ -22,75 +27,140 @@ sheet row, and a check in DA's prepare menu compares the document with the sheet
 
 - The link text is the formatted value, so HTML, `.plain.html`, Markdown and crawlers keep it without JavaScript.
 - The href records where the value comes from.
-- The key is `<model>.<field>` for the figures a model page shows, and `<model>-<version>.<field>` for one
-  version.
+- The key is:
+  - `<model>.<field>` for the figures a model page shows;
+  - `<model>-<version>.<field>` for one version;
+  - `<model>-<configuration>.<field>` for one configuration (`peaq-7seat.boot`).
 
 ## The sheet
 
-Two tabs:
+Three tabs.
 
-- `values`: `key`, `model`, `version`, `field`, `value`, `unit`, `label` (vehicle name), `source` (PDF URL),
-  `sourceDate`, `note`.
+- `values`: `key`, `model`, `version`, `configuration`, `field`, `value`, `unit`, `label` (vehicle name),
+  `source` (URL), `sourceDate`, `confidence`, `limitations`, `note`.
+  - `confidence`:
+    - `official TD PDF`: the per-version figure as printed;
+    - `derived from TD PDF`: the min–max of the versions a model page covers, which is what its grid shows;
+    - `official story` / `official press release`: only where the TD PDF has no such figure (the Peaq display).
+  - `limitations` says what the source does not settle. Examples: the PDF doesn't apply to Sportline; towing
+    1800 / 2000 kg is printed without per-version columns.
 - `models`: `code`, `name`, `pages`, `tags`, `excludeTags`, `pdf`, `pdfDate`.
-  - `pages`: comma-separated paths the model's figures apply to.
-  - `tags`: every tag a page needs to be this model.
-  - `excludeTags`: tags that rule it out.
-  - A page's models are the ones listing its path; otherwise its metadata decides (`model`, `derivative`, `tags`),
-    and the most specific match wins.
-  - So a draft copy keeps its model:
-    - `elroq, rs` is the Elroq RS;
-    - `elroq, sportline` is none (the PDFs don't apply to Sportline).
-  - The audit reads the tags from the rendered page's head (`model`, `article:tag`), because `.plain.html` has
-    no metadata.
+  - A page's models are the ones listing its path. Otherwise its metadata decides (`model`, `derivative`, `tags`):
+    every model tag must be present and no excluded tag. The most specific match wins.
+  - So `elroq, rs` is the Elroq RS, and `elroq, sportline` is none.
+- `records`: measured results that are **not** capability figures. Columns: `model`, `version`, `configuration`,
+  `field`, `value`, `unit`, `label`, `conditions`, `source`, `sourceDate`, `confidence`.
+  - Today: the Peaq 90 record drive, 936 km at 9.2 kWh/100 km (press release, 2. 9. 2026).
 
-Fields: `power`, `torque`, `topSpeed`, `acceleration`, `boot`, `dcCharging`, `range`, `consumption`.
+Fields:
+- the grid: `power`, `torque`, `topSpeed`, `acceleration`, `boot`, `dcCharging` (time), `range`, `consumption`;
+- Peaq only, so far: `batteryGross`, `batteryNet`, `dcChargingPower`, `acChargingPower`, `bootThirdRow`,
+  `bootFolded`, `towing`, `seats`, `seatRows`, `display`, `co2`.
 
-The model rows are what the model page's Technical Data grid shows: the min–max of the versions that page
-covers. Sportline pages are not listed, because the PDFs say "Technical specifications do not apply for
-Sportline cars". A page that matches no model gets its WLTP sentences checked against every model, but its grid isn't
-checked.
+The other six models only have the grid fields, so their other claims come out as "needs review".
+
+Nothing is inferred. Where the PDF prints fewer columns than versions and doesn't say which value is which, there is
+no version row; the RS top speed and DC charging are examples. Claims about those figures need review.
 
 ## The checks
 
 | Check | Issue | Review |
 |---|---|---|
-| Linked values | the link text differs from the sheet; the key isn't in the sheet | |
+| Linked values | the text differs from the sheet; the key isn't in the sheet; the row is another model's and the paragraph doesn't name it | |
 | Technical Data | a grid cell differs from the model's row; a linked cell links another row | a cell without a sheet row; a decimal comma |
-| WLTP figures in the text | a WLTP-labelled range/consumption that isn't official ("936 km WLTP") | a rounded one ("more than 560 km") |
+| Technical claims in the text | a claim contradicts the official rows of the model and version it is about | see below |
+| WLTP label | | a range or consumption cell, link or capability sentence without "WLTP" |
+| Values that could be linked | | an official value typed as text (grid cells, WLTP sentences) |
 
-"Up to 577 km" passes when 577 is the top of an official interval, and "from 408 km" when 408 is its bottom.
-| WLTP label | | a range/consumption cell or sentence without "WLTP" (drive, test and record sentences are skipped) |
-| Values that could be linked | | an official value typed as text |
+**Technical claims in the text** (`claims.js`): every number with a vehicle unit, in every sentence and in the
+metadata Title and Description.
+- **Units:** km, kWh, kW, kWh/100 km, l/100 km, g/km, km/h, l, kg / t, inch, min, s and seats. It also reads
+  number words ("seven-seat", "three rows of seats", "six trim levels") and platform names ("MEB+ platform").
+  Hyphenated forms ("765-litre", "32-inch", "210-kW") and thousands separators ("1,690") count.
+- **The field** comes from the unit and the nearest words:
+  - kW next to DC/AC/wallbox is charging power, next to power/output/motor it's power;
+  - litres near boot/luggage are the boot, and "folded" or "third row" in the clause picks the boot variant;
+  - kg near "tow" is towing;
+  - inches near display/screen are the display (wheels are not).
+- **Not claims:** km without range words in its own clause is a distance ("280 kilometres away"). Percentages,
+  the 0–100 km/h phrase, numbers in URLs and differences ("exceeded … by 289 km") are skipped.
+- **Measured or capability:** the clause decides.
+  - A completed-drive verb ("covered", "averaging") or a record sentence, with no capability word ("up to", "can",
+    "offers", "WLTP", "maximum") in the clause, is a measured result. It's checked against `records`.
+  - "Trip" or "record" elsewhere never turns "offers up to 936 km" into a measurement.
+- **Scope:** the model and version the sentence names ("Peaq 60", "the 90 variant"), else the page's models.
+  - A page without a model is never compared with other models' figures.
+  - These need review: a sentence that names two models, a Sportline sentence, or one about another variant
+    ("the Coupé version" on the RS page).
+- **Units:** a claim is only compared with rows in the same unit. "15.0 l/100 km" is never checked against
+  15.0 kWh/100 km: it needs review. A record must match the unit too.
+- **Seat configuration:** "five-seater", "7-seat" and the like in the sentence limit configuration-specific rows
+  (the Peaq boot: 5-seater 935 l, 7-seater 890 l).
+  - A figure that matches only one configuration's row, in a sentence that names no configuration, needs review.
+  - Notes and limitations are never read as configurations.
+- **Counts:** "6 trim levels" and "3 rows of seats" are read like "six" and "three".
+- **Compartments:** a storage compartment, glovebox, tray or front storage is not the boot; it needs review. A
+  "luggage compartment" is the boot.
+- **Linked values in prose** are claims too, checked in their sentence. The link must be one of the rows the
+  figure matches there (model, version, configuration, field, unit), and a measured result must not link to an
+  official figure. A link never makes a figure pass that the text alone wouldn't.
+- **Qualifiers:**
+  - "up to N": N must be the top of an official figure;
+  - "from N": the bottom;
+  - "around N": a match, or a Review if rounded;
+  - "more than N": a Review if true, an Issue if it overstates.
+- **Verdict:**
+  - **ok:** it matches an official row, or a record.
+  - **Issue:** it differs. The official figures are listed with source and date, plus a note when the number
+    is a record ("936 km is the Peaq 90 record drive, a measured result, not the car's WLTP range").
+  - **Review:** rounded; measured but not in the records; no reference data for that field; no model; ambiguous;
+    Sportline; another variant; inside a model-level min–max with no per-version figure to confirm it.
 
-Figures compare by their numbers and unit: `458 - 646 km`, `458–646 km` and `458 – 646 km` are the same figure.
-Metadata is not checked.
-
-**Fixes** (inside DA only):
+**Fixes** (prepare-menu dialog only):
 - **Update** rewrites stale links, and turns differing grid cells into links with the official value.
-- **Link** turns matching grid cells and official WLTP figures in the text into links.
-
-Each fix re-reads the source first and saves it with the author's token. Nothing is published.
-
-A save guard refuses any fix that would change a block or format tag, or any text outside the values. Then nothing
-is saved.
+- **Link** turns matching grid cells into links. In the text it links only figures the claims check verified:
+  status ok, an official figure of the sentence's model, version and configuration in the same unit, and a row
+  that is exactly that figure. Issues, Reviews, rounded figures and "up to" a min–max are never linked.
+- Prose claims are never corrected automatically.
+- Each fix re-reads the source first and saves it with the author's token. Nothing is published.
+- A save guard refuses any fix that would change a block or format tag, or any text outside the values.
 
 The check advises; it can't stop a publish. A hard stop would belong to the request-to-publish step (SKODA-850a).
 
-## Setup in DA
+## In DA and Canvas
 
-- **Sheet:** upload `tech-data.seed.json` as `/data/tech-data.json`, then preview and publish it. The plugins read
-  the DA source; the page and the audit read the published copy.
-- **Site config `library` row:** title `Tech data`, path
-  `https://main--demo--skoda-storyboard.aem.page/tools/tech-data/picker/picker.html`.
-- **Site config `prepare` row:** title `Tech data check`, path
-  `https://main--demo--skoda-storyboard.aem.page/tools/tech-data/preflight/preflight.html`.
-  - DA merges prepare rows by title, so this adds a menu item, and the built-in **Preflight** stays.
-  - Only a row titled `Preflight` would replace it (`da-live` `blocks/edit/da-prepare/da-prepare.js`, `loadMenu`).
+Set up on 2026-10-29. Backups of the site config before and after are kept locally (`.migration/852/da/`), not in
+the repo.
+
+- **Sheet:** `/data/tech-data.json`, uploaded from `tech-data.seed.json`, previewed and published. The plugins read
+  the DA source; pages and the audit read the published copy.
+- **Site config `prepare` row:** `Tech data check` → `…/tools/tech-data/preflight/preflight.html`.
+  - It shows in the prepare menu of the classic editor and of Canvas. Canvas needs a code branch for path-based
+    items.
+  - It opens as a dialog that checks the **saved** source and offers the fixes.
+  - DA merges prepare rows by title. Canvas also drops any row titled `Preflight`, so this one has its own title.
+- **Site config `library` rows:**
+  - `Tech data` → `…/picker/picker.html`.
+  - `Tech data check` → `…/preflight/preflight.html`. In Canvas a library row is a side panel, and the host
+    offers the live document (`capabilities.liveDocument`). The panel re-checks as the author types, unsaved
+    edits included, read-only.
+  - Canvas leaves the page metadata out of the live document: it serializes it with da-live's
+    `prose2aem(…, livePreview = true)`, which removes the `.metadata` block. The panel therefore reads the saved
+    source once (read-only, again at most once a minute) and checks the live body with the saved metadata (model,
+    tags, Title, Description), and the header says so with the time it was read. Metadata edits show after they
+    are saved. If a host ever sends metadata in the live document, that wins.
+- **Canvas's built-in Preflight panel** can't run this check.
+  - It posts the preview URL to Adobe's Experience Governance service (`experience-context.adobe.io`,
+    `da-live` `blocks/canvas/ew-preflight/api.js`) and shows the built-in, text, image and "site-code" checks
+    that service returns.
+  - There is no public contract for a site to add a check there, so Tech data check runs next to it, not inside
+    it.
+
+The rows point at `main`, so they run the code merged there. A change takes effect in DA once it is merged.
 
 ## Without DA
 
 - **Check a published page:** `/tools/tech-data/preflight/preflight.html?path=/en/skoda-model/peaq`.
-  - Add `&sheet=/tools/tech-data/tech-data.seed.json` until the DA sheet is published.
 - **Picker:** `/tools/tech-data/picker/picker.html`. **Copy** puts the linked value on the clipboard as HTML.
   - Paste it where it belongs: the editor parses a paste inline, so the sentence stays one paragraph.
   - DA's library inserts `sendHTML` as a closed block (`da-library.js`: `new Slice(parsed.content, 0, 0)`), which
@@ -98,13 +168,19 @@ The check advises; it can't stop a publish. A hard stop would belong to the requ
   - For Technical Data cells, the check's **Update** and **Link** are quicker.
 
 ```sh
-npm run tech-data:audit -- --sheet tools/tech-data/tech-data.seed.json --sitemap /en/skoda-model/
+npm run tech-data:audit -- --sitemap /en/skoda-model/            # published pages
+npm run tech-data:audit -- --source da /en/skoda-world/<slug>    # a DA document, unpublished too
 node --test tools/tech-data/ scripts/tech-values.test.mjs
 ```
 
 ## Updating the sheet
 
-When a PDF changes:
-1. Edit its rows in DA, with the new `sourceDate`.
-2. Preview and publish the sheet.
-3. Run the audit, and open each listed page's **Tech data check** → **Update**.
+When a source changes:
+1. Edit `build-seed.mjs`, with the new date and source.
+2. Run `node tools/tech-data/build-seed.mjs`.
+3. Replace the DA sheet's rows (DA keeps versions).
+4. Preview and publish the sheet.
+5. Run the audit.
+
+Adding a model or field means adding rows, plus a `models` row for a new model; the code needs no change unless
+a new unit appears.
