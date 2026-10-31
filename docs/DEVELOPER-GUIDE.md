@@ -173,6 +173,150 @@ npm run lint:fix                  # auto-fix
 - `npm run lint` must pass.
 - **Merging `main` ships code only**, content is published separately via DA (see the import pipeline doc). A code merge does not publish content, and vice-versa.
 
+### Parallel local PR reviews (macOS)
+
+The standard-library Python launcher opens one **new Terminal.app window per PR**,
+with a named Copilot CLI session, detached worktree pinned to the PR head, and its
+own Chrome DevTools MCP process using `--isolated`.
+Each newly prepared review session explicitly selects **GPT-6.1 Sol**
+(`--model gpt-6.1-sol`) with **high reasoning** (`--reasoning-effort high`),
+overriding saved/default model preferences without changing global configuration.
+The launcher does not substitute another model if access is unavailable; resolve
+any Copilot account or organization-policy error before reviewing.
+
+Requirements: Python 3.9+, Git, authenticated `gh` and Copilot CLI, Node/npm (`npx`),
+and Google Chrome. Run `copilot login` / `gh auth login` first if needed. The CLI
+must support `--additional-mcp-config`, `--enable-mcp-server`, `--allow-tool`,
+`--deny-tool`, `--allow-url`, `--model`, `--reasoning-effort` and
+`copilot mcp list --json` (verified with 1.0.105).
+No pip packages are needed.
+
+```bash
+# Replace the example URLs with open PRs from this repository.
+# First inspect the plan: reads GitHub/MCP metadata, but creates nothing.
+python3 tools/pr-review/review_prs.py --dry-run \
+  https://github.com/skoda-storyboard/demo/pull/123 \
+  https://github.com/skoda-storyboard/demo/pull/124
+
+# Then create worktrees and open one window per PR.
+python3 tools/pr-review/review_prs.py \
+  https://github.com/skoda-storyboard/demo/pull/123 \
+  https://github.com/skoda-storyboard/demo/pull/124
+
+# Launcher tests (no GitHub requests, Chrome or Terminal windows).
+python3 -B -m unittest discover -s tools/pr-review -p 'test_*.py'
+```
+
+Move each Terminal window to the desired screen. The launcher does not rearrange
+your displays. URLs may include `/files`, `/commits`, `/checks`, query strings or
+fragments. Duplicate URLs, closed PRs and PRs from another repository are rejected.
+Use `--repo /path/to/checkout` when invoking it from elsewhere.
+
+Every invocation creates a fresh directory under `../demo-reviews/` by default;
+`--output-dir` changes the parent, which must be outside the checkout. Each PR
+directory contains `worktree/`, `evidence/`, `prompt.txt`, `session.json`,
+`status.json` and `launch.command`. Supporting screenshots and test downloads go
+in `evidence/`; no `review.md` or other local review report is requested.
+Failed/partial runs are retained and their location is printed.
+No source changes or uncommitted files are copied into the review checkouts.
+Both head and actual base commits are fetched by SHA; neither `main` nor
+`FETCH_HEAD` is assumed. The launcher rechecks both SHAs before opening windows,
+and the review prompt requires another check before the verdict.
+
+Global MCP settings are **not modified**. Each session gets an ephemeral Chrome
+configuration; `npx` downloads the MCP package on first use if necessary. Other
+configured MCP servers are disabled for that session to prevent accidental shared
+browser use, while the built-in GitHub MCP is enabled. The browser starts on first
+tool use, not merely when Terminal opens. The launcher checks CLI process startup;
+the review's initial browser tool call checks actual MCP/browser readiness.
+Organization MCP policies still apply.
+
+One-time macOS Automation permission (your launching app controlling Terminal),
+Copilot login, folder trust and tool approvals may need confirmation. Check
+`/permissions` is **manual** and `/ide` is not connected to the other PR's workspace.
+Existing saved approvals/settings are not reset: this is not a read-only sandbox.
+The launcher adds a per-session **allowlist**, not allow-all or AI-assisted approval:
+
+- Selected Git reads (`status`, `diff`, `show`, `log`, `rev-parse`, `ls-files`,
+  `ls-tree`, `grep`, `merge-base`) and GitHub CLI reads (`pr view/diff/checks`,
+  `issue view`, `run view`, `repo view`) are pre-approved.
+- Selected Chrome tools for navigation, viewport changes, CSS/DOM inspection,
+  screenshots, hover/click/key/fill interactions and console/network inspection
+  are pre-approved for the isolated review server only.
+- Named GitHub MCP read tools are pre-approved; GitHub writes are not.
+- Native file-writing tools and common Git mutations are explicitly denied.
+  Supporting screenshots/downloads still use the external evidence directory;
+  native write denials do not constrain MCP or shell filesystem access.
+- Arbitrary `evaluate_script` JavaScript, uploads, unknown commands/tools, package
+  scripts and GitHub writes remain approval-gated. Unfamiliar actions may still
+  prompt even when harmless: a strict allowlist cannot identify every safe action.
+  There is no blanket approval for `gh api`, `curl`, shells, interpreters or servers.
+- Only GitHub/API HTTPS URLs are pre-approved by this policy. Other URL/path,
+  folder-trust and organization-policy confirmations may still appear.
+
+The runner disables inherited allow-all and assisted-approval environment flags,
+but does not clear persisted approvals or change global settings. Keep permission
+mode manual; if your saved default is assisted/allow-all, change it to manual
+before reviewing. On resumed sessions, inspect their saved approvals as well.
+CLI command rules match command stems, not all argument semantics; Chrome clicks
+can affect remote state. The prompt limits routine browser actions to PR
+origin/preview testing, requires confirmation for sensitive interactions, and
+forbids accessing secrets or unrelated systems. These rules are not OS sandboxing,
+network isolation or a guarantee that only dangerous actions will prompt. Use a
+container/VM and least-privilege credentials for untrusted PR execution.
+
+Do not use allow-all mode for untrusted PRs. Review sessions must not fix findings
+or create, edit, delete or rename codebase files (including tests, configuration,
+lockfiles and generated files). Auto-fix tools, formatters, code generators,
+project dependency installation and Git-changing operations are prohibited.
+Only checks that leave the codebase unchanged are allowed; inspect package scripts
+and obtain approval before running them. Checks needing missing dependencies or
+codebase changes remain blocked. Implementation belongs in a separate task;
+permission to post feedback never authorizes a code change in a review session.
+Publishing and GitHub writes still require approval. Environment-only tokens
+are not copied into launcher files or new Terminal windows; use stored
+logins. `COPILOT_HOME`, when set, is preserved without copying its contents.
+
+Review findings appear in the terminal, ordered by P0/P1/P2/P3 priority, with
+file/line, impact, reproduction and evidence. Before posting, the agent must show
+the exact proposed text, destination and action, and obtain explicit permission
+for that PR. Declining or not granting permission leaves the findings on screen
+without a GitHub write. Repository-required defect filing still needs permission.
+With no issues, the agent recommends whether approval is appropriate; blocked,
+pending or unverified checks mean "not ready to approve," not a clean pass.
+Approvals are never submitted automatically and also require explicit permission.
+Before a permitted post, the agent rechecks commits and existing GitHub feedback
+to avoid stale or duplicate posts. Changed commits require reassessment and fresh
+permission. These are agent instructions, not a technical GitHub write restriction.
+Copilot's normal conversation history may still persist terminal review output;
+this change does not disable CLI history or delete existing reports.
+
+The launcher uses deployed preview URLs from the PR/ticket, rather than starting
+local servers or publishing content. Missing previews (especially fork PRs) remain
+a review blocker. If a local server is needed, assign a distinct port per worktree.
+Coordinate overlapping fixes/merges, shared DA state and GitHub writes; worktrees
+still share Git refs/configuration and account limits.
+Follow the QA gates in [`../AGENTS.md`](../AGENTS.md), with the user-requested
+exception that reviews do **not** run local Lighthouse/PSI audits. AEM PSI already
+runs on GitHub for each PR. The prompt directs the agent to inspect those check
+results and linked reports for the pinned PR head SHA and show their status and
+URLs on screen. Pending, failed, missing, skipped, cancelled, inaccessible or stale results
+remain unverified/blocked, never a pass or a reason to run a local audit.
+Only report accessibility coverage actually present in CI; retain browser
+measurements, real interactions, heading outlines and other QA checks.
+These prompt and model-selection changes apply to newly prepared sessions;
+existing sessions retain their saved prompts/launch arguments until relaunched
+with a fresh launcher invocation.
+
+On a failed launch, inspect `status.json` and the Terminal window before retrying.
+`launch.command` resumes that prepared review's UUID session and reissues its review
+prompt; it refuses a second concurrent process for the same prepared review.
+Alternatively use `copilot --resume SESSION_UUID` from the recorded worktree, with
+the MCP flags recorded in `session.json`, only after the previous process has stopped.
+The launcher prints session names and non-forced `git worktree remove` commands.
+Stop the review and any servers it owns before removing its worktree; preserve the
+evidence you need. Do not force-remove dirty worktrees or kill unrelated browsers.
+
 ---
 
 ## 10. Common tasks

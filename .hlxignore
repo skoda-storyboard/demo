@@ -22,6 +22,7 @@ templates/**/*.test.mjs
 docs/ui-specs/tools/
 blocks/*/metadata.json
 tools/library/
+tools/pr-review/
 docs/client/
 tools/i18n/
 tools/tech-data/*.test.mjs
