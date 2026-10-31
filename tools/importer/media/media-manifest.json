@@ -245848,6 +245848,180 @@
       },
       "status": "partial",
       "note": ""
+    },
+    "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1.jpg": {
+      "logical_id": "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1-299x384.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1.jpg",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1.jpg",
+      "da_path": "",
+      "alt": "SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_21_23.Still005-RET1-299x384.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 408101,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg": {
+      "logical_id": "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg",
+      "da_path": "",
+      "alt": "An International Women’s Day Surprise",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_00_42_19.Still016_header.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 858446,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg": {
+      "logical_id": "e09742d6__SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg",
+      "da_path": "",
+      "alt": "SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2017/03/SKODA_MDZ_FINAL_VIDEO_OFFLINE-Copy-03.00_01_20_17.Still006_RET1.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 243801,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__spb_ng_sl_006_low_402790cb_e2c5b804.jpg": {
+      "logical_id": "b5e98464__spb_ng_sl_006_low_402790cb_e2c5b804.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/spb_ng_sl_006_low_402790cb_e2c5b804-1440x1080.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/spb_ng_sl_006_low_402790cb_e2c5b804.jpg",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/spb_ng_sl_006_low_402790cb_e2c5b804.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/spb_ng_sl_006_low_402790cb_e2c5b804-1440x1080.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1026054,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__DSC_3046_70e9404e.jpg": {
+      "logical_id": "971e68b7__DSC_3046_70e9404e.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/DSC_3046_70e9404e-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/DSC_3046_70e9404e.jpg",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/DSC_3046_70e9404e.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/DSC_3046_70e9404e-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5704241,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Navrh-bez-nazvu-62_c6d8c1e5.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-62_c6d8c1e5.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-62_c6d8c1e5-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-62_c6d8c1e5.png",
+      "dam_page_path": "en/lifestyle/people/an-international-womens-day-surprise",
+      "page_refs": [
+        "en/lifestyle/people/an-international-womens-day-surprise"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-62_c6d8c1e5.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-62_c6d8c1e5-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4069697,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }
